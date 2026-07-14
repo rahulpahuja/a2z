@@ -13,6 +13,7 @@ import OrderTrackingPage from './pages/OrderTrackingPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
 import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
@@ -73,6 +74,7 @@ export default function App() {
         {ADMIN_ROUTES.map(({ path, Component }) => (
           <Route key={path} path={path} element={adminElement(Component)} />
         ))}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <FloatingContactButtons />
     </EntryGate>

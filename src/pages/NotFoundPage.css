@@ -1,0 +1,36 @@
+@keyframes notfound-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-18px) rotate(4deg); }
+}
+
+@keyframes notfound-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(24px, -16px) scale(1.08); }
+}
+
+@keyframes notfound-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.notfound-float {
+  animation: notfound-float 5s ease-in-out infinite;
+}
+
+.notfound-float-delayed {
+  animation: notfound-float 6s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.notfound-blob {
+  animation: notfound-drift 9s ease-in-out infinite;
+}
+
+.notfound-digits {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-tertiary), var(--color-primary));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: notfound-shimmer 4s linear infinite;
+}
