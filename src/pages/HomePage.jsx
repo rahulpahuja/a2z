@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -50,39 +50,35 @@ const productsRow1 = PRODUCTS.slice(0, 4);
 const productsRow2 = PRODUCTS.slice(4, 8);
 
 function VideoCard({ src, title, description }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const handleMouseEnter = (e) => {
-    e.currentTarget.querySelector('video')?.play().catch(() => {});
-    setIsPlaying(true);
-  };
-  const handleMouseLeave = (e) => {
-    const video = e.currentTarget.querySelector('video');
-    if (video) {
-      video.pause();
-      video.currentTime = 0;
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      // Force play call on mount or URL change
+      videoRef.current.play().catch(() => {});
     }
-    setIsPlaying(false);
-  };
+  }, [src]);
 
   return (
     <div
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 aspect-[9/16] cursor-pointer"
     >
       <video
+        ref={videoRef}
         src={src}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         muted
         loop
         playsInline
+        autoPlay
+        preload="auto"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6">
         <h3 className="font-title-sm text-title-sm text-white playfair mb-1">{title}</h3>
         <p className="font-body-sm text-body-sm text-white/80 line-clamp-2">{description}</p>
-        <div className={`mt-3 flex items-center gap-1.5 text-primary-container font-label-caps text-[11px] uppercase tracking-wider transition-all duration-300 ${isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+        <div className="mt-3 flex items-center gap-1.5 text-primary-container font-label-caps text-[11px] uppercase tracking-wider">
           <span className="material-symbols-outlined text-[16px] animate-pulse">play_circle</span>
-          <span>Playing lookbook</span>
+          <span>Lookbook active</span>
         </div>
       </div>
     </div>
