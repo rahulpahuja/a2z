@@ -27,7 +27,12 @@ export default function FloatingContactButtons() {
       showToast('WhatsApp number is not configured yet.');
       return;
     }
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank', 'noopener,noreferrer');
+    // Format the number to ensure it has only digits and prepends '91' for 10-digit Indian numbers
+    let cleanNumber = WHATSAPP_NUMBER.replace(/\D/g, '');
+    if (cleanNumber.length === 10) {
+      cleanNumber = '91' + cleanNumber;
+    }
+    window.open(`https://wa.me/${cleanNumber}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleInstagram = () => {
