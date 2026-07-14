@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Tracking - A2Z Collection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#2e1506",
+                        "tertiary-fixed": "#ffdbca",
+                        "primary-container": "#ff69b4",
+                        "surface-tint": "#ac2471",
+                        "surface-container-high": "#eae7e7",
+                        "surface-bright": "#fcf9f8",
+                        "on-primary-fixed": "#3d0024",
+                        "surface": "#fcf9f8",
+                        "on-tertiary-container": "#4d2f1e",
+                        "on-primary-container": "#6e0044",
+                        "primary-fixed-dim": "#ffb0d0",
+                        "on-tertiary-fixed-variant": "#603f2d",
+                        "tertiary": "#7a5642",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f6f3f2",
+                        "secondary-fixed": "#c9eea9",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#ffd8e6",
+                        "on-error-container": "#93000a",
+                        "secondary": "#486730",
+                        "on-secondary-fixed": "#0b2000",
+                        "on-background": "#1c1b1b",
+                        "inverse-surface": "#313030",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-surface-variant": "#564149",
+                        "tertiary-fixed-dim": "#ecbda4",
+                        "outline-variant": "#dcbfc9",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb0d0",
+                        "tertiary-container": "#c1967f",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#c9eea9",
+                        "primary": "#ac2471",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e5e2e1",
+                        "on-secondary-container": "#4e6d36",
+                        "outline": "#897179",
+                        "on-secondary-fixed-variant": "#314e1b",
+                        "on-primary-fixed-variant": "#8c0058",
+                        "secondary-fixed-dim": "#aed18f",
+                        "background": "#fcf9f8",
+                        "surface-dim": "#dcd9d9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "container-max": "1280px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Montserrat"],
+                        "body-lg": ["Montserrat"],
+                        "headline-md": ["Playfair Display"],
+                        "price-display": ["Montserrat"],
+                        "display-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "title-sm": ["Montserrat"],
+                        "label-caps": ["Montserrat"],
+                        "headline-md-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "price-display": ["20px", { "lineHeight": "1", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "title-sm": ["18px", { "lineHeight": "1.5", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .progress-line {
+            transition: width 1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg antialiased">
+<!-- TopNavBar -->
+<nav aria-label="Top Navigation" class="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0">
+<div class="flex items-center gap-6">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim" href="#">A2Z Collection</a>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80" href="#">New Arrivals</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80" href="#">Sarees</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80" href="#">Lehengas</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80" href="#">Kurtis</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80" href="#">Sale</a>
+</div>
+</div>
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
+<button aria-label="shopping_cart" class="hover:opacity-80 transition-opacity duration-200 focus:scale-95 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button aria-label="person" class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 focus:scale-95 transition-transform">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col gap-12">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-surface-dim pb-8">
+<div>
+<h1 class="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md text-on-background mb-2">Track Order</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Order #<span class="font-semibold text-primary">ORD-2024-0012345</span></p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-lg border border-tertiary text-tertiary font-label-caps text-label-caps uppercase hover:bg-surface-container transition-colors focus:ring-2 focus:ring-primary-container">
+                    Download Receipt
+                </button>
+<button class="px-6 py-3 rounded-lg bg-primary-container text-on-primary font-label-caps text-label-caps uppercase hover:opacity-90 transition-opacity focus:ring-2 focus:ring-primary-container">
+                    Contact Support
+                </button>
+</div>
+</header>
+<!-- Tracking Visualizer -->
+<section class="bg-surface-container-low rounded-xl p-8 border border-surface-dim border-opacity-30 relative overflow-hidden">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider mb-1">Estimated Delivery</p>
+<p class="font-title-sm text-title-sm text-on-background">July 18, 2024 by 9:00 PM</p>
+</div>
+<div class="flex items-center gap-4">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Carrier: <span class="font-semibold text-on-background">Delhivery</span></p>
+<div class="h-4 w-px bg-surface-dim"></div>
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tracking:</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-background">DEL-987654321</span>
+<button aria-label="Copy Tracking ID" class="text-tertiary hover:text-primary transition-colors" onclick="navigator.clipboard.writeText('DEL-987654321')">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="relative pt-12 pb-8">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-surface-dim -translate-y-1/2 rounded-full overflow-hidden">
+<div class="h-full bg-secondary progress-line" style="width: 66%;"></div>
+</div>
+<div class="flex justify-between relative z-10">
+<!-- Step 1: Confirmed -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-sm">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-background">Confirmed</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">July 13</p>
+</div>
+</div>
+<!-- Step 2: Shipped -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-sm">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+</div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-background">Shipped</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">July 14</p>
+</div>
+</div>
+<!-- Step 3: In Transit -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface border-2 border-secondary flex items-center justify-center text-secondary shadow-md ring-4 ring-secondary-container">
+<span class="material-symbols-outlined text-sm">route</span>
+</div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-background font-bold">In Transit</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Current</p>
+</div>
+</div>
+<!-- Step 4: Delivered -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-dim flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">home</span>
+</div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-surface-variant">Delivered</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-0">Pending</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Order Details Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Items Section -->
+<section class="lg:col-span-2 flex flex-col gap-6">
+<h2 class="font-title-sm text-title-sm text-on-background border-b border-surface-dim pb-4">Order Items</h2>
+<div class="flex flex-col gap-4">
+<!-- Item 1 -->
+<div class="flex gap-6 p-4 rounded-xl border border-tertiary border-opacity-30 bg-surface items-center">
+<div class="w-24 h-32 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A detailed high-fashion editorial photograph of a traditional Indian Banarasi silk saree in deep crimson red with intricate gold zari work. The garment is draped elegantly, bathed in soft, natural sunlight creating a luxurious sheen. The setting is minimal and contemporary, reflecting a high-end global boutique aesthetic. The mood is sophisticated and culturally rich, appealing to a premium fashion audience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5cIJmGtuiP7dkSBJD7kySAYpf1y38QJp-R6GRuRrOK3fM0eSWqLcWQSBV-37wvjFeVP4eOAFnSyggvFuS2qmMnCbqBNOkSGtYl3xUI8-RMSvqWsiBqoAuktOH47Ffl3bIdGrkSFfGfWW7LZhjAMi0rSe9r3YEh8peLnJIOnLVgH1X2OVkhFpRFDwFb1m20ltkjSOcImeyRZ9vyvl0bQ7S6UU8rwvIWSdX69Z785bRMJZ99HQ9GBuktA"/>
+</div>
+<div class="flex-grow flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-sm text-title-sm text-on-background">Crimson Banarasi Saree</h3>
+<p class="font-price-display text-price-display text-on-background">₹14,500</p>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Material: Pure Silk | Color: Red</p>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-tertiary bg-opacity-20 rounded-full font-label-caps text-label-caps text-on-tertiary-container">Qty: 1</span>
+<span class="px-3 py-1 bg-secondary-container rounded-full font-label-caps text-label-caps text-on-secondary-container">Handcrafted</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex gap-6 p-4 rounded-xl border border-tertiary border-opacity-30 bg-surface items-center">
+<div class="w-24 h-32 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A close-up studio shot of a meticulously embroidered sage green Anarkali suit. The fabric features delicate floral motifs in subtle silver thread, illuminated by soft, diffused lighting to highlight the craftsmanship. The composition is clean and minimalist, allowing the rich texture of the traditional Indian garment to stand out against a pristine white background. The overall aesthetic communicates understated elegance and luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBinUgoRKHOQsKXyR_Of4M1Y_CTP6ETSRCRSueh0TeeowDA78P9_rNSzCyue8X9wgiYww-1Zh-1I4DX4i9mfC_ZtBK6zAYk9cFsRhd_uFQJGpvqDLdS_BWBKMm4l1YF3oIpeJyHrfoSE6dvBKvjQICmIqwaS-V2xMqEE0wn4ko8Z3ye1gKDsOfP43Ek5uMJbCwWX5r9lPc4pwuN6wsKLYkA1MCDmO1mocSx2ChqMTNIuyaz49cRbDY8Sw"/>
+</div>
+<div class="flex-grow flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-sm text-title-sm text-on-background">Sage Green Embroidered Anarkali</h3>
+<p class="font-price-display text-price-display text-on-background">₹8,900</p>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Size: M | Color: Sage</p>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-tertiary bg-opacity-20 rounded-full font-label-caps text-label-caps text-on-tertiary-container">Qty: 1</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Shipping Details Sidebar -->
+<section class="flex flex-col gap-6">
+<div class="bg-surface-container-low rounded-xl p-6 border border-surface-dim border-opacity-30">
+<h2 class="font-title-sm text-title-sm text-on-background border-b border-surface-dim pb-4 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">location_on</span>
+                        Shipping Address
+                    </h2>
+<div class="font-body-sm text-body-sm text-on-surface-variant space-y-1">
+<p class="font-semibold text-on-background text-base">Priya Sharma</p>
+<p>123 Heritage Lane, Apt 4B</p>
+<p>Bandra West, Mumbai 400050</p>
+<p>Maharashtra, India</p>
+<p class="pt-2">Phone: +91 98765 43210</p>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-6 border border-surface-dim border-opacity-30">
+<h2 class="font-title-sm text-title-sm text-on-background border-b border-surface-dim pb-4 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+                        Order Summary
+                    </h2>
+<div class="font-body-sm text-body-sm text-on-surface-variant space-y-3">
+<div class="flex justify-between">
+<span>Subtotal (2 items)</span>
+<span>₹23,400</span>
+</div>
+<div class="flex justify-between">
+<span>Shipping</span>
+<span class="text-secondary font-semibold">Free</span>
+</div>
+<div class="flex justify-between border-t border-surface-dim pt-3 font-semibold text-on-background text-base">
+<span>Total</span>
+<span>₹23,400</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto flat no shadows border-t-0 mt-12">
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim mb-4">A2Z Collection</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bridging traditional Indian craftsmanship with high-end contemporary fashion.</p>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block" href="#">About Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block" href="#">Shipping Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block" href="#">Returns</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block" href="#">Contact Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block" href="#">Privacy Policy</a>
+</div>
+<div class="flex items-end justify-start md:justify-end">
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 A2Z Collection. All rights reserved.</p>
+</div>
+</footer>
+</body></html>

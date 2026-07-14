@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aapki Pooja - Shopping Cart</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#f0eded",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#314e1b",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#ffd8e6",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#4e6d36",
+                        "on-tertiary-fixed-variant": "#603f2d",
+                        "surface-container-low": "#f6f3f2",
+                        "secondary-fixed": "#c9eea9",
+                        "tertiary-container": "#c1967f",
+                        "inverse-on-surface": "#f3f0ef",
+                        "surface-variant": "#e5e2e1",
+                        "surface-tint": "#ac2471",
+                        "secondary": "#486730",
+                        "on-tertiary-fixed": "#2e1506",
+                        "on-primary-fixed-variant": "#8c0058",
+                        "on-primary-fixed": "#3d0024",
+                        "background": "#fcf9f8",
+                        "tertiary": "#7a5642",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-fixed": "#ffdbca",
+                        "secondary-fixed-dim": "#aed18f",
+                        "secondary-container": "#c9eea9",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#6e0044",
+                        "on-primary": "#ffffff",
+                        "primary": "#ac2471",
+                        "outline-variant": "#dcbfc9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#ffb0d0",
+                        "inverse-surface": "#313030",
+                        "outline": "#897179",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-primary": "#ffb0d0",
+                        "tertiary-fixed-dim": "#ecbda4",
+                        "surface": "#fcf9f8",
+                        "on-tertiary-container": "#4d2f1e",
+                        "on-secondary-fixed": "#0b2000",
+                        "surface-dim": "#dcd9d9",
+                        "primary-container": "#ff69b4",
+                        "on-surface-variant": "#564149"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Montserrat"],
+                        "label-caps": ["Montserrat"],
+                        "headline-md-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-sm": ["Montserrat"],
+                        "price-display": ["Montserrat"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["18px", {"lineHeight": "1.5", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "price-display": ["20px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 transition-all duration-300">
+<div class="flex items-center gap-6">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                A2Z Collection
+            </div>
+<nav class="hidden md:flex gap-6 font-body-lg text-body-lg">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" href="#">New Arrivals</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" href="#">Sarees</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" href="#">Lehengas</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" href="#">Kurtis</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" href="#">Sale</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button aria-label="Shopping Cart" class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:opacity-80 transition-opacity duration-200 scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="shopping_cart" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+</button>
+<button aria-label="Person" class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-[64px]">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-gutter">Your Cart</h1>
+<div class="flex flex-col lg:flex-row gap-[64px]">
+<!-- Cart Items (70%) -->
+<div class="lg:w-7/10 w-full flex flex-col gap-gutter">
+<!-- Item 1 -->
+<div class="flex gap-gutter items-center border-b border-surface-variant pb-gutter">
+<div class="w-[120px] h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
+<img class="w-full h-full object-cover" data-alt="A detailed flat lay of a beautifully crafted hot pink Banarasi silk saree with intricate gold zari work. The fabric is smooth and luxurious, catching soft studio lighting. The setting is clean and modern, emphasizing the rich color and traditional craftsmanship against a bright, minimalist white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAKDODA2O1gDif1qzeDuzlO9Fwbpq7TOq8J0BQlTtGtuPUORfbee0EsMeYcVdvGzFr4HX3MXEAvdEAcwlHWGU7PeixEL9lpPgJupFv75qdDz4ItRyWdPccpi5j8BhIovrktKbc7tNrwHKBzAAD9EBNZnamSxi4aPjQoioI5e2OEww77_1IqxGOvUGDFAHaYe9psCmf0q8GNgUMIMzh28BhgWQbAPk2lozRjwvpBhMLq05l8u2_X9AbDg"/>
+</div>
+<div class="flex-grow flex flex-col gap-[8px]">
+<h3 class="font-title-sm text-title-sm text-on-surface">Banarasi Silk Saree</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Color: Hot Pink</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Size: Free Size</p>
+<div class="flex items-center gap-4 mt-[8px]">
+<button class="text-secondary hover:text-primary transition-colors font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="edit">edit</span> Edit
+                            </button>
+<button class="text-error hover:text-on-error-container transition-colors font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="delete">delete</span> Remove
+                            </button>
+</div>
+</div>
+<div class="flex flex-col items-end gap-4">
+<span class="font-price-display text-price-display text-on-surface">₹1,250</span>
+<div class="flex items-center border border-outline rounded-DEFAULT overflow-hidden">
+<button aria-label="Decrease quantity" class="px-3 py-1 bg-surface-container hover:bg-surface-variant transition-colors text-on-surface">-</button>
+<input aria-label="Quantity" class="w-[40px] text-center bg-transparent border-none text-on-surface font-body-sm text-body-sm focus:ring-0 p-1" type="number" value="1"/>
+<button aria-label="Increase quantity" class="px-3 py-1 bg-surface-container hover:bg-surface-variant transition-colors text-on-surface">+</button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex gap-gutter items-center border-b border-surface-variant pb-gutter">
+<div class="w-[120px] h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
+<img class="w-full h-full object-cover" data-alt="A detailed flat lay of a dusty rose Anarkali suit set, featuring delicate embroidery around the neckline. The fabric is light and flowing, softly lit in a premium studio setup. The background is pristine white, allowing the subtle pastel tones and fine detailing of the garment to stand out elegantly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfTBTof-j-Kzio1HODDmp1M3WGuw3WNQWyesYPEN6C1L2Dnrc312Ulo-0PsTbjodElu54yup3L7z9972S3fW6X4ivTsBEE10XzqSexvRr63EwY1h-yoA2KLEYeXOwqN_O4QfS_6IfY7hR1Wjcj0bX15jdT6MVldKd6aUv--j-SSWmM37C9DynompKGI31hnbpcVpEhIROzM7hKnmshbZJe3U01w8hfNcVbTSqOlBoz-yAPB2wXUcGhZg"/>
+</div>
+<div class="flex-grow flex flex-col gap-[8px]">
+<h3 class="font-title-sm text-title-sm text-on-surface">Embroidered Anarkali Set</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Color: Dusty Rose</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Size: L</p>
+<div class="flex items-center gap-4 mt-[8px]">
+<button class="text-secondary hover:text-primary transition-colors font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="edit">edit</span> Edit
+                            </button>
+<button class="text-error hover:text-on-error-container transition-colors font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="delete">delete</span> Remove
+                            </button>
+</div>
+</div>
+<div class="flex flex-col items-end gap-4">
+<span class="font-price-display text-price-display text-on-surface">₹1,100</span>
+<div class="flex items-center border border-outline rounded-DEFAULT overflow-hidden">
+<button aria-label="Decrease quantity" class="px-3 py-1 bg-surface-container hover:bg-surface-variant transition-colors text-on-surface">-</button>
+<input aria-label="Quantity" class="w-[40px] text-center bg-transparent border-none text-on-surface font-body-sm text-body-sm focus:ring-0 p-1" type="number" value="1"/>
+<button aria-label="Increase quantity" class="px-3 py-1 bg-surface-container hover:bg-surface-variant transition-colors text-on-surface">+</button>
+</div>
+</div>
+</div>
+<a class="text-secondary hover:text-primary transition-colors font-title-sm text-title-sm flex items-center gap-2 mt-4 self-start" href="#">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span> Continue Shopping
+                </a>
+</div>
+<!-- Order Summary Sidebar (30%) -->
+<div class="lg:w-3/10 w-full">
+<div class="bg-surface-container-low border border-[rgba(220,174,150,0.3)] rounded-[16px] p-gutter sticky top-[100px] shadow-[0px_10px_30px_rgba(172,36,113,0.05)]">
+<h2 class="font-headline-md-mobile md:font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface mb-gutter">Order Summary</h2>
+<div class="flex flex-col gap-[16px] mb-gutter border-b border-surface-variant pb-gutter">
+<div class="flex justify-between items-center">
+<span class="font-body-lg text-body-lg text-on-surface-variant">Subtotal</span>
+<span class="font-price-display text-price-display text-on-surface">₹2,350</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-lg text-body-lg text-on-surface-variant">Shipping</span>
+<span class="font-body-lg text-body-lg text-secondary font-semibold">Free</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-lg text-body-lg text-on-surface-variant">Tax (18%)</span>
+<span class="font-price-display text-price-display text-on-surface text-[16px]">₹423</span>
+</div>
+</div>
+<div class="flex justify-between items-center mb-gutter">
+<span class="font-title-sm text-title-sm text-on-surface">Grand Total</span>
+<span class="font-price-display text-price-display text-primary text-[24px]">₹2,773</span>
+</div>
+<div class="mb-gutter flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant" for="coupon">Coupon Code</label>
+<div class="flex gap-2">
+<input class="flex-grow bg-transparent border-b border-outline focus:border-primary focus:ring-0 font-body-sm text-body-sm text-on-surface py-2 transition-colors" id="coupon" placeholder="Enter code" type="text"/>
+<button class="text-secondary hover:text-primary transition-colors font-label-caps text-label-caps border border-secondary hover:border-primary px-4 py-2 rounded-DEFAULT uppercase">Apply</button>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-surface-tint text-on-primary font-label-caps text-label-caps py-4 rounded-[12px] uppercase tracking-widest transition-colors shadow-sm">
+                        Proceed to Checkout
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto mt-auto">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+                A2Z Collection
+            </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 A2Z Collection. All rights reserved.</p>
+</div>
+<div class="col-span-1 md:col-span-3 flex flex-wrap gap-8 justify-end">
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm" href="#">About Us</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm" href="#">Shipping Policy</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm" href="#">Returns</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm" href="#">Contact Us</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm" href="#">Privacy Policy</a>
+</div>
+</footer>
+</body></html>
