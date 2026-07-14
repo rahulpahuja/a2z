@@ -46,7 +46,48 @@ const categories = [
   },
 ];
 
-const products = PRODUCTS.slice(0, 4);
+const productsRow1 = PRODUCTS.slice(0, 4);
+const productsRow2 = PRODUCTS.slice(4, 8);
+
+function VideoCard({ src, title, description }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const handleMouseEnter = (e) => {
+    e.currentTarget.querySelector('video')?.play().catch(() => {});
+    setIsPlaying(true);
+  };
+  const handleMouseLeave = (e) => {
+    const video = e.currentTarget.querySelector('video');
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+    setIsPlaying(false);
+  };
+
+  return (
+    <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 aspect-[9/16] cursor-pointer"
+    >
+      <video
+        src={src}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        muted
+        loop
+        playsInline
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6">
+        <h3 className="font-title-sm text-title-sm text-white playfair mb-1">{title}</h3>
+        <p className="font-body-sm text-body-sm text-white/80 line-clamp-2">{description}</p>
+        <div className={`mt-3 flex items-center gap-1.5 text-primary-container font-label-caps text-[11px] uppercase tracking-wider transition-all duration-300 ${isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+          <span className="material-symbols-outlined text-[16px] animate-pulse">play_circle</span>
+          <span>Playing lookbook</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [favorites, setFavorites] = useState({});
@@ -136,11 +177,11 @@ export default function HomePage() {
         {/* Trending Now */}
         <TrendingProducts />
 
-        {/* Featured Products */}
-        <section className="py-16 px-margin-desktop max-w-container-max mx-auto">
+        {/* Featured Products Row 1 */}
+        <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
           <h2 className="font-headline-md text-headline-md playfair text-center mb-12">Featured Elegance</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-            {products.map((product) => {
+            {productsRow1.map((product) => {
               const isFavorited = !!favorites[product.id];
               return (
               <Link
@@ -186,6 +227,89 @@ export default function HomePage() {
               </Link>
               );
             })}
+          </div>
+        </section>
+
+        {/* Featured Products Row 2 */}
+        <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
+          <h2 className="font-headline-md text-headline-md playfair text-center mb-12">Heritage Masterpieces</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+            {productsRow2.map((product) => {
+              const isFavorited = !!favorites[product.id];
+              return (
+              <Link
+                key={product.id}
+                to={`/product/${product.id}`}
+                className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+              >
+                <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+                  <img
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
+                    data-alt={product.alt}
+                    src={product.image}
+                  />
+                  {product.badge && (
+                    <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
+                  )}
+                  <button
+                    type="button"
+                    aria-label={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      toggleFavorite(product.id);
+                    }}
+                    className={`absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                  >
+                    <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
+                      {isFavorited ? 'favorite' : 'favorite_border'}
+                    </span>
+                  </button>
+                </div>
+                <div className="p-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name}</h3>
+                    {product.rating && (
+                      <div className="flex items-center text-secondary gap-1 shrink-0">
+                        <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
+                        <span className="font-body-sm text-body-sm">{product.rating}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
+                </div>
+              </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Video Grid Lookbook Section */}
+        <section className="py-16 px-margin-desktop max-w-container-max mx-auto">
+          <h2 className="font-headline-md text-headline-md playfair text-center mb-4">Stories in Motion</h2>
+          <p className="font-body-lg text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-12">
+            Hover over our lookbooks to witness traditional craftsmanship come to life.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+            <VideoCard
+              src="https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-traditional-indian-clothing-40227-large.mp4"
+              title="Vibrant Rani Pink Lookbook"
+              description="Witness the detailed gold zari embroidery and elegant drape in our modern heritage collection."
+            />
+            <VideoCard
+              src="https://assets.mixkit.co/videos/preview/mixkit-traditional-indian-jewellery-closeup-40226-large.mp4"
+              title="Artisanal Jewelry Adornments"
+              description="A beautiful showcase of traditional handcrafted Kundan necklace sets."
+            />
+            <VideoCard
+              src="https://assets.mixkit.co/videos/preview/mixkit-fabric-draped-over-a-surface-41485-large.mp4"
+              title="Pure Silk Weaving & Drape"
+              description="Highlighting the soft, flowing textures and rich weaving of heritage block prints."
+            />
+            <VideoCard
+              src="https://assets.mixkit.co/videos/preview/mixkit-woman-posing-with-traditional-indian-make-up-40232-large.mp4"
+              title="Bridal Craft Editorial"
+              description="Capturing the modern elegant look designed for the contemporary South Asian wedding."
+            />
           </div>
         </section>
       </main>
