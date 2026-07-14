@@ -8,7 +8,7 @@ const ENV_VARS = [
   { name: 'VITE_FIREBASE_DATABASE_URL', desc: 'Realtime Database URL, e.g. https://your-project-default-rtdb.firebaseio.com.' },
   {
     name: 'VITE_ADMIN_EMAILS',
-    desc: 'Comma-separated Google account emails allowed into /dashboard and /admin after signing in. Leave blank to lock everyone out.',
+    desc: 'Comma-separated Google account emails allowed into /dashboard and /super after signing in. Leave blank to lock everyone out.',
   },
   {
     name: 'VITE_ADMIN_PHONES',
@@ -17,11 +17,11 @@ const ENV_VARS = [
 ];
 
 const ADMIN_SECTIONS = [
-  { to: '/admin', label: 'Dashboard', desc: 'Sales KPIs and recent-orders overview.' },
-  { to: '/admin/categories', label: 'Categories', desc: 'Create and remove product categories.' },
-  { to: '/admin/products', label: 'Products', desc: 'Manage the product catalog stored in Realtime Database.' },
-  { to: '/admin/bill-template', label: 'Bill Template', desc: 'Configure the layout used for generated order receipts.' },
-  { to: '/admin/settings', label: 'Store Settings', desc: 'Store name, address, phone, and GST number.' },
+  { to: '/super', label: 'Dashboard', desc: 'Sales KPIs and recent-orders overview.' },
+  { to: '/super/categories', label: 'Categories', desc: 'Create and remove product categories.' },
+  { to: '/super/products', label: 'Products', desc: 'Manage the product catalog stored in Realtime Database.' },
+  { to: '/super/bill-template', label: 'Bill Template', desc: 'Configure the layout used for generated order receipts.' },
+  { to: '/super/settings', label: 'Store Settings', desc: 'Store name, address, phone, and GST number.' },
 ];
 
 const RTDB_PATHS = [
@@ -103,7 +103,7 @@ export default function AdminDocsPage() {
             </p>
             <p>
               Two things are gated behind this: the legacy <Code>/dashboard</Code> page and the full admin panel
-              under <Code>/admin</Code> (this page included).
+              under <Code>/super</Code> (this page included).
             </p>
           </Section>
 
@@ -117,7 +117,7 @@ export default function AdminDocsPage() {
               <li>
                 If the signed-in account's email or phone number is in <Code>VITE_ADMIN_EMAILS</Code> /{' '}
                 <Code>VITE_ADMIN_PHONES</Code>, an <strong>Admin Dashboard</strong> link appears in the account menu
-                and <Code>/admin</Code>, <Code>/dashboard</Code> become reachable.
+                and <Code>/super</Code>, <Code>/dashboard</Code> become reachable.
               </li>
               <li>Otherwise, visiting an admin route shows an "Access Denied" screen with a sign-out button.</li>
             </ol>
@@ -289,7 +289,7 @@ export default function AdminDocsPage() {
                 domains under Authentication settings.
               </li>
               <li>
-                <strong>Signed in but "Access Denied" on /admin:</strong> the account's email/phone isn't in{' '}
+                <strong>Signed in but "Access Denied" on /super:</strong> the account's email/phone isn't in{' '}
                 <Code>VITE_ADMIN_EMAILS</Code>/<Code>VITE_ADMIN_PHONES</Code> — add it and restart the dev server
                 (Vite only reads <Code>.env</Code> at startup).
               </li>

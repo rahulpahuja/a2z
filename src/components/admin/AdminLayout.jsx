@@ -2,12 +2,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 const NAV_ITEMS = [
-  { to: '/admin', label: 'Dashboard', icon: 'dashboard', exact: true },
-  { to: '/admin/categories', label: 'Categories', icon: 'category' },
-  { to: '/admin/products', label: 'Products', icon: 'inventory_2' },
-  { to: '/admin/bill-template', label: 'Bill Template', icon: 'receipt_long' },
-  { to: '/admin/settings', label: 'Store Settings', icon: 'storefront' },
-  { to: '/admin/docs', label: 'Docs', icon: 'menu_book' },
+  { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
+  { to: '/super/categories', label: 'Categories', icon: 'category' },
+  { to: '/super/products', label: 'Products', icon: 'inventory_2' },
+  { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
+  { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
+  { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
 ];
 
 export default function AdminLayout({ children }) {

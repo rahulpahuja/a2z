@@ -32,15 +32,15 @@ function StatCard({ label, value, sublabel }) {
 }
 
 const QUICK_ACTIONS = [
-  { to: '/admin/categories', icon: 'category', label: 'Add a Category', desc: 'Products need a category before they can be added.' },
-  { to: '/admin/products', icon: 'add_box', label: 'Add a Product', desc: 'Title, price, HSN code, colors, sizes & stock.' },
-  { to: '/admin/products', icon: 'label', label: 'Print a Barcode', desc: 'Generate & print a product label from the product list.' },
-  { to: '/admin/bill-template', icon: 'receipt_long', label: 'Customize Bill Template', desc: 'Page size, layout, and where each column prints.' },
-  { to: '/admin/settings', icon: 'storefront', label: 'Store Settings', desc: 'Store name, address, phone, GST number.' },
+  { to: '/super/categories', icon: 'category', label: 'Add a Category', desc: 'Products need a category before they can be added.' },
+  { to: '/super/products', icon: 'add_box', label: 'Add a Product', desc: 'Title, price, HSN code, colors, sizes & stock.' },
+  { to: '/super/products', icon: 'label', label: 'Print a Barcode', desc: 'Generate & print a product label from the product list.' },
+  { to: '/super/bill-template', icon: 'receipt_long', label: 'Customize Bill Template', desc: 'Page size, layout, and where each column prints.' },
+  { to: '/super/settings', icon: 'storefront', label: 'Store Settings', desc: 'Store name, address, phone, GST number.' },
   { to: '#order-lookup', icon: 'local_shipping', label: 'Look Up an Order', desc: 'Jump to the order status search below.' },
   { to: '#product-lookup', icon: 'query_stats', label: 'Look Up a Product', desc: 'Jump to the product sales search below.' },
   { to: '#sales-report', icon: 'leaderboard', label: 'Top & Bottom Sellers', desc: 'Jump to the top 10 / bottom 10 product report.' },
-  { to: '/admin/docs', icon: 'menu_book', label: 'Admin Docs', desc: 'Full guide to everything in this panel.' },
+  { to: '/super/docs', icon: 'menu_book', label: 'Admin Docs', desc: 'Full guide to everything in this panel.' },
 ];
 
 function QuickActions() {
