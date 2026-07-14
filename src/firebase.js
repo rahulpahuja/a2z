@@ -12,10 +12,18 @@ const firebaseConfig = {
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
-export const firebaseApp = initializeApp(firebaseConfig);
+// Feature flag: admin login (Firebase Auth) and the Realtime Database-backed
+// admin/product/order features are disabled until real credentials are set
+// in .env. The public storefront works fully without them. Re-enable by
+// filling in .env and restarting `npm run dev`.
+export const isFirebaseEnabled = Boolean(firebaseConfig.apiKey);
 
-export const auth = getAuth(firebaseApp);
-// Use the browser's language for reCAPTCHA / OTP SMS copy instead of a fixed locale.
-auth.useDeviceLanguage();
+export const firebaseApp = isFirebaseEnabled ? initializeApp(firebaseConfig) : null;
 
-export const db = getDatabase(firebaseApp);
+export const auth = isFirebaseEnabled ? getAuth(firebaseApp) : null;
+if (isFirebaseEnabled) {
+  // Use the browser's language for reCAPTCHA / OTP SMS copy instead of a fixed locale.
+  auth.useDeviceLanguage();
+}
+
+export const db = isFirebaseEnabled ? getDatabase(firebaseApp) : null;

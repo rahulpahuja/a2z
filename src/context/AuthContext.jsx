@@ -7,7 +7,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
-import { auth } from '../firebase.js';
+import { auth, isFirebaseEnabled } from '../firebase.js';
 
 const AuthContext = createContext(null);
 
@@ -28,13 +28,16 @@ function computeIsAdmin(user) {
   return (!!email && ADMIN_EMAILS.includes(email)) || (!!phone && ADMIN_PHONES.includes(phone));
 }
 
+const FIREBASE_DISABLED_MESSAGE = 'Sign-in is not configured yet. Add Firebase credentials to .env to enable it.';
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => auth.currentUser);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => auth?.currentUser ?? null);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
   const confirmationRef = useRef(null);
   const recaptchaRef = useRef(null);
 
   useEffect(() => {
+    if (!isFirebaseEnabled) return undefined;
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);
       setLoading(false);
@@ -43,6 +46,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!isFirebaseEnabled) throw new Error(FIREBASE_DISABLED_MESSAGE);
     await signInWithPopup(auth, new GoogleAuthProvider());
   };
 
@@ -54,6 +58,7 @@ export function AuthProvider({ children }) {
   };
 
   const sendOtp = async (phoneNumber, containerId) => {
+    if (!isFirebaseEnabled) throw new Error(FIREBASE_DISABLED_MESSAGE);
     const verifier = ensureRecaptcha(containerId);
     confirmationRef.current = await signInWithPhoneNumber(auth, phoneNumber, verifier);
   };
@@ -72,7 +77,7 @@ export function AuthProvider({ children }) {
     recaptchaRef.current = null;
   };
 
-  const signOutUser = () => signOut(auth);
+  const signOutUser = () => (isFirebaseEnabled ? signOut(auth) : Promise.resolve());
 
   const value = useMemo(
     () => ({
