@@ -51,16 +51,42 @@ const productsRow2 = PRODUCTS.slice(4, 8);
 
 function VideoCard({ src, title, description }) {
   const videoRef = useRef(null);
+  const [isPaused, setIsPaused] = useState(true);
 
   useEffect(() => {
-    if (videoRef.current) {
-      // Force play call on mount or URL change
-      videoRef.current.play().catch(() => {});
-    }
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlay = () => setIsPaused(false);
+    const handlePause = () => setIsPaused(true);
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+
+    // Force play call on mount or URL change
+    video.play()
+      .then(() => setIsPaused(false))
+      .catch(() => setIsPaused(true));
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
   }, [src]);
+
+  const handleTogglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  };
 
   return (
     <div
+      onClick={handleTogglePlay}
       className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 aspect-[9/16] cursor-pointer"
     >
       <video
@@ -77,8 +103,10 @@ function VideoCard({ src, title, description }) {
         <h3 className="font-title-sm text-title-sm text-white playfair mb-1">{title}</h3>
         <p className="font-body-sm text-body-sm text-white/80 line-clamp-2">{description}</p>
         <div className="mt-3 flex items-center gap-1.5 text-primary-container font-label-caps text-[11px] uppercase tracking-wider">
-          <span className="material-symbols-outlined text-[16px] animate-pulse">play_circle</span>
-          <span>Lookbook active</span>
+          <span className="material-symbols-outlined text-[16px] animate-pulse">
+            {isPaused ? 'play_arrow' : 'pause'}
+          </span>
+          <span>{isPaused ? 'Tap to play' : 'Playing Lookbook'}</span>
         </div>
       </div>
     </div>
