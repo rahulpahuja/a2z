@@ -139,7 +139,7 @@ export default function AdminProductsPage() {
               You need at least one category before you can add a product.
             </p>
             <Link
-              to="/admin/categories"
+              to="/super/categories"
               className="inline-block bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity"
             >
               Create a Category

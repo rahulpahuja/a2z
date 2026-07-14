@@ -38,12 +38,12 @@ const ROUTES = [
 ]
 
 const ADMIN_ROUTES = [
-  { path: '/admin', Component: AdminDashboardPage },
-  { path: '/admin/categories', Component: AdminCategoriesPage },
-  { path: '/admin/products', Component: AdminProductsPage },
-  { path: '/admin/bill-template', Component: AdminBillTemplatePage },
-  { path: '/admin/settings', Component: AdminSettingsPage },
-  { path: '/admin/docs', Component: AdminDocsPage },
+  { path: '/super', Component: AdminDashboardPage },
+  { path: '/super/categories', Component: AdminCategoriesPage },
+  { path: '/super/products', Component: AdminProductsPage },
+  { path: '/super/bill-template', Component: AdminBillTemplatePage },
+  { path: '/super/settings', Component: AdminSettingsPage },
+  { path: '/super/docs', Component: AdminDocsPage },
 ]
 
 function adminElement(Component) {

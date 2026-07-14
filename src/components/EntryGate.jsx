@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 const STORAGE_KEY = 'a2z_entry_gate';
 const UNGATED_PATHS = ['/privacy-policy'];
-const UNGATED_PREFIXES = ['/admin', '/dashboard'];
+const UNGATED_PREFIXES = ['/super', '/dashboard'];
 
 function readStoredGate() {
   try {
