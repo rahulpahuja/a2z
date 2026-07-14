@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -89,10 +89,51 @@ function VideoCard({ src, title, description }) {
   );
 }
 
+const HERO_SLIDES = [
+  {
+    title: 'The Festive Collection',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAi6nWtvfZJXTG4DXcMDNhCLHVdrK6vyhvOVsebD_THMBWJzQBfmneLZtM8xa-cso39eALmfuN97ofl_1zApobtY6XemRxNe0cn-ShqNrIELjxrqksxYN5AdUJfpVNEGY6ZAP3CuK2b3-yuMMDnyWaarDjLJ3fFdIexM86YhJhVkM0Zjl_jecY40qOjOJreeJbF4iGNPe6cLlalbtGW9bCoEAlb2oaqPbd4muawrbsZyh7Lo9aqaS6muQ',
+    alt: 'A stunning, high-fashion editorial photograph of a South Asian woman wearing an intricately embroidered, vibrant Hot Pink and gold Saree.',
+    cta: 'Shop Now',
+    link: '/products',
+  },
+  {
+    title: 'Royal Bridal Heritage',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNqdxRl1N12xTjFuuqWlyyCZgDvVutGsMr_a2j2bIXK0l146oUipKrvoOi5TBuB-oGD_oXFhaMMvWX9ToRlYXqI_Yw50wGMn8B9Y2-NdTGVDySAn6Wkx3EPanZT-At_TWaCri_mqVSqRgy0xZJE-4rSaxqy9oqS2YhRKJ2KBntvIIFonkdK-fXfAEZ6tjvyIyO7wowXYuLs9Y6HrCaXkMNAMUrM90UB503ceap0i_zhLZSlILzrhQCrw',
+    alt: 'A heavily embroidered Bridal Lehenga in deep maroon and gold, presented in a high-end editorial style that highlights the intricate craftsmanship.',
+    cta: 'Explore Bridal',
+    link: '/products?category=Lehenga',
+  },
+  {
+    title: 'Contemporary Luxury Coords',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGeEDQ9fsFvJl2R1sCNwJ9yZ_csqnlzRo6BUr-0UQv_sIOvILMQLjnhDLoRtWkmd5Jh07aZ2yk1IOYUhs5mO0elyMGF2KVzF_knqXKbyTJS4LoDLvCnoaYyQbcVvaQ44eJmurH6w5WK3_UODg-AhFU5z_Jlyp2hy6NeSPwLj7K14xOD1bikOxybrQ-W5rXfvCqNEFtr7nWPxMmVGAtP8eiOxRuR64VuGO7HOu8VOvU8Z3ognrTGtPAxw',
+    alt: 'A contemporary Coord set featuring a tunic and wide-leg trousers in a soft Dusty Rose with subtle, traditional block-print patterns.',
+    cta: 'Discover Coords',
+    link: '/products?category=Coord Set',
+  }
+];
+
 export default function HomePage() {
   const [favorites, setFavorites] = useState({});
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
   };
 
   return (
@@ -129,29 +170,59 @@ export default function HomePage() {
       <main>
         {/* Hero Carousel */}
         <section className="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">
-          <div className="w-full h-full flex">
-            <div className="w-full flex-shrink-0 relative">
-              <div
-                className="bg-cover bg-center bg-no-repeat w-full h-full"
-                data-alt="A stunning, high-fashion editorial photograph of a South Asian woman wearing an intricately embroidered, vibrant Hot Pink and gold Saree. She is posed elegantly against a minimalist, warm off-white studio background. The lighting is soft but dramatic, highlighting the rich textures of the traditional Indian fabric and the subtle Dusty Rose and Sage Green accents in her jewelry. The overall aesthetic is premium, modern corporate luxury mixed with vibrant elegance, utilizing generous whitespace."
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAi6nWtvfZJXTG4DXcMDNhCLHVdrK6vyhvOVsebD_THMBWJzQBfmneLZtM8xa-cso39eALmfuN97ofl_1zApobtY6XemRxNe0cn-ShqNrIELjxrqksxYN5AdUJfpVNEGY6ZAP3CuK2b3-yuMMDnyWaarDjLJ3fFdIexM86YhJhVkM0Zjl_jecY40qOjOJreeJbF4iGNPe6cLlalbtGW9bCoEAlb2oaqPbd4muawrbsZyh7Lo9aqaS6muQ')" }}
-              ></div>
-              <div className="absolute inset-0 bg-black/20"></div>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                <h1 className="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">The Festive Collection</h1>
-                <Link
-                  to="/products"
-                  className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
-                >
-                  Shop Now
-                </Link>
+          <div
+            className="w-full h-full flex transition-transform duration-700 ease-out"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {HERO_SLIDES.map((slide, index) => (
+              <div key={index} className="w-full h-full flex-shrink-0 relative">
+                <div
+                  className="bg-cover bg-center bg-no-repeat w-full h-full"
+                  data-alt={slide.alt}
+                  style={{ backgroundImage: `url('${slide.image}')` }}
+                ></div>
+                <div className="absolute inset-0 bg-black/25"></div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                  <h1 className="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">
+                    {slide.title}
+                  </h1>
+                  <Link
+                    to={slide.link}
+                    className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
+                  >
+                    {slide.cta}
+                  </Link>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-          <button className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors">
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {HERO_SLIDES.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  currentSlide === index ? 'bg-primary w-6' : 'bg-white/50 hover:bg-white'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handlePrevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
+            aria-label="Previous Slide"
+          >
             <span className="material-symbols-outlined">chevron_left</span>
           </button>
-          <button className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors">
+          <button
+            onClick={handleNextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
+            aria-label="Next Slide"
+          >
             <span className="material-symbols-outlined">chevron_right</span>
           </button>
         </section>
