@@ -49,7 +49,7 @@ const categories = [
 const productsRow1 = PRODUCTS.slice(0, 4);
 const productsRow2 = PRODUCTS.slice(4, 8);
 
-function VideoCard({ src, title, description }) {
+function VideoCard({ src, poster, title, description }) {
   const videoRef = useRef(null);
   const [isPaused, setIsPaused] = useState(true);
 
@@ -92,6 +92,7 @@ function VideoCard({ src, title, description }) {
       <video
         ref={videoRef}
         src={src}
+        poster={poster}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         muted
         loop
@@ -386,22 +387,26 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             <VideoCard
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+              src="https://vjs.zencdn.net/v/oceans.mp4"
+              poster={productsRow1[0]?.image}
               title="Vibrant Rani Pink Lookbook"
               description="Witness the detailed gold zari embroidery and elegant drape in our modern heritage collection."
             />
             <VideoCard
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+              src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+              poster={productsRow1[1]?.image}
               title="Artisanal Jewelry Adornments"
               description="A beautiful showcase of traditional handcrafted Kundan necklace sets."
             />
             <VideoCard
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+              src="https://www.w3schools.com/html/mov_bbb.mp4"
+              poster={productsRow1[2]?.image}
               title="Pure Silk Weaving & Drape"
               description="Highlighting the soft, flowing textures and rich weaving of heritage block prints."
             />
             <VideoCard
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+              src="https://www.w3schools.com/html/movie.mp4"
+              poster={productsRow1[3]?.image}
               title="Bridal Craft Editorial"
               description="Capturing the modern elegant look designed for the contemporary South Asian wedding."
             />
