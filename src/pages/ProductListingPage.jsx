@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { PRODUCTS as CATALOG } from '../data/products.js';
 import './ProductListingPage.css';
@@ -99,9 +100,7 @@ export default function ProductListingPage() {
             <span className="material-symbols-outlined">search</span>
           </button>
           <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
-          <button aria-label="Account" className="hover:opacity-80 transition-opacity duration-200">
-            <span className="material-symbols-outlined">person</span>
-          </button>
+          <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
 

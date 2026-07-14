@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { PRODUCTS } from '../data/products.js';
 
@@ -193,9 +194,7 @@ export default function StorefrontPage() {
           {/* Trailing Icons */}
           <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
             <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
-            <button aria-label="person" className="hover:opacity-80 transition-opacity duration-200 hidden md:block">
-              <span className="material-symbols-outlined" data-icon="person">person</span>
-            </button>
+            <ProfileButton className="hover:opacity-80 transition-opacity duration-200 hidden md:block" />
           </div>
         </div>
       </nav>

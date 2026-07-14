@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState } from 'react';
+import { recordPurchase } from '../services/productStats.js';
 
 const CartContext = createContext(null);
 
@@ -13,6 +14,7 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [shippingDetails, setShippingDetails] = useState(null);
   const [lastOrder, setLastOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
 
   const addItem = (product, quantity = 1) => {
     setItems((prev) => {
@@ -48,9 +50,12 @@ export function CartProvider({ children }) {
       paymentMethod,
       placedAt,
       shippingDetails,
+      status: 'Processing',
     };
     setLastOrder(order);
+    setOrders((prev) => [order, ...prev]);
     setItems([]);
+    items.forEach((line) => recordPurchase(line.productId || line.id, line.quantity));
     return order;
   };
 
@@ -69,9 +74,10 @@ export function CartProvider({ children }) {
       shippingDetails,
       setShippingDetails,
       lastOrder,
+      orders,
       placeOrder,
     }),
-    [items, shippingDetails, lastOrder]
+    [items, shippingDetails, lastOrder, orders]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

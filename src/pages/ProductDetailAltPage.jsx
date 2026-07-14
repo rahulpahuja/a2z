@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart } from '../context/CartContext.jsx';
+import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import './ProductDetailAltPage.css';
 
 const PRODUCT = { id: 'crop-shirt-side-dori', title: 'Crop Shirt with Side Dori', price: 360 };
@@ -101,6 +103,12 @@ export default function ProductDetailAltPage() {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const [viewCount, setViewCount] = useState(null);
+
+  useEffect(() => {
+    recordView(PRODUCT.id);
+    return subscribeToProductStats(PRODUCT.id, (stats) => setViewCount(stats.views));
+  }, []);
 
   const toggleAccordion = (key) => {
     setOpenSection((prev) => (prev === key ? null : key));
@@ -108,6 +116,7 @@ export default function ProductDetailAltPage() {
 
   const cartLine = () => ({
     id: `${PRODUCT.id}-${selectedColor}-${selectedSize}`,
+    productId: PRODUCT.id,
     title: PRODUCT.title,
     color: selectedColor,
     size: selectedSize,
@@ -141,9 +150,7 @@ export default function ProductDetailAltPage() {
           {/* Trailing Icons */}
           <div className="flex gap-4 items-center text-primary dark:text-primary-fixed-dim">
             <CartIconButton className="hover:opacity-80 transition-opacity duration-200" iconClassName="material-symbols-outlined text-2xl" />
-            <button className="hover:opacity-80 transition-opacity duration-200">
-              <span className="material-symbols-outlined text-2xl">person</span>
-            </button>
+            <ProfileButton className="hover:opacity-80 transition-opacity duration-200" iconClassName="material-symbols-outlined text-2xl" />
           </div>
         </div>
       </header>
@@ -220,6 +227,12 @@ export default function ProductDetailAltPage() {
                 <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
               </div>
               <span className="font-body-sm text-body-sm text-on-surface-variant underline cursor-pointer">42 Reviews</span>
+              {viewCount !== null && viewCount > 0 && (
+                <span className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">visibility</span>
+                  {viewCount.toLocaleString('en-IN')} views
+                </span>
+              )}
             </div>
             {/* Price */}
             <div className="flex items-end gap-4 mb-8">

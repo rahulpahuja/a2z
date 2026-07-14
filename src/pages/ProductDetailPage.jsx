@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { PRODUCTS, getProductById } from '../data/products.js';
+import { recordView, subscribeToProductStats } from '../services/productStats.js';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -59,7 +61,7 @@ function TopNav() {
       </div>
       <div className="flex items-center gap-unit text-primary dark:text-primary-fixed-dim">
         <CartIconButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
-        <button className="p-2 hover:opacity-80 transition-opacity duration-200"><span className="material-symbols-outlined">person</span></button>
+        <ProfileButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
       </div>
     </nav>
   );
@@ -92,6 +94,14 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
+  const [viewCount, setViewCount] = useState(null);
+
+  useEffect(() => {
+    if (!product) return undefined;
+    recordView(product.id);
+    const unsubscribe = subscribeToProductStats(product.id, (stats) => setViewCount(stats.views));
+    return unsubscribe;
+  }, [product?.id]);
 
   if (!product) {
     return <ProductNotFound />;
@@ -106,6 +116,7 @@ export default function ProductDetailPage() {
 
   const cartLine = () => ({
     id: `${product.id}-${selectedColor}-${selectedSize}`,
+    productId: product.id,
     title: product.name,
     color: selectedColor,
     size: selectedSize,
@@ -176,6 +187,12 @@ export default function ProductDetailPage() {
                 <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
               )}
             </div>
+            {viewCount !== null && viewCount > 0 && (
+              <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
+                <span className="material-symbols-outlined text-[16px]">visibility</span>
+                <span className="font-body-sm text-body-sm">{viewCount.toLocaleString('en-IN')} people viewed this</span>
+              </div>
+            )}
             {product.rating && (
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex text-tertiary-container text-sm">

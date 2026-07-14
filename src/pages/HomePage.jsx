@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
+import TrendingProducts from '../components/TrendingProducts.jsx';
 import { PRODUCTS } from '../data/products.js';
 import { formatCurrency } from '../context/CartContext.jsx';
 import './HomePage.css';
@@ -78,9 +80,7 @@ export default function HomePage() {
             <button className="hover:opacity-80 transition-opacity duration-200 hidden md:block">
               <span className="material-symbols-outlined">search</span>
             </button>
-            <button className="hover:opacity-80 transition-opacity duration-200">
-              <span className="material-symbols-outlined">person</span>
-            </button>
+            <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
             <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
           </div>
         </div>
@@ -132,6 +132,9 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* Trending Now */}
+        <TrendingProducts />
 
         {/* Featured Products */}
         <section className="py-16 px-margin-desktop max-w-container-max mx-auto">
