@@ -1,9 +1,14 @@
 import { onValue, push, ref, remove, serverTimestamp } from 'firebase/database';
-import { db } from '../firebase.js';
+import { db, isFirebaseEnabled } from '../firebase.js';
 
 const ROOT = 'categories';
+const DISABLED_ERROR = new Error('Realtime Database is not configured yet. Add Firebase credentials to .env.');
 
 export function subscribeToCategories(callback) {
+  if (!isFirebaseEnabled) {
+    callback([], DISABLED_ERROR);
+    return () => {};
+  }
   return onValue(
     ref(db, ROOT),
     (snapshot) => {
@@ -19,6 +24,7 @@ export function subscribeToCategories(callback) {
 }
 
 export function createCategory({ title }) {
+  if (!isFirebaseEnabled) return Promise.reject(DISABLED_ERROR);
   return push(ref(db, ROOT), {
     title: title.trim(),
     createdAt: serverTimestamp(),
@@ -26,5 +32,6 @@ export function createCategory({ title }) {
 }
 
 export function deleteCategory(id) {
+  if (!isFirebaseEnabled) return Promise.reject(DISABLED_ERROR);
   return remove(ref(db, `${ROOT}/${id}`));
 }
