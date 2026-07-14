@@ -2,7 +2,6 @@ import { get, onValue, ref, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 
 const PATH = 'settings/billTemplate';
-const DISABLED_ERROR = new Error('Realtime Database is not configured yet. Add Firebase credentials to .env.');
 
 export const DEFAULT_COLUMNS = [
   { key: 'item', label: 'Item', visible: true },
@@ -18,10 +17,32 @@ export const DEFAULT_BILL_TEMPLATE = {
   footerNote: 'Thank you for shopping with us.',
 };
 
+function getLocalBillTemplate() {
+  try {
+    const data = localStorage.getItem(PATH);
+    return data ? JSON.parse(data) : DEFAULT_BILL_TEMPLATE;
+  } catch {
+    return DEFAULT_BILL_TEMPLATE;
+  }
+}
+
+function setLocalBillTemplate(data) {
+  localStorage.setItem(PATH, JSON.stringify(data));
+}
+
+const templateListeners = new Set();
+function notifyTemplateListeners() {
+  const data = getLocalBillTemplate();
+  templateListeners.forEach((listener) => listener(data, null));
+}
+
 export function subscribeToBillTemplate(callback) {
   if (!isFirebaseEnabled) {
-    callback(DEFAULT_BILL_TEMPLATE, DISABLED_ERROR);
-    return () => {};
+    templateListeners.add(callback);
+    callback(getLocalBillTemplate(), null);
+    return () => {
+      templateListeners.delete(callback);
+    };
   }
   return onValue(
     ref(db, PATH),
@@ -33,12 +54,16 @@ export function subscribeToBillTemplate(callback) {
 }
 
 export function saveBillTemplate(data) {
-  if (!isFirebaseEnabled) return Promise.reject(DISABLED_ERROR);
+  if (!isFirebaseEnabled) {
+    setLocalBillTemplate(data);
+    notifyTemplateListeners();
+    return Promise.resolve();
+  }
   return set(ref(db, PATH), { ...data, updatedAt: Date.now() });
 }
 
 export async function getBillTemplateOnce() {
-  if (!isFirebaseEnabled) return DEFAULT_BILL_TEMPLATE;
+  if (!isFirebaseEnabled) return getLocalBillTemplate();
   const snapshot = await get(ref(db, PATH));
   return snapshot.exists() ? { ...DEFAULT_BILL_TEMPLATE, ...snapshot.val() } : DEFAULT_BILL_TEMPLATE;
 }

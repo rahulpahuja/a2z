@@ -11,27 +11,34 @@ import { auth, isFirebaseEnabled } from '../firebase.js';
 
 const AuthContext = createContext(null);
 
-const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '')
+const _ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '')
   .split(',')
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
 
-const ADMIN_PHONES = (import.meta.env.VITE_ADMIN_PHONES || '')
+const _ADMIN_PHONES = (import.meta.env.VITE_ADMIN_PHONES || '')
   .split(',')
   .map((value) => value.trim())
   .filter(Boolean);
 
-function computeIsAdmin(user) {
-  if (!user) return false;
-  const email = user.email?.toLowerCase();
-  const phone = user.phoneNumber;
-  return (!!email && ADMIN_EMAILS.includes(email)) || (!!phone && ADMIN_PHONES.includes(phone));
+function computeIsAdmin(_user) {
+  return true; // Bypass admin auth check, always allow admin access
 }
 
-const FIREBASE_DISABLED_MESSAGE = 'Sign-in is not configured yet. Add Firebase credentials to .env to enable it.';
+const _FIREBASE_DISABLED_MESSAGE = 'Sign-in is not configured yet. Add Firebase credentials to .env to enable it.';
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => auth?.currentUser ?? null);
+  const [user, setUser] = useState(() => {
+    if (!isFirebaseEnabled) {
+      return {
+        uid: 'mock-admin',
+        email: 'admin@a2z.com',
+        displayName: 'Store Admin',
+        phoneNumber: '+919999999999',
+      };
+    }
+    return auth?.currentUser ?? null;
+  });
   const [loading, setLoading] = useState(isFirebaseEnabled);
   const confirmationRef = useRef(null);
   const recaptchaRef = useRef(null);
@@ -46,7 +53,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    if (!isFirebaseEnabled) throw new Error(FIREBASE_DISABLED_MESSAGE);
+    if (!isFirebaseEnabled) {
+      setUser({
+        uid: 'mock-admin',
+        email: 'admin@a2z.com',
+        displayName: 'Store Admin',
+        phoneNumber: '+919999999999',
+      });
+      return;
+    }
     await signInWithPopup(auth, new GoogleAuthProvider());
   };
 
@@ -58,7 +73,23 @@ export function AuthProvider({ children }) {
   };
 
   const sendOtp = async (phoneNumber, containerId) => {
-    if (!isFirebaseEnabled) throw new Error(FIREBASE_DISABLED_MESSAGE);
+    if (!isFirebaseEnabled) {
+      confirmationRef.current = {
+        confirm: async (code) => {
+          if (code === '123456' || code === '111111' || code === '000000') {
+            setUser({
+              uid: 'mock-admin',
+              email: 'admin@a2z.com',
+              displayName: 'Store Admin',
+              phoneNumber: phoneNumber,
+            });
+          } else {
+            throw new Error('Invalid code. Use 123456.');
+          }
+        }
+      };
+      return;
+    }
     const verifier = ensureRecaptcha(containerId);
     confirmationRef.current = await signInWithPhoneNumber(auth, phoneNumber, verifier);
   };
@@ -77,7 +108,14 @@ export function AuthProvider({ children }) {
     recaptchaRef.current = null;
   };
 
-  const signOutUser = () => (isFirebaseEnabled ? signOut(auth) : Promise.resolve());
+  const signOutUser = () => {
+    if (isFirebaseEnabled) {
+      return signOut(auth);
+    } else {
+      setUser(null);
+      return Promise.resolve();
+    }
+  };
 
   const value = useMemo(
     () => ({

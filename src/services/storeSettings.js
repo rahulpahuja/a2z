@@ -2,7 +2,6 @@ import { get, onValue, ref, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 
 const PATH = 'settings/store';
-const DISABLED_ERROR = new Error('Realtime Database is not configured yet. Add Firebase credentials to .env.');
 
 export const DEFAULT_STORE_SETTINGS = {
   storeName: '',
@@ -12,10 +11,32 @@ export const DEFAULT_STORE_SETTINGS = {
   gstNumber: '',
 };
 
+function getLocalStoreSettings() {
+  try {
+    const data = localStorage.getItem(PATH);
+    return data ? JSON.parse(data) : DEFAULT_STORE_SETTINGS;
+  } catch {
+    return DEFAULT_STORE_SETTINGS;
+  }
+}
+
+function setLocalStoreSettings(data) {
+  localStorage.setItem(PATH, JSON.stringify(data));
+}
+
+const settingsListeners = new Set();
+function notifySettingsListeners() {
+  const data = getLocalStoreSettings();
+  settingsListeners.forEach((listener) => listener(data, null));
+}
+
 export function subscribeToStoreSettings(callback) {
   if (!isFirebaseEnabled) {
-    callback(DEFAULT_STORE_SETTINGS, DISABLED_ERROR);
-    return () => {};
+    settingsListeners.add(callback);
+    callback(getLocalStoreSettings(), null);
+    return () => {
+      settingsListeners.delete(callback);
+    };
   }
   return onValue(
     ref(db, PATH),
@@ -27,12 +48,16 @@ export function subscribeToStoreSettings(callback) {
 }
 
 export function saveStoreSettings(data) {
-  if (!isFirebaseEnabled) return Promise.reject(DISABLED_ERROR);
+  if (!isFirebaseEnabled) {
+    setLocalStoreSettings(data);
+    notifySettingsListeners();
+    return Promise.resolve();
+  }
   return set(ref(db, PATH), { ...data, updatedAt: Date.now() });
 }
 
 export async function getStoreSettingsOnce() {
-  if (!isFirebaseEnabled) return DEFAULT_STORE_SETTINGS;
+  if (!isFirebaseEnabled) return getLocalStoreSettings();
   const snapshot = await get(ref(db, PATH));
   return snapshot.exists() ? { ...DEFAULT_STORE_SETTINGS, ...snapshot.val() } : DEFAULT_STORE_SETTINGS;
 }
