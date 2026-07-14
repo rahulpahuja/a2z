@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 
 const NAV_LINKS = [
@@ -109,14 +110,7 @@ export default function CartPage() {
         </div>
         <div className="flex items-center gap-4">
           <CartIconButton className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:opacity-80 transition-opacity duration-200 scale-95 transition-transform" />
-          <button
-            aria-label="Person"
-            className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
-          >
-            <span className="material-symbols-outlined" data-icon="person">
-              person
-            </span>
-          </button>
+          <ProfileButton className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
       {/* Main Content */}

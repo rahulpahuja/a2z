@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 import { generateReceiptPdf } from '../utils/generateReceipt.js';
 import './OrderTrackingPage.css';
 
@@ -57,6 +60,19 @@ const FOOTER_COLUMN_1 = ['About Us', 'Shipping Policy', 'Returns'];
 
 export default function OrderTrackingPage() {
   const { lastOrder } = useCart();
+  const { showToast } = useToast();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadReceipt = async () => {
+    setDownloading(true);
+    try {
+      await generateReceiptPdf(lastOrder);
+    } catch (err) {
+      showToast(err.message || 'Could not generate the receipt.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (!lastOrder) {
     return (
@@ -111,12 +127,7 @@ export default function OrderTrackingPage() {
         </div>
         <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
           <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
-          <button
-            aria-label="person"
-            className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 focus:scale-95 transition-transform"
-          >
-            <span className="material-symbols-outlined">person</span>
-          </button>
+          <ProfileButton className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 focus:scale-95 transition-transform" />
         </div>
       </nav>
 
@@ -134,10 +145,11 @@ export default function OrderTrackingPage() {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => generateReceiptPdf(lastOrder)}
-              className="px-6 py-3 rounded-lg border border-tertiary text-tertiary font-label-caps text-label-caps uppercase hover:bg-surface-container transition-colors focus:ring-2 focus:ring-primary-container"
+              onClick={handleDownloadReceipt}
+              disabled={downloading}
+              className="px-6 py-3 rounded-lg border border-tertiary text-tertiary font-label-caps text-label-caps uppercase hover:bg-surface-container transition-colors focus:ring-2 focus:ring-primary-container disabled:opacity-50"
             >
-              Download Receipt
+              {downloading ? 'Preparing…' : 'Download Receipt'}
             </button>
             <button className="px-6 py-3 rounded-lg bg-primary-container text-on-primary font-label-caps text-label-caps uppercase hover:opacity-90 transition-opacity focus:ring-2 focus:ring-primary-container">
               Contact Support

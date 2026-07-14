@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 const STORAGE_KEY = 'a2z_entry_gate';
 const UNGATED_PATHS = ['/privacy-policy'];
+const UNGATED_PREFIXES = ['/admin', '/dashboard'];
 
 function readStoredGate() {
   try {
@@ -20,7 +21,11 @@ export default function EntryGate({ children }) {
   const [policyChecked, setPolicyChecked] = useState(false);
   const [touched, setTouched] = useState(false);
 
-  if (accepted || UNGATED_PATHS.includes(location.pathname)) {
+  if (
+    accepted ||
+    UNGATED_PATHS.includes(location.pathname) ||
+    UNGATED_PREFIXES.some((prefix) => location.pathname.startsWith(prefix))
+  ) {
     return children;
   }
 
