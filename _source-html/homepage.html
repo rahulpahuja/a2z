@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aapki Pooja</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#f0eded",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#314e1b",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#ffd8e6",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#4e6d36",
+                        "on-tertiary-fixed-variant": "#603f2d",
+                        "surface-container-low": "#f6f3f2",
+                        "secondary-fixed": "#c9eea9",
+                        "tertiary-container": "#c1967f",
+                        "inverse-on-surface": "#f3f0ef",
+                        "surface-variant": "#e5e2e1",
+                        "surface-tint": "#ac2471",
+                        "secondary": "#486730",
+                        "on-tertiary-fixed": "#2e1506",
+                        "on-primary-fixed-variant": "#8c0058",
+                        "on-primary-fixed": "#3d0024",
+                        "background": "#fcf9f8",
+                        "tertiary": "#7a5642",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-fixed": "#ffdbca",
+                        "secondary-fixed-dim": "#aed18f",
+                        "secondary-container": "#c9eea9",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#6e0044",
+                        "on-primary": "#ffffff",
+                        "primary": "#ac2471",
+                        "outline-variant": "#dcbfc9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#ffb0d0",
+                        "inverse-surface": "#313030",
+                        "outline": "#897179",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1b1b",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-primary": "#ffb0d0",
+                        "tertiary-fixed-dim": "#ecbda4",
+                        "surface": "#fcf9f8",
+                        "on-tertiary-container": "#4d2f1e",
+                        "on-secondary-fixed": "#0b2000",
+                        "surface-dim": "#dcd9d9",
+                        "primary-container": "#ff69b4",
+                        "on-surface-variant": "#564149"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "image-radius": "16px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "editorial": "128px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Montserrat"],
+                        "label-caps": ["Montserrat"],
+                        "headline-md-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-sm": ["Montserrat"],
+                        "price-display": ["Montserrat"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["18px", {"lineHeight": "1.5", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "price-display": ["20px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #fcf9f8; color: #1c1b1b; }
+        .playfair { font-family: 'Playfair Display', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+        
+        .carousel-container { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .carousel-item { scroll-snap-align: start; }
+        
+        /* Hide scrollbar for clean look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Top Banner -->
+<div class="bg-primary text-on-primary py-2 text-center text-label-caps font-label-caps uppercase sticky top-0 z-[60]">
+        Enjoy Free Shipping on Orders Above ₹2,500
+    </div>
+<!-- TopNavBar from Shared Components -->
+<header class="bg-surface dark:bg-surface-container-highest docked full-width sticky top-[32px] z-50 flat no shadows border-b border-surface-variant">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto h-[80px]">
+<!-- Mobile Menu Icon -->
+<button class="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Brand Logo -->
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight">
+                A2Z Collection
+            </div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex space-x-8">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" href="#">New Arrivals</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" href="#">Sarees</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" href="#">Lehengas</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" href="#">Kurtis</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" href="#">Sale</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center space-x-6 text-primary dark:text-primary-fixed-dim">
+<button class="hover:opacity-80 transition-opacity duration-200 hidden md:block">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined">person</span>
+</button>
+<button class="hover:opacity-80 transition-opacity duration-200 relative">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="absolute -top-2 -right-2 bg-primary-container text-on-primary-container text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
+</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Carousel -->
+<section class="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">
+<div class="w-full h-full flex">
+<div class="w-full flex-shrink-0 relative">
+<div class="bg-cover bg-center bg-no-repeat w-full h-full" data-alt="A stunning, high-fashion editorial photograph of a South Asian woman wearing an intricately embroidered, vibrant Hot Pink and gold Saree. She is posed elegantly against a minimalist, warm off-white studio background. The lighting is soft but dramatic, highlighting the rich textures of the traditional Indian fabric and the subtle Dusty Rose and Sage Green accents in her jewelry. The overall aesthetic is premium, modern corporate luxury mixed with vibrant elegance, utilizing generous whitespace." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAi6nWtvfZJXTG4DXcMDNhCLHVdrK6vyhvOVsebD_THMBWJzQBfmneLZtM8xa-cso39eALmfuN97ofl_1zApobtY6XemRxNe0cn-ShqNrIELjxrqksxYN5AdUJfpVNEGY6ZAP3CuK2b3-yuMMDnyWaarDjLJ3fFdIexM86YhJhVkM0Zjl_jecY40qOjOJreeJbF4iGNPe6cLlalbtGW9bCoEAlb2oaqPbd4muawrbsZyh7Lo9aqaS6muQ')"></div>
+<div class="absolute inset-0 bg-black/20"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+<h1 class="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">The Festive Collection</h1>
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg">
+                            Shop Now
+                        </button>
+</div>
+</div>
+</div>
+<!-- Carousel Controls -->
+<button class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</section>
+<!-- Category Badges -->
+<section class="py-16 px-margin-desktop max-w-container-max mx-auto overflow-hidden">
+<div class="flex overflow-x-auto no-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A close-up product shot of a luxury, artisanal embroidered clutch bag featuring traditional Indian motifs in gold and Dusty Rose. Set against a clean, off-white minimalist background with soft studio lighting. High-end fashion aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBpGsco9fEpO7fBmbPz1f4WPhiBRCzE1yC-LdMULIAPj1oqU3lfvN3uW1OTgOf8XGauNEf60TzYn_zruaXYYiAgwTpgyEpBBz-YxV32Gsy6MVJkCMq_rm4WSfGj2nzOp9dRwph9cXMeePowLBWAap4YT_A6pwbcO3UMOxuKHGmvy4optk8AZwfbDwRkDs9o7nH-ZriqLJ3ThdC6_ih_QFrL67RmXwKJj9BmZ93cRqDs1gOr8QcixZxl3A')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">Bags</span>
+</div>
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A close-up detailed shot of a best-selling intricate Kundan jewelry set and a folded silk fabric piece in vibrant Hot Pink. Minimalist off-white background, soft premium lighting, high visual fidelity." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDZJtx7cbsa-MVraxiDeswXCPttghVa_D3gmW5QD6L0KoHo_5mstPG-bRrOnzuIjtQWCuRRgIVRAZ7Lplm6AdviVFeBo7ECADEqzUpw91leHwUvbHW0F5LYWKZaYY1pDI_JPxpiKM_7mSrht17kz4I5GOtsRNBihTMt9KFsvnBUal_U54a1gGtOcxHV4M9Wsvn-u7MgORQhHPoBh434MfS1geJJkUDbJWJEDXWoxyRQYurpemwEASfPcw')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">Best Sellers</span>
+</div>
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A stylish, contemporary Indian coordinated set (coord) in Sage Green with subtle artisanal embroidery, displayed neatly folded or on a minimalist hanger against a clean white background. High-end boutique feel." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAapWrtxtpoZLXabbFvrHMqCEyyeVbb5bDIedIyh6taScQaZzribPGI8x5SXkyLNP_iWKAAiGwNki6pETcpqW1eLoy6CmQ8_UtpymntauMUMZgxLX1_uFhEVVgKuukhyMs-_Oo4WSSiFukIHBtv2c6UWizNIVcIfAa8Tj3rYrhMv78JYEN7sVy4DCMq2P0LscHMifD-1z36kJvwxWPUgS_i3AztQzcz76HbzLuIrmY7pz6cDY-3b0vdVg')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">Coords</span>
+</div>
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A macro shot of a new arrival traditional textile, showcasing vibrant rich colors and intricate weaving patterns, possibly a close up of a Saree pallu. Soft, bright lighting, luxury gallery aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3VetkJP_eWca_ztCnWaCquOYSWAk1yXdxkzQ0BAGxUk727Cjv38MxiVDrH5fovo6z1AlfgEBNLLeghJ66uv6qTr7gbWPd9M_e9pRSycSYyZ2zhuki1e9sKWOT_S0Vqg6iKkp9FJsxUqLsyB5o2khg8c-4BudANR2IJdi2VAKLjdUp2xXKHjO7_PADSHX0bR_HkKfB8vZWCvekT_ieHLap-wHcI7S4jIOJkfrpAEK0QAWszA_nhAlhAg')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">New Arrivals</span>
+</div>
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A beautifully crafted contemporary Indian top or Kurti featuring delicate hand-block prints in Dusty Rose and off-white. Clean, minimalist presentation, high-quality fabric texture visible." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDo72VPkQwTN-Nmw1841eShwujwrb6VLMYl1AgelJas6CTCahaUnpIbtUUyhDIhebhC4yNc2fN2Ty-cI7wQh3QCgKJ-htnxBBQWO3-IeXU0srtoApCiVFxKri75kPFYnBa7BBywf8dWlL9G-OmTfjFUfBLaMPEbuWQBK7Eu_5ZjR1pmDJ81P6JojGEaK0AQqqX5fm_8Ik6x0b0FEDr7MXCFjzhpFlMwyxD7XYu_UtzFb_j0a9LtG1bnoQ')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">Tops</span>
+</div>
+<div class="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+<div class="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="A pair of tailored, elegant trousers with a subtle traditional Indian print trim, presented in a minimalist, modern aesthetic against a bright, clean background. Premium fashion product photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAByvkDLFfLo4dnG7PGvRQ0FIcxM8lm3ZuLwOJpAcO4v_lp9eNrz6TLunpW4W7xUeVbltFq4jSWl2jT4yfsMeW_hCaqZrIh1y9e6y31imuerfXQMNnr56c9-wquxsPfgGoVG4ocOyAYoNjvCIQSVHPXdzZUarn3Zvy8FKoHQKyBU9x4YqLVMuUJlMDiDkHXT1Mp7F3tHA3-T29yUWGbdqOkusu17LSvGbGq7Kv-k7Qc80cflf50nA-Kew')"></div>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface text-center">Trousers</span>
+</div>
+</div>
+</section>
+<!-- Featured Products -->
+<section class="py-16 px-margin-desktop max-w-container-max mx-auto">
+<h2 class="font-headline-md text-headline-md playfair text-center mb-12">Featured Elegance</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Product Card 1 -->
+<div class="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300">
+<div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius" data-alt="A high-fashion shot of a stunning Hot Pink Anarkali suit with intricate gold zari work, worn by a model in a minimalist, light-filled studio. The fabric flows elegantly. Dusty Rose and Sage Green accents are subtle in the setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeXdxr1HXyUaGxI1BheZvaYibRHPqljybd7kCAMM7iHtYcAQb0-hUKZbXGf_BRoS6xomEWfkwM7t8Ssua-iWPkABrLo_pE0qEE-dc4-8MrdDam2PmAR9-IlqZGrVyJklI4U7_dm1HZ-LD5Ei1mluOg5qg9-IE2MhnT_oIRw9_fpmcCxSekBCw6rOrMVhGRGXr28W68TYUJMbAMiYU_PWWJS3tumqwmu-DXwOJEF73FnznHic9oIgT2yw"/>
+<div class="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">New Arrival</div>
+<button class="absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h3 class="font-title-sm text-title-sm text-on-surface truncate pr-2">Regal Rani Pink Anarkali</h3>
+<div class="flex items-center text-secondary gap-1 shrink-0">
+<span class="material-symbols-outlined text-[16px] icon-fill">star</span>
+<span class="font-body-sm text-body-sm">4.9</span>
+</div>
+</div>
+<p class="font-price-display text-price-display text-primary">₹12,499</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300">
+<div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius" data-alt="A luxurious Sage Green silk Saree with a rich, woven border, elegantly draped on a mannequin or model. The lighting is soft and studio-quality, emphasizing the sheen of the silk against a minimalist off-white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv3KPgrZRODFQ6eUEl1H3ELdLp5WZYz2VdTDqekp1J2wft_BkcW15WNkdcRXqBwqZqyZWzctihcLP1u_M8zoYSMRgZ98AUg8tidkkBQmIP7SFTSK271F5tuHdYtHRCLtMdAdXuWwoxN10hap1INE0ra8-NUSdfIXzUZzqOOzU8bxQqAfzs9yLLdXD8Oq4LPIe1Zp7W9woX0uxiW8A9HogoQYQECeZQL_tm5F_uHiQIMYNhMInyUCtWSQ"/>
+<button class="absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h3 class="font-title-sm text-title-sm text-on-surface truncate pr-2">Emerald Silk Saree</h3>
+<div class="flex items-center text-secondary gap-1 shrink-0">
+<span class="material-symbols-outlined text-[16px] icon-fill">star</span>
+<span class="font-body-sm text-body-sm">4.7</span>
+</div>
+</div>
+<p class="font-price-display text-price-display text-primary">₹8,999</p>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300">
+<div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius" data-alt="A contemporary Coord set featuring a tunic and wide-leg trousers in a soft Dusty Rose with subtle, traditional block-print patterns. Photographed in a premium, clean, light-mode studio environment. High fashion, modern Indian luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGeEDQ9fsFvJl2R1sCNwJ9yZ_csqnlzRo6BUr-0UQv_sIOvILMQLjnhDLoRtWkmd5Jh07aZ2yk1IOYUhs5mO0elyMGF2KVzF_knqXKbyTJS4LoDLvCnoaYyQbcVvaQ44eJmurH6w5WK3_UODg-AhFU5z_Jlyp2hy6NeSPwLj7K14xOD1bikOxybrQ-W5rXfvCqNEFtr7nWPxMmVGAtP8eiOxRuR64VuGO7HOu8VOvU8Z3ognrTGtPAxw"/>
+<div class="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">New Arrival</div>
+<button class="absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h3 class="font-title-sm text-title-sm text-on-surface truncate pr-2">Dusty Rose Coord Set</h3>
+<div class="flex items-center text-secondary gap-1 shrink-0">
+<span class="material-symbols-outlined text-[16px] icon-fill">star</span>
+<span class="font-body-sm text-body-sm">4.8</span>
+</div>
+</div>
+<p class="font-price-display text-price-display text-primary">₹4,599</p>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300">
+<div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius" data-alt="A heavily embroidered Lehenga in deep maroon and gold, presented in a high-end editorial style. The lighting highlights the intricate craftsmanship. The background is a clean, modern off-white to let the vibrant garment stand out." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNqdxRl1N12xTjFuuqWlyyCZgDvVutGsMr_a2j2bIXK0l146oUipKrvoOi5TBuB-oGD_oXFhaMMvWX9ToRlYXqI_Yw50wGMn8B9Y2-NdTGVDySAn6Wkx3EPanZT-At_TWaCri_mqVSqRgy0xZJE-4rSaxqy9oqS2YhRKJ2KBntvIIFonkdK-fXfAEZ6tjvyIyO7wowXYuLs9Y6HrCaXkMNAMUrM90UB503ceap0i_zhLZSlILzrhQCrw"/>
+<button class="absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-4 flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h3 class="font-title-sm text-title-sm text-on-surface truncate pr-2">Bridal Heritage Lehenga</h3>
+<div class="flex items-center text-secondary gap-1 shrink-0">
+<span class="material-symbols-outlined text-[16px] icon-fill">star</span>
+<span class="font-body-sm text-body-sm">5.0</span>
+</div>
+</div>
+<p class="font-price-display text-price-display text-primary">₹35,000</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer from Shared Components -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom flat no shadows mt-16">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair">A2Z Collection</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant max-w-xs">Bridging traditional Indian craftsmanship with high-end contemporary fashion. Experience vibrant elegance.</p>
+</div>
+<div class="col-span-1 flex flex-col gap-4">
+<h4 class="font-title-sm text-title-sm text-on-surface">Explore</h4>
+<div class="flex flex-col gap-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">About Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Shipping Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Returns</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Contact Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Privacy Policy</a>
+</div>
+</div>
+<div class="col-span-1 md:col-span-2 flex flex-col gap-4">
+<h4 class="font-title-sm text-title-sm text-on-surface">Join Our Newsletter</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
+<div class="flex gap-2 mt-2">
+<input class="flex-1 bg-surface border-b border-tertiary-container focus:border-primary focus:ring-0 focus:outline-none py-2 px-0 font-body-sm text-body-sm bg-transparent transition-colors" placeholder="Enter your email" type="email"/>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-caps text-label-caps uppercase hover:bg-surface-tint transition-colors">Subscribe</button>
+</div>
+</div>
+</div>
+<div class="border-t border-surface-variant py-6 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 A2Z Collection. All rights reserved.</p>
+</div>
+</footer>
+</body></html>

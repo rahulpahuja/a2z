@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>A2Z Collection - Video Modal</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ffb0d0",
+                    "surface-dim": "#dcd9d9",
+                    "secondary-container": "#c9eea9",
+                    "on-primary-fixed-variant": "#8c0058",
+                    "inverse-primary": "#ffb0d0",
+                    "inverse-surface": "#313030",
+                    "surface-tint": "#ac2471",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e5e2e1",
+                    "inverse-on-surface": "#f3f0ef",
+                    "secondary-fixed": "#c9eea9",
+                    "surface-container-high": "#eae7e7",
+                    "on-error": "#ffffff",
+                    "outline": "#897179",
+                    "on-background": "#1c1b1b",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#603f2d",
+                    "on-surface-variant": "#564149",
+                    "surface-container-low": "#f6f3f2",
+                    "background": "#fcf9f8",
+                    "on-secondary-fixed": "#0b2000",
+                    "primary-fixed": "#ffd8e6",
+                    "on-secondary-container": "#4e6d36",
+                    "secondary": "#486730",
+                    "surface-container-highest": "#e5e2e1",
+                    "outline-variant": "#dcbfc9",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#4d2f1e",
+                    "tertiary-fixed-dim": "#ecbda4",
+                    "surface": "#fcf9f8",
+                    "secondary-fixed-dim": "#aed18f",
+                    "on-primary-container": "#6e0044",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#7a5642",
+                    "tertiary-fixed": "#ffdbca",
+                    "on-primary-fixed": "#3d0024",
+                    "primary": "#ac2471",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#ff69b4",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#2e1506",
+                    "on-secondary-fixed-variant": "#314e1b",
+                    "on-surface": "#1c1b1b",
+                    "surface-container": "#f0eded",
+                    "surface-bright": "#fcf9f8",
+                    "tertiary-container": "#c1967f",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "container-max": "1280px",
+                    "unit": "8px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "Montserrat"
+                    ],
+                    "price-display": [
+                            "Montserrat"
+                    ],
+                    "headline-md-mobile": [
+                            "Playfair Display"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "label-caps": [
+                            "Montserrat"
+                    ],
+                    "title-sm": [
+                            "Montserrat"
+                    ],
+                    "body-sm": [
+                            "Montserrat"
+                    ],
+                    "display-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "display-lg": [
+                            "Playfair Display"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "price-display": [
+                            "20px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "title-sm": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-lg overflow-hidden relative min-h-screen">
+<!-- Storefront Background (Blurred out by overlay) -->
+<div class="absolute inset-0 z-0">
+<div class="bg-cover bg-center w-full h-full opacity-30 grayscale-[20%]" data-alt="A vibrant, elegant storefront of an Indian fashion boutique. Racks of colorful saris and kurtis are visible in the background, out of focus. The lighting is bright and airy, reflecting a modern light-mode luxury aesthetic with touches of hot pink and dusty rose." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6qgYfjtimmwYyydsrOURYTpahNEr6OfI4hitvTIQv4EXuRukfDrf6QT96hxjANDMpfeW9Sb_9l6tTlYUQXEdvJCbW487pQQAPsjh7keCBm0El1ma9gEVmZvE1GEaPhJOAYrMEKeRjFgt_3QfJ9P_kVp8Am0T3xwXqNKc6o5jA_QNHfTVbJ_MRQiiYIkf828BRgrKwEki5emiLorSb3m5rbPzDdZbIR_YP0ENdAg7O3rj3lEKHN9n1Gw')"></div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 bg-black/70 modal-overlay z-40 flex items-center justify-center p-4 md:p-8">
+<!-- Navigation Controls (Outside Modal) -->
+<button class="absolute left-4 md:left-margin-desktop top-1/2 -translate-y-1/2 text-white hover:text-primary-container transition-colors p-2 rounded-full hover:bg-white/10 z-50 group">
+<span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">chevron_left</span>
+</button>
+<button class="absolute right-4 md:right-margin-desktop top-1/2 -translate-y-1/2 text-white hover:text-primary-container transition-colors p-2 rounded-full hover:bg-white/10 z-50 group">
+<span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">chevron_right</span>
+</button>
+<!-- Close Button -->
+<button class="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:text-primary-container transition-colors p-2 rounded-full hover:bg-white/10 z-50">
+<span class="material-symbols-outlined text-3xl">close</span>
+</button>
+<!-- Counter -->
+<div class="absolute bottom-4 right-4 md:bottom-8 md:right-margin-desktop text-white font-label-caps text-label-caps tracking-widest z-50">
+            2 / 6
+        </div>
+<!-- Main Modal Container -->
+<div class="w-full max-w-[1000px] h-[80vh] md:h-[600px] bg-surface rounded-[16px] overflow-hidden flex flex-col md:flex-row relative z-50 shadow-[0_10px_30px_rgba(172,36,113,0.15)] border border-tertiary/30">
+<!-- Left Side: Video Player (60%) -->
+<div class="w-full md:w-[60%] h-[50%] md:h-full relative bg-inverse-surface group">
+<!-- Video Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A high-fashion video still of a model wearing a vibrant, intricately embroidered lehenga. The fabric catches the light, showing off traditional Indian craftsmanship. The background is a minimalist studio setting with soft lighting to emphasize the garment's luxury details. The overall color palette leans towards rich jewel tones and dusty rose accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAsro22j_6rJuYnFYHyPkQZFHbgHwCBbu5P_rNqgnJXzH1BHkUSXGd7xqhYrt7gelPBxolC586tCR92l-PfbmBqr5hr1QDfBk_NsA9uN1Sk8Z9ei-maaaslAujq1JCzB2BkQ3Vz4z1elHdpCwzQXEpA2spIYgt0DWCybLMS-Fnedhz8rhtGNPVx22J8n2SoooHR7j8w4absh9jg88DpaWodzeSL9TYcVXOVybYKd9ofUWMk2zM-FT9qsg')"></div>
+<!-- Playback Controls Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-white/30 rounded-full mb-4 cursor-pointer relative">
+<div class="absolute top-0 left-0 h-full bg-primary-container rounded-full w-1/3"></div>
+<!-- Playhead -->
+<div class="absolute top-1/2 -translate-y-1/2 left-1/3 w-3 h-3 bg-white rounded-full shadow-md"></div>
+</div>
+<div class="flex justify-between items-center text-white">
+<div class="flex items-center gap-4">
+<button class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<button class="hover:text-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+<span class="font-body-sm text-body-sm opacity-80">0:15 / 0:45</span>
+</div>
+<button class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Center Play/Pause Indicator (Flashing state) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/40 rounded-full p-4 text-white opacity-0 transition-opacity">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<!-- Right Side: Product Details (40%) -->
+<div class="w-full md:w-[40%] h-[50%] md:h-full bg-surface p-8 flex flex-col overflow-y-auto">
+<div class="mb-4">
+<span class="inline-block bg-tertiary text-on-tertiary-container font-label-caps text-label-caps px-4 py-1.5 rounded-full mb-3 shadow-sm border border-tertiary/20">NEW ARRIVAL</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Midnight Bloom Saree</h2>
+<div class="font-price-display text-price-display text-primary mb-6">
+                    ₹ 18,500
+                </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-8 flex-grow">
+                    A masterpiece of traditional craftsmanship meeting contemporary design. This georgette saree features intricate zari work and subtle sequin detailing along the border, inspired by heritage motifs. Perfect for evening soirées and festive gatherings.
+                </p>
+<div class="space-y-4 mt-auto">
+<!-- Size Selector (Minimalist) -->
+<div>
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-2">SIZE</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center font-body-sm text-body-sm hover:border-primary transition-colors">S</button>
+<button class="w-10 h-10 rounded-full border-2 border-primary bg-primary/5 flex items-center justify-center font-body-sm text-body-sm text-primary font-bold">M</button>
+<button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center font-body-sm text-body-sm hover:border-primary transition-colors">L</button>
+</div>
+</div>
+<button class="w-full bg-[#ff69b4] hover:bg-[#ac2471] text-white font-label-caps text-label-caps py-4 rounded-[12px] transition-colors duration-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-4 shadow-sm hover:shadow-md">
+<span>View Product</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="w-full bg-transparent border border-tertiary/50 text-tertiary font-label-caps text-label-caps py-3 rounded-[12px] hover:bg-tertiary/5 transition-colors uppercase tracking-widest flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">favorite_border</span>
+<span>Save for Later</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
