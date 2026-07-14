@@ -291,22 +291,22 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             <VideoCard
-              src="https://assets.mixkit.co/videos/preview/mixkit-woman-wearing-traditional-indian-clothing-40227-large.mp4"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
               title="Vibrant Rani Pink Lookbook"
               description="Witness the detailed gold zari embroidery and elegant drape in our modern heritage collection."
             />
             <VideoCard
-              src="https://assets.mixkit.co/videos/preview/mixkit-traditional-indian-jewellery-closeup-40226-large.mp4"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
               title="Artisanal Jewelry Adornments"
               description="A beautiful showcase of traditional handcrafted Kundan necklace sets."
             />
             <VideoCard
-              src="https://assets.mixkit.co/videos/preview/mixkit-fabric-draped-over-a-surface-41485-large.mp4"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
               title="Pure Silk Weaving & Drape"
               description="Highlighting the soft, flowing textures and rich weaving of heritage block prints."
             />
             <VideoCard
-              src="https://assets.mixkit.co/videos/preview/mixkit-woman-posing-with-traditional-indian-make-up-40232-large.mp4"
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
               title="Bridal Craft Editorial"
               description="Capturing the modern elegant look designed for the contemporary South Asian wedding."
             />
