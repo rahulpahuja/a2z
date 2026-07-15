@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCart, formatCurrency } from '../../context/CartContext.jsx';
 import { PRODUCTS } from '../../data/products.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
+import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { subscribeToAdminProducts } from '../../services/adminProducts.js';
 import {
   getOrdersToday,
@@ -201,9 +202,18 @@ export default function AdminDashboardPage() {
             <div className="border border-outline-variant/30 rounded-lg p-4 flex flex-col gap-3">
               <div className="flex justify-between items-center flex-wrap gap-2">
                 <span className="font-title-sm text-title-sm text-on-surface">{orderResult.id}</span>
-                <span className={`px-3 py-1 rounded-full font-label-caps text-[10px] uppercase ${STATUS_STYLES[orderResult.status] ?? 'bg-surface-variant text-on-surface-variant'}`}>
-                  {orderResult.status}
-                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => generateReceiptPdf(orderResult)}
+                    className="px-3 py-1 rounded border border-primary text-primary font-label-caps text-[10px] uppercase hover:bg-surface-container transition-colors"
+                  >
+                    Download Invoice
+                  </button>
+                  <span className={`px-3 py-1 rounded-full font-label-caps text-[10px] uppercase ${STATUS_STYLES[orderResult.status] ?? 'bg-surface-variant text-on-surface-variant'}`}>
+                    {orderResult.status}
+                  </span>
+                </div>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 Placed {new Date(orderResult.placedAt).toLocaleString('en-IN')} ·{' '}
