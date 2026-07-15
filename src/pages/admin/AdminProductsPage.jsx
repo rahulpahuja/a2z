@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCategories } from '../../services/categories.js';
+import { subscribeToSubcategories } from '../../services/subcategories.js';
 import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
@@ -37,6 +38,7 @@ const EMPTY_FORM = {
   description: '',
   hashtagsInput: '',
   categoryId: '',
+  subcategoryId: '',
   price: '',
   hsnCode: '',
 };
@@ -44,6 +46,7 @@ const EMPTY_FORM = {
 export default function AdminProductsPage() {
   const { showToast } = useToast();
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -99,6 +102,7 @@ export default function AdminProductsPage() {
       title: product.title || product.name || '',
       description: product.description || '',
       categoryId: product.categoryId || '',
+      subcategoryId: product.subcategoryId || '',
       price: product.price || '',
       hsnCode: product.hsnCode || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
@@ -223,6 +227,7 @@ export default function AdminProductsPage() {
   useEffect(() => {
     setProductId(generateProductId());
     const unsubCategories = subscribeToCategories((rows) => setCategories(rows));
+    const unsubSubcategories = subscribeToSubcategories((rows) => setSubcategories(rows));
     const unsubProducts = subscribeToAdminProducts((rows, error) => {
       setProducts(rows);
       setLoadError(error);
@@ -230,11 +235,24 @@ export default function AdminProductsPage() {
     });
     return () => {
       unsubCategories();
+      unsubSubcategories();
       unsubProducts();
     };
   }, []);
 
-  const updateField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
+  const subcategoryOptions = useMemo(
+    () => subcategories.filter((s) => s.categoryId === form.categoryId),
+    [subcategories, form.categoryId]
+  );
+
+  const updateField = (field) => (event) => {
+    const value = event.target.value;
+    if (field === 'categoryId') {
+      setForm((prev) => ({ ...prev, categoryId: value, subcategoryId: '' }));
+      return;
+    }
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   const addColor = () => {
     const value = colorInput.trim();
@@ -307,6 +325,7 @@ export default function AdminProductsPage() {
     }
 
     const category = categories.find((c) => c.id === form.categoryId);
+    const subcategory = subcategories.find((s) => s.id === form.subcategoryId);
     setSaving(true);
     try {
       const uploadPromises = activeSlots.map(async (idx) => {
@@ -345,6 +364,8 @@ export default function AdminProductsPage() {
           .map((tag) => (tag.startsWith('#') ? tag : `#${tag}`)),
         categoryId: form.categoryId,
         categoryTitle: category?.title ?? '',
+        subcategoryId: form.subcategoryId || null,
+        subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
         colors,
@@ -454,7 +475,7 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-category">
                     Category
@@ -472,6 +493,27 @@ export default function AdminProductsPage() {
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-subcategory">
+                    Subcategory (optional)
+                  </label>
+                  <select
+                    id="p-subcategory"
+                    value={form.subcategoryId}
+                    onChange={updateField('subcategoryId')}
+                    disabled={!form.categoryId || subcategoryOptions.length === 0}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {form.categoryId && subcategoryOptions.length === 0 ? 'No subcategories yet' : 'None'}
+                    </option>
+                    {subcategoryOptions.map((subcategory) => (
+                      <option key={subcategory.id} value={subcategory.id}>
+                        {subcategory.title}
                       </option>
                     ))}
                   </select>
@@ -803,7 +845,8 @@ export default function AdminProductsPage() {
                             )}
                           </h3>
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
-                            {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
+                            {product.categoryTitle}
+                            {product.subcategoryTitle ? ` / ${product.subcategoryTitle}` : ''} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
                           </p>
                         </div>
                         <div className="flex gap-3">
