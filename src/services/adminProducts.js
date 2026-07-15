@@ -1,4 +1,4 @@
-import { onValue, ref, remove, serverTimestamp, set } from 'firebase/database';
+import { onValue, ref, remove, serverTimestamp, set, get } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { PRODUCTS } from '../data/products.js';
 
@@ -110,6 +110,40 @@ export function deleteAdminProduct(id) {
     return Promise.resolve();
   }
   return remove(ref(db, `${ROOT}/${id}`));
+}
+
+export function reduceProductStock(productId, size, quantity) {
+  if (!isFirebaseEnabled) {
+    const products = getLocalProducts();
+    const product = products.find((p) => p.id === productId);
+    if (product && product.sizes) {
+      product.sizes = product.sizes.map((s) => {
+        if (s.size === size) {
+          return { ...s, stock: Math.max(0, s.stock - quantity) };
+        }
+        return s;
+      });
+      setLocalProducts(products);
+      notifyLocalListeners();
+    }
+    return Promise.resolve();
+  }
+
+  const productRef = ref(db, `${ROOT}/${productId}`);
+  return get(productRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const product = snapshot.val();
+      if (product.sizes) {
+        const updatedSizes = product.sizes.map((s) => {
+          if (s.size === size) {
+            return { ...s, stock: Math.max(0, s.stock - quantity) };
+          }
+          return s;
+        });
+        return set(ref(db, `${ROOT}/${productId}/sizes`), updatedSizes);
+      }
+    }
+  });
 }
 
 export function createFileMetadata(metadata) {

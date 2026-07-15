@@ -1,5 +1,7 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { recordPurchase } from '../services/productStats.js';
+import { createFirebaseOrder, subscribeToOrders } from '../services/orders.js';
+import { reduceProductStock } from '../services/adminProducts.js';
 
 const CartContext = createContext(null);
 
@@ -37,6 +39,13 @@ export function CartProvider({ children }) {
 
   const clearCart = () => setItems([]);
 
+  useEffect(() => {
+    const unsub = subscribeToOrders((loadedOrders) => {
+      setOrders(loadedOrders);
+    });
+    return unsub;
+  }, []);
+
   const placeOrder = ({ paymentMethod, placedAt }) => {
     const subtotalAtOrder = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
     const taxAtOrder = subtotalAtOrder * 0.18;
@@ -52,10 +61,20 @@ export function CartProvider({ children }) {
       shippingDetails,
       status: 'Processing',
     };
+
+    // Save order details to Firebase Database
+    createFirebaseOrder(order);
+
+    // Update stock levels in Firebase
+    items.forEach((line) => {
+      if (line.size) {
+        reduceProductStock(line.id, line.size, line.quantity);
+      }
+    });
+
     setLastOrder(order);
-    setOrders((prev) => [order, ...prev]);
     setItems([]);
-    items.forEach((line) => recordPurchase(line.productId || line.id, line.quantity));
+    items.forEach((line) => recordPurchase(line.id, line.quantity));
     return order;
   };
 
