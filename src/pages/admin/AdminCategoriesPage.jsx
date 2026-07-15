@@ -130,6 +130,45 @@ export default function AdminCategoriesPage() {
         </section>
 
         <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
+          <h2 className="font-title-sm text-title-sm text-on-surface mb-4">New Subcategory</h2>
+          {categories.length === 0 ? (
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Add a category first to unlock subcategories.
+            </p>
+          ) : (
+            <form onSubmit={handleSubSubmit} className="flex flex-col sm:flex-row gap-3">
+              <select
+                value={subCategoryId}
+                onChange={(e) => setSubCategoryId(e.target.value)}
+                className="sm:w-64 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.title}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={subTitle}
+                onChange={(e) => setSubTitle(e.target.value)}
+                placeholder="e.g. Silk Saree"
+                className="flex-1 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={savingSub || !subTitle.trim() || !subCategoryId}
+                className="bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                Add Subcategory
+              </button>
+            </form>
+          )}
+        </section>
+
+        <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
           <h2 className="font-title-sm text-title-sm text-on-surface mb-4">All Categories</h2>
           {loading ? (
             <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
@@ -145,15 +184,33 @@ export default function AdminCategoriesPage() {
           ) : (
             <ul className="divide-y divide-outline-variant/20">
               {categories.map((category) => (
-                <li key={category.id} className="flex justify-between items-center py-3">
-                  <span className="font-body-lg text-body-lg text-on-surface">{category.title}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(category.id)}
-                    className="text-error font-label-caps text-label-caps hover:underline"
-                  >
-                    Delete
-                  </button>
+                <li key={category.id} className="py-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-body-lg text-body-lg text-on-surface">{category.title}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(category.id)}
+                      className="text-error font-label-caps text-label-caps hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {!subLoading && (subcategoriesByCategory[category.id]?.length ?? 0) > 0 && (
+                    <ul className="mt-2 ml-4 pl-4 border-l border-outline-variant/30 flex flex-col gap-2">
+                      {subcategoriesByCategory[category.id].map((sub) => (
+                        <li key={sub.id} className="flex justify-between items-center">
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">{sub.title}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleSubDelete(sub.id)}
+                            className="text-error font-label-caps text-[10px] hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>
