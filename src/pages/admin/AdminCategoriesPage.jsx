@@ -1,5 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { subscribeToCategories, createCategory, deleteCategory } from '../../services/categories.js';
+import {
+  subscribeToSubcategories,
+  createSubcategory,
+  deleteSubcategory,
+} from '../../services/subcategories.js';
 import { useToast } from '../../context/ToastContext.jsx';
 
 export default function AdminCategoriesPage() {
@@ -10,6 +15,12 @@ export default function AdminCategoriesPage() {
   const [title, setTitle] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const [subcategories, setSubcategories] = useState([]);
+  const [subLoading, setSubLoading] = useState(true);
+  const [subTitle, setSubTitle] = useState('');
+  const [subCategoryId, setSubCategoryId] = useState('');
+  const [savingSub, setSavingSub] = useState(false);
+
   useEffect(() => {
     const unsubscribe = subscribeToCategories((rows, error) => {
       setCategories(rows);
@@ -18,6 +29,23 @@ export default function AdminCategoriesPage() {
     });
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToSubcategories((rows) => {
+      setSubcategories(rows);
+      setSubLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const subcategoriesByCategory = useMemo(() => {
+    const map = {};
+    subcategories.forEach((sub) => {
+      if (!map[sub.categoryId]) map[sub.categoryId] = [];
+      map[sub.categoryId].push(sub);
+    });
+    return map;
+  }, [subcategories]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -40,6 +68,35 @@ export default function AdminCategoriesPage() {
       showToast('Category deleted.');
     } catch (err) {
       showToast(err.message || 'Could not delete category.');
+    }
+  };
+
+  const handleSubSubmit = async (event) => {
+    event.preventDefault();
+    if (!subTitle.trim() || !subCategoryId) return;
+    const category = categories.find((c) => c.id === subCategoryId);
+    setSavingSub(true);
+    try {
+      await createSubcategory({
+        title: subTitle,
+        categoryId: subCategoryId,
+        categoryTitle: category?.title ?? '',
+      });
+      setSubTitle('');
+      showToast('Subcategory created.');
+    } catch (err) {
+      showToast(err.message || 'Could not create subcategory.');
+    } finally {
+      setSavingSub(false);
+    }
+  };
+
+  const handleSubDelete = async (id) => {
+    try {
+      await deleteSubcategory(id);
+      showToast('Subcategory deleted.');
+    } catch (err) {
+      showToast(err.message || 'Could not delete subcategory.');
     }
   };
 
