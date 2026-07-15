@@ -1,3 +1,4 @@
+import { getHighResUrl } from '../utils/image.js';
 import './WatchAndBuyModalPage.css';
 
 const SIZES = ['S', 'M', 'L'];
@@ -11,10 +12,10 @@ export default function WatchAndBuyModalPage() {
         <div
           className="bg-cover bg-center w-full h-full opacity-30 grayscale-[20%]"
           data-alt="A vibrant, elegant storefront of an Indian fashion boutique. Racks of colorful saris and kurtis are visible in the background, out of focus. The lighting is bright and airy, reflecting a modern light-mode luxury aesthetic with touches of hot pink and dusty rose."
-          style={{
-            backgroundImage:
-              "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6qgYfjtimmwYyydsrOURYTpahNEr6OfI4hitvTIQv4EXuRukfDrf6QT96hxjANDMpfeW9Sb_9l6tTlYUQXEdvJCbW487pQQAPsjh7keCBm0El1ma9gEVmZvE1GEaPhJOAYrMEKeRjFgt_3QfJ9P_kVp8Am0T3xwXqNKc6o5jA_QNHfTVbJ_MRQiiYIkf828BRgrKwEki5emiLorSb3m5rbPzDdZbIR_YP0ENdAg7O3rj3lEKHN9n1Gw')",
-          }}
+            style={{
+              backgroundImage:
+                `url('${getHighResUrl('https://lh3.googleusercontent.com/aida-public/AB6AXuC6qgYfjtimmwYyydsrOURYTpahNEr6OfI4hitvTIQv4EXuRukfDrf6QT96hxjANDMpfeW9Sb_9l6tTlYUQXEdvJCbW487pQQAPsjh7keCBm0El1ma9gEVmZvE1GEaPhJOAYrMEKeRjFgt_3QfJ9P_kVp8Am0T3xwXqNKc6o5jA_QNHfTVbJ_MRQiiYIkf828BRgrKwEki5emiLorSb3m5rbPzDdZbIR_YP0ENdAg7O3rj3lEKHN9n1Gw')}')`,
+            }}
         ></div>
       </div>
       {/* Modal Overlay */}
@@ -48,7 +49,7 @@ export default function WatchAndBuyModalPage() {
               data-alt="A high-fashion video still of a model wearing a vibrant, intricately embroidered lehenga. The fabric catches the light, showing off traditional Indian craftsmanship. The background is a minimalist studio setting with soft lighting to emphasize the garment's luxury details. The overall color palette leans towards rich jewel tones and dusty rose accents."
               style={{
                 backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAsro22j_6rJuYnFYHyPkQZFHbgHwCBbu5P_rNqgnJXzH1BHkUSXGd7xqhYrt7gelPBxolC586tCR92l-PfbmBqr5hr1QDfBk_NsA9uN1Sk8Z9ei-maaaslAujq1JCzB2BkQ3Vz4z1elHdpCwzQXEpA2spIYgt0DWCybLMS-Fnedhz8rhtGNPVx22J8n2SoooHR7j8w4absh9jg88DpaWodzeSL9TYcVXOVybYKd9ofUWMk2zM-FT9qsg')",
+                  `url('${getHighResUrl('https://lh3.googleusercontent.com/aida-public/AB6AXuAsro22j_6rJuYnFYHyPkQZFHbgHwCBbu5P_rNqgnJXzH1BHkUSXGd7xqhYrt7gelPBxolC586tCR92l-PfbmBqr5hr1QDfBk_NsA9uN1Sk8Z9ei-maaaslAujq1JCzB2BkQ3Vz4z1elHdpCwzQXEpA2spIYgt0DWCybLMS-Fnedhz8rhtGNPVx22J8n2SoooHR7j8w4absh9jg88DpaWodzeSL9TYcVXOVybYKd9ofUWMk2zM-FT9qsg')}')`,
               }}
             ></div>
             {/* Playback Controls Overlay */}

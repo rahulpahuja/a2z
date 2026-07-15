@@ -306,16 +306,15 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Accordions */}
-          <div className="flex flex-col border-t border-outline-variant/30 mt-4 divide-y divide-outline-variant/30">
+          {/* Policies (Always Expanded) */}
+          <div className="flex flex-col border-t border-outline-variant/30 mt-4 divide-y divide-outline-variant/30 font-body-sm text-body-sm">
             {ACCORDION_ITEMS.map((item) => (
-              <details key={item.title} className="group py-4">
-                <summary className="flex justify-between items-center font-title-sm text-title-sm cursor-pointer list-none">
+              <div key={item.title} className="py-4 flex flex-col gap-2">
+                <h3 className="font-title-sm text-title-sm text-on-surface">
                   {item.title}
-                  <span className="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
-                </summary>
-                <div className={`mt-4 font-body-sm text-body-sm ${item.tone}`}>{item.body}</div>
-              </details>
+                </h3>
+                <div className={item.tone}>{item.body}</div>
+              </div>
             ))}
           </div>
 

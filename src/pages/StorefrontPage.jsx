@@ -3,6 +3,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { PRODUCTS } from '../data/products.js';
+import { getHighResUrl } from '../utils/image.js';
 
 const categories = [
   {
@@ -79,6 +80,13 @@ const videos = [
     price: "₹ 9,500",
   },
 ];
+
+categories.forEach((c) => {
+  c.src = getHighResUrl(c.src);
+});
+videos.forEach((v) => {
+  v.src = getHighResUrl(v.src);
+});
 
 function CategoryBadge({ name, alt, src }) {
   return (
@@ -206,7 +214,7 @@ export default function StorefrontPage() {
           <img
             className="absolute inset-0 w-full h-full object-cover object-top opacity-90 mix-blend-multiply"
             alt="High-fidelity lifestyle photography of a woman wearing a vibrant, elegantly embroidered red traditional Indian Saree. She is standing in a minimalist, luxury global boutique setting with generous whitespace, bathed in soft, bright studio lighting. The mood is 'Vibrant Elegance', bridging traditional craftsmanship with contemporary fashion, perfect for a premium brand hero image."
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2MgYYN6KLRtwHEMEo3L4qTcAnGQbIzzqbPyC3EbYhS1lp6cgi5J4jEfC7KVeEXa25a0seXS0qeAV5dUeB5CaVWpcbtRv6BxBOhngNKSkP9svm3mgNqtJ_ct2iQVGQF1udW5Yx8s_x5oKuq4gMd88_KN2QVAU5_qTwlOKIuspLFk8PpF-I_AXoZbH2KBjI542szzasBe43EVwhowFxOhmYsSELsbHBvnU8Ytgy2tqvgeoom-K21glJsg"
+            src={getHighResUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuB2MgYYN6KLRtwHEMEo3L4qTcAnGQbIzzqbPyC3EbYhS1lp6cgi5J4jEfC7KVeEXa25a0seXS0qeAV5dUeB5CaVWpcbtRv6BxBOhngNKSkP9svm3mgNqtJ_ct2iQVGQF1udW5Yx8s_x5oKuq4gMd88_KN2QVAU5_qTwlOKIuspLFk8PpF-I_AXoZbH2KBjI542szzasBe43EVwhowFxOhmYsSELsbHBvnU8Ytgy2tqvgeoom-K21glJsg")}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-80"></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-margin-mobile md:px-margin-desktop">

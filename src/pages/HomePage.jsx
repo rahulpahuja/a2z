@@ -5,6 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import TrendingProducts from '../components/TrendingProducts.jsx';
 import { PRODUCTS } from '../data/products.js';
 import { formatCurrency } from '../context/CartContext.jsx';
+import { getHighResUrl } from '../utils/image.js';
 import './HomePage.css';
 
 const categories = [
@@ -137,6 +138,13 @@ const HERO_SLIDES = [
     link: '/products?category=Coord Set',
   }
 ];
+
+categories.forEach((c) => {
+  c.image = getHighResUrl(c.image);
+});
+HERO_SLIDES.forEach((s) => {
+  s.image = getHighResUrl(s.image);
+});
 
 export default function HomePage() {
   const [favorites, setFavorites] = useState({});

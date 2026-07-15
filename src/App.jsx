@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import EntryGate from './components/EntryGate.jsx'
+import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HomePage from './pages/HomePage.jsx'
 import StorefrontPage from './pages/StorefrontPage.jsx'
@@ -59,6 +60,7 @@ function adminElement(Component) {
 export default function App() {
   return (
     <EntryGate>
+      <ScrollToTop />
       <Routes>
         {ROUTES.map(({ path, Component }) => (
           <Route key={path} path={path} element={<Component />} />
