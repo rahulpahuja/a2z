@@ -859,6 +859,9 @@ export default function AdminProductsPage() {
                             {product.categoryTitle}
                             {product.subcategoryTitle ? ` / ${product.subcategoryTitle}` : ''} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
                           </p>
+                          <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
+                            ID: {product.id}
+                          </p>
                         </div>
                         <div className="flex gap-3">
                           <button
@@ -875,6 +878,12 @@ export default function AdminProductsPage() {
                           >
                             Print Barcode
                           </button>
+                          <Link
+                            to={`/super/product-videos?productId=${product.id}`}
+                            className="font-label-caps text-label-caps text-primary hover:underline"
+                          >
+                            Add Video
+                          </Link>
                           <button
                             type="button"
                             onClick={() => handleDelete(product)}
