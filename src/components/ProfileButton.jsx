@@ -12,9 +12,11 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const containerClasses = `relative inline-flex items-center justify-center`;
+
   if (!user) {
     return (
-      <>
+      <div className={containerClasses}>
         <button
           type="button"
           aria-label="Sign In"
@@ -24,12 +26,12 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
           <span className={iconClassName}>person</span>
         </button>
         {modalOpen && <AuthModal onClose={() => setModalOpen(false)} />}
-      </>
+      </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className={containerClasses}>
       <button
         type="button"
         aria-label="Account"
