@@ -92,14 +92,22 @@ function CategoryBadge({ name, alt, src }) {
 
 function ProductCard({ product }) {
   const { addItem } = useCart();
+  const isAvailable = product.inStock;
   return (
-    <article className="group relative flex flex-col bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300">
+    <article className={`group relative flex flex-col bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}>
       <Link to={`/product/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl bg-surface-variant block">
         <img
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+          className={`object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ${!isAvailable ? 'grayscale opacity-50' : ''}`}
           alt={product.alt}
           src={product.src}
         />
+        {!isAvailable && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+            <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+              Out of Stock
+            </span>
+          </div>
+        )}
         {product.badge && (
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             <span
@@ -129,24 +137,30 @@ function ProductCard({ product }) {
         <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 flex-grow">{product.desc}</p>
         <div className="flex items-center justify-between mt-auto">
           <span className="font-price-display text-price-display text-on-background">{product.price}</span>
-          <button
-            type="button"
-            aria-label="Add to Cart"
-            onClick={() =>
-              addItem({
-                id: product.id,
-                title: product.name,
-                price: product.priceValue,
-                image: product.src,
-                alt: product.alt,
-                color: null,
-                size: null,
-              })
-            }
-            className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
-          >
-            <span className="material-symbols-outlined text-[20px]">add</span>
-          </button>
+          {isAvailable ? (
+            <button
+              type="button"
+              aria-label="Add to Cart"
+              onClick={() =>
+                addItem({
+                  id: product.id,
+                  title: product.name,
+                  price: product.priceValue,
+                  image: product.src,
+                  alt: product.alt,
+                  color: null,
+                  size: null,
+                })
+              }
+              className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">add</span>
+            </button>
+          ) : (
+            <span className="px-3 py-1 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-[10px] uppercase opacity-60">
+              OOS
+            </span>
+          )}
         </div>
       </div>
     </article>
@@ -186,6 +200,7 @@ export default function StorefrontPage() {
     desc: product.description,
     price: formatCurrency(product.price),
     priceValue: product.price,
+    inStock: product.sizes?.some((s) => s.stock > 0) ?? product.inStock,
   }));
 
   return (

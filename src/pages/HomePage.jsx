@@ -290,18 +290,26 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {productsRow1.map((product) => {
               const isFavorited = !!favorites[product.id];
+              const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
               return (
               <Link
                 key={product.id}
                 to={`/product/${product.id}`}
-                className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+                className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
                   <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                     data-alt={product.alt}
                     src={product.image}
                   />
+                  {!isAvailable && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                      <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
                   {product.badge && (
                     <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
                   )}
@@ -346,18 +354,26 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {productsRow2.map((product) => {
               const isFavorited = !!favorites[product.id];
+              const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
               return (
               <Link
                 key={product.id}
                 to={`/product/${product.id}`}
-                className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+                className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
                   <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                     data-alt={product.alt}
                     src={product.image}
                   />
+                  {!isAvailable && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                      <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
                   {product.badge && (
                     <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
                   )}
