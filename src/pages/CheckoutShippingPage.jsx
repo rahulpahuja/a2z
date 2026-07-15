@@ -179,7 +179,13 @@ export default function CheckoutShippingPage() {
                 value={form.phone}
                 onChange={handleChange}
               />
-              <div className="pt-6">
+              <div className="pt-6 flex flex-col-reverse md:flex-row items-center gap-4">
+                <Link
+                  to="/cart"
+                  className="w-full md:w-auto text-center border border-tertiary/30 text-on-surface font-label-caps text-label-caps uppercase px-8 py-4 rounded-[12px] hover:border-primary hover:text-primary transition-colors duration-200"
+                >
+                  Back to Cart
+                </Link>
                 <button
                   className="w-full md:w-auto bg-primary text-on-primary font-label-caps text-label-caps uppercase px-8 py-4 rounded-[12px] hover:bg-primary/90 transition-colors duration-200 shadow-[0px_4px_10px_rgba(172,36,113,0.2)]"
                   type="submit"
