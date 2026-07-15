@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart, formatCurrency } from '../../context/CartContext.jsx';
 import { PRODUCTS } from '../../data/products.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
+import { subscribeToAdminProducts } from '../../services/adminProducts.js';
 import {
   getOrdersToday,
   findOrderById,
@@ -112,11 +113,29 @@ function ProductRankTable({ title, rows, emptyText }) {
 
 export default function AdminDashboardPage() {
   const { orders: liveOrders } = useCart();
+  const [dbProducts, setDbProducts] = useState([]);
+
+  useEffect(() => {
+    const unsub = subscribeToAdminProducts((rows) => {
+      setDbProducts(rows);
+    });
+    return unsub;
+  }, []);
+
+  const allProducts = useMemo(() => {
+    const merged = [...dbProducts];
+    PRODUCTS.forEach((staticProd) => {
+      if (!merged.some((p) => p.id === staticProd.id)) {
+        merged.push(staticProd);
+      }
+    });
+    return merged;
+  }, [dbProducts]);
 
   const allOrders = useMemo(() => [...liveOrders, ...MOCK_ORDERS], [liveOrders]);
   const ordersToday = useMemo(() => getOrdersToday(allOrders), [allOrders]);
   const weekSummary = useMemo(() => getWeekSalesSummary(allOrders), [allOrders]);
-  const salesStats = useMemo(() => getProductSalesStats(allOrders, PRODUCTS), [allOrders]);
+  const salesStats = useMemo(() => getProductSalesStats(allOrders, allProducts), [allOrders, allProducts]);
   const topProducts = useMemo(() => getTopProducts(salesStats, 10), [salesStats]);
   const bottomProducts = useMemo(() => getBottomProducts(salesStats, 10), [salesStats]);
 
@@ -133,7 +152,7 @@ export default function AdminDashboardPage() {
 
   const handleProductLookup = (event) => {
     event.preventDefault();
-    setProductMatches(searchProducts(PRODUCTS, productQuery));
+    setProductMatches(searchProducts(allProducts, productQuery));
   };
 
   const statsForProduct = (productId) => salesStats.find((s) => s.product.id === productId);
@@ -230,22 +249,37 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col gap-4">
               {productMatches.map((product) => {
                 const stat = statsForProduct(product.id);
+                const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
                 return (
                   <div key={product.id} className="flex gap-4 border border-outline-variant/30 rounded-lg p-4">
-                    <img src={product.image} alt={product.name} className="w-16 h-20 object-cover rounded-md shrink-0" />
+                    <img src={product.images?.[0] || product.image} alt={product.name || product.title} className="w-16 h-20 object-cover rounded-md shrink-0" />
                     <div className="flex-1">
                       <div className="flex justify-between items-start flex-wrap gap-2">
                         <div>
-                          <h3 className="font-title-sm text-title-sm text-on-surface">{product.name}</h3>
+                          <h3 className="font-title-sm text-title-sm text-on-surface">{product.name || product.title}</h3>
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
-                            {product.category} · {formatCurrency(product.price)} · {product.inStock ? 'In Stock' : 'Out of Stock'}
+                            {product.category || product.categoryTitle} · {formatCurrency(product.price)} · {isAvailable ? 'In Stock' : 'Out of Stock'}
                           </p>
                         </div>
                         <Link to={`/product/${product.id}`} className="font-label-caps text-label-caps text-primary hover:underline">
                           View on Storefront
                         </Link>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 mt-3 font-body-sm text-body-sm">
+
+                      {product.sizes && product.sizes.length > 0 && (
+                        <div className="mt-3 p-3 bg-surface-container rounded-lg border border-outline-variant/25">
+                          <p className="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1 font-semibold">Live Stock Breakdown</p>
+                          <div className="flex flex-wrap gap-2">
+                            {product.sizes.map((s) => (
+                              <span key={s.size} className="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant/20 font-mono text-[11px] text-on-surface">
+                                Size {s.size}: <strong className={s.stock > 0 ? "text-primary" : "text-error"}>{s.stock} left</strong>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-3 gap-4 mt-3 font-body-sm text-body-sm border-t border-outline-variant/20 pt-3">
                         <div>
                           <p className="text-on-surface-variant">Units this week</p>
                           <p className="text-on-surface font-semibold">{stat?.unitsThisWeek ?? 0}</p>

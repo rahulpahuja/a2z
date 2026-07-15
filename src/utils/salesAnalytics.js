@@ -28,9 +28,9 @@ export function searchProducts(products, query, limit = 5) {
     .filter(
       (p) =>
         p.id.toLowerCase().includes(needle) ||
-        p.name.toLowerCase().includes(needle) ||
-        p.category.toLowerCase().includes(needle) ||
-        p.description.toLowerCase().includes(needle)
+        (p.name || p.title || '').toLowerCase().includes(needle) ||
+        (p.category || p.categoryTitle || '').toLowerCase().includes(needle) ||
+        (p.description || '').toLowerCase().includes(needle)
     )
     .slice(0, limit);
 }
