@@ -172,7 +172,7 @@ export default function AdminDocsPage() {
               </li>
               <li>
                 <strong>Authentication → Settings → Authorized domains</strong>: make sure your deployed domain
-                (and <Code>localhost</Code> for local dev) is listed, or the Google popup will fail.
+                (<Code>a2zco.netlify.app</Code> and <Code>localhost</Code> for local dev) is listed, or the Google popup will fail.
               </li>
               <li>
                 <strong>Realtime Database → Rules</strong>: paste in the contents of{' '}

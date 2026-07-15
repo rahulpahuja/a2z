@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
-import { PRODUCTS } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 
 const categories = [
@@ -35,16 +35,7 @@ const BADGE_STYLES = {
   '15% OFF': { bg: 'bg-error', text: 'text-on-error' },
 };
 
-const products = PRODUCTS.slice(4, 8).map((product) => ({
-  id: product.id,
-  alt: product.alt,
-  src: product.image,
-  badge: product.badge ? { label: product.badge, ...BADGE_STYLES[product.badge] } : null,
-  name: product.name,
-  desc: product.description,
-  price: formatCurrency(product.price),
-  priceValue: product.price,
-}));
+// products catalog slices are mapped dynamically inside the component using the useProducts hook
 
 const videos = [
   {
@@ -179,6 +170,18 @@ function VideoCard({ video }) {
 }
 
 export default function StorefrontPage() {
+  const { products: allProducts } = useProducts();
+  const products = allProducts.slice(4, 8).map((product) => ({
+    id: product.id,
+    alt: product.alt,
+    src: product.image,
+    badge: product.badge ? { label: product.badge, ...BADGE_STYLES[product.badge] } : null,
+    name: product.name || product.title,
+    desc: product.description,
+    price: formatCurrency(product.price),
+    priceValue: product.price,
+  }));
+
   return (
     <>
       {/* TopNavBar */}
