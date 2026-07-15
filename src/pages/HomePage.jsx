@@ -320,6 +320,9 @@ export default function HomePage() {
                   </button>
                 </div>
                 <div className="p-4 flex flex-col gap-2">
+                  <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
+                    {product.category || product.categoryTitle}
+                  </span>
                   <div className="flex justify-between items-start">
                     <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
                     {product.rating && (
@@ -373,6 +376,9 @@ export default function HomePage() {
                   </button>
                 </div>
                 <div className="p-4 flex flex-col gap-2">
+                  <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
+                    {product.category || product.categoryTitle}
+                  </span>
                   <div className="flex justify-between items-start">
                     <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
                     {product.rating && (

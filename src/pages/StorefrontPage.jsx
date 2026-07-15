@@ -118,6 +118,11 @@ function ProductCard({ product }) {
         </button>
       </Link>
       <div className="p-4 flex flex-col flex-grow">
+        {product.category && (
+          <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
+            {product.category}
+          </span>
+        )}
         <Link to={`/product/${product.id}`}>
           <h3 className="font-title-sm text-title-sm text-on-background mb-1 truncate">{product.name}</h3>
         </Link>
@@ -177,6 +182,7 @@ export default function StorefrontPage() {
     src: product.image,
     badge: product.badge ? { label: product.badge, ...BADGE_STYLES[product.badge] } : null,
     name: product.name || product.title,
+    category: product.category || product.categoryTitle,
     desc: product.description,
     price: formatCurrency(product.price),
     priceValue: product.price,
