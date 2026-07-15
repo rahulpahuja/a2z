@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { subscribeToAdminProducts, updateProductVideos, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { transcodeVideoToH264 } from '../../utils/videoTranscode.js';
+import VideoPlayer from '../../components/VideoPlayer.jsx';
 
 const MAX_VIDEOS = 2;
 const SLOTS = [0, 1];
@@ -404,7 +405,7 @@ export default function AdminProductVideosPage() {
                       </div>
                     ) : preview ? (
                       <div className="w-full aspect-video rounded-md overflow-hidden bg-black border border-outline-variant/30">
-                        <video src={preview} controls className="w-full h-full object-contain" />
+                        <VideoPlayer src={preview} className="w-full h-full object-contain" />
                       </div>
                     ) : (
                       <div
