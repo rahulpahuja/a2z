@@ -1,7 +1,10 @@
 import { Routes, Route } from 'react-router-dom'
+import BotGate from './components/BotGate.jsx'
 import EntryGate from './components/EntryGate.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
+import HoneypotLink from './components/HoneypotLink.jsx'
+import BotTrapPage from './pages/BotTrapPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import StorefrontPage from './pages/StorefrontPage.jsx'
 import ProductListingPage from './pages/ProductListingPage.jsx'
@@ -38,6 +41,7 @@ const ROUTES = [
   { path: '/orders/tracking', Component: OrderTrackingPage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
+  { path: '/__trap__', Component: BotTrapPage },
 ]
 
 const ADMIN_ROUTES = [
@@ -62,28 +66,31 @@ function adminElement(Component) {
 
 export default function App() {
   return (
-    <ProductsProvider>
-      <EntryGate>
-        <ScrollToTop />
-        <Routes>
-          {ROUTES.map(({ path, Component }) => (
-            <Route key={path} path={path} element={<Component />} />
-          ))}
-          <Route
-            path="/dashboard"
-            element={
-              <RequireAdmin>
-                <DashboardPage />
-              </RequireAdmin>
-            }
-          />
-          {ADMIN_ROUTES.map(({ path, Component }) => (
-            <Route key={path} path={path} element={adminElement(Component)} />
-          ))}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-        <FloatingContactButtons />
-      </EntryGate>
-    </ProductsProvider>
+    <BotGate>
+      <ProductsProvider>
+        <EntryGate>
+          <ScrollToTop />
+          <HoneypotLink />
+          <Routes>
+            {ROUTES.map(({ path, Component }) => (
+              <Route key={path} path={path} element={<Component />} />
+            ))}
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAdmin>
+                  <DashboardPage />
+                </RequireAdmin>
+              }
+            />
+            {ADMIN_ROUTES.map(({ path, Component }) => (
+              <Route key={path} path={path} element={adminElement(Component)} />
+            ))}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          <FloatingContactButtons />
+        </EntryGate>
+      </ProductsProvider>
+    </BotGate>
   )
 }
