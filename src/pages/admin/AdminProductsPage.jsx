@@ -58,6 +58,111 @@ export default function AdminProductsPage() {
   const [imageFiles, setImageFiles] = useState([null, null, null, null, null]);
   const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
+
+  const getR2KeyFromUrl = (url) => {
+    try {
+      const parsed = new URL(url);
+      const parts = parsed.pathname.split('/');
+      return parts[parts.length - 1]; // gets filename
+    } catch {
+      return null;
+    }
+  };
+
+  const deleteProductAndImages = async (product) => {
+    const urls = product.images || (product.image ? [product.image] : []);
+    const deletePromises = urls.map(async (url) => {
+      const key = getR2KeyFromUrl(url);
+      if (key) {
+        try {
+          const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
+          if (apiUrl) {
+            await fetch(`${apiUrl}/${key}`, {
+              method: 'DELETE',
+            });
+          }
+        } catch (e) {
+          console.error(`Failed to delete R2 file: ${key}`, e);
+        }
+      }
+    });
+    await Promise.all(deletePromises);
+    await deleteAdminProduct(product.id);
+  };
+
+  const handleStartEdit = (product) => {
+    setEditingProductId(product.id);
+    setProductId(product.id);
+    setForm({
+      title: product.title || product.name || '',
+      description: product.description || '',
+      categoryId: product.categoryId || '',
+      price: product.price || '',
+      hsnCode: product.hsnCode || '',
+      hashtagsInput: (product.hashtags ?? []).join(', '),
+    });
+    setColors(product.colors ?? []);
+    setSizes(product.sizes ?? []);
+    setImageFiles([null, null, null, null, null]);
+
+    const initialPreviews = ['', '', '', '', ''];
+    const initialNames = ['', '', '', '', ''];
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((url, idx) => {
+        if (idx < 5) {
+          initialPreviews[idx] = url;
+          initialNames[idx] = getR2KeyFromUrl(url) || '';
+        }
+      });
+    } else if (product.image) {
+      initialPreviews[0] = product.image;
+      initialNames[0] = getR2KeyFromUrl(product.image) || '';
+    }
+    setImagePreviews(initialPreviews);
+    setImageNames(initialNames);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleSelectProduct = (id) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedProductIds.length === products.length) {
+      setSelectedProductIds([]);
+    } else {
+      setSelectedProductIds(products.map((p) => p.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProductIds.length === 0) return;
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete the ${selectedProductIds.length} selected products? This will remove all associated database records and images from R2 storage. This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    try {
+      const deletePromises = selectedProductIds.map(async (id) => {
+        const product = products.find((p) => p.id === id);
+        if (product) {
+          await deleteProductAndImages(product);
+        }
+      });
+      await Promise.all(deletePromises);
+      showToast(`${selectedProductIds.length} products deleted successfully.`);
+      setSelectedProductIds([]);
+    } catch (err) {
+      showToast(err.message || 'Could not delete some products.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const generateProductId = () => `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
@@ -160,12 +265,15 @@ export default function AdminProductsPage() {
     setSizes([]);
     setCustomSize('');
     imagePreviews.forEach((preview) => {
-      if (preview) URL.revokeObjectURL(preview);
+      if (preview && preview.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
     });
     setImageFiles([null, null, null, null, null]);
     setImagePreviews(['', '', '', '', '']);
     setImageNames(['', '', '', '', '']);
     setProductId(generateProductId());
+    setEditingProductId(null);
   };
 
   const handleSubmit = async (event) => {
@@ -183,9 +291,11 @@ export default function AdminProductsPage() {
       return;
     }
 
-    const activeSlots = imageFiles.map((file, idx) => file ? idx : null).filter((val) => val !== null);
+    const activeSlots = [0, 1, 2, 3, 4].filter(
+      (idx) => imageFiles[idx] || imagePreviews[idx]
+    );
     if (activeSlots.length < 3) {
-      showToast('Please upload at least 3 images (max 5) for the product.');
+      showToast('Please provide at least 3 images (max 5) for the product.');
       return;
     }
 
@@ -202,18 +312,27 @@ export default function AdminProductsPage() {
       const uploadPromises = activeSlots.map(async (idx) => {
         const file = imageFiles[idx];
         const customName = imageNames[idx].trim();
-        const url = await uploadImageToExternalServer(file, customName);
-        return {
-          url,
-          key: customName,
-          name: file.name,
-          size: file.size,
-          type: file.type,
-        };
+        if (file) {
+          const url = await uploadImageToExternalServer(file, customName);
+          return {
+            url,
+            key: customName,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            isNew: true,
+          };
+        } else {
+          return {
+            url: imagePreviews[idx],
+            key: customName,
+            isNew: false,
+          };
+        }
       });
 
       const uploadedFiles = await Promise.all(uploadPromises);
-      const uploadedUrls = uploadedFiles.map((f) => f.url);
+      const uploadedUrls = uploadedFiles.map((f) => f.url).filter(Boolean);
 
       await createAdminProduct({
         id: productId,
@@ -234,8 +353,9 @@ export default function AdminProductsPage() {
         images: uploadedUrls,
       });
 
-      // Save file metadata logs in Firebase Realtime Database
-      const metaPromises = uploadedFiles.map((f) => {
+      // Save file metadata only for new uploads in Firebase Realtime Database
+      const newUploads = uploadedFiles.filter((f) => f.isNew);
+      const metaPromises = newUploads.map((f) => {
         return createFileMetadata({
           productId: productId,
           key: f.key,
@@ -247,21 +367,29 @@ export default function AdminProductsPage() {
       });
       await Promise.all(metaPromises);
 
-      showToast('Product created.');
+      showToast(editingProductId ? 'Product updated.' : 'Product created.');
       resetForm();
     } catch (err) {
-      showToast(err.message || 'Could not create product.');
+      showToast(err.message || 'Could not save product.');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (product) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete "${product.title || product.name}"? This will remove all associated database records and images from R2 storage. This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
     try {
-      await deleteAdminProduct(id);
+      await deleteProductAndImages(product);
       showToast('Product deleted.');
     } catch (err) {
       showToast(err.message || 'Could not delete product.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -286,7 +414,20 @@ export default function AdminProductsPage() {
           </section>
         ) : (
           <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-4">New Product</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-title-sm text-title-sm text-on-surface">
+                {editingProductId ? 'Edit Product' : 'New Product'}
+              </h2>
+              {editingProductId && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="font-label-caps text-label-caps text-error hover:underline"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="md:col-span-2">
@@ -575,7 +716,7 @@ export default function AdminProductsPage() {
                 disabled={saving}
                 className="self-start bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {saving ? 'Saving…' : 'Add Product'}
+                {saving ? 'Saving…' : (editingProductId ? 'Save Changes' : 'Add Product')}
               </button>
             </form>
           </section>
@@ -583,7 +724,30 @@ export default function AdminProductsPage() {
 
         {/* Product list */}
         <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
-          <h2 className="font-title-sm text-title-sm text-on-surface mb-4">All Products</h2>
+          <div className="flex justify-between items-center mb-6 flex-wrap gap-4 border-b border-outline-variant/20 pb-4">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={products.length > 0 && selectedProductIds.length === products.length}
+                onChange={toggleSelectAll}
+                className="rounded border-outline w-5 h-5 text-primary focus:ring-primary cursor-pointer"
+              />
+              <h2 className="font-title-sm text-title-sm text-on-surface">
+                All Products ({products.length})
+              </h2>
+            </div>
+            {selectedProductIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className="flex items-center gap-2 bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">delete</span>
+                Delete Selected ({selectedProductIds.length})
+              </button>
+            )}
+          </div>
+
           {loading ? (
             <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
           ) : loadError ? (
@@ -596,47 +760,85 @@ export default function AdminProductsPage() {
             <div className="flex flex-col gap-4">
               {products.map((product) => {
                 const totalStock = (product.sizes ?? []).reduce((sum, s) => sum + (s.stock ?? 0), 0);
+                const isSelected = selectedProductIds.includes(product.id);
                 return (
-                  <div key={product.id} className="border border-outline-variant/30 rounded-lg p-4 flex gap-4 items-start">
+                  <div 
+                    key={product.id} 
+                    className={`border rounded-lg p-4 flex gap-4 items-start transition-colors ${
+                      isSelected 
+                        ? 'border-primary/50 bg-primary/5' 
+                        : 'border-outline-variant/30 bg-surface-container-lowest'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelectProduct(product.id)}
+                      className="rounded border-outline w-5 h-5 text-primary focus:ring-primary cursor-pointer mt-1"
+                    />
+
                     {product.image && (
-                      <div className="w-16 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30">
-                        <img src={product.image} className="w-full h-full object-cover" alt={product.title} />
+                      <div className="w-16 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30 relative">
+                        <img 
+                          src={product.image} 
+                          className={`w-full h-full object-cover ${totalStock === 0 ? 'grayscale opacity-60' : ''}`} 
+                          alt={product.title} 
+                        />
+                        {totalStock === 0 && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[9px] font-bold uppercase tracking-wider">
+                            OOS
+                          </span>
+                        )}
                       </div>
                     )}
                     <div className="flex-1 flex flex-col gap-2">
                       <div className="flex justify-between items-start flex-wrap gap-2">
                         <div>
-                          <h3 className="font-title-sm text-title-sm text-on-surface">{product.title}</h3>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
-                        </p>
+                          <h3 className="font-title-sm text-title-sm text-on-surface flex items-center gap-2">
+                            {product.title}
+                            {totalStock === 0 && (
+                              <span className="text-[10px] font-bold bg-error/10 text-error px-2 py-0.5 rounded-full uppercase">
+                                Out of Stock
+                              </span>
+                            )}
+                          </h3>
+                          <p className="font-body-sm text-body-sm text-on-surface-variant">
+                            {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
+                          </p>
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(product)}
+                            className="font-label-caps text-label-caps text-primary hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBarcodeProduct(product)}
+                            className="font-label-caps text-label-caps text-primary hover:underline"
+                          >
+                            Print Barcode
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(product)}
+                            className="font-label-caps text-label-caps text-error hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setBarcodeProduct(product)}
-                          className="font-label-caps text-label-caps text-primary hover:underline"
-                        >
-                          Print Barcode
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(product.id)}
-                          className="font-label-caps text-label-caps text-error hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant">
-                      Colors: {(product.colors ?? []).join(', ') || '—'}
-                    </p>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant">
-                      Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: {totalStock}
-                    </p>
-                    {product.hashtags?.length > 0 && (
-                      <p className="font-body-sm text-body-sm text-secondary">{product.hashtags.join(' ')}</p>
-                    )}
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        Colors: {(product.colors ?? []).join(', ') || '—'}
+                      </p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: <span className={totalStock === 0 ? "text-error font-semibold" : ""}>{totalStock}</span>
+                      </p>
+                      {product.hashtags?.length > 0 && (
+                        <p className="font-body-sm text-body-sm text-secondary">{product.hashtags.join(' ')}</p>
+                      )}
                     </div>
                   </div>
                 );

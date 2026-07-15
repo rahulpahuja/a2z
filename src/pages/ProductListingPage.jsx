@@ -256,18 +256,26 @@ export default function ProductListingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {filteredProducts.map((product) => {
               const isFavorited = !!favorites[product.id];
+              const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
               return (
                 <article
                   key={product.id}
-                  className="group relative flex flex-col bg-surface-container-lowest border border-[#DCAE96]/30 rounded-[16px] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1"
+                  className={`group relative flex flex-col bg-surface-container-lowest border border-[#DCAE96]/30 rounded-[16px] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1 ${!isAvailable ? 'opacity-85' : ''}`}
                 >
                   <Link to={`/product/${product.id}`} className="relative w-full aspect-[3/4] overflow-hidden product-card-img-wrapper bg-surface-container block">
                     <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                       loading="lazy"
                       src={product.image}
                       alt={product.alt}
                     />
+                    {!isAvailable && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                        <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                     {product.badge && (
                       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                         <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
