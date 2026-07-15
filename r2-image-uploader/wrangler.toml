@@ -1,0 +1,11 @@
+name = "r2-image-uploader"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "a2z"
+
+# Optional: Add your public custom domain/public bucket URL here if you want to override the default placeholder URL
+# [vars]
+# R2_PUBLIC_URL = "https://your-custom-public-domain.com"

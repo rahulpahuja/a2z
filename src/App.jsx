@@ -21,6 +21,7 @@ import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx'
 import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
+import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 
@@ -45,6 +46,7 @@ const ADMIN_ROUTES = [
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/settings', Component: AdminSettingsPage },
   { path: '/super/docs', Component: AdminDocsPage },
+  { path: '/super/upload-test', Component: AdminUploadTestPage },
 ]
 
 function adminElement(Component) {

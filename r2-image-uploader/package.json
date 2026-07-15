@@ -1,0 +1,16 @@
+{
+  "name": "r2-image-uploader",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for secure client-side R2 image uploads",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.500.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.60.0"
+  }
+}

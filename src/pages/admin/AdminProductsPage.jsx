@@ -1,15 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCategories } from '../../services/categories.js';
-import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct } from '../../services/adminProducts.js';
+import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 
-const uploadImageToExternalServer = async (file) => {
+const uploadImageToExternalServer = async (file, customName) => {
+  const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
+  if (apiUrl) {
+    const formData = new FormData();
+    formData.append('file', file, customName);
+
+    const response = await fetch(`${apiUrl}/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload failed: ${errorText || response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.url;
+  }
+
   await new Promise((resolve) => setTimeout(resolve, 800)); // simulate network delay
-  const uniqueId = Math.random().toString(36).substring(2, 9);
-  return `https://external-image-server.com/uploads/${uniqueId}_${file.name}`;
+  return `https://external-image-server.com/uploads/${customName}`;
 };
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -36,21 +54,69 @@ export default function AdminProductsPage() {
   const [customSize, setCustomSize] = useState('');
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
+  const [productId, setProductId] = useState('');
+  const [imageFiles, setImageFiles] = useState([null, null, null, null, null]);
+  const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
+  const [imageNames, setImageNames] = useState(['', '', '', '', '']);
 
-  const handleImageChange = (e) => {
+  const generateProductId = () => `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+  const handleImageChange = (index, e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-      setImagePreview(URL.createObjectURL(file));
+      const ext = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
+      const autoName = `${productId}_image_${index + 1}${ext}`;
+
+      setImageFiles((prev) => {
+        const copy = [...prev];
+        copy[index] = file;
+        return copy;
+      });
+
+      setImagePreviews((prev) => {
+        const copy = [...prev];
+        if (copy[index]) URL.revokeObjectURL(copy[index]);
+        copy[index] = URL.createObjectURL(file);
+        return copy;
+      });
+
+      setImageNames((prev) => {
+        const copy = [...prev];
+        copy[index] = autoName;
+        return copy;
+      });
     }
   };
 
+  const handleImageNameChange = (index, value) => {
+    setImageNames((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  const clearImageSlot = (index) => {
+    setImageFiles((prev) => {
+      const copy = [...prev];
+      copy[index] = null;
+      return copy;
+    });
+    setImagePreviews((prev) => {
+      const copy = [...prev];
+      if (copy[index]) URL.revokeObjectURL(copy[index]);
+      copy[index] = '';
+      return copy;
+    });
+    setImageNames((prev) => {
+      const copy = [...prev];
+      copy[index] = '';
+      return copy;
+    });
+  };
+
   useEffect(() => {
+    setProductId(generateProductId());
     const unsubCategories = subscribeToCategories((rows) => setCategories(rows));
     const unsubProducts = subscribeToAdminProducts((rows, error) => {
       setProducts(rows);
@@ -93,11 +159,13 @@ export default function AdminProductsPage() {
     setColorInput('');
     setSizes([]);
     setCustomSize('');
-    setImageFile(null);
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImagePreview('');
+    imagePreviews.forEach((preview) => {
+      if (preview) URL.revokeObjectURL(preview);
+    });
+    setImageFiles([null, null, null, null, null]);
+    setImagePreviews(['', '', '', '', '']);
+    setImageNames(['', '', '', '', '']);
+    setProductId(generateProductId());
   };
 
   const handleSubmit = async (event) => {
@@ -114,14 +182,41 @@ export default function AdminProductsPage() {
       showToast('Add at least one size with stock.');
       return;
     }
+
+    const activeSlots = imageFiles.map((file, idx) => file ? idx : null).filter((val) => val !== null);
+    if (activeSlots.length < 3) {
+      showToast('Please upload at least 3 images (max 5) for the product.');
+      return;
+    }
+
+    for (const idx of activeSlots) {
+      if (!imageNames[idx].trim()) {
+        showToast(`Please enter a valid file name for Image Box ${idx + 1}.`);
+        return;
+      }
+    }
+
     const category = categories.find((c) => c.id === form.categoryId);
     setSaving(true);
     try {
-      let imageUrl = '';
-      if (imageFile) {
-        imageUrl = await uploadImageToExternalServer(imageFile);
-      }
+      const uploadPromises = activeSlots.map(async (idx) => {
+        const file = imageFiles[idx];
+        const customName = imageNames[idx].trim();
+        const url = await uploadImageToExternalServer(file, customName);
+        return {
+          url,
+          key: customName,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+        };
+      });
+
+      const uploadedFiles = await Promise.all(uploadPromises);
+      const uploadedUrls = uploadedFiles.map((f) => f.url);
+
       await createAdminProduct({
+        id: productId,
         title: form.title.trim(),
         description: form.description.trim(),
         hashtags: form.hashtagsInput
@@ -135,8 +230,23 @@ export default function AdminProductsPage() {
         hsnCode: form.hsnCode.trim(),
         colors,
         sizes,
-        image: imageUrl, // Uploaded image URL stored in Firebase
+        image: uploadedUrls[0],
+        images: uploadedUrls,
       });
+
+      // Save file metadata logs in Firebase Realtime Database
+      const metaPromises = uploadedFiles.map((f) => {
+        return createFileMetadata({
+          productId: productId,
+          key: f.key,
+          url: f.url,
+          originalName: f.name,
+          fileSize: f.size,
+          contentType: f.type,
+        });
+      });
+      await Promise.all(metaPromises);
+
       showToast('Product created.');
       resetForm();
     } catch (err) {
@@ -178,8 +288,8 @@ export default function AdminProductsPage() {
           <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
             <h2 className="font-title-sm text-title-sm text-on-surface mb-4">New Product</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="md:col-span-2">
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-title">
                     Title
                   </label>
@@ -191,6 +301,19 @@ export default function AdminProductsPage() {
                     className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                   />
                 </div>
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
+                    Product ID (Auto-generated)
+                  </label>
+                  <input
+                    readOnly
+                    value={productId}
+                    className="w-full bg-surface-container-low border border-outline-variant/60 rounded-lg px-4 py-3 font-mono text-body-md text-on-surface-variant cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-category">
                     Category
@@ -228,31 +351,76 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* Image Upload & Preview */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-end">
+              {/* Product Images (5 Slots) */}
+              <div className="space-y-4 border border-outline-variant/35 rounded-xl p-5 bg-surface-container-low/40">
                 <div>
-                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-image">
-                    Product Image
-                  </label>
-                  <input
-                    id="p-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-sm text-body-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-label-caps file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                  />
-                  <p className="font-body-sm text-body-sm text-on-surface-variant/70 mt-2">
-                    Image will be uploaded to external server, and path will be stored in Firebase.
+                  <h3 className="font-title-sm text-[16px] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    First image is the primary thumbnail. Filenames are customizable and automatically name-spaced to the Product ID.
                   </p>
                 </div>
-                {imagePreview && (
-                  <div>
-                    <span className="block font-label-caps text-label-caps text-on-surface-variant mb-2">Image Preview</span>
-                    <div className="w-24 aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant">
-                      <img src={imagePreview} className="w-full h-full object-cover" alt="Upload preview" />
-                    </div>
-                  </div>
-                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                  {[0, 1, 2, 3, 4].map((index) => {
+                    const preview = imagePreviews[index];
+                    const fileName = imageNames[index];
+                    const hasImage = !!imageFiles[index];
+
+                    return (
+                      <div key={index} className="flex flex-col gap-2 p-3 border border-outline-variant/40 rounded-lg bg-surface-container-lowest relative">
+                        <div className="flex justify-between items-center">
+                          <span className="font-label-caps text-[10px] text-on-surface-variant">Image Box {index + 1} {index < 3 && <span className="text-error font-bold">*</span>}</span>
+                          {hasImage && (
+                            <button
+                              type="button"
+                              onClick={() => clearImageSlot(index)}
+                              className="text-error font-body-sm text-[10px] hover:underline"
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
+
+                        {preview ? (
+                          <div className="w-full aspect-[3/4] rounded-md overflow-hidden bg-surface-container border border-outline-variant/30 relative">
+                            <img src={preview} className="w-full h-full object-cover" alt={`Preview ${index + 1}`} />
+                          </div>
+                        ) : (
+                          <div 
+                            onClick={() => document.getElementById(`image-file-input-${index}`).click()}
+                            className="w-full aspect-[3/4] rounded-md border-2 border-dashed border-outline-variant/70 hover:border-primary/50 bg-surface-container-low flex flex-col items-center justify-center cursor-pointer transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[24px] text-outline">add_a_photo</span>
+                            <span className="font-body-sm text-[10px] text-on-surface-variant/80 mt-1">Upload</span>
+                          </div>
+                        )}
+
+                        <input
+                          id={`image-file-input-${index}`}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageChange(index, e)}
+                          className="hidden"
+                        />
+
+                        {hasImage && (
+                          <div className="flex flex-col gap-1 mt-1">
+                            <label className="font-body-sm text-[10px] text-on-surface-variant/80" htmlFor={`filename-${index}`}>
+                              File Name
+                            </label>
+                            <input
+                              id={`filename-${index}`}
+                              type="text"
+                              value={fileName}
+                              onChange={(e) => handleImageNameChange(index, e.target.value)}
+                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-mono text-[10px] text-on-surface"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -440,7 +608,7 @@ export default function AdminProductsPage() {
                         <div>
                           <h3 className="font-title-sm text-title-sm text-on-surface">{product.title}</h3>
                         <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku}
+                          {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
                         </p>
                       </div>
                       <div className="flex gap-3">

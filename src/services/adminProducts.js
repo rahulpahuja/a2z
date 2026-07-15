@@ -1,4 +1,4 @@
-import { onValue, push, ref, remove, serverTimestamp } from 'firebase/database';
+import { onValue, ref, remove, serverTimestamp, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { PRODUCTS } from '../data/products.js';
 
@@ -75,11 +75,12 @@ export function subscribeToAdminProducts(callback) {
 // product: { title, description, hashtags: string[], categoryId, categoryTitle,
 //            price: number, hsnCode, colors: string[], sizes: [{ size, stock }] }
 export function createAdminProduct(product) {
+  const productId = product.id || `prod_${Date.now()}`;
   if (!isFirebaseEnabled) {
     const products = getLocalProducts();
     const newProduct = {
       ...product,
-      id: `prod_${Date.now()}`,
+      id: productId,
       sku: generateSku(),
       createdAt: new Date().toISOString(),
       createdAtMs: Date.now(),
@@ -89,12 +90,15 @@ export function createAdminProduct(product) {
     notifyLocalListeners();
     return Promise.resolve(newProduct);
   }
-  return push(ref(db, ROOT), {
+  const productRef = ref(db, `${ROOT}/${productId}`);
+  const payload = {
     ...product,
+    id: productId,
     sku: generateSku(),
     createdAt: serverTimestamp(),
     createdAtMs: Date.now(),
-  });
+  };
+  return set(productRef, payload).then(() => ({ id: productId, ...payload }));
 }
 
 export function deleteAdminProduct(id) {
@@ -106,4 +110,27 @@ export function deleteAdminProduct(id) {
     return Promise.resolve();
   }
   return remove(ref(db, `${ROOT}/${id}`));
+}
+
+export function createFileMetadata(metadata) {
+  const fileKey = (metadata.key || `file_${Date.now()}`).replace(/\./g, '_');
+  if (!isFirebaseEnabled) {
+    try {
+      const existing = JSON.parse(localStorage.getItem('fileMetadata') || '[]');
+      existing.push({ ...metadata, fileKey, createdAtMs: Date.now() });
+      localStorage.setItem('fileMetadata', JSON.stringify(existing));
+    } catch (e) {
+      console.error(e);
+    }
+    return Promise.resolve({ ...metadata, fileKey });
+  }
+
+  const fileRef = ref(db, `fileMetadata/${fileKey}`);
+  const payload = {
+    ...metadata,
+    fileKey,
+    createdAt: serverTimestamp(),
+    createdAtMs: Date.now(),
+  };
+  return set(fileRef, payload).then(() => ({ fileKey, ...payload }));
 }

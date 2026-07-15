@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
+  { to: '/super/upload-test', label: 'R2 Upload Test', icon: 'cloud_upload' },
 ];
 
 export default function AdminLayout({ children }) {
