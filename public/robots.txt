@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /__trap__
+Disallow: /super/
+Disallow: /dashboard
