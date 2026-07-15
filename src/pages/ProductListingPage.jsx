@@ -80,7 +80,7 @@ export default function ProductListingPage() {
 
   return (
     <>
-      <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 docked full-width top-0 sticky">
+      <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
         <div className="flex items-center gap-6">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
         </div>
@@ -104,7 +104,7 @@ export default function ProductListingPage() {
         </div>
       </header>
 
-      <div className="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
+      <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
         <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
           {activeCategory === 'All' ? 'ALL PRODUCTS' : `${activeCategory.toUpperCase()}S`}
         </h1>
@@ -127,8 +127,8 @@ export default function ProductListingPage() {
         </div>
       </div>
 
-      <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 flex flex-col md:flex-row gap-8">
-        <aside className="w-full md:w-[300px] flex-shrink-0 space-y-8 pr-4">
+      <main className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row gap-8">
+        <aside className="w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4">
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
               Category
@@ -254,7 +254,7 @@ export default function ProductListingPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {filteredProducts.map((product) => {
               const isFavorited = !!favorites[product.id];
               return (
@@ -375,7 +375,7 @@ export default function ProductListingPage() {
         </div>
       </main>
 
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest mt-auto grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto full-width bottom">
+      <footer className="bg-surface-container-low dark:bg-surface-container-lowest mt-auto grid grid-cols-1 md:grid-cols-4 gap-gutter px-6 md:px-12 py-12 max-w-[1680px] mx-auto full-width bottom">
         <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
           <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>

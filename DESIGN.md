@@ -159,3 +159,9 @@ The shape language is defined by "Soft Architectural" lines. While the grid is r
 - **Input Fields:** Minimalist design with a bottom border or a very light 1px border in Dusty Rose. Focus states transition the border to Hot Pink.
 - **Lists/Navigation:** Desktop navigation uses Playfair Display for top-level categories to signal luxury, while sub-menus use Montserrat for clarity. 
 - **Icons:** Custom stroke icons that represent Indian heritage (e.g., a stylized lotus for favorites or a traditional fabric roll for 'Material' details) are encouraged.
+
+## Product Image Upload Specification
+- **Process**: Administrators can upload a product image when creating a new product.
+- **Preview**: An instant local image preview is shown in 3:4 aspect ratio.
+- **External Image Server**: Uploaded images are sent to a dedicated external media server to minimize load on the core database.
+- **Database Storage**: The core Firebase Realtime Database stores the returned absolute URL/path from the external server, rather than the raw binary data.
