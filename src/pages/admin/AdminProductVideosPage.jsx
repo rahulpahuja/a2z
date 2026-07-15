@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { subscribeToAdminProducts, updateProductVideos, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
 
@@ -41,6 +42,8 @@ const getR2KeyFromUrl = (url) => {
 
 export default function AdminProductVideosPage() {
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedProductId = searchParams.get('productId');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -62,6 +65,15 @@ export default function AdminProductVideosPage() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (!requestedProductId || selectedProductId) return;
+    const product = products.find((p) => p.id === requestedProductId);
+    if (product) {
+      loadProductIntoForm(product);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedProductId, products, selectedProductId]);
+
   const selectedProduct = useMemo(
     () => products.find((p) => p.id === selectedProductId) ?? null,
     [products, selectedProductId]
@@ -79,6 +91,7 @@ export default function AdminProductVideosPage() {
 
   const loadProductIntoForm = (product) => {
     setSelectedProductId(product.id);
+    setSearchParams({ productId: product.id });
     setQuery('');
     const existing = product.videos ?? [];
     const previews = ['', ''];
@@ -147,6 +160,7 @@ export default function AdminProductVideosPage() {
 
   const backToSearch = () => {
     setSelectedProductId(null);
+    setSearchParams({});
     videoPreviews.forEach((preview) => {
       if (preview && preview.startsWith('blob:')) URL.revokeObjectURL(preview);
     });
@@ -227,6 +241,11 @@ export default function AdminProductVideosPage() {
         {!selectedProduct ? (
           <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
             <h2 className="font-title-sm text-title-sm text-on-surface mb-4">Find a Product</h2>
+            {requestedProductId && !loading && !loadError && (
+              <p className="font-body-sm text-body-sm text-error mb-4">
+                Couldn't find a product with ID "{requestedProductId}". Search for it below instead.
+              </p>
+            )}
             <div className="relative">
               <input
                 value={query}
@@ -268,6 +287,9 @@ export default function AdminProductVideosPage() {
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
                             SKU {product.sku} · {product.categoryTitle}
                           </p>
+                          <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono truncate">
+                            ID: {product.id}
+                          </p>
                         </div>
                         <span className="font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap">
                           {videoCount}/{MAX_VIDEOS} videos
@@ -296,6 +318,9 @@ export default function AdminProductVideosPage() {
                   <h2 className="font-title-sm text-title-sm text-on-surface">{selectedProduct.title || selectedProduct.name}</h2>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     SKU {selectedProduct.sku} · {selectedProduct.categoryTitle}
+                  </p>
+                  <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
+                    ID: {selectedProduct.id}
                   </p>
                 </div>
               </div>
