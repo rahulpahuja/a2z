@@ -14,6 +14,10 @@ const ENV_VARS = [
     name: 'VITE_ADMIN_PHONES',
     desc: 'Comma-separated E.164 phone numbers (e.g. +919876543210) allowed the same access via phone OTP sign-in.',
   },
+  {
+    name: 'VITE_IMAGE_UPLOAD_API_URL',
+    desc: 'Your deployed Cloudflare R2 Upload Worker endpoint (e.g. https://r2-image-uploader.<subdomain>.workers.dev). Leave blank for local uploader simulation.',
+  },
 ];
 
 const ADMIN_SECTIONS = [
@@ -22,6 +26,7 @@ const ADMIN_SECTIONS = [
   { to: '/super/products', label: 'Products', desc: 'Manage the product catalog stored in Realtime Database.' },
   { to: '/super/bill-template', label: 'Bill Template', desc: 'Configure the layout used for generated order receipts.' },
   { to: '/super/settings', label: 'Store Settings', desc: 'Store name, address, phone, and GST number.' },
+  { to: '/super/upload-test', label: 'R2 Upload Test', desc: 'Diagnose and run test uploads to Cloudflare R2.' },
 ];
 
 const RTDB_PATHS = [
@@ -30,6 +35,7 @@ const RTDB_PATHS = [
   { path: 'adminProducts/*', access: 'Read & write: signed-in users only.', note: 'Used by the Products admin page.' },
   { path: 'categories/*', access: 'Read & write: signed-in users only.', note: 'Used by the Categories admin page.' },
   { path: 'settings/*', access: 'Read & write: signed-in users only.', note: 'Store Settings + Bill Template.' },
+  { path: 'fileMetadata/*', access: 'Read & write: signed-in users only.', note: 'Logs R2 storage keys, urls, MIME types, and sizes for all uploads.' },
 ];
 
 function Section({ id, title, children }) {
@@ -62,6 +68,7 @@ const TOC = [
   { id: 'signing-in', label: 'Signing In' },
   { id: 'env-vars', label: 'Environment Variables' },
   { id: 'firebase-setup', label: 'Firebase Console Setup' },
+  { id: 'r2-setup', label: 'Cloudflare R2 Worker Setup' },
   { id: 'view-tracking', label: 'Product View & Purchase Tracking' },
   { id: 'rtdb-paths', label: 'Realtime Database Paths' },
   { id: 'admin-sections', label: 'Admin Panel Sections' },
@@ -174,6 +181,41 @@ export default function AdminDocsPage() {
                 it worked in the browser.
               </li>
             </ol>
+          </Section>
+
+          <Section id="r2-setup" title="Cloudflare R2 Worker Setup">
+            <p>
+              Product images are uploaded to **Cloudflare R2** object storage. The upload process runs through a 
+              secured, keyless Cloudflare Worker located in the <Code>r2-image-uploader/</Code> directory.
+            </p>
+
+            <h3 className="font-semibold text-on-surface mt-4 mb-2">Local Development &amp; Testing</h3>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Wrangler automatically simulates R2 buckets locally using Miniflare when running dev servers.</li>
+              <li>Start the local worker by executing: <Code>cd r2-image-uploader &amp;&amp; npm run dev</Code> (Runs on <Code>http://localhost:8787</Code>).</li>
+              <li>Vite React app starts on <Code>http://localhost:5173</Code>. Go to <Code>/super/upload-test</Code> to verify local uploads.</li>
+            </ol>
+
+            <h3 className="font-semibold text-on-surface mt-4 mb-2">Cloudflare Bucket Configuration</h3>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>In Cloudflare, go to **R2** &gt; click your bucket **`a2z`** (Bucket ID: `b8ebe9fcc46b4305a85b2ce591f72033`).</li>
+              <li>Go to **Settings** &gt; scroll to **Public Access** &gt; enable **R2.dev subdomain** (or custom domain). Copy this public URL.</li>
+            </ol>
+
+            <h3 className="font-semibold text-on-surface mt-4 mb-2">Production Live Deployment</h3>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Register your free subdomain at <a href="https://dash.cloudflare.com/6c94ed9cf1a037967350e4f9374c4b1c/workers/onboarding" target="_blank" rel="noreferrer" className="text-primary hover:underline">Cloudflare Onboarding</a>.</li>
+              <li>Deploy the worker: <Code>npx wrangler deploy</Code>.</li>
+              <li>Securely bind your public R2 URL in secrets: <Code>npx wrangler secret put R2_PUBLIC_URL</Code> (paste your public bucket URL when prompted).</li>
+              <li>In your storefront's <Code>.env</Code> file, set <Code>VITE_IMAGE_UPLOAD_API_URL</Code> to your live worker endpoint.</li>
+            </ol>
+
+            <h3 className="font-semibold text-on-surface mt-4 mb-2">Upload Logic &amp; Constraints</h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>Slots</strong>: Product creation supports uploading **3 to 5 images** in parallel. First image is the primary thumbnail.</li>
+              <li><strong>Renaming</strong>: Images are auto-renamed to `{`productId`}_image_{`index`}.{`ext`}`. Filenames are fully editable in the UI before submitting.</li>
+              <li><strong>Metadata</strong>: After successful R2 uploads, complete file logs are saved in Firebase RTDB at <Code>fileMetadata/</Code> (tracking sizes, keys, URLs, and timestamps).</li>
+            </ul>
           </Section>
 
           <Section id="view-tracking" title="Product View & Purchase Tracking">
