@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.3.2",
     "chart.js": "^4.5.1",
     "firebase": "^12.16.0",
+    "heic2any": "^0.0.4",
     "jsbarcode": "^3.12.3",
     "jspdf": "^4.2.1",
     "react": "^19.2.7",

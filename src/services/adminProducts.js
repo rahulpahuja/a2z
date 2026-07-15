@@ -112,6 +112,20 @@ export function deleteAdminProduct(id) {
   return remove(ref(db, `${ROOT}/${id}`));
 }
 
+export function updateProductVideos(productId, videos) {
+  if (!isFirebaseEnabled) {
+    const products = getLocalProducts();
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      product.videos = videos;
+      setLocalProducts(products);
+      notifyLocalListeners();
+    }
+    return Promise.resolve();
+  }
+  return set(ref(db, `${ROOT}/${productId}/videos`), videos);
+}
+
 export function reduceProductStock(productId, size, quantity) {
   if (!isFirebaseEnabled) {
     const products = getLocalProducts();

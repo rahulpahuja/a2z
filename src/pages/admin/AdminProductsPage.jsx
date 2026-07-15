@@ -6,6 +6,7 @@ import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct, creat
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
+import { isHeicFile, convertHeicFileToJpeg } from '../../utils/heic.js';
 
 const uploadImageToExternalServer = async (file, customName) => {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
@@ -170,9 +171,19 @@ export default function AdminProductsPage() {
 
   const generateProductId = () => `prod_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-  const handleImageChange = (index, e) => {
-    const file = e.target.files?.[0];
+  const handleImageChange = async (index, e) => {
+    let file = e.target.files?.[0];
     if (file) {
+      if (isHeicFile(file)) {
+        showToast('Converting HEIC photo…');
+        try {
+          file = await convertHeicFileToJpeg(file);
+        } catch {
+          showToast('Could not convert HEIC photo. Please try a JPG or PNG.');
+          return;
+        }
+      }
+
       const ext = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
       const autoName = `${productId}_image_${index + 1}${ext}`;
 
@@ -581,7 +592,7 @@ export default function AdminProductsPage() {
                         <input
                           id={`image-file-input-${index}`}
                           type="file"
-                          accept="image/*"
+                          accept="image/*,.heic,.heif"
                           onChange={(e) => handleImageChange(index, e)}
                           className="hidden"
                         />

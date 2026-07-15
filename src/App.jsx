@@ -21,6 +21,7 @@ import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
 import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
+import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx'
 import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
@@ -48,6 +49,7 @@ const ADMIN_ROUTES = [
   { path: '/super', Component: AdminDashboardPage },
   { path: '/super/categories', Component: AdminCategoriesPage },
   { path: '/super/products', Component: AdminProductsPage },
+  { path: '/super/product-videos', Component: AdminProductVideosPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/settings', Component: AdminSettingsPage },
   { path: '/super/docs', Component: AdminDocsPage },
