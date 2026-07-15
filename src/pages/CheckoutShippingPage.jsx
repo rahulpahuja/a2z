@@ -50,6 +50,8 @@ export default function CheckoutShippingPage() {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const tax = subtotal * 0.18;
+  const grandTotal = subtotal + tax;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -239,8 +241,8 @@ export default function CheckoutShippingPage() {
                   <span>Free</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Taxes</span>
-                  <span>Calculated at checkout</span>
+                  <span>Tax (18%)</span>
+                  <span>{formatCurrency(tax)}</span>
                 </div>
               </div>
               {/* Divider */}
@@ -248,7 +250,7 @@ export default function CheckoutShippingPage() {
               {/* Total */}
               <div className="flex justify-between items-center">
                 <span className="font-title-sm text-title-sm text-on-surface">Total</span>
-                <span className="font-price-display text-price-display text-primary text-2xl">{formatCurrency(subtotal)}</span>
+                <span className="font-price-display text-price-display text-primary text-2xl">{formatCurrency(grandTotal)}</span>
               </div>
             </div>
           </div>
