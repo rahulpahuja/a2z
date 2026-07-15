@@ -57,6 +57,20 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Prohibited Automated Access</h2>
+            <p>
+              You may not use any bot, crawler, scraper, scanner, or AI-based tool or agent to access, extract,
+              copy, or create a modified or derivative reproduction of any content on this website — including
+              product listings, images, descriptions, pricing, or site design — for any personal, commercial, or
+              other purpose, without our prior written consent.
+            </p>
+            <p className="mt-4">
+              Any person or entity found engaging in such unauthorized automated access or reproduction will be
+              subject to heavy penalization, to the fullest extent permitted by law.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Contact Us</h2>
             <p>
               If you have any questions about this Privacy Policy, please reach out to us through the contact

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { subscribeToAdminProducts } from '../services/adminProducts.js';
 import { subscribeToCategories } from '../services/categories.js';
+import { subscribeToSubcategories } from '../services/subcategories.js';
 import { PRODUCTS } from '../data/products.js';
 
 const ProductsContext = createContext(null);
@@ -8,6 +9,7 @@ const ProductsContext = createContext(null);
 export function ProductsProvider({ children }) {
   const [dbProducts, setDbProducts] = useState([]);
   const [dbCategories, setDbCategories] = useState([]);
+  const [dbSubcategories, setDbSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,9 +20,13 @@ export function ProductsProvider({ children }) {
       setDbCategories(rows);
       setLoading(false);
     });
+    const unsubSubcategories = subscribeToSubcategories((rows) => {
+      setDbSubcategories(rows);
+    });
     return () => {
       unsubProducts();
       unsubCategories();
+      unsubSubcategories();
     };
   }, []);
 
@@ -43,13 +49,16 @@ export function ProductsProvider({ children }) {
     return ['All', ...titles];
   }, [dbCategories]);
 
+  const subcategories = useMemo(() => dbSubcategories, [dbSubcategories]);
+
   const value = useMemo(
     () => ({
       products,
       categories,
+      subcategories,
       loading,
     }),
-    [products, categories, loading]
+    [products, categories, subcategories, loading]
   );
 
   return <ProductsContext.Provider value={value}>{children}</ProductsContext.Provider>;

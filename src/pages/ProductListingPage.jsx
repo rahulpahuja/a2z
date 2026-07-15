@@ -42,10 +42,11 @@ const BADGE_STYLES = {
 const PAGES = [1];
 
 export default function ProductListingPage() {
-  const { products: CATALOG, categories: CATEGORY_OPTIONS } = useProducts();
+  const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
   const { addItem } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') ?? 'All';
+  const activeSubcategory = searchParams.get('subcategory') ?? 'All';
 
   const [priceValue, setPriceValue] = useState(2500);
   const [selectedColor, setSelectedColor] = useState('dusty-rose');
@@ -55,11 +56,16 @@ export default function ProductListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const setActiveCategory = (category) => {
-    if (category === 'All') {
-      setSearchParams({});
-    } else {
-      setSearchParams({ category });
-    }
+    const next = {};
+    if (category !== 'All') next.category = category;
+    setSearchParams(next);
+  };
+
+  const setActiveSubcategory = (subcategory) => {
+    const next = {};
+    if (activeCategory !== 'All') next.category = activeCategory;
+    if (subcategory !== 'All') next.subcategory = subcategory;
+    setSearchParams(next);
   };
 
   const toggleFavorite = (id) => {
@@ -69,13 +75,45 @@ export default function ProductListingPage() {
   const selectedColorLabel = COLORS.find((c) => c.id === selectedColor)?.label ?? null;
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
 
+  const subcategoryOptions = useMemo(() => {
+    const relevant = activeCategory === 'All'
+      ? SUBCATEGORIES
+      : SUBCATEGORIES.filter((s) => s.categoryTitle === activeCategory);
+    const titles = [...new Set(relevant.map((s) => s.title))];
+    return titles;
+  }, [SUBCATEGORIES, activeCategory]);
+
   const filteredProducts = useMemo(() => {
-    const base = activeCategory === 'All' ? CATALOG : CATALOG.filter((p) => (p.category || p.categoryTitle) === activeCategory);
+    let base = activeCategory === 'All' ? CATALOG : CATALOG.filter((p) => (p.category || p.categoryTitle) === activeCategory);
+    if (activeSubcategory !== 'All') {
+      base = base.filter((p) => p.subcategoryTitle === activeSubcategory);
+    }
     if (sortBy === 'price-asc') return [...base].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
-  }, [activeCategory, sortBy]);
+  }, [CATALOG, activeCategory, activeSubcategory, sortBy]);
+
+  // Arrange products grouped by subcategory so like-with-like sits together on the grid.
+  const productGroups = useMemo(() => {
+    if (activeSubcategory !== 'All') {
+      return [{ title: null, items: filteredProducts }];
+    }
+    const groups = [];
+    const indexByTitle = new Map();
+    filteredProducts.forEach((product) => {
+      const key = product.subcategoryTitle || '';
+      if (!indexByTitle.has(key)) {
+        indexByTitle.set(key, groups.length);
+        groups.push({ title: key || null, items: [] });
+      }
+      groups[indexByTitle.get(key)].items.push(product);
+    });
+    if (groups.length <= 1) {
+      return [{ title: null, items: filteredProducts }];
+    }
+    return groups;
+  }, [filteredProducts, activeSubcategory]);
 
   return (
     <>
@@ -148,6 +186,39 @@ export default function ProductListingPage() {
               ))}
             </div>
           </div>
+
+          {subcategoryOptions.length > 0 && (
+            <div className="space-y-4 border-b border-surface-variant pb-6">
+              <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+                Subcategory
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    checked={activeSubcategory === 'All'}
+                    onChange={() => setActiveSubcategory('All')}
+                    className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                    type="radio"
+                    name="subcategory"
+                  />
+                  <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">All</span>
+                </label>
+                {subcategoryOptions.map((subcategory) => (
+                  <label key={subcategory} className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      checked={activeSubcategory === subcategory}
+                      onChange={() => setActiveSubcategory(subcategory)}
+                      className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                      type="radio"
+                      name="subcategory"
+                    />
+                    <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">{subcategory}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
@@ -223,7 +294,7 @@ export default function ProductListingPage() {
           <button
             className="w-full py-3 rounded-xl border border-primary text-primary font-label-caps text-label-caps uppercase tracking-widest hover:bg-primary/5 transition-colors"
             onClick={() => {
-              setActiveCategory('All');
+              setSearchParams({});
               setPriceValue(2500);
               setSelectedColor(null);
               setSelectedSize(null);
@@ -253,12 +324,19 @@ export default function ProductListingPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-            {filteredProducts.map((product) => {
-              const isFavorited = !!favorites[product.id];
-              const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
-              return (
-                <article
+          {productGroups.map((group, groupIdx) => (
+            <div key={group.title ?? `group-${groupIdx}`} className={groupIdx > 0 ? 'mt-10' : ''}>
+              {group.title && (
+                <h2 className="font-title-md text-title-md text-on-surface mb-4 pb-2 border-b border-surface-variant">
+                  {group.title}
+                </h2>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                {group.items.map((product) => {
+                  const isFavorited = !!favorites[product.id];
+                  const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                  return (
+                    <article
                   key={product.id}
                   className={`group relative flex flex-col bg-surface-container-lowest border border-[#DCAE96]/30 rounded-[16px] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1 ${!isAvailable ? 'opacity-85' : ''}`}
                 >
@@ -346,9 +424,11 @@ export default function ProductListingPage() {
                     )}
                   </div>
                 </article>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
 
           <div className="mt-12 flex justify-center items-center gap-2">
             <button
