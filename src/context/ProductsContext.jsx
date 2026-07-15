@@ -1,19 +1,27 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { subscribeToAdminProducts } from '../services/adminProducts.js';
+import { subscribeToCategories } from '../services/categories.js';
 import { PRODUCTS } from '../data/products.js';
 
 const ProductsContext = createContext(null);
 
 export function ProductsProvider({ children }) {
   const [dbProducts, setDbProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = subscribeToAdminProducts((rows) => {
+    const unsubProducts = subscribeToAdminProducts((rows) => {
       setDbProducts(rows);
+    });
+    const unsubCategories = subscribeToCategories((rows) => {
+      setDbCategories(rows);
       setLoading(false);
     });
-    return unsub;
+    return () => {
+      unsubProducts();
+      unsubCategories();
+    };
   }, []);
 
   const products = useMemo(() => {
@@ -31,13 +39,9 @@ export function ProductsProvider({ children }) {
   }, [dbProducts]);
 
   const categories = useMemo(() => {
-    const cats = new Set();
-    products.forEach((p) => {
-      const cat = p.categoryTitle || p.category;
-      if (cat) cats.add(cat);
-    });
-    return ['All', ...Array.from(cats)];
-  }, [products]);
+    const titles = dbCategories.map((c) => c.title);
+    return ['All', ...titles];
+  }, [dbCategories]);
 
   const value = useMemo(
     () => ({

@@ -289,6 +289,9 @@ export default function ProductListingPage() {
                     </button>
                   </Link>
                   <div className="p-4 flex flex-col flex-grow">
+                    <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
+                      {product.category || product.categoryTitle}
+                    </span>
                     <Link to={`/product/${product.id}`}>
                       <h2 className="font-title-sm text-title-sm text-on-surface mb-1 line-clamp-1">{product.name || product.title}</h2>
                     </Link>
