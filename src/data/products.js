@@ -97,8 +97,7 @@ export const PRODUCTS = [
     badge: 'New Arrival',
     inStock: true,
     category: 'Kurti',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCi3kP4sXTZ-vZpQcCQ9ThUtB61s2Vr4jK7XKsEUFqM9uZipKtCHbFttQBnFF2e-BzC8x8HRpK5uatV9K9kzH-90cgrxP0GI-2h3x2YPZubbkonNW-3WYAXKfIg1UAUy43U10_PR7q9aAqENyfzyAq9oOU6uB686NXCn4o4xRhlUhnYh7q5vwARRaQ1zwxccic5cN2YmcuIkyBIUzJsOeFb5LletNwGzEpwduKlDxDR8elxnPYGIxZs5w',
+    image: '/mustard_kurti_set.jpg',
     alt: 'A striking portrait of a model wearing a contemporary mustard yellow Kurti set with palazzos.',
   },
   {
