@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
+import { getHighResUrl } from '../utils/image.js';
 import './ProductDetailAltPage.css';
 
 const PRODUCT = { id: 'crop-shirt-side-dori', title: 'Crop Shirt with Side Dori', price: 360 };
@@ -96,6 +97,13 @@ const relatedProducts = [
   },
 ];
 
+thumbnails.forEach((t) => {
+  t.src = getHighResUrl(t.src);
+});
+relatedProducts.forEach((rp) => {
+  rp.src = getHighResUrl(rp.src);
+});
+
 export default function ProductDetailAltPage() {
   const [openSection, setOpenSection] = useState(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].label);
@@ -178,7 +186,7 @@ export default function ProductDetailAltPage() {
                 className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
                 data-alt="A highly editorial fashion photograph of a beautiful handcrafted crop shirt with a side dori detail. The garment is made from traditional Indian textiles featuring subtle dusty rose and hot pink motifs, blending minimalism with modern luxury. The setting is a pristine, bright studio with soft, natural lighting that casts gentle shadows, highlighting the rich texture of the fabric. The overall aesthetic is 'Vibrant Elegance', appealing to a high-end contemporary fashion audience. Shot with an 85mm lens."
                 id="main-product-image"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA862w4s_QW4LsrwVqg_i79cFJRyRWPymM0bS5ADeHlUd1Od_JDVv9XPUCfYz5CTTPg3fqKZZwePePzrOaG2g2XnA5QJLj_cHSaf1AYMVuJXw4WRIyp5bI7Wpz0KxvFRRYvgeOV9DYD3NZZhSlBCo6OQWiy32TfaNTxF6v3BmHA9qw3dxJK6-3Nl2GJZbu5cviFyd32GQq9IjSB257ofYBYYE4vc2kwL74TQG0Xxh37YTYvr7e0-68N7w"
+                src={getHighResUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuA862w4s_QW4LsrwVqg_i79cFJRyRWPymM0bS5ADeHlUd1Od_JDVv9XPUCfYz5CTTPg3fqKZZwePePzrOaG2g2XnA5QJLj_cHSaf1AYMVuJXw4WRIyp5bI7Wpz0KxvFRRYvgeOV9DYD3NZZhSlBCo6OQWiy32TfaNTxF6v3BmHA9qw3dxJK6-3Nl2GJZbu5cviFyd32GQq9IjSB257ofYBYYE4vc2kwL74TQG0Xxh37YTYvr7e0-68N7w")}
               />
               {/* Favorite FAB */}
               <button className="absolute top-4 right-4 w-10 h-10 bg-surface rounded-full flex items-center justify-center text-outline shadow-sm hover:text-primary transition-colors">
@@ -326,27 +334,42 @@ export default function ProductDetailAltPage() {
             {/* Accordions (Shipping, Returns) */}
             <div className="border-t border-outline-variant/30">
               {accordionItems.map((item) => {
-                const isOpen = openSection === item.key;
+                const isPermanentOpen = item.key === 'shipping' || item.key === 'returns';
+                const isOpen = isPermanentOpen || openSection === item.key;
                 return (
                   <div key={item.key} className="border-b border-outline-variant/30 py-4">
-                    <button
-                      className="accordion-btn w-full flex justify-between items-center text-left focus:outline-none"
-                      onClick={() => toggleAccordion(item.key)}
-                    >
-                      <span className="font-title-sm text-title-sm text-on-surface flex items-center gap-3">
-                        <span className="material-symbols-outlined text-outline">{item.icon}</span>
-                        {item.title}
-                      </span>
-                      <span
-                        className="material-symbols-outlined text-on-surface-variant transition-transform duration-300"
-                        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                      >
-                        expand_more
-                      </span>
-                    </button>
-                    <div className={`accordion-content font-body-sm text-body-sm text-on-surface-variant pt-2 pr-8 ${isOpen ? 'open' : ''}`}>
-                      {item.content}
-                    </div>
+                    {isPermanentOpen ? (
+                      <div className="w-full flex flex-col text-left">
+                        <span className="font-title-sm text-title-sm text-on-surface flex items-center gap-3 mb-2">
+                          <span className="material-symbols-outlined text-outline">{item.icon}</span>
+                          {item.title}
+                        </span>
+                        <div className="font-body-sm text-body-sm text-on-surface-variant pr-8">
+                          {item.content}
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          className="accordion-btn w-full flex justify-between items-center text-left focus:outline-none"
+                          onClick={() => toggleAccordion(item.key)}
+                        >
+                          <span className="font-title-sm text-title-sm text-on-surface flex items-center gap-3">
+                            <span className="material-symbols-outlined text-outline">{item.icon}</span>
+                            {item.title}
+                          </span>
+                          <span
+                            className="material-symbols-outlined text-on-surface-variant transition-transform duration-300"
+                            style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                          >
+                            expand_more
+                          </span>
+                        </button>
+                        <div className={`accordion-content font-body-sm text-body-sm text-on-surface-variant pt-2 pr-8 ${isOpen ? 'open' : ''}`}>
+                          {item.content}
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })}
