@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
+import VideoPlayer from '../components/VideoPlayer.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
@@ -96,7 +97,6 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
   const [viewCount, setViewCount] = useState(null);
-  const [videoUnsupported, setVideoUnsupported] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -172,23 +172,7 @@ export default function ProductDetailPage() {
         <section className="md:col-span-7 flex flex-col gap-unit">
           <div className="relative w-full aspect-[3/4] bg-surface-container rounded-xl overflow-hidden group">
             {mainMedia.type === 'video' ? (
-              videoUnsupported ? (
-                <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-surface-container-high">
-                  <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">error</span>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    This video format isn't supported in your browser.
-                  </p>
-                </div>
-              ) : (
-                <video
-                  key={mainMedia.src}
-                  src={mainMedia.src}
-                  controls
-                  playsInline
-                  className="w-full h-full object-contain bg-black"
-                  onError={() => setVideoUnsupported(true)}
-                />
-              )
+              <VideoPlayer src={mainMedia.src} className="w-full h-full object-contain bg-black" />
             ) : (
               <img
                 alt={product.name}
@@ -208,10 +192,7 @@ export default function ProductDetailPage() {
               {media.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => {
-                    setVideoUnsupported(false);
-                    setSelectedThumbnail(index);
-                  }}
+                  onClick={() => setSelectedThumbnail(index)}
                   className={`relative w-16 h-20 rounded-md overflow-hidden border transition-all ${
                     selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
                   }`}
