@@ -78,27 +78,33 @@ export function createAdminProduct(product) {
   const productId = product.id || `prod_${Date.now()}`;
   if (!isFirebaseEnabled) {
     const products = getLocalProducts();
+    const existing = products.find((p) => p.id === productId);
     const newProduct = {
       ...product,
       id: productId,
-      sku: generateSku(),
-      createdAt: new Date().toISOString(),
-      createdAtMs: Date.now(),
+      sku: existing?.sku || generateSku(),
+      createdAt: existing?.createdAt || new Date().toISOString(),
+      createdAtMs: existing?.createdAtMs ?? Date.now(),
     };
-    products.push(newProduct);
-    setLocalProducts(products);
+    const updatedProducts = existing
+      ? products.map((p) => (p.id === productId ? newProduct : p))
+      : [...products, newProduct];
+    setLocalProducts(updatedProducts);
     notifyLocalListeners();
     return Promise.resolve(newProduct);
   }
   const productRef = ref(db, `${ROOT}/${productId}`);
-  const payload = {
-    ...product,
-    id: productId,
-    sku: generateSku(),
-    createdAt: serverTimestamp(),
-    createdAtMs: Date.now(),
-  };
-  return set(productRef, payload).then(() => ({ id: productId, ...payload }));
+  return get(productRef).then((snapshot) => {
+    const existing = snapshot.exists() ? snapshot.val() : null;
+    const payload = {
+      ...product,
+      id: productId,
+      sku: existing?.sku || generateSku(),
+      createdAt: existing?.createdAt || serverTimestamp(),
+      createdAtMs: existing?.createdAtMs ?? Date.now(),
+    };
+    return set(productRef, payload).then(() => ({ id: productId, ...payload }));
+  });
 }
 
 export function deleteAdminProduct(id) {

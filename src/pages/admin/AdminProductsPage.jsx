@@ -64,6 +64,7 @@ export default function AdminProductsPage() {
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
   const [editingProductId, setEditingProductId] = useState(null);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
+  const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
   const getR2KeyFromUrl = (url) => {
     try {
@@ -127,6 +128,7 @@ export default function AdminProductsPage() {
     }
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
+    setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -195,7 +197,17 @@ export default function AdminProductsPage() {
 
       setImagePreviews((prev) => {
         const copy = [...prev];
-        if (copy[index]) URL.revokeObjectURL(copy[index]);
+        const previousUrl = copy[index];
+        if (previousUrl) {
+          if (previousUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previousUrl);
+          } else {
+            // Replacing an already-uploaded image — queue the old file for
+            // deletion from R2 once the product save succeeds.
+            const key = getR2KeyFromUrl(previousUrl);
+            if (key) setRemovedImageKeys((keys) => [...keys, key]);
+          }
+        }
         copy[index] = URL.createObjectURL(file);
         return copy;
       });
@@ -224,7 +236,15 @@ export default function AdminProductsPage() {
     });
     setImagePreviews((prev) => {
       const copy = [...prev];
-      if (copy[index]) URL.revokeObjectURL(copy[index]);
+      const previousUrl = copy[index];
+      if (previousUrl) {
+        if (previousUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(previousUrl);
+        } else {
+          const key = getR2KeyFromUrl(previousUrl);
+          if (key) setRemovedImageKeys((keys) => [...keys, key]);
+        }
+      }
       copy[index] = '';
       return copy;
     });
@@ -301,6 +321,7 @@ export default function AdminProductsPage() {
     setImageFiles([null, null, null, null, null]);
     setImagePreviews(['', '', '', '', '']);
     setImageNames(['', '', '', '', '']);
+    setRemovedImageKeys([]);
     setProductId(generateProductId());
     setEditingProductId(null);
   };
@@ -398,6 +419,22 @@ export default function AdminProductsPage() {
         });
       });
       await Promise.all(metaPromises);
+
+      // Only now that the product record itself has saved successfully do we
+      // remove the replaced/deleted images from R2 — deleting first and
+      // failing the save would leave the product pointing at nothing.
+      if (removedImageKeys.length > 0) {
+        const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
+        const deletePromises = removedImageKeys.map(async (key) => {
+          if (!apiUrl) return;
+          try {
+            await fetch(`${apiUrl}/${key}`, { method: 'DELETE' });
+          } catch (e) {
+            console.error(`Failed to delete R2 file: ${key}`, e);
+          }
+        });
+        await Promise.all(deletePromises);
+      }
 
       showToast(editingProductId ? 'Product updated.' : 'Product created.');
       resetForm();
