@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { subscribeToAdminProducts, updateProductVideos, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { transcodeVideoToH264 } from '../../utils/videoTranscode.js';
 
 const MAX_VIDEOS = 2;
 const SLOTS = [0, 1];
@@ -30,6 +31,13 @@ const uploadVideoToExternalServer = async (file, customName) => {
   return `https://external-image-server.com/uploads/${customName}`;
 };
 
+const VIDEO_EXTENSION_RE = /\.(mp4|mov|m4v|webm|ogg|avi|mkv)$/i;
+
+// iPhone videos come through as .mov (often HEVC-encoded) with MIME type
+// "video/quicktime" — that already matches "video/*", but some file pickers
+// hand back an empty file.type, so fall back to checking the extension too.
+const isVideoFile = (file) => file.type.startsWith('video/') || VIDEO_EXTENSION_RE.test(file.name);
+
 const getR2KeyFromUrl = (url) => {
   try {
     const parsed = new URL(url);
@@ -55,6 +63,7 @@ export default function AdminProductVideosPage() {
   const [videoNames, setVideoNames] = useState(['', '']);
   const [removedKeys, setRemovedKeys] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [convertingProgress, setConvertingProgress] = useState({});
 
   useEffect(() => {
     const unsubscribe = subscribeToAdminProducts((rows, error) => {
@@ -106,25 +115,47 @@ export default function AdminProductVideosPage() {
     setRemovedKeys([]);
   };
 
-  const handleVideoChange = (index, e) => {
+  const handleVideoChange = async (index, e) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
-    if (!file.type.startsWith('video/')) {
+    if (!isVideoFile(file)) {
       showToast('Please select a valid video file.');
       return;
     }
-    const ext = file.name.substring(file.name.lastIndexOf('.')) || '.mp4';
-    const autoName = `${selectedProduct.id}_video_${index + 1}${ext}`;
+
+    setConvertingProgress((prev) => ({ ...prev, [index]: 0 }));
+    let converted;
+    try {
+      converted = await transcodeVideoToH264(file, (progress) => {
+        setConvertingProgress((prev) => ({ ...prev, [index]: progress }));
+      });
+    } catch (err) {
+      showToast(err.message || 'Could not convert this video for playback compatibility.');
+      setConvertingProgress((prev) => {
+        const copy = { ...prev };
+        delete copy[index];
+        return copy;
+      });
+      return;
+    }
+    setConvertingProgress((prev) => {
+      const copy = { ...prev };
+      delete copy[index];
+      return copy;
+    });
+
+    const autoName = `${selectedProduct.id}_video_${index + 1}.mp4`;
 
     setVideoFiles((prev) => {
       const copy = [...prev];
-      copy[index] = file;
+      copy[index] = converted;
       return copy;
     });
     setVideoPreviews((prev) => {
       const copy = [...prev];
       if (copy[index] && copy[index].startsWith('blob:')) URL.revokeObjectURL(copy[index]);
-      copy[index] = URL.createObjectURL(file);
+      copy[index] = URL.createObjectURL(converted);
       return copy;
     });
     setVideoNames((prev) => {
@@ -333,11 +364,19 @@ export default function AdminProductVideosPage() {
               </button>
             </div>
 
+            <p className="font-body-sm text-body-sm text-on-surface-variant/80 mb-5">
+              iPhone videos (.MOV, including HEVC) are supported. Every video is automatically converted to a
+              universally-compatible format in your browser before it uploads, so it plays correctly for every
+              customer regardless of their device or browser.
+            </p>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {SLOTS.map((index) => {
                 const preview = videoPreviews[index];
                 const fileName = videoNames[index];
                 const hasVideo = !!preview;
+                const converting = convertingProgress[index] !== undefined;
+                const progressPct = Math.round((convertingProgress[index] ?? 0) * 100);
 
                 return (
                   <div key={index} className="flex flex-col gap-2 p-3 border border-outline-variant/40 rounded-lg bg-surface-container-lowest">
@@ -345,7 +384,7 @@ export default function AdminProductVideosPage() {
                       <span className="font-label-caps text-[10px] text-on-surface-variant">
                         Video {index + 1} {index === 0 && <span className="text-error font-bold">*</span>}
                       </span>
-                      {hasVideo && (
+                      {hasVideo && !converting && (
                         <button
                           type="button"
                           onClick={() => clearVideoSlot(index)}
@@ -356,7 +395,14 @@ export default function AdminProductVideosPage() {
                       )}
                     </div>
 
-                    {preview ? (
+                    {converting ? (
+                      <div className="w-full aspect-video rounded-md border-2 border-dashed border-primary/40 bg-surface-container-low flex flex-col items-center justify-center gap-2 px-4">
+                        <span className="animate-spin inline-block w-6 h-6 border-2 border-t-transparent border-primary rounded-full"></span>
+                        <span className="font-body-sm text-[11px] text-on-surface-variant">
+                          Converting for compatibility… {progressPct}%
+                        </span>
+                      </div>
+                    ) : preview ? (
                       <div className="w-full aspect-video rounded-md overflow-hidden bg-black border border-outline-variant/30">
                         <video src={preview} controls className="w-full h-full object-contain" />
                       </div>
@@ -373,12 +419,13 @@ export default function AdminProductVideosPage() {
                     <input
                       id={`video-file-input-${index}`}
                       type="file"
-                      accept="video/*"
+                      accept="video/*,.mov,.m4v"
                       onChange={(e) => handleVideoChange(index, e)}
+                      disabled={converting}
                       className="hidden"
                     />
 
-                    {hasVideo && (
+                    {hasVideo && !converting && (
                       <p className="font-body-sm text-[10px] text-on-surface-variant/80 font-mono truncate">{fileName}</p>
                     )}
                   </div>
@@ -389,7 +436,7 @@ export default function AdminProductVideosPage() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || Object.keys(convertingProgress).length > 0}
               className="mt-6 self-start bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save Videos'}

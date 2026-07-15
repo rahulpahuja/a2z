@@ -96,6 +96,7 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
   const [viewCount, setViewCount] = useState(null);
+  const [videoUnsupported, setVideoUnsupported] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -125,7 +126,12 @@ export default function ProductDetailPage() {
   }
 
   const images = product.images && product.images.length > 1 ? product.images : [product.image];
-  const mainImage = images[selectedThumbnail] ?? images[0];
+  const videos = product.videos ?? [];
+  const media = [
+    ...images.map((src) => ({ type: 'image', src })),
+    ...videos.map((src) => ({ type: 'video', src })),
+  ];
+  const mainMedia = media[selectedThumbnail] ?? media[0];
   const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   const availableSizes = product.sizes ?? SIZES.map((size) => ({ size, stock: 100 }));
@@ -145,7 +151,7 @@ export default function ProductDetailPage() {
     color: selectedColor,
     size: selectedSize,
     price: product.price,
-    image: mainImage,
+    image: images[0],
     alt: product.alt,
   });
 
@@ -165,27 +171,58 @@ export default function ProductDetailPage() {
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="md:col-span-7 flex flex-col gap-unit">
           <div className="relative w-full aspect-[3/4] bg-surface-container rounded-xl overflow-hidden group">
-            <img
-              alt={product.name}
-              className="object-cover w-full h-full"
-              data-alt={product.alt}
-              src={mainImage}
-            />
-            <button className="absolute top-4 right-4 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="material-symbols-outlined">zoom_in</span>
-            </button>
+            {mainMedia.type === 'video' ? (
+              videoUnsupported ? (
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 bg-surface-container-high">
+                  <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">error</span>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    This video format isn't supported in your browser.
+                  </p>
+                </div>
+              ) : (
+                <video
+                  key={mainMedia.src}
+                  src={mainMedia.src}
+                  controls
+                  playsInline
+                  className="w-full h-full object-contain bg-black"
+                  onError={() => setVideoUnsupported(true)}
+                />
+              )
+            ) : (
+              <img
+                alt={product.name}
+                className="object-cover w-full h-full"
+                data-alt={product.alt}
+                src={mainMedia.src}
+              />
+            )}
+            {mainMedia.type !== 'video' && (
+              <button className="absolute top-4 right-4 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="material-symbols-outlined">zoom_in</span>
+              </button>
+            )}
           </div>
-          {images.length > 1 && (
+          {media.length > 1 && (
             <div className="grid grid-cols-5 gap-unit">
-              {images.map((src, index) => (
+              {media.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedThumbnail(index)}
-                  className={`w-16 h-20 rounded-md overflow-hidden border transition-all ${
+                  onClick={() => {
+                    setVideoUnsupported(false);
+                    setSelectedThumbnail(index);
+                  }}
+                  className={`relative w-16 h-20 rounded-md overflow-hidden border transition-all ${
                     selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
                   }`}
                 >
-                  <img alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={src} />
+                  {item.type === 'video' ? (
+                    <div className="w-full h-full flex items-center justify-center bg-surface-container-high">
+                      <span className="material-symbols-outlined text-on-surface-variant">play_circle</span>
+                    </div>
+                  ) : (
+                    <img alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={item.src} />
+                  )}
                 </button>
               ))}
             </div>

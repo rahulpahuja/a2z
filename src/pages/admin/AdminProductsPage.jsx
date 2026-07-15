@@ -6,7 +6,7 @@ import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct, creat
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
-import { isHeicFile, convertHeicFileToJpeg } from '../../utils/heic.js';
+import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 
 const uploadImageToExternalServer = async (file, customName) => {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
@@ -177,7 +177,7 @@ export default function AdminProductsPage() {
       if (isHeicFile(file)) {
         showToast('Converting HEIC photo…');
         try {
-          file = await convertHeicFileToJpeg(file);
+          file = await convertHeicFileToPng(file);
         } catch {
           showToast('Could not convert HEIC photo. Please try a JPG or PNG.');
           return;
