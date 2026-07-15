@@ -6,6 +6,12 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 
+const uploadImageToExternalServer = async (file) => {
+  await new Promise((resolve) => setTimeout(resolve, 800)); // simulate network delay
+  const uniqueId = Math.random().toString(36).substring(2, 9);
+  return `https://external-image-server.com/uploads/${uniqueId}_${file.name}`;
+};
+
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 
 const EMPTY_FORM = {
@@ -30,6 +36,19 @@ export default function AdminProductsPage() {
   const [customSize, setCustomSize] = useState('');
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   useEffect(() => {
     const unsubCategories = subscribeToCategories((rows) => setCategories(rows));
@@ -74,6 +93,11 @@ export default function AdminProductsPage() {
     setColorInput('');
     setSizes([]);
     setCustomSize('');
+    setImageFile(null);
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImagePreview('');
   };
 
   const handleSubmit = async (event) => {
@@ -93,6 +117,10 @@ export default function AdminProductsPage() {
     const category = categories.find((c) => c.id === form.categoryId);
     setSaving(true);
     try {
+      let imageUrl = '';
+      if (imageFile) {
+        imageUrl = await uploadImageToExternalServer(imageFile);
+      }
       await createAdminProduct({
         title: form.title.trim(),
         description: form.description.trim(),
@@ -107,6 +135,7 @@ export default function AdminProductsPage() {
         hsnCode: form.hsnCode.trim(),
         colors,
         sizes,
+        image: imageUrl, // Uploaded image URL stored in Firebase
       });
       showToast('Product created.');
       resetForm();
@@ -197,6 +226,33 @@ export default function AdminProductsPage() {
                   onChange={updateField('description')}
                   className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                 />
+              </div>
+
+              {/* Image Upload & Preview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-end">
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-image">
+                    Product Image
+                  </label>
+                  <input
+                    id="p-image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-sm text-body-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-label-caps file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                  <p className="font-body-sm text-body-sm text-on-surface-variant/70 mt-2">
+                    Image will be uploaded to external server, and path will be stored in Firebase.
+                  </p>
+                </div>
+                {imagePreview && (
+                  <div>
+                    <span className="block font-label-caps text-label-caps text-on-surface-variant mb-2">Image Preview</span>
+                    <div className="w-24 aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant">
+                      <img src={imagePreview} className="w-full h-full object-cover" alt="Upload preview" />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -373,10 +429,16 @@ export default function AdminProductsPage() {
               {products.map((product) => {
                 const totalStock = (product.sizes ?? []).reduce((sum, s) => sum + (s.stock ?? 0), 0);
                 return (
-                  <div key={product.id} className="border border-outline-variant/30 rounded-lg p-4 flex flex-col gap-2">
-                    <div className="flex justify-between items-start flex-wrap gap-2">
-                      <div>
-                        <h3 className="font-title-sm text-title-sm text-on-surface">{product.title}</h3>
+                  <div key={product.id} className="border border-outline-variant/30 rounded-lg p-4 flex gap-4 items-start">
+                    {product.image && (
+                      <div className="w-16 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30">
+                        <img src={product.image} className="w-full h-full object-cover" alt={product.title} />
+                      </div>
+                    )}
+                    <div className="flex-1 flex flex-col gap-2">
+                      <div className="flex justify-between items-start flex-wrap gap-2">
+                        <div>
+                          <h3 className="font-title-sm text-title-sm text-on-surface">{product.title}</h3>
                         <p className="font-body-sm text-body-sm text-on-surface-variant">
                           {product.categoryTitle} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku}
                         </p>
@@ -407,6 +469,7 @@ export default function AdminProductsPage() {
                     {product.hashtags?.length > 0 && (
                       <p className="font-body-sm text-body-sm text-secondary">{product.hashtags.join(' ')}</p>
                     )}
+                    </div>
                   </div>
                 );
               })}
