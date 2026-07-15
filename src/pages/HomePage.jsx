@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import TrendingProducts from '../components/TrendingProducts.jsx';
-import { PRODUCTS } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import './HomePage.css';
@@ -47,8 +47,7 @@ const categories = [
   },
 ];
 
-const productsRow1 = PRODUCTS.slice(0, 4);
-const productsRow2 = PRODUCTS.slice(4, 8);
+// Product slices are computed inside the component using the useProducts hook
 
 function VideoCard({ src, poster, title, description }) {
   const videoRef = useRef(null);
@@ -147,6 +146,10 @@ HERO_SLIDES.forEach((s) => {
 });
 
 export default function HomePage() {
+  const { products } = useProducts();
+  const productsRow1 = products.slice(0, 4);
+  const productsRow2 = products.slice(4, 8);
+
   const [favorites, setFavorites] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -318,7 +321,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-4 flex flex-col gap-2">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name}</h3>
+                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
                     {product.rating && (
                       <div className="flex items-center text-secondary gap-1 shrink-0">
                         <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
@@ -371,7 +374,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-4 flex flex-col gap-2">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name}</h3>
+                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
                     {product.rating && (
                       <div className="flex items-center text-secondary gap-1 shrink-0">
                         <span className="material-symbols-outlined text-[16px] fill-icon">star</span>

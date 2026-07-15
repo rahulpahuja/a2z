@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getProductById } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { subscribeToTopProducts } from '../services/productStats.js';
 
@@ -10,6 +10,7 @@ const TABS = [
 ];
 
 export default function TrendingProducts() {
+  const { products: allProducts } = useProducts();
   const [activeTab, setActiveTab] = useState('views');
   const [rows, setRows] = useState({ views: [], purchases: [] });
 
@@ -24,8 +25,11 @@ export default function TrendingProducts() {
 
   const tab = TABS.find((t) => t.key === activeTab);
   const products = rows[activeTab]
-    .map((stat) => ({ ...getProductById(stat.id), stat: stat[activeTab] }))
-    .filter((product) => product.id);
+    .map((stat) => {
+      const match = allProducts.find((p) => p.id === stat.id);
+      return match ? { ...match, stat: stat[activeTab] } : null;
+    })
+    .filter(Boolean);
 
   if (rows.views.length === 0 && rows.purchases.length === 0) {
     return null;
@@ -73,7 +77,7 @@ export default function TrendingProducts() {
               </div>
             </div>
             <div className="p-4 flex flex-col gap-2">
-              <h3 className="font-title-sm text-title-sm text-on-surface truncate">{product.name}</h3>
+              <h3 className="font-title-sm text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
               <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
             </div>
           </Link>

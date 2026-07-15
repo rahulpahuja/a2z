@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
-import { PRODUCTS as CATALOG } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import './ProductListingPage.css';
 
 const NAV_LINKS = [
@@ -12,8 +12,6 @@ const NAV_LINKS = [
   { label: 'Lehengas', to: '/products?category=Lehenga' },
   { label: 'Kurtis', to: '/products?category=Kurti' },
 ];
-
-const CATEGORY_OPTIONS = ['All', ...Array.from(new Set(CATALOG.map((p) => p.category)))];
 
 const COLORS = [
   { id: 'red', label: 'Red', className: 'bg-red-600' },
@@ -44,6 +42,7 @@ const BADGE_STYLES = {
 const PAGES = [1];
 
 export default function ProductListingPage() {
+  const { products: CATALOG, categories: CATEGORY_OPTIONS } = useProducts();
   const { addItem } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') ?? 'All';
@@ -71,7 +70,7 @@ export default function ProductListingPage() {
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
 
   const filteredProducts = useMemo(() => {
-    const base = activeCategory === 'All' ? CATALOG : CATALOG.filter((p) => p.category === activeCategory);
+    const base = activeCategory === 'All' ? CATALOG : CATALOG.filter((p) => (p.category || p.categoryTitle) === activeCategory);
     if (sortBy === 'price-asc') return [...base].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
@@ -291,7 +290,7 @@ export default function ProductListingPage() {
                   </Link>
                   <div className="p-4 flex flex-col flex-grow">
                     <Link to={`/product/${product.id}`}>
-                      <h2 className="font-title-sm text-title-sm text-on-surface mb-1 line-clamp-1">{product.name}</h2>
+                      <h2 className="font-title-sm text-title-sm text-on-surface mb-1 line-clamp-1">{product.name || product.title}</h2>
                     </Link>
                     <p className="font-body-sm text-body-sm text-on-surface-variant mb-3 line-clamp-1">{product.description}</p>
                     {product.originalPrice ? (
@@ -312,12 +311,12 @@ export default function ProductListingPage() {
                         )}
                       </div>
                     )}
-                    {product.inStock ? (
+                    {(product.sizes?.some((s) => s.stock > 0) ?? product.inStock) ? (
                       <button
                         onClick={() =>
                           addItem({
                             id: product.id,
-                            title: product.name,
+                            title: product.name || product.title,
                             price: product.price,
                             image: product.image,
                             alt: product.alt,

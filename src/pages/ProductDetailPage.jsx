@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
-import { PRODUCTS, getProductById } from '../data/products.js';
+import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 
 const NAV_LINKS = [
@@ -88,13 +88,30 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const product = getProductById(id);
+  const { products: allProducts } = useProducts();
+  const product = allProducts.find((p) => p.id === id) || null;
 
   const [selectedThumbnail, setSelectedThumbnail] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
   const [viewCount, setViewCount] = useState(null);
+
+  useEffect(() => {
+    if (product) {
+      if (product.sizes && product.sizes.length > 0) {
+        const firstAvailable = product.sizes.find((s) => s.stock > 0) || product.sizes[0];
+        setSelectedSize(firstAvailable.size);
+      } else {
+        setSelectedSize('M');
+      }
+      if (product.colors && product.colors.length > 0) {
+        setSelectedColor(product.colors[0]);
+      } else {
+        setSelectedColor('Pink');
+      }
+    }
+  }, [product]);
 
   useEffect(() => {
     if (!product) return undefined;
@@ -109,15 +126,22 @@ export default function ProductDetailPage() {
 
   const images = product.images && product.images.length > 1 ? product.images : [product.image];
   const mainImage = images[selectedThumbnail] ?? images[0];
-  const relatedProducts = PRODUCTS.filter((p) => p.id !== product.id).slice(0, 4);
+  const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+
+  const availableSizes = product.sizes ?? SIZES.map((size) => ({ size, stock: 100 }));
+  const availableColors = product.colors 
+    ? product.colors.map((c) => typeof c === 'string' ? { name: c, hex: null } : c)
+    : COLORS;
+
+  const selectedSizeStock = product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999;
 
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
-  const incrementQuantity = () => setQuantity((q) => q + 1);
+  const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
 
   const cartLine = () => ({
     id: `${product.id}-${selectedColor}-${selectedSize}`,
     productId: product.id,
-    title: product.name,
+    title: product.name || product.title,
     color: selectedColor,
     size: selectedSize,
     price: product.price,
@@ -154,17 +178,15 @@ export default function ProductDetailPage() {
           {images.length > 1 && (
             <div className="grid grid-cols-5 gap-unit">
               {images.map((src, index) => (
-                <div
-                  key={src}
-                  className={`aspect-[3/4] rounded-lg overflow-hidden border cursor-pointer transition-opacity ${
-                    index === selectedThumbnail
-                      ? 'border-outline-variant/30 opacity-100'
-                      : 'border-transparent opacity-70 hover:opacity-100'
-                  }`}
+                <button
+                  key={index}
                   onClick={() => setSelectedThumbnail(index)}
+                  className={`w-16 h-20 rounded-md overflow-hidden border transition-all ${
+                    selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
+                  }`}
                 >
-                  <img alt={`${product.name} ${index + 1}`} className="object-cover w-full h-full" src={src} />
-                </div>
+                  <img alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={src} />
+                </button>
               ))}
             </div>
           )}
@@ -219,48 +241,73 @@ export default function ProductDetailPage() {
                 <span className="font-title-sm text-title-sm text-on-surface">Size</span>
                 <a className="font-body-sm text-body-sm text-primary hover:underline" href="#">Size Guide</a>
               </div>
-              <div className="flex gap-2">
-                {SIZES.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded-full border font-label-caps text-label-caps flex items-center justify-center transition-colors uppercase ${
-                      selectedSize === size
-                        ? 'border-primary bg-primary text-on-primary'
-                        : 'border-outline-variant text-on-surface hover:border-primary'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+              <div className="flex gap-2 flex-wrap">
+                {availableSizes.map((s) => {
+                  const isSelected = selectedSize === s.size;
+                  const isOutOfStock = s.stock === 0;
+                  return (
+                    <button
+                      key={s.size}
+                      disabled={isOutOfStock}
+                      onClick={() => setSelectedSize(s.size)}
+                      className={`w-12 h-12 rounded-full border font-label-caps text-label-caps flex items-center justify-center transition-colors uppercase relative ${
+                        isOutOfStock
+                          ? 'opacity-40 border-outline-variant text-on-surface-variant cursor-not-allowed line-through'
+                          : isSelected
+                          ? 'border-primary bg-primary text-on-primary font-bold'
+                          : 'border-outline-variant text-on-surface hover:border-primary'
+                      }`}
+                    >
+                      {s.size}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Color */}
             <div className="flex flex-col gap-3">
               <span className="font-title-sm text-title-sm text-on-surface">Color: <span className="font-normal text-on-surface-variant ml-1">{selectedColor}</span></span>
-              <div className="flex gap-3">
-                {COLORS.map((color) => (
-                  <button
-                    key={color.name}
-                    aria-label={color.name}
-                    onClick={() => setSelectedColor(color.name)}
-                    className={`w-8 h-8 rounded-full border ring-2 ring-offset-2 transition-all ${
-                      selectedColor === color.name
-                        ? 'border-primary ring-primary'
-                        : 'border-outline-variant ring-transparent hover:ring-outline-variant'
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                  ></button>
-                ))}
+              <div className="flex gap-3 flex-wrap">
+                {availableColors.map((color) => {
+                  const isSelected = selectedColor === color.name;
+                  if (color.hex) {
+                    return (
+                      <button
+                        key={color.name}
+                        aria-label={color.name}
+                        onClick={() => setSelectedColor(color.name)}
+                        className={`w-8 h-8 rounded-full border ring-2 ring-offset-2 transition-all ${
+                          isSelected
+                            ? 'border-primary ring-primary'
+                            : 'border-outline-variant ring-transparent hover:ring-outline-variant'
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      ></button>
+                    );
+                  }
+                  return (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(color.name)}
+                      className={`px-4 py-2 rounded-lg border font-body-sm text-body-sm flex items-center justify-center transition-colors uppercase ${
+                        isSelected
+                          ? 'border-primary bg-primary/10 text-primary font-semibold'
+                          : 'border-outline-variant text-on-surface hover:border-primary'
+                      }`}
+                    >
+                      {color.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Stock & Quantity */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 font-body-sm text-body-sm text-secondary">
-                <span className="material-symbols-outlined text-[16px]">{product.inStock ? 'check_circle' : 'cancel'}</span>
-                <span>{product.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                <span className="material-symbols-outlined text-[16px]">{selectedSizeStock > 0 ? 'check_circle' : 'cancel'}</span>
+                <span>{selectedSizeStock > 0 ? `In Stock (${selectedSizeStock} left)` : 'Out of Stock'}</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center border border-outline-variant rounded-lg overflow-hidden h-12 w-32">
@@ -286,7 +333,7 @@ export default function ProductDetailPage() {
           <div className="flex flex-col gap-3 mt-4">
             <button
               onClick={handleBuyNow}
-              disabled={!product.inStock}
+              disabled={selectedSizeStock === 0}
               className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-lg hover:opacity-90 transition-opacity uppercase tracking-widest shadow-[0_10px_30px_rgba(172,36,113,0.15)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
@@ -294,7 +341,7 @@ export default function ProductDetailPage() {
             </button>
             <button
               onClick={handleAddToCart}
-              disabled={!product.inStock}
+              disabled={selectedSizeStock === 0}
               className="w-full border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps py-4 rounded-lg hover:bg-primary-fixed transition-colors uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>

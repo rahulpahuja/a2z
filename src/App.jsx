@@ -24,6 +24,7 @@ import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
 import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
+import { ProductsProvider } from './context/ProductsContext.jsx'
 
 const ROUTES = [
   { path: '/', Component: HomePage },
@@ -61,26 +62,28 @@ function adminElement(Component) {
 
 export default function App() {
   return (
-    <EntryGate>
-      <ScrollToTop />
-      <Routes>
-        {ROUTES.map(({ path, Component }) => (
-          <Route key={path} path={path} element={<Component />} />
-        ))}
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAdmin>
-              <DashboardPage />
-            </RequireAdmin>
-          }
-        />
-        {ADMIN_ROUTES.map(({ path, Component }) => (
-          <Route key={path} path={path} element={adminElement(Component)} />
-        ))}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-      <FloatingContactButtons />
-    </EntryGate>
+    <ProductsProvider>
+      <EntryGate>
+        <ScrollToTop />
+        <Routes>
+          {ROUTES.map(({ path, Component }) => (
+            <Route key={path} path={path} element={<Component />} />
+          ))}
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAdmin>
+                <DashboardPage />
+              </RequireAdmin>
+            }
+          />
+          {ADMIN_ROUTES.map(({ path, Component }) => (
+            <Route key={path} path={path} element={adminElement(Component)} />
+          ))}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+        <FloatingContactButtons />
+      </EntryGate>
+    </ProductsProvider>
   )
 }
