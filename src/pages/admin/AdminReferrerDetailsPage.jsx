@@ -23,6 +23,18 @@ export default function AdminReferrerDetailsPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!name.trim()) return;
+
+    if (phone.trim()) {
+      if (phone.length !== 10) {
+        showToast('Phone number must be exactly 10 digits.');
+        return;
+      }
+      if (!/^[6-9]/.test(phone)) {
+        showToast('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.');
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       await createReferrer({ name, phone });
@@ -67,7 +79,7 @@ export default function AdminReferrerDetailsPage() {
             />
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
               placeholder="Phone (optional)"
               type="tel"
               className="sm:w-56 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
