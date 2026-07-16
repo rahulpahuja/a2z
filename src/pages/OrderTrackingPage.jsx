@@ -6,6 +6,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { generateReceiptPdf } from '../utils/generateReceipt.js';
 import ProductImage from '../components/ProductImage.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
 import './OrderTrackingPage.css';
 
 const NAV_LINKS = [
@@ -53,11 +54,6 @@ const TRACKING_STEPS = [
     dateClassName: 'font-body-sm text-body-sm text-on-surface-variant opacity-0',
   },
 ];
-
-const FOOTER_LINK_CLASS =
-  'font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container inline-block';
-
-const FOOTER_COLUMN_1 = ['About Us', 'Shipping Policy', 'Returns'];
 
 export default function OrderTrackingPage() {
   const { lastOrder } = useCart();
@@ -270,29 +266,7 @@ export default function OrderTrackingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto flat no shadows border-t-0 mt-12">
-        <div>
-          <h2 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim mb-4">A2Z Collection</h2>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Bridging traditional Indian craftsmanship with high-end contemporary fashion.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2">
-          {FOOTER_COLUMN_1.map((link) => (
-            <a key={link} className={FOOTER_LINK_CLASS} href="#">
-              {link}
-            </a>
-          ))}
-        </div>
-        <div className="flex flex-col gap-2">
-          <a className={FOOTER_LINK_CLASS} href="#">Contact Us</a>
-          <Link className={FOOTER_LINK_CLASS} to="/privacy-policy">Privacy Policy</Link>
-        </div>
-        <div className="flex items-end justify-start md:justify-end">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

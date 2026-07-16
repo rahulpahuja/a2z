@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -213,47 +214,7 @@ export default function CartPage() {
         </div>
         )}
       </main>
-      {/* Footer */}
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto mt-auto">
-        <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
-          </Link>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-wrap gap-8 justify-end">
-          <a
-            className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm"
-            href="#"
-          >
-            About Us
-          </a>
-          <a
-            className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm"
-            href="#"
-          >
-            Shipping Policy
-          </a>
-          <a
-            className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm"
-            href="#"
-          >
-            Returns
-          </a>
-          <a
-            className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm"
-            href="#"
-          >
-            Contact Us
-          </a>
-          <Link
-            className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm"
-            to="/privacy-policy"
-          >
-            Privacy Policy
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
