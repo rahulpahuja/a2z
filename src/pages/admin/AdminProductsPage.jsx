@@ -55,8 +55,6 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [colors, setColors] = useState([]);
-  const [colorInput, setColorInput] = useState('');
   const [sizes, setSizes] = useState([]); // [{ size, stock }]
   const [customSize, setCustomSize] = useState('');
   const [saving, setSaving] = useState(false);
@@ -65,6 +63,7 @@ export default function AdminProductsPage() {
   const [imageFiles, setImageFiles] = useState([null, null, null, null, null]);
   const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
+  const [imageColors, setImageColors] = useState(['', '', '', '', '']);
   const [editingProductId, setEditingProductId] = useState(null);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
@@ -113,25 +112,28 @@ export default function AdminProductsPage() {
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
     });
-    setColors(product.colors ?? []);
     setSizes(product.sizes ?? []);
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
     const initialNames = ['', '', '', '', ''];
+    const initialColors = ['', '', '', '', ''];
     if (product.images && product.images.length > 0) {
       product.images.forEach((url, idx) => {
         if (idx < 5) {
           initialPreviews[idx] = url;
           initialNames[idx] = getR2KeyFromUrl(url) || '';
+          initialColors[idx] = product.imageColors?.[idx] || '';
         }
       });
     } else if (product.image) {
       initialPreviews[0] = product.image;
       initialNames[0] = getR2KeyFromUrl(product.image) || '';
+      initialColors[0] = product.imageColors?.[0] || product.colors?.[0] || '';
     }
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
+    setImageColors(initialColors);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -241,6 +243,14 @@ export default function AdminProductsPage() {
     });
   };
 
+  const handleImageColorChange = (index, value) => {
+    setImageColors((prev) => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
   const clearImageSlot = (index) => {
     setImageFiles((prev) => {
       const copy = [...prev];
@@ -262,6 +272,11 @@ export default function AdminProductsPage() {
       return copy;
     });
     setImageNames((prev) => {
+      const copy = [...prev];
+      copy[index] = '';
+      return copy;
+    });
+    setImageColors((prev) => {
       const copy = [...prev];
       copy[index] = '';
       return copy;
@@ -298,16 +313,6 @@ export default function AdminProductsPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const addColor = () => {
-    const value = colorInput.trim();
-    if (value && !colors.includes(value)) {
-      setColors((prev) => [...prev, value]);
-    }
-    setColorInput('');
-  };
-
-  const removeColor = (value) => setColors((prev) => prev.filter((c) => c !== value));
-
   const addSize = (size) => {
     if (!size.trim() || sizes.some((s) => s.size === size)) return;
     setSizes((prev) => [...prev, { size, stock: 0 }]);
@@ -322,8 +327,6 @@ export default function AdminProductsPage() {
 
   const resetForm = () => {
     setForm(EMPTY_FORM);
-    setColors([]);
-    setColorInput('');
     setSizes([]);
     setCustomSize('');
     imagePreviews.forEach((preview) => {
@@ -334,6 +337,7 @@ export default function AdminProductsPage() {
     setImageFiles([null, null, null, null, null]);
     setImagePreviews(['', '', '', '', '']);
     setImageNames(['', '', '', '', '']);
+    setImageColors(['', '', '', '', '']);
     setRemovedImageKeys([]);
     setProductId(generateProductId());
     setEditingProductId(null);
@@ -343,10 +347,6 @@ export default function AdminProductsPage() {
     event.preventDefault();
     if (!form.categoryId) {
       showToast('Select a category before adding a product.');
-      return;
-    }
-    if (colors.length === 0) {
-      showToast('Add at least one color.');
       return;
     }
     if (sizes.length === 0) {
@@ -367,6 +367,10 @@ export default function AdminProductsPage() {
         showToast(`Please enter a valid file name for Image Box ${idx + 1}.`);
         return;
       }
+      if (!imageColors[idx].trim()) {
+        showToast(`Please enter the color shown in Image Box ${idx + 1}.`);
+        return;
+      }
     }
 
     const category = categories.find((c) => c.id === form.categoryId);
@@ -376,11 +380,13 @@ export default function AdminProductsPage() {
       const uploadPromises = activeSlots.map(async (idx) => {
         const file = imageFiles[idx];
         const customName = imageNames[idx].trim();
+        const color = imageColors[idx].trim();
         if (file) {
           const url = await uploadImageToExternalServer(file, customName);
           return {
             url,
             key: customName,
+            color,
             name: file.name,
             size: file.size,
             type: file.type,
@@ -390,13 +396,16 @@ export default function AdminProductsPage() {
           return {
             url: imagePreviews[idx],
             key: customName,
+            color,
             isNew: false,
           };
         }
       });
 
-      const uploadedFiles = await Promise.all(uploadPromises);
-      const uploadedUrls = uploadedFiles.map((f) => f.url).filter(Boolean);
+      const uploadedFiles = (await Promise.all(uploadPromises)).filter((f) => f.url);
+      const uploadedUrls = uploadedFiles.map((f) => f.url);
+      const uploadedColors = uploadedFiles.map((f) => f.color);
+      const derivedColors = [...new Set(uploadedColors.filter(Boolean))];
 
       await createAdminProduct({
         id: productId,
@@ -414,10 +423,11 @@ export default function AdminProductsPage() {
         subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
-        colors,
+        colors: derivedColors,
         sizes,
         image: uploadedUrls[0],
         images: uploadedUrls,
+        imageColors: uploadedColors,
       });
 
       // Save file metadata only for new uploads in Firebase Realtime Database
@@ -602,6 +612,7 @@ export default function AdminProductsPage() {
                   <h3 className="font-title-sm text-[16px] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     First image is the primary thumbnail. Filenames are customizable and automatically name-spaced to the Product ID.
+                    Tag each photo with the color shown so the storefront color filter and swatches work correctly.
                   </p>
                 </div>
 
@@ -647,6 +658,22 @@ export default function AdminProductsPage() {
                           onChange={(e) => handleImageChange(index, e)}
                           className="hidden"
                         />
+
+                        {(hasImage || preview) && (
+                          <div className="flex flex-col gap-1 mt-1">
+                            <label className="font-body-sm text-[10px] text-on-surface-variant/80" htmlFor={`color-${index}`}>
+                              Color <span className="text-error font-bold">*</span>
+                            </label>
+                            <input
+                              id={`color-${index}`}
+                              type="text"
+                              value={imageColors[index]}
+                              onChange={(e) => handleImageColorChange(index, e.target.value)}
+                              placeholder="e.g. Rani Pink"
+                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-[11px] text-on-surface"
+                            />
+                          </div>
+                        )}
 
                         {hasImage && (
                           <div className="flex flex-col gap-1 mt-1">
@@ -724,49 +751,6 @@ export default function AdminProductsPage() {
                     className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                   />
                 </div>
-              </div>
-
-              {/* Colors */}
-              <div>
-                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
-                  Colors (add multiple)
-                </label>
-                <div className="flex gap-3">
-                  <input
-                    value={colorInput}
-                    onChange={(e) => setColorInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ',') {
-                        e.preventDefault();
-                        addColor();
-                      }
-                    }}
-                    placeholder="e.g. Hot Pink — press Enter"
-                    className="flex-1 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={addColor}
-                    className="px-5 py-2 rounded-lg border border-outline-variant text-on-surface font-label-caps text-label-caps uppercase hover:border-primary hover:text-primary transition-colors"
-                  >
-                    Add
-                  </button>
-                </div>
-                {colors.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {colors.map((color) => (
-                      <span
-                        key={color}
-                        className="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-on-surface font-body-sm text-body-sm"
-                      >
-                        {color}
-                        <button type="button" onClick={() => removeColor(color)} className="text-on-surface-variant hover:text-error">
-                          <span className="material-symbols-outlined text-[14px]">close</span>
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Sizes + stock */}
