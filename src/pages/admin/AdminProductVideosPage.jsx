@@ -344,7 +344,7 @@ export default function AdminProductVideosPage() {
               <div className="flex items-center gap-4">
                 {selectedProduct.image && (
                   <div className="w-14 h-16 rounded-md overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30">
-                    <img src={selectedProduct.image} className="w-full h-full object-cover" alt={selectedProduct.title} />
+                    <ProductImage src={selectedProduct.image} className="w-full h-full object-cover" alt={selectedProduct.title} />
                   </div>
                 )}
                 <div>
