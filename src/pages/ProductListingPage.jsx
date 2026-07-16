@@ -5,6 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
 import './ProductListingPage.css';
 
 const NAV_LINKS = [
@@ -466,19 +467,7 @@ export default function ProductListingPage() {
         </div>
       </main>
 
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest mt-auto grid grid-cols-1 md:grid-cols-4 gap-gutter px-6 md:px-12 py-12 max-w-[1680px] mx-auto full-width bottom">
-        <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
-        </div>
-        <div className="col-span-1 md:col-span-3 flex flex-wrap gap-8 md:justify-end items-start">
-          <a className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-sm text-body-sm hover:underline transition-all" href="#">About Us</a>
-          <a className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-sm text-body-sm hover:underline transition-all" href="#">Shipping Policy</a>
-          <a className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-sm text-body-sm hover:underline transition-all" href="#">Returns</a>
-          <a className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-sm text-body-sm hover:underline transition-all" href="#">Contact Us</a>
-          <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-sm text-body-sm hover:underline transition-all" to="/privacy-policy">Privacy Policy</Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

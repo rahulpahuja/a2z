@@ -5,6 +5,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
 
 const categories = [
   {
@@ -322,36 +323,7 @@ export default function StorefrontPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom mt-auto border-t border-surface-variant">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto">
-          {/* Brand & Copyright */}
-          <div className="flex flex-col gap-4 col-span-1 md:col-span-2">
-            <div className="font-headline-md-mobile md:font-headline-md text-headline-md-mobile md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-              A2Z Collection
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant max-w-sm mt-4">
-              Bridging traditional Indian craftsmanship with high-end contemporary fashion. Experience vibrant elegance.
-            </p>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-auto pt-8">
-              © 2026 A2Z Collection. All rights reserved.
-            </p>
-          </div>
-          {/* Links Column 1 */}
-          <div className="flex flex-col gap-4">
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-2">Customer Care</h4>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">About Us</a>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Shipping Policy</a>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Returns</a>
-          </div>
-          {/* Links Column 2 */}
-          <div className="flex flex-col gap-4">
-            <h4 className="font-label-caps text-label-caps text-on-surface mb-2">Legal</h4>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Contact Us</a>
-            <Link className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" to="/privacy-policy">Privacy Policy</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

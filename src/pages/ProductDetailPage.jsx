@@ -7,6 +7,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import ProductImage from '../components/ProductImage.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -42,7 +43,6 @@ const ACCORDION_ITEMS = [
   },
 ];
 
-const FOOTER_LINKS = ['About Us', 'Shipping Policy', 'Returns', 'Contact Us'];
 
 function TopNav() {
   return (
@@ -460,25 +460,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom flat no shadows text-primary dark:text-primary-fixed-dim">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
-          <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
-            <span className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</span>
-            <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant mt-2">© 2026 A2Z Collection. All rights reserved.</p>
-          </div>
-          <div className="col-span-1 md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {FOOTER_LINKS.map((link) => (
-              <div key={link} className="flex flex-col gap-2">
-                <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container rounded" href="#">{link}</a>
-              </div>
-            ))}
-            <div className="flex flex-col gap-2">
-              <Link className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container rounded" to="/privacy-policy">Privacy Policy</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

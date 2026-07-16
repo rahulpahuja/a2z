@@ -8,6 +8,7 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
+import SiteFooter from '../components/SiteFooter.jsx';
 import './HomePage.css';
 
 const categories = [
@@ -438,39 +439,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom flat no shadows mt-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
-          <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
-            <div className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair">A2Z Collection</div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant max-w-xs">Bridging traditional Indian craftsmanship with high-end contemporary fashion. Experience vibrant elegance.</p>
-          </div>
-          <div className="col-span-1 flex flex-col gap-4">
-            <h4 className="font-title-sm text-title-sm text-on-surface">Explore</h4>
-            <div className="flex flex-col gap-2">
-              <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">About Us</a>
-              <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Shipping Policy</a>
-              <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Returns</a>
-              <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Contact Us</a>
-              <Link className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" to="/privacy-policy">Privacy Policy</Link>
-            </div>
-          </div>
-          <div className="col-span-1 md:col-span-2 flex flex-col gap-4">
-            <h4 className="font-title-sm text-title-sm text-on-surface">Join Our Newsletter</h4>
-            <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
-            <div className="flex gap-2 mt-2">
-              <input
-                className="flex-1 bg-surface border-b border-tertiary-container focus:border-primary focus:ring-0 focus:outline-none py-2 px-0 font-body-sm text-body-sm bg-transparent transition-colors"
-                placeholder="Enter your email"
-                type="email"
-              />
-              <button className="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-caps text-label-caps uppercase hover:bg-surface-tint transition-colors">Subscribe</button>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-surface-variant py-6 text-center">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

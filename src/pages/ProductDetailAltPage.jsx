@@ -5,6 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import { getHighResUrl } from '../utils/image.js';
+import SiteFooter from '../components/SiteFooter.jsx';
 import './ProductDetailAltPage.css';
 
 const PRODUCT = { id: 'crop-shirt-side-dori', title: 'Crop Shirt with Side Dori', price: 360 };
@@ -416,36 +417,7 @@ export default function ProductDetailAltPage() {
         </section>
       </main>
 
-      {/* Footer (Shared Component) */}
-      <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
-          {/* Brand / Copyright */}
-          <div className="flex flex-col gap-4 col-span-1 md:col-span-2">
-            <span className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-              A2Z Collection
-            </span>
-            <p className="font-body-sm text-body-sm text-on-surface-variant max-w-md">
-              Bridging traditional Indian craftsmanship with high-end contemporary fashion. Discover the art of vibrant elegance.
-            </p>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-auto pt-4">
-              © 2026 A2Z Collection. All rights reserved.
-            </p>
-          </div>
-          {/* Links Column 1 */}
-          <div className="flex flex-col gap-3">
-            <h4 className="font-label-caps text-label-caps text-primary dark:text-primary-fixed-dim font-bold mb-2">Explore</h4>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container w-fit" href="#">About Us</a>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container w-fit" href="#">Contact Us</a>
-          </div>
-          {/* Links Column 2 */}
-          <div className="flex flex-col gap-3">
-            <h4 className="font-label-caps text-label-caps text-primary dark:text-primary-fixed-dim font-bold mb-2">Policies</h4>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container w-fit" href="#">Shipping Policy</a>
-            <a className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container w-fit" href="#">Returns</a>
-            <Link className="font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container w-fit" to="/privacy-policy">Privacy Policy</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
