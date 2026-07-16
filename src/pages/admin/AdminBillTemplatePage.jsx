@@ -4,7 +4,10 @@ import { useToast } from '../../context/ToastContext.jsx';
 
 const PAGE_SIZES = [
   { value: 'a4', label: 'A4 (standard printer)' },
+  { value: 'a5', label: 'A5 (compact invoice)' },
+  { value: 'letter', label: 'Letter (US standard)' },
   { value: 'thermal80', label: 'Thermal Receipt (80mm)' },
+  { value: 'thermal58', label: 'Thermal Receipt (58mm)' },
 ];
 
 const ALIGNMENTS = [

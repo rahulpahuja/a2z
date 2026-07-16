@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
+import { subscribeToReferrers } from '../services/referrers.js';
 
 const STATE_OPTIONS = [
   { value: 'MH', label: 'Maharashtra' },
@@ -43,7 +44,15 @@ export default function CheckoutShippingPage() {
     state: '',
     zip: '',
     phone: '',
+    gstNumber: '',
+    referredBy: '',
   });
+  const [referrers, setReferrers] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToReferrers((rows) => setReferrers(rows));
+    return unsubscribe;
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -180,6 +189,34 @@ export default function CheckoutShippingPage() {
                 value={form.phone}
                 onChange={handleChange}
               />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <TextField
+                  id="gstNumber"
+                  label="GST Number (optional)"
+                  placeholder="For a GST invoice, e.g. 27ABCDE1234F1Z5"
+                  value={form.gstNumber}
+                  onChange={handleChange}
+                />
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="referredBy">
+                    Referred By (optional)
+                  </label>
+                  <select
+                    className={`${inputClassName} appearance-none`}
+                    id="referredBy"
+                    name="referredBy"
+                    value={form.referredBy}
+                    onChange={handleChange}
+                  >
+                    <option value="">None</option>
+                    {referrers.map((referrer) => (
+                      <option key={referrer.id} value={referrer.name}>
+                        {referrer.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="pt-6 flex flex-col-reverse md:flex-row items-center gap-4">
                 <Link
                   to="/cart"
