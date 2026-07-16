@@ -65,9 +65,28 @@ export default {
           const fileData = await file.arrayBuffer();
           const uniqueFileName = file.name.replace(/\s+/g, "_");
 
+          const ext = uniqueFileName.split('.').pop().toLowerCase();
+          const mimeTypes = {
+            'mp4': 'video/mp4',
+            'mov': 'video/quicktime',
+            'm4v': 'video/x-m4v',
+            'webm': 'video/webm',
+            'ogg': 'video/ogg',
+            'png': 'image/png',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'svg': 'image/svg+xml',
+            'pdf': 'application/pdf',
+          };
+          const contentType = file.type && file.type !== "application/octet-stream"
+            ? file.type
+            : (mimeTypes[ext] || "application/octet-stream");
+
           // Upload to R2 securely
           await env.BUCKET.put(uniqueFileName, fileData, {
-            httpMetadata: { contentType: file.type || "image/jpeg" },
+            httpMetadata: { contentType },
           });
 
           // Construct public URL dynamically using request origin for local testing,

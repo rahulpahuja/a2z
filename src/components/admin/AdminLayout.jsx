@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext.jsx';
 
 const NAV_ITEMS = [
   { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
+  { to: '/super/sales', label: 'Sales Management', icon: 'bar_chart' },
+  { to: '/super/carousel', label: 'Hero Carousel', icon: 'view_carousel' },
   { to: '/super/categories', label: 'Categories', icon: 'category' },
   { to: '/super/products', label: 'Products', icon: 'inventory_2' },
   { to: '/super/product-videos', label: 'Product Videos', icon: 'video_library' },

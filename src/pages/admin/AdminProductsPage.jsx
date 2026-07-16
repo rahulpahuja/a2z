@@ -7,7 +7,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
-import { compressImageFile, COMPRESSED_EXTENSION } from '../../utils/imageCompression.js';
+import { compressImageFile } from '../../utils/imageCompression.js';
 import ProductImage from '../../components/ProductImage.jsx';
 
 const uploadImageToExternalServer = async (file, customName) => {
@@ -200,7 +200,7 @@ export default function AdminProductsPage() {
         return;
       }
 
-      const autoName = `${productId}_image_${index + 1}${COMPRESSED_EXTENSION}`;
+      const autoName = `${productId}_image_${index + 1}${compressed.extension}`;
 
       setImageFiles((prev) => {
         const copy = [...prev];

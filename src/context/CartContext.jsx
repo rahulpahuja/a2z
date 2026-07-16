@@ -1,9 +1,20 @@
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
-import { createFirebaseOrder, subscribeToOrders } from '../services/orders.js';
+import { createFirebaseOrder } from '../services/orders.js';
 import { reduceProductStock } from '../services/adminProducts.js';
 
 const CartContext = createContext(null);
+
+const LAST_ORDER_KEY = 'a2z_last_order';
+
+function readStoredLastOrder() {
+  try {
+    const raw = localStorage.getItem(LAST_ORDER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 export const parsePrice = (value) =>
   typeof value === 'number' ? value : Number(String(value).replace(/[^0-9.]/g, '')) || 0;
@@ -15,8 +26,8 @@ let orderSequence = 1000;
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [shippingDetails, setShippingDetails] = useState(null);
-  const [lastOrder, setLastOrder] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [lastOrder, setLastOrder] = useState(readStoredLastOrder);
+
 
   const addItem = (product, quantity = 1) => {
     setItems((prev) => {
@@ -39,12 +50,7 @@ export function CartProvider({ children }) {
 
   const clearCart = () => setItems([]);
 
-  useEffect(() => {
-    const unsub = subscribeToOrders((loadedOrders) => {
-      setOrders(loadedOrders);
-    });
-    return unsub;
-  }, []);
+
 
   const placeOrder = ({ paymentMethod, placedAt }) => {
     const subtotalAtOrder = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
@@ -72,6 +78,11 @@ export function CartProvider({ children }) {
       }
     });
 
+    try {
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
+    } catch {
+      // ignore storage failures (e.g. private mode)
+    }
     setLastOrder(order);
     setItems([]);
     items.forEach((line) => recordPurchase(line.id, line.quantity));
@@ -93,10 +104,9 @@ export function CartProvider({ children }) {
       shippingDetails,
       setShippingDetails,
       lastOrder,
-      orders,
       placeOrder,
     }),
-    [items, shippingDetails, lastOrder, orders]
+    [items, shippingDetails, lastOrder]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
