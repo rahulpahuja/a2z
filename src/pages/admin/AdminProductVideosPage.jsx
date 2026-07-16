@@ -116,7 +116,6 @@ export default function AdminProductVideosPage() {
     setVideoFiles([null, null]);
     setRemovedKeys([]);
   };
-
   const handleVideoChange = async (index, e) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -126,26 +125,33 @@ export default function AdminProductVideosPage() {
       return;
     }
 
-    setConvertingProgress((prev) => ({ ...prev, [index]: 0 }));
+    const isMp4 = file.name.toLowerCase().endsWith('.mp4') || file.type === 'video/mp4';
     let converted;
-    try {
-      converted = await transcodeVideoToH264(file, (progress) => {
-        setConvertingProgress((prev) => ({ ...prev, [index]: progress }));
-      });
-    } catch (err) {
-      showToast(err.message || 'Could not convert this video for playback compatibility.');
+
+    if (isMp4) {
+      converted = file;
+    } else {
+      setConvertingProgress((prev) => ({ ...prev, [index]: 0 }));
+      try {
+        converted = await transcodeVideoToH264(file, (progress) => {
+          setConvertingProgress((prev) => ({ ...prev, [index]: progress }));
+        });
+      } catch (err) {
+        console.error('Transcoding failed:', err);
+        showToast(err.message || 'Could not convert this video to MP4 format for compatibility.');
+        setConvertingProgress((prev) => {
+          const copy = { ...prev };
+          delete copy[index];
+          return copy;
+        });
+        return;
+      }
       setConvertingProgress((prev) => {
         const copy = { ...prev };
         delete copy[index];
         return copy;
       });
-      return;
     }
-    setConvertingProgress((prev) => {
-      const copy = { ...prev };
-      delete copy[index];
-      return copy;
-    });
 
     const autoName = `${selectedProduct.id}_video_${index + 1}.mp4`;
 
