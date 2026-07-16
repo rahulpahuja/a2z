@@ -1,4 +1,4 @@
-const CORE_BASE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd';
+const CORE_BASE_URL = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm';
 const MAX_INPUT_BYTES = 300 * 1024 * 1024; // 300MB — larger clips can exceed the wasm heap and hang
 
 let ffmpegPromise = null;
