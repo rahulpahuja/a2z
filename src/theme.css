@@ -2,7 +2,7 @@
 
 /* Single source of truth for design tokens, shared by every page. */
 @theme {
-  --color-surface-container: #f0eded;
+  --color-surface-container: #f0eded99;
   --color-on-error-container: #93000a;
   --color-on-tertiary: #ffffff;
   --color-on-secondary-fixed-variant: #314e1b;
@@ -11,17 +11,17 @@
   --color-error-container: #ffdad6;
   --color-on-secondary-container: #4e6d36;
   --color-on-tertiary-fixed-variant: #603f2d;
-  --color-surface-container-low: #f6f3f2;
+  --color-surface-container-low: #f6f3f2a6;
   --color-secondary-fixed: #c9eea9;
   --color-tertiary-container: #c1967f;
   --color-inverse-on-surface: #f3f0ef;
-  --color-surface-variant: #e5e2e1;
+  --color-surface-variant: #e5e2e1a6;
   --color-surface-tint: #ac2471;
   --color-secondary: #486730;
   --color-on-tertiary-fixed: #2e1506;
   --color-on-primary-fixed-variant: #8c0058;
   --color-on-primary-fixed: #3d0024;
-  --color-background: #fcf9f8;
+  --color-background: #fcf9f826;
   --color-tertiary: #7a5642;
   --color-on-surface: #1c1b1b;
   --color-tertiary-fixed: #ffdbca;
@@ -32,21 +32,21 @@
   --color-on-primary: #ffffff;
   --color-primary: #ac2471;
   --color-outline-variant: #dcbfc9;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-bright: #fcf9f8;
+  --color-surface-container-lowest: #ffffffb3;
+  --color-surface-bright: #fcf9f8cc;
   --color-primary-fixed-dim: #ffb0d0;
   --color-inverse-surface: #313030;
   --color-outline: #897179;
-  --color-surface-container-high: #eae7e7;
+  --color-surface-container-high: #eae7e7b3;
   --color-on-secondary: #ffffff;
   --color-on-background: #1c1b1b;
-  --color-surface-container-highest: #e5e2e1;
+  --color-surface-container-highest: #e5e2e1cc;
   --color-inverse-primary: #ffb0d0;
   --color-tertiary-fixed-dim: #ecbda4;
-  --color-surface: #fcf9f8;
+  --color-surface: #fcf9f8c0;
   --color-on-tertiary-container: #4d2f1e;
   --color-on-secondary-fixed: #0b2000;
-  --color-surface-dim: #dcd9d9;
+  --color-surface-dim: #dcd9d999;
   --color-primary-container: #ff69b4;
   --color-on-surface-variant: #564149;
 
@@ -118,7 +118,7 @@
 /* Shared base + utilities used by two or more pages. Page-only rules live in that page's own CSS file. */
 body {
   font-family: var(--font-body-lg);
-  background-color: var(--color-background);
+  background-color: transparent;
   color: var(--color-on-background);
 }
 
@@ -152,4 +152,82 @@ input::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* Glassmorphism blurs for headers and footers */
+header {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+footer {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Luxury card styling and transitions */
+.group.relative.bg-surface-container-low,
+.group.relative.bg-surface-container-lowest,
+article.group,
+.carousel-item > div {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+article.group:hover,
+.group.relative.bg-surface-container-low:hover,
+.group.relative.bg-surface-container-lowest:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(172, 36, 113, 0.08) !important;
+  border-color: rgba(172, 36, 113, 0.2) !important;
+}
+
+/* Float Animations for backdrop blobs */
+@keyframes float-slow-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(60px, 40px) scale(1.1);
+  }
+  66% {
+    transform: translate(-40px, 60px) scale(0.95);
+  }
+}
+
+@keyframes float-slow-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1.05);
+  }
+  50% {
+    transform: translate(-80px, -30px) scale(0.95);
+  }
+  75% {
+    transform: translate(40px, 50px) scale(1.05);
+  }
+}
+
+@keyframes float-slow-3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.95);
+  }
+  40% {
+    transform: translate(40px, -60px) scale(1.02);
+  }
+  80% {
+    transform: translate(-50px, 20px) scale(0.97);
+  }
+}
+
+.animate-float-slow-1 {
+  animation: float-slow-1 25s infinite ease-in-out;
+}
+
+.animate-float-slow-2 {
+  animation: float-slow-2 30s infinite ease-in-out;
+}
+
+.animate-float-slow-3 {
+  animation: float-slow-3 27s infinite ease-in-out;
 }

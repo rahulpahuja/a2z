@@ -190,6 +190,7 @@ export default function HomePage() {
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products">New Arrivals</Link>
+            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase text-primary font-bold" to="/ai-studio">✨ AI Studio</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Saree">Sarees</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Lehenga">Lehengas</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Kurti">Kurtis</Link>

@@ -1,4 +1,4 @@
-import { onValue, push, ref, remove, serverTimestamp } from 'firebase/database';
+import { onValue, push, ref, remove, serverTimestamp, update } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 
 const ROOT = 'subcategories';
@@ -83,4 +83,24 @@ export function deleteSubcategory(id) {
     return Promise.resolve();
   }
   return remove(ref(db, `${ROOT}/${id}`));
+}
+
+export function updateSubcategory(id, { title }) {
+  if (!isFirebaseEnabled) {
+    const subcategories = getLocalSubcategories();
+    const index = subcategories.findIndex((s) => s.id === id);
+    if (index !== -1) {
+      subcategories[index] = {
+        ...subcategories[index],
+        title: title.trim(),
+      };
+      setLocalSubcategories(subcategories);
+      notifyLocalListeners();
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error('Subcategory not found.'));
+  }
+  return update(ref(db, `${ROOT}/${id}`), {
+    title: title.trim(),
+  });
 }

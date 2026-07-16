@@ -8,6 +8,7 @@ import './ProductListingPage.css';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
+  { label: 'AI Studio', to: '/ai-studio' },
   { label: 'Sarees', to: '/products?category=Saree' },
   { label: 'Lehengas', to: '/products?category=Lehenga' },
   { label: 'Kurtis', to: '/products?category=Kurti' },
