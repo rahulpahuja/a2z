@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import ProductImage from '../components/ProductImage.jsx';
 
 const STATE_OPTIONS = [
   { value: 'MH', label: 'Maharashtra' },
@@ -209,7 +210,7 @@ export default function CheckoutShippingPage() {
                   cartItems.map((item) => (
                     <div className="flex gap-4" key={item.id}>
                       <div className="w-20 h-24 flex-shrink-0 rounded-[16px] overflow-hidden bg-surface-container-highest">
-                        <img
+                        <ProductImage
                           className="w-full h-full object-cover"
                           data-alt={item.alt}
                           src={item.image}

@@ -5,6 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { generateReceiptPdf } from '../utils/generateReceipt.js';
+import ProductImage from '../components/ProductImage.jsx';
 import './OrderTrackingPage.css';
 
 const NAV_LINKS = [
@@ -201,7 +202,7 @@ export default function OrderTrackingPage() {
               {lastOrder.items.map((item) => (
                 <div key={item.id} className="flex gap-6 p-4 rounded-xl border border-tertiary border-opacity-30 bg-surface items-center">
                   <div className="w-24 h-32 rounded-lg overflow-hidden shrink-0">
-                    <img className="w-full h-full object-cover" data-alt={item.alt} src={item.image} />
+                    <ProductImage className="w-full h-full object-cover" data-alt={item.alt} alt={item.alt} src={item.image} />
                   </div>
                   <div className="flex-grow flex flex-col justify-center">
                     <div className="flex justify-between items-start mb-2">

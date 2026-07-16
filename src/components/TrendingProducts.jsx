@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { subscribeToTopProducts } from '../services/productStats.js';
+import ProductImage from './ProductImage.jsx';
 
 const TABS = [
   { key: 'views', label: 'Most Viewed', statLabel: 'views', icon: 'visibility' },
@@ -66,9 +67,10 @@ export default function TrendingProducts() {
             className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
           >
             <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-              <img
+              <ProductImage
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
                 data-alt={product.alt}
+                alt={product.alt}
                 src={product.image}
               />
               <div className="absolute top-4 left-4 bg-surface/90 backdrop-blur text-on-surface px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
