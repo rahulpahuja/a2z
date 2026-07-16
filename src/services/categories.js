@@ -1,4 +1,4 @@
-import { onValue, push, ref, remove, serverTimestamp } from 'firebase/database';
+import { onValue, push, ref, remove, serverTimestamp, update, get } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 
 const ROOT = 'categories';
@@ -89,4 +89,58 @@ export function deleteCategory(id) {
     return Promise.resolve();
   }
   return remove(ref(db, `${ROOT}/${id}`));
+}
+
+export function updateCategory(id, { title }) {
+  if (!isFirebaseEnabled) {
+    const categories = getLocalCategories();
+    const catIndex = categories.findIndex((c) => c.id === id);
+    if (catIndex !== -1) {
+      const oldTitle = categories[catIndex].title;
+      categories[catIndex] = {
+        ...categories[catIndex],
+        title: title.trim(),
+      };
+      setLocalCategories(categories);
+      notifyLocalListeners();
+
+      // Update corresponding subcategories categoryTitle in localStorage
+      try {
+        const subData = localStorage.getItem('subcategories');
+        if (subData) {
+          const subcategories = JSON.parse(subData);
+          let subChanged = false;
+          subcategories.forEach((sub) => {
+            if (sub.categoryId === id) {
+              sub.categoryTitle = title.trim();
+              subChanged = true;
+            }
+          });
+          if (subChanged) {
+            localStorage.setItem('subcategories', JSON.stringify(subcategories));
+          }
+        }
+      } catch (e) {
+        console.error('Error updating local subcategories categoryTitle:', e);
+      }
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error('Category not found.'));
+  }
+
+  // Update in Firebase atomic updates
+  return get(ref(db, 'subcategories')).then((snapshot) => {
+    const updates = {};
+    updates[`categories/${id}/title`] = title.trim();
+
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnap) => {
+        const sub = childSnap.val();
+        if (sub.categoryId === id) {
+          updates[`subcategories/${childSnap.key}/categoryTitle`] = title.trim();
+        }
+      });
+    }
+    return update(ref(db), updates);
+  });
 }
