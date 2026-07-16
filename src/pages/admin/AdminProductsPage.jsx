@@ -7,6 +7,8 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
+import { compressImageFile, COMPRESSED_EXTENSION } from '../../utils/imageCompression.js';
+import ProductImage from '../../components/ProductImage.jsx';
 
 const uploadImageToExternalServer = async (file, customName) => {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
@@ -188,12 +190,21 @@ export default function AdminProductsPage() {
         }
       }
 
-      const ext = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
-      const autoName = `${productId}_image_${index + 1}${ext}`;
+      let compressed;
+      try {
+        showToast('Compressing image…');
+        compressed = await compressImageFile(file);
+      } catch (err) {
+        console.error('Image compression failed', err);
+        showToast('Could not compress this image. Please try a different file.');
+        return;
+      }
+
+      const autoName = `${productId}_image_${index + 1}${COMPRESSED_EXTENSION}`;
 
       setImageFiles((prev) => {
         const copy = [...prev];
-        copy[index] = file;
+        copy[index] = compressed.file;
         return copy;
       });
 
@@ -210,7 +221,7 @@ export default function AdminProductsPage() {
             if (key) setRemovedImageKeys((keys) => [...keys, key]);
           }
         }
-        copy[index] = URL.createObjectURL(file);
+        copy[index] = compressed.previewUrl;
         return copy;
       });
 
@@ -617,7 +628,7 @@ export default function AdminProductsPage() {
 
                         {preview ? (
                           <div className="w-full aspect-[3/4] rounded-md overflow-hidden bg-surface-container border border-outline-variant/30 relative">
-                            <img src={preview} className="w-full h-full object-cover" alt={`Preview ${index + 1}`} />
+                            <ProductImage src={preview} className="w-full h-full object-cover" alt={`Preview ${index + 1}`} />
                           </div>
                         ) : (
                           <div 
@@ -888,10 +899,10 @@ export default function AdminProductsPage() {
 
                     {product.image && (
                       <div className="w-16 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30 relative">
-                        <img 
-                          src={product.image} 
-                          className={`w-full h-full object-cover ${totalStock === 0 ? 'grayscale opacity-60' : ''}`} 
-                          alt={product.title} 
+                        <ProductImage
+                          src={product.image}
+                          className={`w-full h-full object-cover ${totalStock === 0 ? 'grayscale opacity-60' : ''}`}
+                          alt={product.title}
                         />
                         {totalStock === 0 && (
                           <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[9px] font-bold uppercase tracking-wider">
