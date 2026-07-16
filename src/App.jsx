@@ -17,6 +17,7 @@ import OrderTrackingPage from './pages/OrderTrackingPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
+import AIStudioPage from './pages/AIStudioPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
@@ -29,6 +30,7 @@ import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
+import LuxuryBackdrop from './components/LuxuryBackdrop.jsx'
 
 const ROUTES = [
   { path: '/', Component: HomePage },
@@ -42,6 +44,7 @@ const ROUTES = [
   { path: '/orders/tracking', Component: OrderTrackingPage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
+  { path: '/ai-studio', Component: AIStudioPage },
   { path: '/__trap__', Component: BotTrapPage },
 ]
 
@@ -71,6 +74,7 @@ export default function App() {
     <BotGate>
       <ProductsProvider>
         <EntryGate>
+          <LuxuryBackdrop />
           <ScrollToTop />
           <HoneypotLink />
           <Routes>

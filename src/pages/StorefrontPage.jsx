@@ -219,6 +219,7 @@ export default function StorefrontPage() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products">New Arrivals</Link>
+            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 text-primary font-bold" to="/ai-studio">✨ AI Studio</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Saree">Sarees</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Lehenga">Lehengas</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Kurti">Kurtis</Link>

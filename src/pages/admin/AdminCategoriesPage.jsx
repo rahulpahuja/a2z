@@ -4,6 +4,7 @@ import {
   subscribeToSubcategories,
   createSubcategory,
   deleteSubcategory,
+  updateSubcategory,
 } from '../../services/subcategories.js';
 import { useToast } from '../../context/ToastContext.jsx';
 
@@ -20,6 +21,9 @@ export default function AdminCategoriesPage() {
   const [subTitle, setSubTitle] = useState('');
   const [subCategoryId, setSubCategoryId] = useState('');
   const [savingSub, setSavingSub] = useState(false);
+  const [editingSubId, setEditingSubId] = useState(null);
+  const [editingSubTitle, setEditingSubTitle] = useState('');
+  const [updatingSub, setUpdatingSub] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToCategories((rows, error) => {
@@ -97,6 +101,30 @@ export default function AdminCategoriesPage() {
       showToast('Subcategory deleted.');
     } catch (err) {
       showToast(err.message || 'Could not delete subcategory.');
+    }
+  };
+
+  const handleSubEditStart = (sub) => {
+    setEditingSubId(sub.id);
+    setEditingSubTitle(sub.title);
+  };
+
+  const handleSubEditCancel = () => {
+    setEditingSubId(null);
+    setEditingSubTitle('');
+  };
+
+  const handleSubEditSave = async (id) => {
+    if (!editingSubTitle.trim()) return;
+    setUpdatingSub(true);
+    try {
+      await updateSubcategory(id, { title: editingSubTitle });
+      showToast('Subcategory updated.');
+      handleSubEditCancel();
+    } catch (err) {
+      showToast(err.message || 'Could not update subcategory.');
+    } finally {
+      setUpdatingSub(false);
     }
   };
 
@@ -197,18 +225,58 @@ export default function AdminCategoriesPage() {
                   </div>
                   {!subLoading && (subcategoriesByCategory[category.id]?.length ?? 0) > 0 && (
                     <ul className="mt-2 ml-4 pl-4 border-l border-outline-variant/30 flex flex-col gap-2">
-                      {subcategoriesByCategory[category.id].map((sub) => (
-                        <li key={sub.id} className="flex justify-between items-center">
-                          <span className="font-body-sm text-body-sm text-on-surface-variant">{sub.title}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleSubDelete(sub.id)}
-                            className="text-error font-label-caps text-[10px] hover:underline"
-                          >
-                            Delete
-                          </button>
-                        </li>
-                      ))}
+                      {subcategoriesByCategory[category.id].map((sub) => {
+                        const isEditing = editingSubId === sub.id;
+                        return isEditing ? (
+                          <li key={sub.id} className="flex justify-between items-center gap-3 py-1">
+                            <input
+                              value={editingSubTitle}
+                              onChange={(e) => setEditingSubTitle(e.target.value)}
+                              className="flex-1 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-body-sm text-on-surface"
+                              disabled={updatingSub}
+                              autoFocus
+                            />
+                            <div className="flex gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleSubEditSave(sub.id)}
+                                disabled={updatingSub || !editingSubTitle.trim()}
+                                className="text-primary font-label-caps text-[10px] hover:underline disabled:opacity-50"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleSubEditCancel}
+                                disabled={updatingSub}
+                                className="text-on-surface-variant font-label-caps text-[10px] hover:underline"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </li>
+                        ) : (
+                          <li key={sub.id} className="flex justify-between items-center py-1">
+                            <span className="font-body-sm text-body-sm text-on-surface-variant">{sub.title}</span>
+                            <div className="flex gap-3 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleSubEditStart(sub)}
+                                className="text-primary font-label-caps text-[10px] hover:underline"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSubDelete(sub.id)}
+                                className="text-error font-label-caps text-[10px] hover:underline"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </li>
