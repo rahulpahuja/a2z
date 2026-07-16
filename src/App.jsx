@@ -44,7 +44,6 @@ const ROUTES = [
   { path: '/orders/tracking', Component: OrderTrackingPage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
-  { path: '/ai-studio', Component: AIStudioPage },
   { path: '/__trap__', Component: BotTrapPage },
 ]
 
@@ -57,6 +56,7 @@ const ADMIN_ROUTES = [
   { path: '/super/settings', Component: AdminSettingsPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/upload-test', Component: AdminUploadTestPage },
+  { path: '/super/ai-studio', Component: AIStudioPage },
 ]
 
 function adminElement(Component) {

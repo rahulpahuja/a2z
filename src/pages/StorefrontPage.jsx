@@ -4,6 +4,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
+import ProductImage from '../components/ProductImage.jsx';
 
 const categories = [
   {
@@ -96,7 +97,7 @@ function ProductCard({ product }) {
   return (
     <article className={`group relative flex flex-col bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}>
       <Link to={`/product/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl bg-surface-variant block">
-        <img
+        <ProductImage
           className={`object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ${!isAvailable ? 'grayscale opacity-50' : ''}`}
           alt={product.alt}
           src={product.src}
@@ -219,7 +220,6 @@ export default function StorefrontPage() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products">New Arrivals</Link>
-            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 text-primary font-bold" to="/ai-studio">✨ AI Studio</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Saree">Sarees</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Lehenga">Lehengas</Link>
             <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Kurti">Kurtis</Link>

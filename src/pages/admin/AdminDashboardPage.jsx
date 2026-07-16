@@ -5,6 +5,7 @@ import { PRODUCTS } from '../../data/products.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { subscribeToAdminProducts } from '../../services/adminProducts.js';
+import ProductImage from '../../components/ProductImage.jsx';
 import {
   getOrdersToday,
   findOrderById,
@@ -97,7 +98,7 @@ function ProductRankTable({ title, rows, emptyText }) {
                 <tr key={row.product.id} className="border-b border-outline-variant/10 last:border-0">
                   <td className="py-3 pr-4 text-on-surface-variant">{index + 1}</td>
                   <td className="py-3 pr-4 text-on-surface flex items-center gap-3">
-                    <img src={row.product.image} alt={row.product.name} className="w-9 h-11 object-cover rounded-md" />
+                    <ProductImage src={row.product.image} alt={row.product.name} className="w-9 h-11 object-cover rounded-md" />
                     {row.product.name}
                   </td>
                   <td className="py-3 pr-4 text-on-surface">{row.unitsThisMonth}</td>
@@ -262,7 +263,7 @@ export default function AdminDashboardPage() {
                 const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
                 return (
                   <div key={product.id} className="flex gap-4 border border-outline-variant/30 rounded-lg p-4">
-                    <img src={product.images?.[0] || product.image} alt={product.name || product.title} className="w-16 h-20 object-cover rounded-md shrink-0" />
+                    <ProductImage src={product.images?.[0] || product.image} alt={product.name || product.title} className="w-16 h-20 object-cover rounded-md shrink-0" />
                     <div className="flex-1">
                       <div className="flex justify-between items-start flex-wrap gap-2">
                         <div>

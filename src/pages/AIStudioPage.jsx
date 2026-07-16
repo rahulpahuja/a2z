@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { removeBackground } from '@imgly/background-removal';
-import CartIconButton from '../components/CartIconButton.jsx';
-import ProfileButton from '../components/ProfileButton.jsx';
-import { formatCurrency } from '../context/CartContext.jsx';
 
 const PROMPT_SUGGESTIONS = [
   {
@@ -215,25 +212,11 @@ export default function AIStudioPage() {
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header */}
-      <header className="bg-surface/75 dark:bg-surface-container-highest/75 docked full-width sticky top-[32px] z-50 flat no shadows border-b border-surface-variant">
-        <div className="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto h-[80px]">
-          <Link
-            to="/"
-            className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight"
-          >
-            A2Z Collection
-          </Link>
-          <nav className="hidden md:flex space-x-8">
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products">New Arrivals</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase text-primary underline" to="/ai-studio">AI Studio</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Saree">Sarees</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Lehenga">Lehengas</Link>
-          </nav>
-          <div className="flex items-center space-x-6 text-primary dark:text-primary-fixed-dim">
-            <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
-            <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
-          </div>
-        </div>
+      <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6">
+        <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">AI Background Studio</h1>
+        <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          Isolate subject/product photos and generate gorgeous luxury backdrops using AI.
+        </p>
       </header>
 
       {/* Main Studio Body */}

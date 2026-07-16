@@ -4,11 +4,11 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import ProductImage from '../components/ProductImage.jsx';
 import './ProductListingPage.css';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
-  { label: 'AI Studio', to: '/ai-studio' },
   { label: 'Sarees', to: '/products?category=Saree' },
   { label: 'Lehengas', to: '/products?category=Lehenga' },
   { label: 'Kurtis', to: '/products?category=Kurti' },
@@ -342,7 +342,7 @@ export default function ProductListingPage() {
                   className={`group relative flex flex-col bg-surface-container-lowest border border-[#DCAE96]/30 rounded-[16px] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1 ${!isAvailable ? 'opacity-85' : ''}`}
                 >
                   <Link to={`/product/${product.id}`} className="relative w-full aspect-[3/4] overflow-hidden product-card-img-wrapper bg-surface-container block">
-                    <img
+                    <ProductImage
                       className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                       loading="lazy"
                       src={product.image}

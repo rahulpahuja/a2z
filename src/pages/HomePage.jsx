@@ -6,6 +6,7 @@ import TrendingProducts from '../components/TrendingProducts.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
+import ProductImage from '../components/ProductImage.jsx';
 import './HomePage.css';
 
 const categories = [
@@ -190,7 +191,6 @@ export default function HomePage() {
           </Link>
           <nav className="hidden md:flex space-x-8">
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products">New Arrivals</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase text-primary font-bold" to="/ai-studio">✨ AI Studio</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Saree">Sarees</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Lehenga">Lehengas</Link>
             <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Kurti">Kurtis</Link>
@@ -299,9 +299,10 @@ export default function HomePage() {
                 className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                  <img
+                  <ProductImage
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                     data-alt={product.alt}
+                    alt={product.alt}
                     src={product.image}
                   />
                   {!isAvailable && (
@@ -363,9 +364,10 @@ export default function HomePage() {
                 className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                  <img
+                  <ProductImage
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                     data-alt={product.alt}
+                    alt={product.alt}
                     src={product.image}
                   />
                   {!isAvailable && (

@@ -6,6 +6,7 @@ import VideoPlayer from '../components/VideoPlayer.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
+import ProductImage from '../components/ProductImage.jsx';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -174,7 +175,7 @@ export default function ProductDetailPage() {
             {mainMedia.type === 'video' ? (
               <VideoPlayer src={mainMedia.src} className="w-full h-full object-contain bg-black" />
             ) : (
-              <img
+              <ProductImage
                 alt={product.name}
                 className="object-cover w-full h-full"
                 data-alt={product.alt}
@@ -202,7 +203,7 @@ export default function ProductDetailPage() {
                       <span className="material-symbols-outlined text-on-surface-variant">play_circle</span>
                     </div>
                   ) : (
-                    <img alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={item.src} />
+                    <ProductImage alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={item.src} />
                   )}
                 </button>
               ))}
@@ -439,7 +440,7 @@ export default function ProductDetailPage() {
               {relatedProducts.map((related) => (
                 <Link key={related.id} to={`/product/${related.id}`} className="group flex flex-col gap-3">
                   <div className="relative aspect-[3/4] rounded-[16px] overflow-hidden bg-surface-container border border-[#DCAE96]/30">
-                    <img
+                    <ProductImage
                       alt={related.alt}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                       src={related.image}

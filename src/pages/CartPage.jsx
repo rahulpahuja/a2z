@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import ProductImage from '../components/ProductImage.jsx';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -15,7 +16,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
   return (
     <div className="flex gap-gutter items-center border-b border-surface-variant pb-gutter">
       <div className="w-[120px] h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
-        <img className="w-full h-full object-cover" data-alt={item.alt} src={item.image} />
+        <ProductImage className="w-full h-full object-cover" data-alt={item.alt} alt={item.alt} src={item.image} />
       </div>
       <div className="flex-grow flex flex-col gap-[8px]">
         <h3 className="font-title-sm text-title-sm text-on-surface">{item.title}</h3>
