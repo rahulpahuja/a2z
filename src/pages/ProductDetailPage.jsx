@@ -107,11 +107,12 @@ export default function ProductDetailPage() {
       } else {
         setSelectedSize('M');
       }
-      if (product.colors && product.colors.length > 0) {
-        setSelectedColor(product.colors[0]);
-      } else {
-        setSelectedColor('Pink');
-      }
+      const initialColor = product.colors && product.colors.length > 0 ? product.colors[0] : 'Pink';
+      setSelectedColor(initialColor);
+      const matchIndex = (product.imageColors ?? []).findIndex(
+        (c) => c && c.toLowerCase() === initialColor.toLowerCase()
+      );
+      setSelectedThumbnail(matchIndex !== -1 ? matchIndex : 0);
     }
   }, [product]);
 
@@ -144,6 +145,14 @@ export default function ProductDetailPage() {
 
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
+
+  const handleSelectColor = (colorName) => {
+    setSelectedColor(colorName);
+    const matchIndex = (product.imageColors ?? []).findIndex(
+      (c) => c && c.toLowerCase() === colorName.toLowerCase()
+    );
+    if (matchIndex !== -1) setSelectedThumbnail(matchIndex);
+  };
 
   const cartLine = () => ({
     id: `${product.id}-${selectedColor}-${selectedSize}`,
@@ -295,7 +304,7 @@ export default function ProductDetailPage() {
                       <button
                         key={color.name}
                         aria-label={color.name}
-                        onClick={() => setSelectedColor(color.name)}
+                        onClick={() => handleSelectColor(color.name)}
                         className={`w-8 h-8 rounded-full border ring-2 ring-offset-2 transition-all ${
                           isSelected
                             ? 'border-primary ring-primary'
@@ -308,7 +317,7 @@ export default function ProductDetailPage() {
                   return (
                     <button
                       key={color.name}
-                      onClick={() => setSelectedColor(color.name)}
+                      onClick={() => handleSelectColor(color.name)}
                       className={`px-4 py-2 rounded-lg border font-body-sm text-body-sm flex items-center justify-center transition-colors uppercase ${
                         isSelected
                           ? 'border-primary bg-primary/10 text-primary font-semibold'
