@@ -17,14 +17,33 @@
       }
     },
     "adminProducts": {
-      ".read": "auth != null",
+      ".read": true,
       ".write": "auth != null"
     },
     "categories": {
-      ".read": "auth != null",
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "subcategories": {
+      ".read": true,
       ".write": "auth != null"
     },
     "settings": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "fileMetadata": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "orders": {
+      ".read": "auth != null",
+      "$orderId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "referrers": {
       ".read": "auth != null",
       ".write": "auth != null"
     },

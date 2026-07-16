@@ -12,7 +12,10 @@ export function createFirebaseOrder(order) {
     localStorage.setItem(ROOT, JSON.stringify(filtered));
     return Promise.resolve(order);
   }
-  return set(ref(db, `${ROOT}/${order.id}`), order);
+  // Firebase's set() throws synchronously if any value in the tree is
+  // undefined (e.g. items missing optional fields like `alt`) — round-trip
+  // through JSON to drop those keys instead of crashing the caller.
+  return set(ref(db, `${ROOT}/${order.id}`), JSON.parse(JSON.stringify(order)));
 }
 
 export function getFirebaseOrder(id) {

@@ -7,6 +7,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
+import { subscribeToCarousel } from '../services/carousel.js';
 import './HomePage.css';
 
 const categories = [
@@ -115,35 +116,8 @@ function VideoCard({ src, poster, title, description }) {
   );
 }
 
-const HERO_SLIDES = [
-  {
-    title: 'The Festive Collection',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAi6nWtvfZJXTG4DXcMDNhCLHVdrK6vyhvOVsebD_THMBWJzQBfmneLZtM8xa-cso39eALmfuN97ofl_1zApobtY6XemRxNe0cn-ShqNrIELjxrqksxYN5AdUJfpVNEGY6ZAP3CuK2b3-yuMMDnyWaarDjLJ3fFdIexM86YhJhVkM0Zjl_jecY40qOjOJreeJbF4iGNPe6cLlalbtGW9bCoEAlb2oaqPbd4muawrbsZyh7Lo9aqaS6muQ',
-    alt: 'A stunning, high-fashion editorial photograph of a South Asian woman wearing an intricately embroidered, vibrant Hot Pink and gold Saree.',
-    cta: 'Shop Now',
-    link: '/products',
-  },
-  {
-    title: 'Royal Bridal Heritage',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNqdxRl1N12xTjFuuqWlyyCZgDvVutGsMr_a2j2bIXK0l146oUipKrvoOi5TBuB-oGD_oXFhaMMvWX9ToRlYXqI_Yw50wGMn8B9Y2-NdTGVDySAn6Wkx3EPanZT-At_TWaCri_mqVSqRgy0xZJE-4rSaxqy9oqS2YhRKJ2KBntvIIFonkdK-fXfAEZ6tjvyIyO7wowXYuLs9Y6HrCaXkMNAMUrM90UB503ceap0i_zhLZSlILzrhQCrw',
-    alt: 'A heavily embroidered Bridal Lehenga in deep maroon and gold, presented in a high-end editorial style that highlights the intricate craftsmanship.',
-    cta: 'Explore Bridal',
-    link: '/products?category=Lehenga',
-  },
-  {
-    title: 'Contemporary Luxury Coords',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGeEDQ9fsFvJl2R1sCNwJ9yZ_csqnlzRo6BUr-0UQv_sIOvILMQLjnhDLoRtWkmd5Jh07aZ2yk1IOYUhs5mO0elyMGF2KVzF_knqXKbyTJS4LoDLvCnoaYyQbcVvaQ44eJmurH6w5WK3_UODg-AhFU5z_Jlyp2hy6NeSPwLj7K14xOD1bikOxybrQ-W5rXfvCqNEFtr7nWPxMmVGAtP8eiOxRuR64VuGO7HOu8VOvU8Z3ognrTGtPAxw',
-    alt: 'A contemporary Coord set featuring a tunic and wide-leg trousers in a soft Dusty Rose with subtle, traditional block-print patterns.',
-    cta: 'Discover Coords',
-    link: '/products?category=Coord Set',
-  }
-];
-
 categories.forEach((c) => {
   c.image = getHighResUrl(c.image);
-});
-HERO_SLIDES.forEach((s) => {
-  s.image = getHighResUrl(s.image);
 });
 
 export default function HomePage() {
@@ -153,24 +127,39 @@ export default function HomePage() {
 
   const [favorites, setFavorites] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [heroSlides, setHeroSlides] = useState([]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 3000);
-    return () => clearInterval(timer);
+    const unsub = subscribeToCarousel((slides) => {
+      const processed = slides.map(s => ({
+        ...s,
+        image: getHighResUrl(s.image)
+      }));
+      setHeroSlides(processed);
+    });
+    return unsub;
   }, []);
 
+  useEffect(() => {
+    if (heroSlides.length === 0) return undefined;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [heroSlides]);
+
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+    if (heroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev === 0 ? heroSlides.length - 1 : prev - 1));
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    if (heroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   };
 
   return (
@@ -211,8 +200,8 @@ export default function HomePage() {
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
-            {HERO_SLIDES.map((slide, index) => (
-              <div key={index} className="w-full h-full flex-shrink-0 relative">
+            {heroSlides.map((slide, index) => (
+              <div key={slide.id || index} className="w-full h-full flex-shrink-0 relative">
                 <div
                   className="bg-cover bg-center bg-no-repeat w-full h-full"
                   data-alt={slide.alt}
@@ -236,7 +225,7 @@ export default function HomePage() {
 
           {/* Dots Indicator */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-            {HERO_SLIDES.map((_, index) => (
+            {heroSlides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}

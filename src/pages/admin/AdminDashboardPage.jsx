@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart, formatCurrency } from '../../context/CartContext.jsx';
+import { formatCurrency } from '../../context/CartContext.jsx';
 import { PRODUCTS } from '../../data/products.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { subscribeToAdminProducts } from '../../services/adminProducts.js';
+import { subscribeToOrders } from '../../services/orders.js';
 import ProductImage from '../../components/ProductImage.jsx';
 import {
   getOrdersToday,
@@ -114,14 +115,20 @@ function ProductRankTable({ title, rows, emptyText }) {
 }
 
 export default function AdminDashboardPage() {
-  const { orders: liveOrders } = useCart();
+  const [liveOrders, setLiveOrders] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);
 
   useEffect(() => {
-    const unsub = subscribeToAdminProducts((rows) => {
+    const unsubProducts = subscribeToAdminProducts((rows) => {
       setDbProducts(rows);
     });
-    return unsub;
+    const unsubOrders = subscribeToOrders((loadedOrders) => {
+      setLiveOrders(loadedOrders);
+    });
+    return () => {
+      unsubProducts();
+      unsubOrders();
+    };
   }, []);
 
   const allProducts = useMemo(() => {
