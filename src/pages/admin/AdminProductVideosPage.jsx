@@ -4,6 +4,7 @@ import { subscribeToAdminProducts, updateProductVideos, createFileMetadata } fro
 import { useToast } from '../../context/ToastContext.jsx';
 import { transcodeVideoToH264 } from '../../utils/videoTranscode.js';
 import VideoPlayer from '../../components/VideoPlayer.jsx';
+import ProductImage from '../../components/ProductImage.jsx';
 
 const MAX_VIDEOS = 2;
 const SLOTS = [0, 1];
@@ -311,7 +312,7 @@ export default function AdminProductVideosPage() {
                       >
                         {product.image && (
                           <div className="w-12 h-14 rounded-md overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30">
-                            <img src={product.image} className="w-full h-full object-cover" alt={product.title} />
+                            <ProductImage src={product.image} className="w-full h-full object-cover" alt={product.title} />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
