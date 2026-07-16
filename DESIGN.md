@@ -160,8 +160,17 @@ The shape language is defined by "Soft Architectural" lines. While the grid is r
 - **Lists/Navigation:** Desktop navigation uses Playfair Display for top-level categories to signal luxury, while sub-menus use Montserrat for clarity. 
 - **Icons:** Custom stroke icons that represent Indian heritage (e.g., a stylized lotus for favorites or a traditional fabric roll for 'Material' details) are encouraged.
 
-## Product Image Upload Specification
+## Product Media Upload Specification
+
+### Images
 - **Process**: Administrators can upload a product image when creating a new product.
 - **Preview**: An instant local image preview is shown in 3:4 aspect ratio.
 - **External Image Server**: Uploaded images are sent to a dedicated external media server to minimize load on the core database.
 - **Database Storage**: The core Firebase Realtime Database stores the returned absolute URL/path from the external server, rather than the raw binary data.
+
+### Videos
+- **Process**: Administrators can upload product videos from the Video Management panel.
+- **Direct MP4 Upload**: Videos already in `.mp4` format bypass browser transcoding and are uploaded directly to the R2 server to maximize upload speed and ensure 100% reliability.
+- **Client-Side Transcoding**: Non-`.mp4` videos (e.g. `.mov` from iPhones, or `.webm` files) are transcoded to a universally-compatible H.264 `.mp4` container client-side using a single-threaded WebAssembly build of FFmpeg (`@ffmpeg/core` ESM).
+- **Fallback / Validation**: If transcoding fails for non-MP4 formats, the process is aborted with a diagnostic message to prevent uploading incompatible formats, ensuring all stored videos play back seamlessly on all devices and browsers.
+- **Database Storage**: The Firebase Realtime Database stores the public URL of the uploaded `.mp4` video.

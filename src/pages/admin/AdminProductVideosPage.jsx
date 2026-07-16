@@ -9,28 +9,56 @@ import ProductImage from '../../components/ProductImage.jsx';
 const MAX_VIDEOS = 2;
 const SLOTS = [0, 1];
 
-const uploadVideoToExternalServer = async (file, customName) => {
-  const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
-  if (apiUrl) {
-    const formData = new FormData();
-    formData.append('file', file, customName);
+const uploadVideoToExternalServer = (file, customName, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
+    if (apiUrl) {
+      const formData = new FormData();
+      formData.append('file', file, customName);
 
-    const response = await fetch(`${apiUrl}/upload`, {
-      method: 'POST',
-      body: formData,
-    });
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${apiUrl}/upload`, true);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Upload failed: ${errorText || response.statusText}`);
+      if (xhr.upload && onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            onProgress(percentComplete);
+          }
+        };
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve(data.url);
+          } catch (e) {
+            reject(new Error('Invalid server response'));
+          }
+        } else {
+          reject(new Error(`Upload failed: ${xhr.responseText || xhr.statusText}`));
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Network error during upload'));
+      };
+
+      xhr.send(formData);
+    } else {
+      // Simulate network delay and progress
+      let currentProgress = 0;
+      const interval = setInterval(() => {
+        currentProgress += 10;
+        if (onProgress) onProgress(currentProgress);
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          resolve(`https://external-image-server.com/uploads/${customName}`);
+        }
+      }, 100);
     }
-
-    const data = await response.json();
-    return data.url;
-  }
-
-  await new Promise((resolve) => setTimeout(resolve, 800)); // simulate network delay
-  return `https://external-image-server.com/uploads/${customName}`;
+  });
 };
 
 const VIDEO_EXTENSION_RE = /\.(mp4|mov|m4v|webm|ogg|avi|mkv)$/i;
@@ -66,6 +94,7 @@ export default function AdminProductVideosPage() {
   const [removedKeys, setRemovedKeys] = useState([]);
   const [saving, setSaving] = useState(false);
   const [convertingProgress, setConvertingProgress] = useState({});
+  const [uploadProgress, setUploadProgress] = useState({});
 
   useEffect(() => {
     const unsubscribe = subscribeToAdminProducts((rows, error) => {
@@ -217,6 +246,7 @@ export default function AdminProductVideosPage() {
     }
 
     setSaving(true);
+    setUploadProgress({});
     try {
       const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
 
@@ -236,7 +266,10 @@ export default function AdminProductVideosPage() {
         const file = videoFiles[idx];
         const customName = videoNames[idx].trim();
         if (file) {
-          const url = await uploadVideoToExternalServer(file, customName);
+          setUploadProgress((prev) => ({ ...prev, [idx]: 0 }));
+          const url = await uploadVideoToExternalServer(file, customName, (progress) => {
+            setUploadProgress((prev) => ({ ...prev, [idx]: progress }));
+          });
           uploadedUrls.push(url);
           newUploads.push({ key: customName, url, name: file.name, size: file.size, type: file.type });
         } else {
@@ -264,6 +297,7 @@ export default function AdminProductVideosPage() {
       showToast(err.message || 'Could not save videos.');
     } finally {
       setSaving(false);
+      setUploadProgress({});
     }
   };
 
@@ -371,11 +405,10 @@ export default function AdminProductVideosPage() {
                 Choose a different product
               </button>
             </div>
-
             <p className="font-body-sm text-body-sm text-on-surface-variant/80 mb-5">
-              iPhone videos (.MOV, including HEVC) are supported. Every video is automatically converted to a
-              universally-compatible format in your browser before it uploads, so it plays correctly for every
-              customer regardless of their device or browser.
+              MP4 videos are uploaded directly. Other formats like iPhone videos (.MOV, including HEVC) are
+              automatically converted to a universally-compatible MP4 format in your browser before uploading,
+              ensuring smooth playback for all customers regardless of their device.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -440,6 +473,28 @@ export default function AdminProductVideosPage() {
                 );
               })}
             </div>
+
+            {saving && Object.keys(uploadProgress).length > 0 && (
+              <div className="mt-5 p-4 rounded-xl border border-outline-variant/30 bg-surface-container-low flex flex-col gap-3 max-w-md">
+                <span className="font-label-caps text-label-caps text-on-surface-variant font-semibold">
+                  Uploading Videos
+                </span>
+                {Object.entries(uploadProgress).map(([slotIdx, pct]) => (
+                  <div key={slotIdx} className="flex flex-col gap-1.5">
+                    <div className="flex justify-between font-body-sm text-[12px] text-on-surface-variant">
+                      <span className="truncate">Video {parseInt(slotIdx) + 1} ({videoNames[slotIdx]})</span>
+                      <span className="font-semibold shrink-0 ml-2">{pct}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-150 ease-out rounded-full"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <button
               type="button"
