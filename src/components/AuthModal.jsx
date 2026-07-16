@@ -49,10 +49,17 @@ export default function AuthModal({ onClose, dismissible = true }) {
 
   const handleSendOtp = async (event) => {
     event.preventDefault();
+    const cleaned = phone.trim();
+
+    if (cleaned.length !== 10 || !/^[6-9]/.test(cleaned)) {
+      setError('Please enter a valid 10-digit mobile number (starts with 6, 7, 8, or 9).');
+      return;
+    }
+
     setBusy(true);
     setError('');
     try {
-      await sendOtp(phone.trim(), RECAPTCHA_CONTAINER_ID);
+      await sendOtp('+91' + cleaned, RECAPTCHA_CONTAINER_ID);
       setStep('otp');
     } catch (err) {
       setError(err.message || 'Could not send the code. Check the number and try again.');
@@ -125,9 +132,9 @@ export default function AuthModal({ onClose, dismissible = true }) {
               <input
                 id="auth-phone"
                 type="tel"
-                placeholder="+91 98765 43210"
+                placeholder="Enter 10-digit mobile number"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
               <button

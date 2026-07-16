@@ -3,24 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import { subscribeToReferrers } from '../services/referrers.js';
-
-const STATE_OPTIONS = [
-  { value: 'MH', label: 'Maharashtra' },
-  { value: 'DL', label: 'Delhi' },
-  { value: 'KA', label: 'Karnataka' },
-];
+import { INDIAN_STATES_AND_UT, STATE_CITIES } from '../data/indiaData.js';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
 
-function TextField({ id, label, placeholder, type = 'text', value, onChange }) {
+function TextField({ id, label, placeholder, type = 'text', value, onChange, error }) {
   return (
     <div>
       <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={id}>
         {label}
       </label>
       <input
-        className={inputClassName}
+        className={`${inputClassName} ${error ? 'border-error! focus:border-error!' : ''}`}
         id={id}
         name={id}
         placeholder={placeholder}
@@ -28,6 +23,7 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange }) {
         value={value}
         onChange={onChange}
       />
+      {error && <p className="text-error text-xs mt-1 font-body-sm">{error}</p>}
     </div>
   );
 }
@@ -48,6 +44,7 @@ export default function CheckoutShippingPage() {
     referredBy: '',
   });
   const [referrers, setReferrers] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const unsubscribe = subscribeToReferrers((rows) => setReferrers(rows));
@@ -56,7 +53,17 @@ export default function CheckoutShippingPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'phone') {
+      const digits = value.replace(/\D/g, '').slice(0, 10);
+      setForm((prev) => ({ ...prev, [name]: digits }));
+      if (errors.phone) {
+        setErrors((prev) => ({ ...prev, phone: '' }));
+      }
+    } else if (name === 'state') {
+      setForm((prev) => ({ ...prev, state: value, city: '' }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -65,6 +72,22 @@ export default function CheckoutShippingPage() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const phoneVal = form.phone;
+    const errorsMap = {};
+
+    if (!phoneVal) {
+      errorsMap.phone = 'Phone number is required';
+    } else if (phoneVal.length !== 10) {
+      errorsMap.phone = 'Phone number must be exactly 10 digits';
+    } else if (!/^[6-9]/.test(phoneVal)) {
+      errorsMap.phone = 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9';
+    }
+
+    if (Object.keys(errorsMap).length > 0) {
+      setErrors(errorsMap);
+      return;
+    }
+
     setShippingDetails(form);
     navigate('/checkout/payment');
   };
@@ -141,16 +164,7 @@ export default function CheckoutShippingPage() {
                 onChange={handleChange}
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
-                  <TextField
-                    id="city"
-                    label="City"
-                    placeholder="City"
-                    value={form.city}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="md:col-span-1">
+                 <div className="md:col-span-1">
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="state">
                     State / Province
                   </label>
@@ -164,11 +178,34 @@ export default function CheckoutShippingPage() {
                     <option disabled value="">
                       Select State
                     </option>
-                    {STATE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                    {INDIAN_STATES_AND_UT.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div className="md:col-span-1">
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="city">
+                    City
+                  </label>
+                  <select
+                    className={`${inputClassName} appearance-none`}
+                    id="city"
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    disabled={!form.state}
+                  >
+                    <option disabled value="">
+                      {form.state ? 'Select City' : 'Select State First'}
+                    </option>
+                    {form.state &&
+                      STATE_CITIES[form.state]?.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div className="md:col-span-1">
@@ -188,6 +225,7 @@ export default function CheckoutShippingPage() {
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
+                error={errors.phone}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextField
