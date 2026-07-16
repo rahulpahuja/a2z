@@ -42,6 +42,7 @@ const EMPTY_FORM = {
   subcategoryId: '',
   price: '',
   hsnCode: '',
+  gender: 'Unisex',
 };
 
 export default function AdminProductsPage() {
@@ -108,6 +109,7 @@ export default function AdminProductsPage() {
       price: product.price || '',
       hsnCode: product.hsnCode || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
+      gender: product.gender || 'Unisex',
     });
     setColors(product.colors ?? []);
     setSizes(product.sizes ?? []);
@@ -389,6 +391,7 @@ export default function AdminProductsPage() {
         id: productId,
         title: form.title.trim(),
         description: form.description.trim(),
+        gender: form.gender || 'Unisex',
         hashtags: form.hashtagsInput
           .split(/[\s,]+/)
           .map((tag) => tag.trim())
@@ -654,7 +657,7 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-price">
                     Price (₹)
@@ -681,6 +684,22 @@ export default function AdminProductsPage() {
                     placeholder="e.g. 6204"
                     className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                   />
+                </div>
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-gender">
+                    Gender
+                  </label>
+                  <select
+                    id="p-gender"
+                    required
+                    value={form.gender}
+                    onChange={updateField('gender')}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Unisex">Unisex</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-hashtags">
@@ -894,7 +913,7 @@ export default function AdminProductsPage() {
                           </h3>
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
                             {product.categoryTitle}
-                            {product.subcategoryTitle ? ` / ${product.subcategoryTitle}` : ''} · {formatCurrency(product.price)} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
+                            {product.subcategoryTitle ? ` / ${product.subcategoryTitle}` : ''} · {formatCurrency(product.price)} · {product.gender || 'Unisex'} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
                           </p>
                           <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
                             ID: {product.id}
