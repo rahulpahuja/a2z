@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/super/product-videos', label: 'Product Videos', icon: 'video_library' },
   { to: '/super/ai-studio', label: 'AI Studio', icon: 'auto_awesome' },
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
+  { to: '/super/referrers', label: 'Referrer Details', icon: 'person_add' },
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
   { to: '/super/upload-test', label: 'R2 Upload Test', icon: 'cloud_upload' },

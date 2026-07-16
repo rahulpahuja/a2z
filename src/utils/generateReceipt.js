@@ -6,7 +6,10 @@ import { getBillTemplateOnce, DEFAULT_BILL_TEMPLATE } from '../services/billTemp
 
 const PAGE_FORMATS = {
   a4: { format: 'a4', width: 595 },
+  a5: { format: 'a5', width: 420 },
+  letter: { format: 'letter', width: 612 },
   thermal80: { format: [226, 900], width: 226 },
+  thermal58: { format: [164, 700], width: 164 },
 };
 
 const ITEM_VALUE = {
@@ -63,12 +66,22 @@ export async function generateReceiptPdf(order) {
   doc.setFontSize(9);
   doc.text(`Order ID: ${order.id}`, marginX, y);
   y += 13;
-  doc.text(`Date: ${placedDate.toLocaleString('en-IN')}`, marginX, y);
+  doc.text(`Order Date: ${placedDate.toLocaleString('en-IN')}`, marginX, y);
+  y += 13;
+  doc.text(`Printed On: ${new Date().toLocaleString('en-IN')}`, marginX, y);
   y += 13;
   doc.text(`Customer: ${customerName}`, marginX, y);
   y += 13;
   if (order.paymentMethod) {
     doc.text(`Payment: ${order.paymentMethod}`, marginX, y);
+    y += 13;
+  }
+  if (order.shippingDetails?.gstNumber) {
+    doc.text(`Customer GSTIN: ${order.shippingDetails.gstNumber}`, marginX, y);
+    y += 13;
+  }
+  if (order.shippingDetails?.referredBy) {
+    doc.text(`Referred By: ${order.shippingDetails.referredBy}`, marginX, y);
     y += 13;
   }
 
