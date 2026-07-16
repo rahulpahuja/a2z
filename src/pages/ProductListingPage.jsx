@@ -51,7 +51,7 @@ export default function ProductListingPage() {
   const activeSubcategory = searchParams.get('subcategory') ?? 'All';
 
   const [priceValue, setPriceValue] = useState(2500);
-  const [selectedColor, setSelectedColor] = useState('dusty-rose');
+  const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState('m');
   const [favorites, setFavorites] = useState({});
   const [sortBy, setSortBy] = useState('newest');
@@ -90,11 +90,14 @@ export default function ProductListingPage() {
     if (activeSubcategory !== 'All') {
       base = base.filter((p) => p.subcategoryTitle === activeSubcategory);
     }
+    if (selectedColorLabel) {
+      base = base.filter((p) => (p.colors ?? []).some((c) => String(c).toLowerCase() === selectedColorLabel.toLowerCase()));
+    }
     if (sortBy === 'price-asc') return [...base].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
-  }, [CATALOG, activeCategory, activeSubcategory, sortBy]);
+  }, [CATALOG, activeCategory, activeSubcategory, selectedColorLabel, sortBy]);
 
   // Arrange products grouped by subcategory so like-with-like sits together on the grid.
   const productGroups = useMemo(() => {
