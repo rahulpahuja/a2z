@@ -1,6 +1,6 @@
 // Active application versioning parameters.
 // Updated automatically by developer AI agent hooks.
 export const APP_VERSION = '1.1.0';
-export const APP_BUILD = 130;
+export const APP_BUILD = 131;
 export const LAST_UPDATED = '2026-07-18';
 export const BUILD_ENVIRONMENT = 'production';

@@ -696,6 +696,159 @@ export default function AdminConfiguratorPage() {
               </div>
             </div>
 
+            {/* 6. Stories in Motion Video Lookbooks */}
+            <div className="admin-card flex flex-col gap-5">
+              <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">movie</span>
+                6. Stories in Motion (Video Lookbooks)
+              </h3>
+              
+              <div className="space-y-6">
+                {(form.lookbookVideos || []).map((video, idx) => (
+                  <div key={video.id || idx} className="p-4 rounded-xl border border-outline-variant/30 bg-surface-container-low/50 flex flex-col gap-3">
+                    <h4 className="text-[12px] font-bold text-primary flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[16px]">play_circle</span>
+                      Video Slot {idx + 1}
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="form-group">
+                        <label className="form-label text-[11px]" htmlFor={`video-title-${idx}`}>
+                          Video Title
+                        </label>
+                        <input
+                          id={`video-title-${idx}`}
+                          type="text"
+                          value={video.title || ''}
+                          onChange={(e) => {
+                            const updated = [...(form.lookbookVideos || [])];
+                            updated[idx] = { ...updated[idx], title: e.target.value };
+                            handleChange('lookbookVideos', updated);
+                          }}
+                          placeholder="e.g. Vibrant Rani Pink Lookbook"
+                          className="form-input text-[11px] py-1.5 px-3"
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label className="form-label text-[11px]" htmlFor={`video-desc-${idx}`}>
+                          Description
+                        </label>
+                        <input
+                          id={`video-desc-${idx}`}
+                          type="text"
+                          value={video.description || ''}
+                          onChange={(e) => {
+                            const updated = [...(form.lookbookVideos || [])];
+                            updated[idx] = { ...updated[idx], description: e.target.value };
+                            handleChange('lookbookVideos', updated);
+                          }}
+                          placeholder="e.g. Witness the detailed gold zari embroidery..."
+                          className="form-input text-[11px] py-1.5 px-3"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-outline-variant/10">
+                      <div className="form-group">
+                        <label className="form-label text-[11px]">Video Source Mode</label>
+                        <select
+                          value={video.sourceMode || (video.src?.startsWith('blob:') || video.src?.startsWith('data:') ? 'upload' : 'url')}
+                          onChange={(e) => {
+                            const mode = e.target.value;
+                            const updated = [...(form.lookbookVideos || [])];
+                            updated[idx] = { ...updated[idx], sourceMode: mode };
+                            handleChange('lookbookVideos', updated);
+                          }}
+                          className="form-select text-[11px] py-1.5 px-2"
+                        >
+                          <option value="url">Paste Custom Video URL</option>
+                          <option value="preset">Select Mixkit Luxury Preset</option>
+                          <option value="upload">Upload Custom MP4 Video File</option>
+                        </select>
+                      </div>
+
+                      {/* URL input field */}
+                      {(video.sourceMode === 'url' || (!video.sourceMode && !video.src?.startsWith('blob:'))) && (
+                        <div className="form-group">
+                          <label className="form-label text-[11px]" htmlFor={`video-url-${idx}`}>
+                            Video URL Link
+                          </label>
+                          <input
+                            id={`video-url-${idx}`}
+                            type="text"
+                            value={video.src || ''}
+                            onChange={(e) => {
+                              const updated = [...(form.lookbookVideos || [])];
+                              updated[idx] = { ...updated[idx], src: e.target.value };
+                              handleChange('lookbookVideos', updated);
+                            }}
+                            placeholder="https://..."
+                            className="form-input text-[11px] py-1.5 px-3"
+                          />
+                        </div>
+                      )}
+
+                      {/* Preset Select dropdown */}
+                      {video.sourceMode === 'preset' && (
+                        <div className="form-group">
+                          <label className="form-label text-[11px]" htmlFor={`video-preset-${idx}`}>
+                            Choose Preset Video
+                          </label>
+                          <select
+                            id={`video-preset-${idx}`}
+                            value={video.src || ''}
+                            onChange={(e) => {
+                              const updated = [...(form.lookbookVideos || [])];
+                              updated[idx] = { ...updated[idx], src: e.target.value };
+                              handleChange('lookbookVideos', updated);
+                            }}
+                            className="form-select text-[11px] py-1.5 px-2"
+                          >
+                            <option value="">-- Choose Preset --</option>
+                            <option value="https://vjs.zencdn.net/v/oceans.mp4">Preset 1: Oceans Waves</option>
+                            <option value="https://media.w3.org/2010/05/sintel/trailer_hd.mp4">Preset 2: Sintel Cinematic Trailer</option>
+                            <option value="https://www.w3schools.com/html/mov_bbb.mp4">Preset 3: Big Buck Bunny</option>
+                            <option value="https://www.w3schools.com/html/movie.mp4">Preset 4: Classic Canvas Film</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Local File Uploader */}
+                      {video.sourceMode === 'upload' && (
+                        <div className="form-group">
+                          <label className="form-label text-[11px]" htmlFor={`video-file-${idx}`}>
+                            Upload MP4 / WebM
+                          </label>
+                          <input
+                            id={`video-file-${idx}`}
+                            type="file"
+                            accept="video/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const localUrl = URL.createObjectURL(file);
+                                const updated = [...(form.lookbookVideos || [])];
+                                updated[idx] = { ...updated[idx], src: localUrl, originalName: file.name };
+                                handleChange('lookbookVideos', updated);
+                                showToast(`Video Slot ${idx + 1} loaded locally! Preview on the right.`);
+                              }
+                            }}
+                            className="form-input text-[11px] py-1 px-2 text-[10px]"
+                          />
+                          {video.originalName && (
+                            <span className="text-[9px] text-on-surface-variant/70 mt-1 block truncate">
+                              Loaded: {video.originalName}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Form actions */}
             <div className="flex gap-3 justify-end">
               <button
@@ -778,77 +931,112 @@ export default function AdminConfiguratorPage() {
               <div className="w-full relative z-10 max-w-[500px]">
                 {previewTab === 'listing' ? (
                   /* Listing Card Preview */
-                  <div 
-                    className="grid gap-3 w-full"
-                    style={{
-                      gridTemplateColumns: `repeat(${form.gridCols || 4}, minmax(0, 1fr))`,
-                    }}
-                  >
-                    {Array.from({ length: form.gridCols || 4 }).map((_, i) => (
-                      <div 
-                        key={i}
-                        className="flex flex-col transition-all duration-300 w-full shadow-md animate-fade-in"
-                        style={{
-                          borderRadius: form.borderRadius,
-                          borderWidth: form.borderWidth,
-                          borderColor: form.borderColor,
-                          borderStyle: 'solid',
-                          backgroundColor: form.themeMode === 'dark' 
-                            ? '#1e1e1e' 
-                            : form.themeMode === 'midnight' 
-                              ? '#0b0f19' 
-                              : 'var(--color-surface-container-lowest, #ffffff)',
-                          overflow: 'hidden',
-                        }}
-                      >
+                  <div className="flex flex-col gap-4 w-full">
+                    <div 
+                      className="grid gap-3 w-full"
+                      style={{
+                        gridTemplateColumns: `repeat(${form.gridCols || 4}, minmax(0, 1fr))`,
+                      }}
+                    >
+                      {Array.from({ length: form.gridCols || 4 }).map((_, i) => (
                         <div 
-                          className="preview-aspect-box"
+                          key={i}
+                          className="flex flex-col transition-all duration-300 w-full shadow-md animate-fade-in"
                           style={{
-                            aspectRatio: form.listingImgAspect,
-                            borderRadius: '0px',
-                            borderWidth: '0px',
-                            minHeight: '40px',
+                            borderRadius: form.borderRadius,
+                            borderWidth: form.borderWidth,
+                            borderColor: form.borderColor,
+                            borderStyle: 'solid',
+                            backgroundColor: form.themeMode === 'dark' 
+                              ? '#1e1e1e' 
+                              : form.themeMode === 'midnight' 
+                                ? '#0b0f19' 
+                                : 'var(--color-surface-container-lowest, #ffffff)',
+                            overflow: 'hidden',
                           }}
                         >
-                          <span className="material-symbols-outlined text-outline-variant text-[14px]">image</span>
-                        </div>
-                        {form.gridCols <= 4 ? (
                           <div 
-                            className="p-2 flex flex-col gap-0.5"
+                            className="preview-aspect-box"
                             style={{
-                              backgroundColor: form.themeMode === 'dark' 
-                                ? '#1e1e1e' 
-                                : form.themeMode === 'midnight' 
-                                  ? '#0b0f19' 
-                                  : 'var(--color-surface-container-lowest, #ffffff)',
+                              aspectRatio: form.listingImgAspect,
+                              borderRadius: '0px',
+                              borderWidth: '0px',
+                              minHeight: '40px',
                             }}
                           >
-                            <span 
-                              className="text-[7px] uppercase tracking-wider font-bold leading-none"
-                              style={{ color: form.primaryColor || '#ac2471' }}
-                            >
-                              Category
-                            </span>
-                            <h4 
-                              className="font-bold text-on-surface line-clamp-1 leading-none"
-                              style={{ fontSize: `calc(${form.titleSizeListing} * 0.75)` }}
-                            >
-                              Sample Item
-                            </h4>
+                            <span className="material-symbols-outlined text-outline-variant text-[14px]">image</span>
+                          </div>
+                          {form.gridCols <= 4 ? (
                             <div 
-                              className="font-bold text-on-surface mt-0.5"
-                              style={{ fontSize: `calc(${form.priceSizeListing} * 0.75)` }}
+                              className="p-2 flex flex-col gap-0.5"
+                              style={{
+                                backgroundColor: form.themeMode === 'dark' 
+                                  ? '#1e1e1e' 
+                                  : form.themeMode === 'midnight' 
+                                    ? '#0b0f19' 
+                                    : 'var(--color-surface-container-lowest, #ffffff)',
+                              }}
                             >
-                              ₹1,499
+                              <span 
+                                className="text-[7px] uppercase tracking-wider font-bold leading-none"
+                                style={{ color: form.primaryColor || '#ac2471' }}
+                              >
+                                Category
+                              </span>
+                              <h4 
+                                className="font-bold text-on-surface line-clamp-1 leading-none"
+                                style={{ fontSize: `calc(${form.titleSizeListing} * 0.75)` }}
+                              >
+                                Sample Item
+                              </h4>
+                              <div 
+                                className="font-bold text-on-surface mt-0.5"
+                                style={{ fontSize: `calc(${form.priceSizeListing} * 0.75)` }}
+                              >
+                                ₹1,499
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-1 flex flex-col bg-surface-container-lowest text-center">
+                              <span className="font-bold text-on-surface text-[8px] leading-none">Item {i + 1}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Mini Lookbook Preview */}
+                    <div className="border-t border-outline-variant/20 pt-4 mt-2">
+                      <span className="text-[9px] uppercase tracking-wider font-semibold block mb-2 opacity-80">
+                        Stories in Motion (Preview)
+                      </span>
+                      <div className="flex gap-2 overflow-x-auto pb-1 max-w-[480px]">
+                        {(form.lookbookVideos || []).map((video, idx) => (
+                          <div 
+                            key={video.id || idx} 
+                            className="flex-shrink-0 w-24 aspect-[9/16] rounded bg-surface-container-high border border-outline-variant/35 overflow-hidden relative shadow-sm"
+                          >
+                            {video.src ? (
+                              <video 
+                                src={video.src} 
+                                className="w-full h-full object-cover" 
+                                muted 
+                                loop 
+                                playsInline 
+                                autoPlay
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span className="material-symbols-outlined text-[14px]">movie</span>
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-black/40 flex items-end p-1.5">
+                              <span className="text-[6px] text-white line-clamp-1 font-bold">{video.title}</span>
                             </div>
                           </div>
-                        ) : (
-                          <div className="p-1 flex flex-col bg-surface-container-lowest text-center">
-                            <span className="font-bold text-on-surface text-[8px] leading-none">Item {i + 1}</span>
-                          </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
                 ) : (
                   /* Details View Preview */
