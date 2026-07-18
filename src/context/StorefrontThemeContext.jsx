@@ -34,6 +34,34 @@ export const DEFAULT_THEME = {
   // Pagination & Layout Grid Sizing
   itemsPerPage: 400,
   gridCols: 4,
+
+  // Lookbook Videos
+  lookbookVideos: [
+    {
+      id: 'video-1',
+      src: 'https://vjs.zencdn.net/v/oceans.mp4',
+      title: 'Vibrant Rani Pink Lookbook',
+      description: 'Witness the detailed gold zari embroidery and elegant drape in our modern heritage collection.'
+    },
+    {
+      id: 'video-2',
+      src: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+      title: 'Artisanal Jewelry Adornments',
+      description: 'A beautiful showcase of traditional handcrafted Kundan necklace sets.'
+    },
+    {
+      id: 'video-3',
+      src: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      title: 'Pure Silk Weaving & Drape',
+      description: 'Highlighting the soft, flowing textures and rich weaving of heritage block prints.'
+    },
+    {
+      id: 'video-4',
+      src: 'https://www.w3schools.com/html/movie.mp4',
+      title: 'Bridal Craft Editorial',
+      description: 'Capturing the modern elegant look designed for the contemporary South Asian wedding.'
+    }
+  ],
 };
 
 const THEME_STORAGE_KEY = 'storefront_theme_settings';

@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import TrendingProducts from '../components/TrendingProducts.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
@@ -123,6 +124,7 @@ categories.forEach((c) => {
 
 export default function HomePage() {
   const { products } = useProducts();
+  const { theme } = useStorefrontTheme();
   const productsRow1 = products.slice(0, 4);
   const productsRow2 = products.slice(4, 24);
   const heritageScrollRef = useRef(null);
@@ -440,30 +442,15 @@ export default function HomePage() {
             Hover over our lookbooks to witness traditional craftsmanship come to life.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-            <VideoCard
-              src="https://vjs.zencdn.net/v/oceans.mp4"
-              poster={productsRow1[0]?.image}
-              title="Vibrant Rani Pink Lookbook"
-              description="Witness the detailed gold zari embroidery and elegant drape in our modern heritage collection."
-            />
-            <VideoCard
-              src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
-              poster={productsRow1[1]?.image}
-              title="Artisanal Jewelry Adornments"
-              description="A beautiful showcase of traditional handcrafted Kundan necklace sets."
-            />
-            <VideoCard
-              src="https://www.w3schools.com/html/mov_bbb.mp4"
-              poster={productsRow1[2]?.image}
-              title="Pure Silk Weaving & Drape"
-              description="Highlighting the soft, flowing textures and rich weaving of heritage block prints."
-            />
-            <VideoCard
-              src="https://www.w3schools.com/html/movie.mp4"
-              poster={productsRow1[3]?.image}
-              title="Bridal Craft Editorial"
-              description="Capturing the modern elegant look designed for the contemporary South Asian wedding."
-            />
+            {(theme.lookbookVideos || []).map((video, idx) => (
+              <VideoCard
+                key={video.id || idx}
+                src={video.src}
+                poster={video.poster || productsRow1[idx % productsRow1.length]?.image}
+                title={video.title}
+                description={video.description}
+              />
+            ))}
           </div>
         </section>
       </main>
