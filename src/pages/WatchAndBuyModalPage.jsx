@@ -133,7 +133,10 @@ export default function WatchAndBuyModalPage() {
                   )}
                 </div>
               </div>
-              <button className="w-full bg-[#ff69b4] hover:bg-[#ac2471] text-white font-label-caps text-label-caps py-4 rounded-[12px] transition-colors duration-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-4 shadow-sm hover:shadow-md">
+              <button 
+                className="w-full text-white font-label-caps text-label-caps py-4 rounded-[12px] transition-colors duration-300 uppercase tracking-widest flex items-center justify-center gap-2 mt-4 shadow-sm hover:shadow-md"
+                style={{ backgroundColor: 'var(--color-primary)' }}
+              >
                 <span>View Product</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>

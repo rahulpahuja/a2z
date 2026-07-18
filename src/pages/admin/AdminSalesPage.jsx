@@ -333,7 +333,7 @@ export default function AdminSalesPage() {
   useEffect(() => {
     if (loading) return;
 
-    const brandPink = '#ac2471';
+    const brandPink = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#ac2471';
     const brandGreen = '#486730';
     const brandRose = '#7a5642';
     const chartGridColor = '#e5e2e1';
