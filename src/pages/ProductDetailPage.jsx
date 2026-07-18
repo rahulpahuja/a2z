@@ -244,7 +244,7 @@ export default function ProductDetailPage() {
 
         {/* Right: Product Info (40% -> 5 columns) */}
         <section className="md:col-span-5 flex flex-col gap-6">
-          {/* Headers & Price */}
+          {/* Title & Description */}
           <div className="flex flex-col gap-2 border-b border-outline-variant/30 pb-6">
             <div className="flex justify-between items-start">
               <span className="font-label-caps text-label-caps text-secondary uppercase tracking-widest">{product.category}</span>
@@ -252,13 +252,10 @@ export default function ProductDetailPage() {
                 <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
               )}
             </div>
-            <h1 className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface" style={{ fontSize: 'var(--custom-font-title-size-detail, 28px)' }}>{product.name}</h1>
-            <div className="flex items-center gap-4 mt-2">
-              <span className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</span>
-              {product.originalPrice && (
-                <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
-              )}
-            </div>
+            <h1 className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface" style={{ fontSize: 'var(--custom-font-title-size-detail, 28px)' }}>{product.name || product.title}</h1>
+            {product.description && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-1" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
+            )}
             {viewCount !== null && viewCount > 0 && (
               <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
@@ -313,6 +310,14 @@ export default function ProductDetailPage() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Price */}
+            <div className="flex items-center gap-4">
+              <span className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</span>
+              {product.originalPrice && (
+                <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
+              )}
             </div>
 
             {/* Color */}
