@@ -1,0 +1,254 @@
+/* Shared theme and common structural components across A2Z Collection */
+
+/* Page & Header Layouts */
+.admin-page-container {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+}
+
+.admin-header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-surface-variant);
+  padding: 1.5rem var(--spacing-margin-mobile);
+}
+@media (min-width: 768px) {
+  .admin-header {
+    padding: 1.5rem var(--spacing-margin-desktop);
+  }
+}
+
+.admin-main-container {
+  max-width: var(--spacing-container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2.5rem var(--spacing-margin-mobile);
+}
+@media (min-width: 768px) {
+  .admin-main-container {
+    padding: 2.5rem var(--spacing-margin-desktop);
+  }
+}
+
+/* Typography */
+.admin-page-title {
+  font-family: var(--font-display-lg-mobile);
+  font-size: var(--text-display-lg-mobile);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.admin-page-subtitle {
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  margin-top: 0.25rem;
+}
+
+/* Cards & Containers */
+.admin-card {
+  background-color: var(--color-surface-container-low);
+  border: 1px solid rgba(220, 191, 201, 0.3);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-card-title {
+  font-family: var(--font-title-sm);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-bottom: 0.25rem;
+}
+
+.admin-card-subtitle {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  text-transform: uppercase;
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  font-weight: var(--text-label-caps--font-weight);
+  color: var(--color-on-surface-variant);
+  margin-bottom: 0.5rem;
+}
+
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body-lg);
+  font-size: var(--text-body-lg);
+  color: var(--color-on-surface);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: rgba(86, 65, 73, 0.4);
+}
+
+.form-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.25rem;
+  border-color: var(--color-outline-variant);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* Button Component Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  font-weight: var(--text-label-caps--font-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-outline);
+  color: var(--color-on-surface);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--color-surface-container-high);
+}
+
+.btn-cancel {
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: rgba(86, 65, 73, 0.1);
+}
+
+/* Banners / Alerts */
+.alert-banner {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border-width: 1px;
+  display: flex;
+  gap: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.alert-banner-error {
+  background-color: rgba(186, 26, 26, 0.1);
+  border-color: rgba(186, 26, 26, 0.2);
+  color: var(--color-error);
+}
+
+.alert-banner-success {
+  background-color: rgba(72, 103, 48, 0.1);
+  border-color: rgba(72, 103, 48, 0.2);
+  color: var(--color-secondary);
+}
+
+/* Badges & Tags */
+.status-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.status-badge-primary {
+  background-color: rgba(172, 36, 113, 0.1);
+  color: var(--color-primary);
+}
+
+.status-badge-secondary {
+  background-color: rgba(72, 103, 48, 0.15);
+  color: var(--color-secondary);
+}
+
+.status-badge-error {
+  background-color: rgba(186, 26, 26, 0.15);
+  color: var(--color-error);
+}
+
+/* Table Configurations */
+.admin-table-container {
+  overflow-x: auto;
+  border: 1px solid rgba(220, 191, 201, 0.2);
+  border-radius: 0.5rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background-color: var(--color-surface-container-lowest);
+}
+
+.admin-table th {
+  background-color: var(--color-surface-container);
+  border-bottom: 1px solid rgba(220, 191, 201, 0.3);
+  padding: 1rem;
+  font-family: var(--font-label-caps);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface);
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(220, 191, 201, 0.2);
+  font-size: 14px;
+}

@@ -1,0 +1,15 @@
+/* Custom styles specific to AdminSalesPage */
+
+.drill-down-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(172, 36, 113, 0.1);
+}
+
+.kpi-trend-up {
+  color: var(--color-secondary);
+}
+
+.chart-wrapper {
+  position: relative;
+  min-height: 280px;
+}

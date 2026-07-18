@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./common.css";
 
 /* Single source of truth for design tokens, shared by every page. */
 @theme {

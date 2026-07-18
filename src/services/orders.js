@@ -49,3 +49,30 @@ export function subscribeToOrders(callback) {
     () => callback([])
   );
 }
+
+export function updateFirebaseOrder(order) {
+  return createFirebaseOrder(order);
+}
+
+export function subscribeToOrder(id, callback) {
+  if (!isFirebaseEnabled) {
+    const getOrder = () => {
+      const localOrders = JSON.parse(localStorage.getItem(ROOT) || '[]');
+      return localOrders.find((o) => o.id === id) || null;
+    };
+    callback(getOrder());
+    const handleStorage = () => {
+      callback(getOrder());
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }
+  return onValue(
+    ref(db, `${ROOT}/${id}`),
+    (snapshot) => {
+      callback(snapshot.exists() ? snapshot.val() : null);
+    },
+    () => callback(null)
+  );
+}
+
