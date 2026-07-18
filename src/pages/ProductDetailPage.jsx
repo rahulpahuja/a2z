@@ -177,10 +177,26 @@ export default function ProductDetailPage() {
       <TopNav />
 
       {/* Main Content Canvas */}
-      <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter">
+      <main 
+        className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter"
+        style={{
+          backgroundColor: 'var(--custom-store-bg, transparent)',
+          backdropFilter: 'var(--custom-backdrop-filter, none)',
+          background: 'var(--custom-backdrop-bg, inherit)',
+        }}
+      >
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="md:col-span-7 flex flex-col gap-unit">
-          <div className="relative w-full aspect-[3/4] bg-surface-container rounded-xl overflow-hidden group">
+          <div 
+            className="relative w-full bg-surface-container overflow-hidden group"
+            style={{
+              aspectRatio: 'var(--custom-detail-img-aspect, 3/4)',
+              borderRadius: 'var(--custom-border-radius, 12px)',
+              borderWidth: 'var(--custom-border-width, 0px)',
+              borderColor: 'var(--custom-border-color, transparent)',
+              borderStyle: 'solid',
+            }}
+          >
             {mainMedia.type === 'video' ? (
               <VideoPlayer src={mainMedia.src} className="w-full h-full object-contain bg-black" />
             ) : (
@@ -203,9 +219,14 @@ export default function ProductDetailPage() {
                 <button
                   key={index}
                   onClick={() => setSelectedThumbnail(index)}
-                  className={`relative w-16 h-20 rounded-md overflow-hidden border transition-all ${
+                  className={`relative overflow-hidden border transition-all ${
                     selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
                   }`}
+                  style={{
+                    width: 'var(--custom-gallery-thumb-w, 64px)',
+                    height: 'var(--custom-gallery-thumb-h, 80px)',
+                    borderRadius: 'var(--custom-border-radius-sm, 6px)',
+                  }}
                 >
                   {item.type === 'video' ? (
                     <div className="w-full h-full flex items-center justify-center bg-surface-container-high">
@@ -230,7 +251,7 @@ export default function ProductDetailPage() {
                 <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
               )}
             </div>
-            <h1 className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface">{product.name}</h1>
+            <h1 className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface" style={{ fontSize: 'var(--custom-font-title-size-detail, 28px)' }}>{product.name}</h1>
             <div className="flex items-center gap-4 mt-2">
               <span className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</span>
               {product.originalPrice && (
@@ -414,7 +435,7 @@ export default function ProductDetailPage() {
             <div>
               <h2 className="font-headline-md text-headline-md text-on-surface mb-6">The Artisan's Touch</h2>
               <div className="font-body-lg text-body-lg text-on-surface-variant space-y-4">
-                <p>{product.description}</p>
+                <p style={{ fontSize: 'var(--custom-font-desc-size-detail, 16px)' }}>{product.description}</p>
               </div>
             </div>
 

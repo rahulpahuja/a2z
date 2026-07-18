@@ -1,0 +1,48 @@
+/* Custom styles specific to AdminConfiguratorPage */
+
+.configurator-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .configurator-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-picker-input {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid var(--color-outline-variant);
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+
+.preview-aspect-box {
+  background-color: var(--color-surface-container-high);
+  border: var(--custom-border-width, 1px) solid var(--custom-border-color, rgba(220,174,150,0.3));
+  border-radius: var(--custom-border-radius, 16px);
+  width: 100%;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.test-card-box {
+  background-color: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 12px;
+  padding: 1rem;
+}
