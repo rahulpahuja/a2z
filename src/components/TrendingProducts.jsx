@@ -39,7 +39,7 @@ export default function TrendingProducts() {
 
   return (
     <section className="py-16 px-margin-desktop max-w-container-max mx-auto">
-      <div className="flex flex-col items-center gap-6 mb-12">
+      <div className="relative flex flex-col items-center gap-6 mb-12">
         <h2 className="font-headline-md text-headline-md playfair text-center">Trending Now</h2>
         <div className="flex gap-2 bg-surface-container rounded-full p-1">
           {TABS.map((t) => (
@@ -58,6 +58,13 @@ export default function TrendingProducts() {
             </button>
           ))}
         </div>
+        <Link
+          to="/products"
+          className="absolute right-0 top-1 font-label-caps text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+        >
+          View All
+          <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </Link>
       </div>
 
       <div className="relative group/arrows">
