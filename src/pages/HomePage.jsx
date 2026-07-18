@@ -124,7 +124,8 @@ categories.forEach((c) => {
 export default function HomePage() {
   const { products } = useProducts();
   const productsRow1 = products.slice(0, 4);
-  const productsRow2 = products.slice(4, 8);
+  const productsRow2 = products.slice(4, 24);
+  const heritageScrollRef = useRef(null);
 
   const [favorites, setFavorites] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -343,65 +344,92 @@ export default function HomePage() {
         {/* Featured Products Row 2 */}
         <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
           <h2 className="font-headline-md text-headline-md playfair text-center mb-12">Heritage Masterpieces</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-            {productsRow2.map((product) => {
-              const isFavorited = !!favorites[product.id];
-              const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
-              return (
-              <Link
-                key={product.id}
-                to={`/product/${product.id}`}
-                className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
-              >
-                <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                  <ProductImage
-                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                    data-alt={product.alt}
-                    alt={product.alt}
-                    src={product.image}
-                  />
-                  {!isAvailable && (
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
-                      <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
-                        Out of Stock
-                      </span>
-                    </div>
-                  )}
-                  {product.badge && (
-                    <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
-                  )}
-                  <button
-                    type="button"
-                    aria-label={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      toggleFavorite(product.id);
-                    }}
-                    className={`absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
-                  >
-                    <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
-                      {isFavorited ? 'favorite' : 'favorite_border'}
-                    </span>
-                  </button>
-                </div>
-                <div className="p-4 flex flex-col gap-2">
-                  <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
-                    {product.category || product.categoryTitle}
-                  </span>
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
-                    {product.rating && (
-                      <div className="flex items-center text-secondary gap-1 shrink-0">
-                        <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
-                        <span className="font-body-sm text-body-sm">{product.rating}</span>
+          <div className="relative group/arrows">
+            {/* Left scroll navigation */}
+            <button
+              type="button"
+              onClick={() => heritageScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              aria-label="Scroll Left"
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            {/* Scrolling horizontal list */}
+            <div
+              ref={heritageScrollRef}
+              className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+            >
+              {productsRow2.map((product) => {
+                const isFavorited = !!favorites[product.id];
+                const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                return (
+                  <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
+                    <Link
+                      to={`/product/${product.id}`}
+                      className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
+                    >
+                      <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+                        <ProductImage
+                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
+                          data-alt={product.alt}
+                          alt={product.alt}
+                          src={product.image}
+                        />
+                        {!isAvailable && (
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                            <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+                              Out of Stock
+                            </span>
+                          </div>
+                        )}
+                        {product.badge && (
+                          <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
+                        )}
+                        <button
+                          type="button"
+                          aria-label={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            toggleFavorite(product.id);
+                          }}
+                          className={`absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                        >
+                          <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
+                            {isFavorited ? 'favorite' : 'favorite_border'}
+                          </span>
+                        </button>
                       </div>
-                    )}
+                      <div className="p-4 flex flex-col gap-2 mt-auto">
+                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
+                          {product.category || product.categoryTitle}
+                        </span>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
+                          {product.rating && (
+                            <div className="flex items-center text-secondary gap-1 shrink-0">
+                              <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
+                              <span className="font-body-sm text-body-sm">{product.rating}</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
+                      </div>
+                    </Link>
                   </div>
-                  <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
-                </div>
-              </Link>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            {/* Right scroll navigation */}
+            <button
+              type="button"
+              onClick={() => heritageScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              aria-label="Scroll Right"
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
         </section>
 
