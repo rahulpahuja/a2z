@@ -34,6 +34,7 @@ import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.j
 import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
 import AdminImageConverterPage from './pages/admin/AdminImageConverterPage.jsx'
 import AdminConfiguratorPage from './pages/admin/AdminConfiguratorPage.jsx'
+import AdminWatermarkPage from './pages/admin/AdminWatermarkPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
@@ -70,6 +71,7 @@ const ADMIN_ROUTES = [
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
   { path: '/super/image-converter', Component: AdminImageConverterPage },
   { path: '/super/configurator', Component: AdminConfiguratorPage },
+  { path: '/super/watermark-remover', Component: AdminWatermarkPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/upload-test', Component: AdminUploadTestPage },
   { path: '/super/ai-studio', Component: AIStudioPage },

@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },
   { to: '/super/image-converter', label: 'Image Converter', icon: 'image' },
   { to: '/super/configurator', label: 'Layout Configurator', icon: 'settings_accessibility' },
+  { to: '/super/watermark-remover', label: 'Watermark Remover', icon: 'auto_fix' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
   { to: '/super/upload-test', label: 'R2 Upload Test', icon: 'cloud_upload' },
 ];
