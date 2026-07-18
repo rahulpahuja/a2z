@@ -3,7 +3,7 @@ import ProductImage from './ProductImage.jsx';
 
 // After this many ms of continuous hover, start auto-sliding through the
 // product's other images (one slide in from the right per interval).
-const START_DELAY_MS = 1500;
+const START_DELAY_MS = 1000;
 const SLIDE_INTERVAL_MS = 1800;
 
 export default function ProductCardImage({ images, alt, className = '', loading = 'lazy', activeIndex = 0 }) {
