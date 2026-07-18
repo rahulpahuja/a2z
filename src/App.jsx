@@ -33,9 +33,11 @@ import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.jsx'
 import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
 import AdminImageConverterPage from './pages/admin/AdminImageConverterPage.jsx'
+import AdminConfiguratorPage from './pages/admin/AdminConfiguratorPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
+import { StorefrontThemeProvider } from './context/StorefrontThemeContext.jsx'
 import LuxuryBackdrop from './components/LuxuryBackdrop.jsx'
 import SimulatedSmsToaster from './components/SimulatedSmsToaster.jsx'
 
@@ -67,6 +69,7 @@ const ADMIN_ROUTES = [
   { path: '/super/tracking-partners', Component: AdminTrackingPartnersPage },
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
   { path: '/super/image-converter', Component: AdminImageConverterPage },
+  { path: '/super/configurator', Component: AdminConfiguratorPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/upload-test', Component: AdminUploadTestPage },
   { path: '/super/ai-studio', Component: AIStudioPage },
@@ -86,30 +89,32 @@ export default function App() {
   return (
     <BotGate>
       <ProductsProvider>
-        <EntryGate>
-          <LuxuryBackdrop />
-          <ScrollToTop />
-          <HoneypotLink />
-          <Routes>
-            {ROUTES.map(({ path, Component }) => (
-              <Route key={path} path={path} element={<Component />} />
-            ))}
-            <Route
-              path="/dashboard"
-              element={
-                <RequireAdmin>
-                  <DashboardPage />
-                </RequireAdmin>
-              }
-            />
-            {ADMIN_ROUTES.map(({ path, Component }) => (
-              <Route key={path} path={path} element={adminElement(Component)} />
-            ))}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-          <FloatingContactButtons />
-          <SimulatedSmsToaster />
-        </EntryGate>
+        <StorefrontThemeProvider>
+          <EntryGate>
+            <LuxuryBackdrop />
+            <ScrollToTop />
+            <HoneypotLink />
+            <Routes>
+              {ROUTES.map(({ path, Component }) => (
+                <Route key={path} path={path} element={<Component />} />
+              ))}
+              <Route
+                path="/dashboard"
+                element={
+                  <RequireAdmin>
+                    <DashboardPage />
+                  </RequireAdmin>
+                }
+              />
+              {ADMIN_ROUTES.map(({ path, Component }) => (
+                <Route key={path} path={path} element={adminElement(Component)} />
+              ))}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <FloatingContactButtons />
+            <SimulatedSmsToaster />
+          </EntryGate>
+        </StorefrontThemeProvider>
       </ProductsProvider>
     </BotGate>
   )

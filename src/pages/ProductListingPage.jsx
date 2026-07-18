@@ -169,7 +169,14 @@ export default function ProductListingPage() {
         </div>
       </div>
 
-      <main className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row gap-8">
+      <main 
+        className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row gap-8"
+        style={{
+          backgroundColor: 'var(--custom-store-bg, transparent)',
+          backdropFilter: 'var(--custom-backdrop-filter, none)',
+          background: 'var(--custom-backdrop-bg, inherit)',
+        }}
+      >
         <aside className="w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4">
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
@@ -342,69 +349,104 @@ export default function ProductListingPage() {
                   const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
                   return (
                     <article
-                  key={product.id}
-                  className={`group relative flex flex-col bg-surface-container-lowest border border-[#DCAE96]/30 rounded-[16px] overflow-hidden transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1 ${!isAvailable ? 'opacity-85' : ''}`}
-                >
-                  <Link to={`/product/${product.id}`} className="relative w-full aspect-[3/4] overflow-hidden product-card-img-wrapper bg-surface-container block">
-                    <ProductImage
-                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                      loading="lazy"
-                      src={product.image}
-                      alt={product.alt}
-                    />
-                    {!isAvailable && (
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
-                        <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md">
-                          Out of Stock
-                        </span>
-                      </div>
-                    )}
-                    {product.badge && (
-                      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-                        <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
-                          {product.badge}
-                        </span>
-                      </div>
-                    )}
-                    <button
-                      aria-label={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        toggleFavorite(product.id);
+                      key={product.id}
+                      className={`group relative flex flex-col transition-all duration-300 hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] hover:-translate-y-1 ${!isAvailable ? 'opacity-85' : ''}`}
+                      style={{
+                        borderRadius: 'var(--custom-border-radius, 16px)',
+                        borderWidth: 'var(--custom-border-width, 1px)',
+                        borderColor: 'var(--custom-border-color, rgba(220,174,150,0.3))',
+                        borderStyle: 'solid',
+                        backgroundColor: 'var(--custom-backdrop-bg, var(--color-surface-container-lowest, #ffffff))',
+                        backdropFilter: 'var(--custom-backdrop-filter, none)',
+                        overflow: 'hidden',
                       }}
-                      className={`absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                     >
-                      <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
-                        {isFavorited ? 'favorite' : 'favorite_border'}
-                      </span>
-                    </button>
-                  </Link>
-                  <div className="p-4 flex flex-col flex-grow">
-                    <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
-                      {product.category || product.categoryTitle}
-                    </span>
-                    <Link to={`/product/${product.id}`}>
-                      <h2 className="font-title-sm text-title-sm text-on-surface mb-1 line-clamp-1">{product.name || product.title}</h2>
-                    </Link>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-3 line-clamp-1">{product.description}</p>
-                    {product.originalPrice ? (
-                      <div className="mt-auto flex flex-col justify-between">
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-price-display text-price-display text-error">{formatCurrency(product.price)}</span>
-                          <span className="font-body-sm text-body-sm text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="font-price-display text-price-display text-on-surface">{formatCurrency(product.price)}</div>
-                        {product.rating && (
-                          <div className="flex items-center gap-1 text-tertiary">
-                            <span className="material-symbols-outlined text-[16px] fill-current">star</span>
-                            <span className="font-body-sm text-body-sm font-medium">{product.rating}</span>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="relative w-full overflow-hidden product-card-img-wrapper bg-surface-container block"
+                        style={{
+                          aspectRatio: 'var(--custom-listing-img-aspect, 3/4)',
+                        }}
+                      >
+                        <ProductImage
+                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
+                          loading="lazy"
+                          src={product.image}
+                          alt={product.alt}
+                        />
+                        {!isAvailable && (
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                            <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md">
+                              Out of Stock
+                            </span>
                           </div>
                         )}
-                      </div>
-                    )}
+                        {product.badge && (
+                          <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+                            <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
+                              {product.badge}
+                            </span>
+                          </div>
+                        )}
+                        <button
+                          aria-label={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            toggleFavorite(product.id);
+                          }}
+                          className={`absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                        >
+                          <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
+                            {isFavorited ? 'favorite' : 'favorite_border'}
+                          </span>
+                        </button>
+                      </Link>
+                      <div className="p-4 flex flex-col flex-grow">
+                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
+                          {product.category || product.categoryTitle}
+                        </span>
+                        <Link to={`/product/${product.id}`}>
+                          <h2
+                            className="text-on-surface mb-1 line-clamp-1 font-semibold"
+                            style={{ fontSize: 'var(--custom-font-title-size, 14px)' }}
+                          >
+                            {product.name || product.title}
+                          </h2>
+                        </Link>
+                        <p
+                          className="text-on-surface-variant mb-3 line-clamp-1"
+                          style={{ fontSize: 'var(--custom-font-desc-size, 12px)' }}
+                        >
+                          {product.description}
+                        </p>
+                        {product.originalPrice ? (
+                          <div className="mt-auto flex flex-col justify-between">
+                            <div className="flex items-baseline gap-2">
+                              <span
+                                className="text-error font-bold"
+                                style={{ fontSize: 'var(--custom-font-price-size, 14px)' }}
+                              >
+                                {formatCurrency(product.price)}
+                              </span>
+                              <span className="font-body-sm text-[11px] text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-auto flex items-center justify-between">
+                            <div
+                              className="text-on-surface font-bold"
+                              style={{ fontSize: 'var(--custom-font-price-size, 14px)' }}
+                            >
+                              {formatCurrency(product.price)}
+                            </div>
+                            {product.rating && (
+                              <div className="flex items-center gap-1 text-tertiary">
+                               <span className="material-symbols-outlined text-[16px] fill-current">star</span>
+                                <span className="font-body-sm text-body-sm font-medium">{product.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                     {(product.sizes?.some((s) => s.stock > 0) ?? product.inStock) ? (
                       <button
                         onClick={() =>
