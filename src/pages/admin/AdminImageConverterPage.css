@@ -1,0 +1,39 @@
+/* Custom styles specific to AdminImageConverterPage */
+
+.dropzone-active {
+  border-color: var(--color-primary);
+  background-color: rgba(172, 36, 113, 0.05);
+}
+
+.converter-file-row {
+  animation: fileRowEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fileRowEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.test-badge-passed {
+  background-color: rgba(72, 103, 48, 0.15);
+  color: var(--color-secondary);
+  border: 1px solid rgba(72, 103, 48, 0.25);
+}
+
+.test-badge-failed {
+  background-color: rgba(186, 26, 26, 0.15);
+  color: var(--color-error);
+  border: 1px solid rgba(186, 26, 26, 0.25);
+}
+
+.test-badge-running {
+  background-color: rgba(172, 36, 113, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(172, 36, 113, 0.2);
+}

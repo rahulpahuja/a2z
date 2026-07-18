@@ -32,6 +32,7 @@ import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
 import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.jsx'
 import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
+import AdminImageConverterPage from './pages/admin/AdminImageConverterPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
@@ -65,6 +66,7 @@ const ADMIN_ROUTES = [
   { path: '/super/settings', Component: AdminSettingsPage },
   { path: '/super/tracking-partners', Component: AdminTrackingPartnersPage },
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
+  { path: '/super/image-converter', Component: AdminImageConverterPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/upload-test', Component: AdminUploadTestPage },
   { path: '/super/ai-studio', Component: AIStudioPage },

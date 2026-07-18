@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/tracking-partners', label: 'Tracking Partners', icon: 'local_shipping' },
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },
+  { to: '/super/image-converter', label: 'Image Converter', icon: 'image' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
   { to: '/super/upload-test', label: 'R2 Upload Test', icon: 'cloud_upload' },
 ];
