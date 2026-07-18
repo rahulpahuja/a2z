@@ -36,6 +36,69 @@ export default function AdminSalesPage() {
   const [trackingPartner, setTrackingPartner] = useState('');
   const [isSavingTracking, setIsSavingTracking] = useState(false);
 
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [bulkModalOpen, setBulkModalOpen] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState('Shipped');
+  const [bulkPartner, setBulkPartner] = useState('');
+  const [bulkTrackingIds, setBulkTrackingIds] = useState({});
+
+  const handleOpenBulkModal = () => {
+    const initialIds = {};
+    selectedOrderIds.forEach(id => {
+      const order = allOrders.find(o => o.id === id);
+      initialIds[id] = order?.trackingId || '';
+    });
+    setBulkTrackingIds(initialIds);
+    const firstOrder = allOrders.find(o => o.id === selectedOrderIds[0]);
+    setBulkPartner(firstOrder?.trackingPartner || '');
+    setBulkStatus('Shipped');
+    setBulkModalOpen(true);
+  };
+
+  const handleSaveBulkTracking = async () => {
+    setIsSavingTracking(true);
+    try {
+      let dispatched = false;
+      for (const id of selectedOrderIds) {
+        const originalOrder = allOrders.find(o => o.id === id);
+        if (originalOrder) {
+          const updatedOrder = {
+            ...originalOrder,
+            status: bulkStatus,
+            trackingPartner: bulkPartner || null,
+            trackingId: bulkTrackingIds[id] || null,
+          };
+          await updateFirebaseOrder(updatedOrder);
+          
+          if (updatedOrder.trackingId) {
+            const smsMessage = `Hi ${originalOrder.shippingDetails?.firstName || 'Customer'}, your order ${id} has been shipped via ${updatedOrder.trackingPartner}. Track it here: ${window.location.origin}/orders/tracking`;
+            const notifications = JSON.parse(localStorage.getItem('simulated_sms') || '[]');
+            notifications.push({
+              id: `${id}-${Date.now()}`,
+              orderId: id,
+              phone: originalOrder.shippingDetails?.phone || '',
+              message: smsMessage,
+              timestamp: Date.now(),
+              read: false,
+            });
+            localStorage.setItem('simulated_sms', JSON.stringify(notifications));
+            dispatched = true;
+          }
+        }
+      }
+      if (dispatched) {
+        window.dispatchEvent(new Event('new-sms'));
+      }
+      showToast(`Successfully updated status & tracking for ${selectedOrderIds.length} orders.`);
+      setSelectedOrderIds([]);
+      setBulkModalOpen(false);
+    } catch (err) {
+      showToast(err.message || 'Could not save bulk tracking details.');
+    } finally {
+      setIsSavingTracking(false);
+    }
+  };
+
   // Subscribe to tracking partners
   useEffect(() => {
     const unsubPartners = subscribeToTrackingPartners((data) => {
@@ -63,6 +126,22 @@ export default function AdminSalesPage() {
     try {
       await updateFirebaseOrder(updatedOrder);
       setSelectedOrder(updatedOrder);
+      
+      if (updatedOrder.trackingId) {
+        const smsMessage = `Hi ${selectedOrder.shippingDetails?.firstName || 'Customer'}, your order ${selectedOrder.id} has been shipped via ${updatedOrder.trackingPartner}. Track it here: ${window.location.origin}/orders/tracking`;
+        const notifications = JSON.parse(localStorage.getItem('simulated_sms') || '[]');
+        notifications.push({
+          id: `${selectedOrder.id}-${Date.now()}`,
+          orderId: selectedOrder.id,
+          phone: selectedOrder.shippingDetails?.phone || '',
+          message: smsMessage,
+          timestamp: Date.now(),
+          read: false,
+        });
+        localStorage.setItem('simulated_sms', JSON.stringify(notifications));
+        window.dispatchEvent(new Event('new-sms'));
+      }
+
       showToast(`Order ${selectedOrder.id} status & tracking details updated.`);
     } catch (err) {
       showToast(err.message || 'Could not update order details.');
@@ -577,6 +656,22 @@ export default function AdminSalesPage() {
             </div>
           </div>
 
+          {selectedOrderIds.length > 0 && (
+            <div className="p-4 bg-primary/10 rounded-xl border border-primary/20 flex justify-between items-center animate-fade-in mb-4">
+              <span className="font-body-sm text-[13px] text-on-surface font-semibold">
+                Selected <span className="text-primary">{selectedOrderIds.length}</span> orders
+              </span>
+              <button
+                type="button"
+                onClick={handleOpenBulkModal}
+                className="btn btn-primary py-2 px-4 text-[11px] flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px]">local_shipping</span>
+                Bulk Update Tracking
+              </button>
+            </div>
+          )}
+
           {displayOrders.length === 0 ? (
             <div className="text-center py-12 text-on-surface-variant/60 flex flex-col items-center justify-center gap-2">
               <span className="material-symbols-outlined text-4xl">search_off</span>
@@ -588,6 +683,20 @@ export default function AdminSalesPage() {
               <table className="w-full border-collapse text-left bg-surface-container-lowest">
                 <thead>
                   <tr className="bg-surface-container border-b border-outline-variant/30 text-on-surface font-label-caps text-[10px] uppercase tracking-wider">
+                    <th className="p-4 w-12 text-center">
+                      <input
+                        type="checkbox"
+                        checked={displayOrders.length > 0 && selectedOrderIds.length === displayOrders.length}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrderIds(displayOrders.map((o) => o.id));
+                          } else {
+                            setSelectedOrderIds([]);
+                          }
+                        }}
+                        className="form-checkbox"
+                      />
+                    </th>
                     <th className="p-4">Order ID</th>
                     <th className="p-4">Exact Date &amp; Time (Timestamp)</th>
                     <th className="p-4">Customer Name</th>
@@ -620,6 +729,20 @@ export default function AdminSalesPage() {
                         className="hover:bg-surface-container-low transition-colors cursor-pointer"
                         onClick={() => handleSelectOrder(order)}
                       >
+                        <td className="p-4 w-12 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedOrderIds.includes(order.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedOrderIds((prev) => [...prev, order.id]);
+                              } else {
+                                setSelectedOrderIds((prev) => prev.filter((id) => id !== order.id));
+                              }
+                            }}
+                            className="form-checkbox"
+                          />
+                        </td>
                         <td className="p-4 font-mono font-bold text-[12px] text-primary">{order.id}</td>
                         <td className="p-4 text-on-surface font-semibold whitespace-nowrap text-[12px]">{formattedTime}</td>
                         <td className="p-4 text-on-surface font-semibold">{customer}</td>
@@ -873,6 +996,118 @@ export default function AdminSalesPage() {
               >
                 <span className="material-symbols-outlined text-[14px]">download</span>
                 Download Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Update Tracking Modal */}
+      {bulkModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto flex flex-col shadow-2xl animate-fade-in">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-outline-variant/35 flex justify-between items-center">
+              <div>
+                <span className="font-label-caps text-[10px] text-primary uppercase font-bold tracking-widest">Batch Processing</span>
+                <h3 className="font-headline-md text-[20px] text-on-surface font-bold mt-1">Bulk Update Tracking Details</h3>
+              </div>
+              <button
+                onClick={() => setBulkModalOpen(false)}
+                className="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 flex flex-col gap-6">
+              {/* Batch Configuration */}
+              <div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                    Batch Order Status
+                  </label>
+                  <select
+                    value={bulkStatus}
+                    onChange={(e) => setBulkStatus(e.target.value)}
+                    className="form-select text-[12px] py-1.5 px-3"
+                  >
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                    Batch Tracking Partner
+                  </label>
+                  <select
+                    value={bulkPartner}
+                    onChange={(e) => setBulkPartner(e.target.value)}
+                    className="form-select text-[12px] py-1.5 px-3"
+                  >
+                    <option value="">Select Partner</option>
+                    {trackingPartners.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Individual Tracking IDs List */}
+              <div>
+                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold mb-3">Individual Tracking IDs</h4>
+                <div className="flex flex-col gap-3 max-h-[35vh] overflow-y-auto pr-1">
+                  {selectedOrderIds.map((id) => {
+                    const order = allOrders.find((o) => o.id === id);
+                    const customer = [order?.shippingDetails?.firstName, order?.shippingDetails?.lastName]
+                      .filter(Boolean)
+                      .join(' ') || 'Guest Customer';
+                    return (
+                      <div key={id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 rounded-lg border border-outline-variant/20 bg-surface-container-lowest">
+                        <div className="flex-1">
+                          <p className="font-mono font-bold text-[12px] text-primary">{id}</p>
+                          <p className="text-[11px] text-on-surface-variant/80 mt-0.5">{customer}</p>
+                        </div>
+                        <div className="w-full sm:w-64">
+                          <input
+                            type="text"
+                            value={bulkTrackingIds[id] || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setBulkTrackingIds((prev) => ({ ...prev, [id]: val }));
+                            }}
+                            placeholder="Enter unique Tracking ID"
+                            className="form-input text-[12px] py-1 px-3"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-outline-variant/35 bg-surface-container flex gap-3 justify-end rounded-b-2xl">
+              <button
+                type="button"
+                onClick={() => setBulkModalOpen(false)}
+                className="btn btn-cancel text-[10px]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isSavingTracking}
+                onClick={handleSaveBulkTracking}
+                className="btn btn-primary text-[10px]"
+              >
+                {isSavingTracking ? 'Saving…' : 'Save Batch Details'}
               </button>
             </div>
           </div>

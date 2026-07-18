@@ -6,6 +6,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { generateReceiptPdf } from '../utils/generateReceipt.js';
 import { subscribeToOrder } from '../services/orders.js';
+import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import './OrderTrackingPage.css';
@@ -235,9 +236,20 @@ export default function OrderTrackingPage() {
                   <p className="text-[11px] text-on-surface-variant mt-0.5">Your package is on its way. Use the tracking ID below to check live transit updates.</p>
                 </div>
               </div>
-              <div className="flex items-center bg-surface-container border border-outline-variant/35 rounded-lg px-4 py-2 font-mono text-[12px] text-on-surface select-all shadow-sm">
-                <span className="text-on-surface-variant text-[10px] uppercase font-sans font-semibold tracking-wider mr-2">Tracking ID:</span>
-                {liveOrder.trackingId}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                <div className="flex items-center bg-surface-container border border-outline-variant/35 rounded-lg px-4 py-2 font-mono text-[12px] text-on-surface select-all shadow-sm">
+                  <span className="text-on-surface-variant text-[10px] uppercase font-sans font-semibold tracking-wider mr-2">Tracking ID:</span>
+                  {liveOrder.trackingId}
+                </div>
+                <a
+                  href={getTrackingPortalUrl(liveOrder.trackingPartner, liveOrder.trackingId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary py-2 px-3 text-[10px] flex items-center justify-center gap-1.5"
+                >
+                  <span>Track on Portal</span>
+                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                </a>
               </div>
             </div>
           )}
