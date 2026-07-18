@@ -7,7 +7,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
-import ProductImage from '../components/ProductImage.jsx';
+import ProductCardImage from '../components/ProductCardImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import './HomePage.css';
@@ -292,11 +292,10 @@ export default function HomePage() {
                 className={`group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                  <ProductImage
+                  <ProductCardImage
+                    images={product.images && product.images.length > 0 ? product.images : [product.image]}
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                    data-alt={product.alt}
                     alt={product.alt}
-                    src={product.image}
                   />
                   {!isAvailable && (
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
@@ -372,11 +371,10 @@ export default function HomePage() {
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
                     >
                       <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                        <ProductImage
+                        <ProductCardImage
+                          images={product.images && product.images.length > 0 ? product.images : [product.image]}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                          data-alt={product.alt}
                           alt={product.alt}
-                          src={product.image}
                         />
                         {!isAvailable && (
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
