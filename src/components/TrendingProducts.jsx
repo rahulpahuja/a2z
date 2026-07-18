@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
@@ -14,10 +14,11 @@ export default function TrendingProducts() {
   const { products: allProducts } = useProducts();
   const [activeTab, setActiveTab] = useState('views');
   const [rows, setRows] = useState({ views: [], purchases: [] });
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const unsubscribers = TABS.map((tab) =>
-      subscribeToTopProducts(tab.key, 4, (stats) => {
+      subscribeToTopProducts(tab.key, 20, (stats) => {
         setRows((prev) => ({ ...prev, [tab.key]: stats }));
       })
     );
@@ -59,31 +60,58 @@ export default function TrendingProducts() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-        {products.map((product) => (
-          <Link
-            key={product.id}
-            to={`/product/${product.id}`}
-            className="group relative bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
-          >
-            <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-              <ProductImage
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
-                data-alt={product.alt}
-                alt={product.alt}
-                src={product.image}
-              />
-              <div className="absolute top-4 left-4 bg-surface/90 backdrop-blur text-on-surface px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">{tab.icon}</span>
-                {product.stat.toLocaleString('en-IN')} {tab.statLabel}
-              </div>
+      <div className="relative group/arrows">
+        {/* Left scroll navigation */}
+        <button
+          type="button"
+          onClick={() => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+          aria-label="Scroll Left"
+        >
+          <span className="material-symbols-outlined">chevron_left</span>
+        </button>
+
+        {/* Scrolling horizontal list */}
+        <div
+          ref={scrollRef}
+          className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+        >
+          {products.map((product) => (
+            <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
+              <Link
+                to={`/product/${product.id}`}
+                className="group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+              >
+                <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
+                  <ProductImage
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
+                    data-alt={product.alt}
+                    alt={product.alt}
+                    src={product.image}
+                  />
+                  <div className="absolute top-4 left-4 bg-surface/90 backdrop-blur text-on-surface px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">{tab.icon}</span>
+                    {product.stat.toLocaleString('en-IN')} {tab.statLabel}
+                  </div>
+                </div>
+                <div className="p-4 flex flex-col gap-2 mt-auto">
+                  <h3 className="font-title-sm text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
+                  <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
+                </div>
+              </Link>
             </div>
-            <div className="p-4 flex flex-col gap-2">
-              <h3 className="font-title-sm text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
-              <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
-            </div>
-          </Link>
-        ))}
+          ))}
+        </div>
+
+        {/* Right scroll navigation */}
+        <button
+          type="button"
+          onClick={() => scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+          aria-label="Scroll Right"
+        >
+          <span className="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </section>
   );
