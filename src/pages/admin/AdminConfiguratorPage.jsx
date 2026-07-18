@@ -94,6 +94,7 @@ export default function AdminConfiguratorPage() {
         itemsPerPage: 150,
         gridCols: 6,
         primaryColor: '#ff0055',
+        themeMode: 'dark',
       };
 
       // Apply test parameters
@@ -104,7 +105,8 @@ export default function AdminConfiguratorPage() {
         const root = document.documentElement;
         return root.style.getPropertyValue('--custom-listing-img-aspect') === '16/9' &&
                root.style.getPropertyValue('--custom-border-color') === '#ff0055' &&
-               root.style.getPropertyValue('--color-primary') === '#ff0055';
+               root.style.getPropertyValue('--color-primary') === '#ff0055' &&
+               root.classList.contains('dark');
       });
 
       // Assert DOM variables update
@@ -522,6 +524,22 @@ export default function AdminConfiguratorPage() {
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="form-group sm:col-span-2">
+                  <label className="form-label font-semibold" htmlFor="theme-mode">
+                    Base Theme Mode
+                  </label>
+                  <select
+                    id="theme-mode"
+                    value={form.themeMode || 'light'}
+                    onChange={(e) => handleChange('themeMode', e.target.value)}
+                    className="form-select text-[12px] py-2 px-3"
+                  >
+                    <option value="light">Light Theme (Classic)</option>
+                    <option value="dark">Dark Theme (Modern Sleek)</option>
+                    <option value="midnight">Midnight Theme (Deep Luxury Blue/Black)</option>
+                  </select>
+                </div>
+
                 <div className="form-group">
                   <label className="form-label">
                     Main Store Background Color
@@ -734,11 +752,18 @@ export default function AdminConfiguratorPage() {
 
             {/* Interactive Viewport Canvas */}
             <div 
-              className="p-6 rounded-2xl border border-outline-variant transition-all duration-300 relative min-h-[420px] flex items-center justify-center overflow-hidden shadow-inner"
+              className={`p-6 rounded-2xl border border-outline-variant transition-all duration-300 relative min-h-[420px] flex items-center justify-center overflow-hidden shadow-inner ${
+                form.themeMode === 'dark' || form.themeMode === 'midnight' ? 'dark' : ''
+              }`}
               style={{
-                backgroundColor: form.storeBgColor,
-                background: form.backdropBg,
+                backgroundColor: form.themeMode === 'dark' 
+                  ? '#121212' 
+                  : form.themeMode === 'midnight' 
+                    ? '#030712' 
+                    : form.storeBgColor,
+                background: form.themeMode === 'light' ? form.backdropBg : 'none',
                 backdropFilter: form.backdropFilter,
+                color: form.themeMode === 'dark' || form.themeMode === 'midnight' ? '#f5f5f5' : '#1c1b1b',
               }}
             >
               {/* Blur backdrop indicator if backdropFilter is active */}
@@ -768,7 +793,11 @@ export default function AdminConfiguratorPage() {
                           borderWidth: form.borderWidth,
                           borderColor: form.borderColor,
                           borderStyle: 'solid',
-                          backgroundColor: 'var(--color-surface-container-lowest, #ffffff)',
+                          backgroundColor: form.themeMode === 'dark' 
+                            ? '#1e1e1e' 
+                            : form.themeMode === 'midnight' 
+                              ? '#0b0f19' 
+                              : 'var(--color-surface-container-lowest, #ffffff)',
                           overflow: 'hidden',
                         }}
                       >
@@ -784,7 +813,16 @@ export default function AdminConfiguratorPage() {
                           <span className="material-symbols-outlined text-outline-variant text-[14px]">image</span>
                         </div>
                         {form.gridCols <= 4 ? (
-                          <div className="p-2 flex flex-col gap-0.5 bg-surface-container-lowest">
+                          <div 
+                            className="p-2 flex flex-col gap-0.5"
+                            style={{
+                              backgroundColor: form.themeMode === 'dark' 
+                                ? '#1e1e1e' 
+                                : form.themeMode === 'midnight' 
+                                  ? '#0b0f19' 
+                                  : 'var(--color-surface-container-lowest, #ffffff)',
+                            }}
+                          >
                             <span 
                               className="text-[7px] uppercase tracking-wider font-bold leading-none"
                               style={{ color: form.primaryColor || '#ac2471' }}
@@ -849,15 +887,28 @@ export default function AdminConfiguratorPage() {
                     </div>
 
                     {/* Typography Preview */}
-                    <div className="space-y-2 border-t border-outline-variant/30 pt-3 bg-surface-container-lowest/70 backdrop-blur-md p-3 rounded-xl border border-outline-variant/20">
+                    <div 
+                      className="space-y-2 border-t border-outline-variant/30 pt-3 backdrop-blur-md p-3 rounded-xl border"
+                      style={{
+                        backgroundColor: form.themeMode === 'dark' 
+                          ? '#1e1e1e' 
+                          : form.themeMode === 'midnight' 
+                            ? '#0b0f19' 
+                            : 'rgba(255, 255, 255, 0.7)',
+                        borderColor: form.themeMode === 'dark' || form.themeMode === 'midnight' 
+                          ? '#3a3a3a' 
+                          : 'var(--color-outline-variant)',
+                        color: form.themeMode === 'dark' || form.themeMode === 'midnight' ? '#f5f5f5' : '#1c1b1b',
+                      }}
+                    >
                       <h2 
-                        className="font-bold text-on-surface leading-tight"
+                        className="font-bold leading-tight"
                         style={{ fontSize: form.titleSizeDetail }}
                       >
                         Detail Title Text
                       </h2>
                       <p 
-                        className="text-on-surface-variant leading-relaxed text-[13px]"
+                        className="leading-relaxed text-[13px] opacity-90"
                         style={{ fontSize: form.descSizeDetail }}
                       >
                         This text block displays how long product description paragraphs adjust in size to ensure optimal legibility and screen aesthetics.
