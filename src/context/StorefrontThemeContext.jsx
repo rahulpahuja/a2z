@@ -28,6 +28,7 @@ export const DEFAULT_THEME = {
   storeBgColor: '#ffffff',
   backdropFilter: 'none',     // 'none', 'blur(8px)', 'blur(16px)'
   backdropBg: 'transparent',
+  primaryColor: '#ac2471',
 
   // Pagination & Layout Grid Sizing
   itemsPerPage: 400,
@@ -63,6 +64,7 @@ export function StorefrontThemeProvider({ children }) {
     root.style.setProperty('--custom-store-bg', themeData.storeBgColor);
     root.style.setProperty('--custom-backdrop-filter', themeData.backdropFilter);
     root.style.setProperty('--custom-backdrop-bg', themeData.backdropBg);
+    root.style.setProperty('--color-primary', themeData.primaryColor);
 
     // Custom pagination and grid settings
     root.style.setProperty('--custom-grid-cols', themeData.gridCols);
