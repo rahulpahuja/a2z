@@ -122,7 +122,27 @@ export default function SiteFooter() {
         <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
         <p className="text-[10px] text-on-surface-variant/50 font-mono">v{APP_VERSION} (Build #{APP_BUILD})</p>
         <p className="text-[10px] text-on-surface-variant/50">
-          Powered by Mobile1x · Founder Rahul Pahuja · +91-8819091000
+          Powered by{' '}
+          <a
+            href="https://mobile1x.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary hover:underline transition-colors"
+          >
+            Mobile1x
+          </a>{' '}
+          · Founder Rahul Pahuja · +91-8819091000
+        </p>
+        <p className="text-[10px] text-on-surface-variant/50">
+          Developed by{' '}
+          <a
+            href="https://therahulpahuja.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary hover:underline transition-colors"
+          >
+            Rahul Pahuja
+          </a>
         </p>
       </div>
     </footer>
