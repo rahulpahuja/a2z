@@ -17,6 +17,14 @@ import OrderTrackingPage from './pages/OrderTrackingPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
+import ContactUsPage from './pages/ContactUsPage.jsx'
+import AboutUsPage from './pages/AboutUsPage.jsx'
+import FAQPage from './pages/FAQPage.jsx'
+import SizeChartPage from './pages/SizeChartPage.jsx'
+import StoreAppointmentPage from './pages/StoreAppointmentPage.jsx'
+import A2ZStoresPage from './pages/A2ZStoresPage.jsx'
+import CareersPage from './pages/CareersPage.jsx'
+import FeedbackPage from './pages/FeedbackPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
@@ -32,6 +40,8 @@ import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.j
 import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
 import AdminConfiguratorPage from './pages/admin/AdminConfiguratorPage.jsx'
 import ImageStudioPage from './pages/admin/ImageStudioPage.jsx'
+import AdminJobsPage from './pages/admin/AdminJobsPage.jsx'
+import AdminFeedbackPage from './pages/admin/AdminFeedbackPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
@@ -51,6 +61,14 @@ const ROUTES = [
   { path: '/orders/tracking', Component: OrderTrackingPage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
+  { path: '/contact-us', Component: ContactUsPage },
+  { path: '/about-us', Component: AboutUsPage },
+  { path: '/faqs', Component: FAQPage },
+  { path: '/size-chart', Component: SizeChartPage },
+  { path: '/store-appointment', Component: StoreAppointmentPage },
+  { path: '/a2z-stores', Component: A2ZStoresPage },
+  { path: '/careers', Component: CareersPage },
+  { path: '/feedback', Component: FeedbackPage },
   { path: '/__trap__', Component: BotTrapPage },
 ]
 
@@ -69,6 +87,8 @@ const ADMIN_ROUTES = [
   { path: '/super/configurator', Component: AdminConfiguratorPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/image-studio', Component: ImageStudioPage },
+  { path: '/super/jobs', Component: AdminJobsPage },
+  { path: '/super/feedback', Component: AdminFeedbackPage },
 ]
 
 // Old standalone routes for tools now living inside Image Studio tabs.

@@ -11,6 +11,8 @@ export const NAV_ITEMS = [
   { to: '/super/image-studio', label: 'Image Studio', icon: 'photo_library' },
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
   { to: '/super/referrers', label: 'Referrer Details', icon: 'person_add' },
+  { to: '/super/jobs', label: 'Job Portal', icon: 'work' },
+  { to: '/super/feedback', label: 'Customer Feedback', icon: 'reviews' },
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/tracking-partners', label: 'Tracking Partners', icon: 'local_shipping' },
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },

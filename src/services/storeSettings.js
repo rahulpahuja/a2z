@@ -1,5 +1,6 @@
 import { get, onValue, ref, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
+import { FACEBOOK_URL } from '../config/store.js';
 
 const PATH = 'settings/store';
 
@@ -9,6 +10,7 @@ export const DEFAULT_STORE_SETTINGS = {
   address: '',
   phone: '',
   gstNumber: '',
+  facebookUrl: FACEBOOK_URL,
 };
 
 function getLocalStoreSettings() {
