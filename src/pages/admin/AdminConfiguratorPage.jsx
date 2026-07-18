@@ -10,6 +10,7 @@ export default function AdminConfiguratorPage() {
   // Local form states (initialized when theme loads)
   const [form, setForm] = useState(DEFAULT_THEME);
   const [isSaving, setIsSaving] = useState(false);
+  const [previewTab, setPreviewTab] = useState('listing'); // 'listing' | 'detail'
 
   // Diagnostic Test States
   const [diagStatus, setDiagStatus] = useState(null); // 'running', 'passed', 'failed'
@@ -588,114 +589,153 @@ export default function AdminConfiguratorPage() {
           {/* Right sidebar live previews */}
           <section className="flex flex-col gap-6">
             <div>
-              <h2 className="admin-card-title">Live Sizing Preview</h2>
+              <h2 className="admin-card-title">Live Viewport Preview</h2>
               <p className="admin-card-subtitle">Real-time simulation of layout customizations.</p>
             </div>
 
-            {/* Listing card preview */}
-            <div className="admin-card flex flex-col gap-3">
-              <span className="font-label-caps text-[9px] text-primary uppercase font-bold tracking-widest">
-                Listing Card Preview
-              </span>
-              
-              <div 
-                className="flex flex-col border transition-all duration-300 w-full"
-                style={{
-                  borderRadius: form.borderRadius,
-                  borderWidth: form.borderWidth,
-                  borderColor: form.borderColor,
-                  borderStyle: 'solid',
-                  backgroundColor: form.backdropBg || '#ffffff',
-                  backdropFilter: form.backdropFilter,
-                  overflow: 'hidden',
-                }}
+            {/* Toggle tabs for viewport */}
+            <div className="flex bg-surface-container rounded-lg p-1 border border-outline-variant/35 w-full">
+              <button
+                type="button"
+                onClick={() => setPreviewTab('listing')}
+                className={`flex-1 text-center font-label-caps text-[10px] uppercase py-2 rounded-md transition-all ${
+                  previewTab === 'listing' 
+                    ? 'bg-surface shadow text-primary font-bold' 
+                    : 'text-on-surface-variant hover:text-on-surface font-medium'
+                }`}
               >
-                <div 
-                  className="preview-aspect-box"
-                  style={{
-                    aspectRatio: form.listingImgAspect,
-                  }}
-                >
-                  <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
-                </div>
-                <div className="p-4 flex flex-col gap-1">
-                  <span className="text-[9px] uppercase tracking-wider text-primary font-bold">Category Name</span>
-                  <h4 
-                    className="font-bold text-on-surface line-clamp-1 leading-snug"
-                    style={{ fontSize: form.titleSizeListing }}
-                  >
-                    Sample Product Name
-                  </h4>
-                  <p 
-                    className="text-on-surface-variant line-clamp-1 leading-normal"
-                    style={{ fontSize: form.descSizeListing }}
-                  >
-                    Short descriptive sample sentence representing design scale.
-                  </p>
-                  <div 
-                    className="font-bold text-on-surface mt-1"
-                    style={{ fontSize: form.priceSizeListing }}
-                  >
-                    ₹1,499.00
-                  </div>
-                </div>
-              </div>
+                Listing View
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewTab('detail')}
+                className={`flex-1 text-center font-label-caps text-[10px] uppercase py-2 rounded-md transition-all ${
+                  previewTab === 'detail' 
+                    ? 'bg-surface shadow text-primary font-bold' 
+                    : 'text-on-surface-variant hover:text-on-surface font-medium'
+                }`}
+              >
+                Detail View
+              </button>
             </div>
 
-            {/* Details page elements preview */}
-            <div className="admin-card flex flex-col gap-4">
-              <span className="font-label-caps text-[9px] text-primary uppercase font-bold tracking-widest">
-                Detail View Preview
-              </span>
+            {/* Interactive Viewport Canvas */}
+            <div 
+              className="p-6 rounded-2xl border border-outline-variant transition-all duration-300 relative min-h-[420px] flex items-center justify-center overflow-hidden shadow-inner"
+              style={{
+                backgroundColor: form.storeBgColor,
+                background: form.backdropBg,
+                backdropFilter: form.backdropFilter,
+              }}
+            >
+              {/* Blur backdrop indicator if backdropFilter is active */}
+              {form.backdropFilter !== 'none' && (
+                <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-20">
+                  <span className="text-[10px] font-mono tracking-widest text-outline uppercase">
+                    Backdrop Filter Active ({form.backdropFilter})
+                  </span>
+                </div>
+              )}
 
-              {/* Main image preview */}
-              <div 
-                className="preview-aspect-box"
-                style={{
-                  aspectRatio: form.detailImgAspect,
-                  borderRadius: form.borderRadius,
-                  borderWidth: form.borderWidth,
-                  borderColor: form.borderColor,
-                  borderStyle: 'solid',
-                }}
-              >
-                <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
-              </div>
-
-              {/* Thumbnails preview */}
-              <div className="flex gap-2">
-                {Array.from({ length: 3 }).map((_, i) => (
+              <div className="w-full relative z-10">
+                {previewTab === 'listing' ? (
+                  /* Listing Card Preview */
                   <div 
-                    key={i} 
-                    className={`border ${i === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant'} flex items-center justify-center bg-surface-container`}
+                    className="flex flex-col transition-all duration-300 w-full max-w-[220px] mx-auto shadow-md"
                     style={{
-                      width: form.galleryThumbW,
-                      height: form.galleryThumbH,
-                      borderRadius: form.borderRadiusSm,
+                      borderRadius: form.borderRadius,
+                      borderWidth: form.borderWidth,
+                      borderColor: form.borderColor,
+                      borderStyle: 'solid',
+                      backgroundColor: 'var(--color-surface-container-lowest, #ffffff)',
+                      overflow: 'hidden',
                     }}
                   >
-                    <span className="material-symbols-outlined text-outline-variant text-[16px]">image</span>
+                    <div 
+                      className="preview-aspect-box"
+                      style={{
+                        aspectRatio: form.listingImgAspect,
+                        borderRadius: '0px', // Handled by outer container
+                        borderWidth: '0px',
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
+                    </div>
+                    <div className="p-4 flex flex-col gap-1 bg-surface-container-lowest">
+                      <span className="text-[9px] uppercase tracking-wider text-primary font-bold">Category Name</span>
+                      <h4 
+                        className="font-bold text-on-surface line-clamp-1 leading-snug"
+                        style={{ fontSize: form.titleSizeListing }}
+                      >
+                        Sample Product Name
+                      </h4>
+                      <p 
+                        className="text-on-surface-variant line-clamp-1 leading-normal"
+                        style={{ fontSize: form.descSizeListing }}
+                      >
+                        Short descriptive sample sentence representing design scale.
+                      </p>
+                      <div 
+                        className="font-bold text-on-surface mt-1"
+                        style={{ fontSize: form.priceSizeListing }}
+                      >
+                        ₹1,499.00
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  /* Details View Preview */
+                  <div className="flex flex-col gap-4 max-w-[260px] mx-auto">
+                    {/* Main image preview */}
+                    <div 
+                      className="preview-aspect-box shadow-sm"
+                      style={{
+                        aspectRatio: form.detailImgAspect,
+                        borderRadius: form.borderRadius,
+                        borderWidth: form.borderWidth,
+                        borderColor: form.borderColor,
+                        borderStyle: 'solid',
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
+                    </div>
 
-              {/* Typography Preview */}
-              <div className="space-y-2 border-t border-outline-variant/30 pt-4">
-                <h2 
-                  className="font-bold text-on-surface leading-tight"
-                  style={{ fontSize: form.titleSizeDetail }}
-                >
-                  Detail Title Text
-                </h2>
-                <p 
-                  className="text-on-surface-variant leading-relaxed"
-                  style={{ fontSize: form.descSizeDetail }}
-                >
-                  This text block displays how long product description paragraphs adjust in size to ensure optimal legibility and screen aesthetics.
-                </p>
+                    {/* Thumbnails preview */}
+                    <div className="flex gap-2 justify-center">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`border ${i === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant'} flex items-center justify-center bg-surface-container`}
+                          style={{
+                            width: form.galleryThumbW,
+                            height: form.galleryThumbH,
+                            borderRadius: form.borderRadiusSm,
+                          }}
+                        >
+                          <span className="material-symbols-outlined text-outline-variant text-[16px]">image</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Typography Preview */}
+                    <div className="space-y-2 border-t border-outline-variant/30 pt-3 bg-surface-container-lowest/70 backdrop-blur-md p-3 rounded-xl border border-outline-variant/20">
+                      <h2 
+                        className="font-bold text-on-surface leading-tight"
+                        style={{ fontSize: form.titleSizeDetail }}
+                      >
+                        Detail Title Text
+                      </h2>
+                      <p 
+                        className="text-on-surface-variant leading-relaxed text-[13px]"
+                        style={{ fontSize: form.descSizeDetail }}
+                      >
+                        This text block displays how long product description paragraphs adjust in size to ensure optimal legibility and screen aesthetics.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-
           </section>
 
         </div>
