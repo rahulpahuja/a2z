@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import './ProductListingPage.css';
@@ -41,9 +42,10 @@ const BADGE_STYLES = {
   'Best Seller': 'bg-tertiary text-on-tertiary',
 };
 
-const PAGES = [1];
-
 export default function ProductListingPage() {
+  const { theme } = useStorefrontTheme();
+  const itemsPerPage = theme?.itemsPerPage ? Math.max(50, Number(theme.itemsPerPage)) : 400;
+
   const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
   const { addItem } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,6 +58,13 @@ export default function ProductListingPage() {
   const [favorites, setFavorites] = useState({});
   const [sortBy, setSortBy] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(50);
+
+  // Reset pagination state when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    setVisibleCount(50);
+  }, [activeCategory, activeSubcategory, selectedColor, priceValue, selectedSize, sortBy]);
 
   const setActiveCategory = (category) => {
     const next = {};
@@ -99,14 +108,34 @@ export default function ProductListingPage() {
     return base;
   }, [CATALOG, activeCategory, activeSubcategory, selectedColorLabel, sortBy]);
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  const paginatedProducts = useMemo(() => {
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, startIndex, endIndex]);
+
+  const lazyLoadedProducts = useMemo(() => {
+    return paginatedProducts.slice(0, visibleCount);
+  }, [paginatedProducts, visibleCount]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
+  const PAGES = useMemo(() => {
+    const list = [];
+    for (let i = 1; i <= totalPages; i++) {
+      list.push(i);
+    }
+    return list;
+  }, [totalPages]);
+
   // Arrange products grouped by subcategory so like-with-like sits together on the grid.
   const productGroups = useMemo(() => {
     if (activeSubcategory !== 'All') {
-      return [{ title: null, items: filteredProducts }];
+      return [{ title: null, items: lazyLoadedProducts }];
     }
     const groups = [];
     const indexByTitle = new Map();
-    filteredProducts.forEach((product) => {
+    lazyLoadedProducts.forEach((product) => {
       const key = product.subcategoryTitle || '';
       if (!indexByTitle.has(key)) {
         indexByTitle.set(key, groups.length);
@@ -115,10 +144,10 @@ export default function ProductListingPage() {
       groups[indexByTitle.get(key)].items.push(product);
     });
     if (groups.length <= 1) {
-      return [{ title: null, items: filteredProducts }];
+      return [{ title: null, items: lazyLoadedProducts }];
     }
     return groups;
-  }, [filteredProducts, activeSubcategory]);
+  }, [lazyLoadedProducts, activeSubcategory]);
 
   return (
     <>
@@ -343,7 +372,7 @@ export default function ProductListingPage() {
                   {group.title}
                 </h2>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 custom-product-grid">
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
                   const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
@@ -476,6 +505,21 @@ export default function ProductListingPage() {
               </div>
             </div>
           ))}
+          {/* Lazy Load Trigger Button */}
+          {visibleCount < paginatedProducts.length && (
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => Math.min(paginatedProducts.length, prev + 50))}
+                className="btn btn-primary px-6 py-2.5 text-[11px]"
+              >
+                Load More Products (+50)
+              </button>
+              <p className="text-[11px] text-on-surface-variant/75 font-medium">
+                Showing {visibleCount} of {paginatedProducts.length} items (Page {currentPage} of {totalPages})
+              </p>
+            </div>
+          )}
 
           <div className="mt-12 flex justify-center items-center gap-2">
             <button
@@ -503,8 +547,9 @@ export default function ProductListingPage() {
               )
             )}
             <button
-              className="w-10 h-10 rounded-full flex items-center justify-center border border-outline text-on-surface hover:border-primary hover:text-primary transition-colors"
-              onClick={() => setCurrentPage((p) => p + 1)}
+              className="w-10 h-10 rounded-full flex items-center justify-center border border-outline text-on-surface hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             >
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>

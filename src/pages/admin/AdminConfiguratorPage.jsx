@@ -91,6 +91,8 @@ export default function AdminConfiguratorPage() {
         storeBgColor: '#121212',
         backdropFilter: 'blur(10px)',
         backdropBg: 'rgba(0,0,0,0.5)',
+        itemsPerPage: 150,
+        gridCols: 6,
       };
 
       // Apply test parameters
@@ -127,6 +129,11 @@ export default function AdminConfiguratorPage() {
       assert('DOM Root contains correct --custom-store-bg value', () => {
         const value = document.documentElement.style.getPropertyValue('--custom-store-bg');
         return value === '#121212';
+      });
+
+      assert('DOM Root contains correct --custom-grid-cols value', () => {
+        const value = document.documentElement.style.getPropertyValue('--custom-grid-cols');
+        return value === '6';
       });
 
       // Test Case 2: Reset and check defaults
@@ -564,6 +571,55 @@ export default function AdminConfiguratorPage() {
                 </div>
               </div>
             </div>
+            {/* Pagination & Grid Layout Settings */}
+            <div className="admin-card flex flex-col gap-5">
+              <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">grid_on</span>
+                5. Pagination &amp; Catalog Layout
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="items-per-page">
+                    Max Items Per Page (Pagination Limit)
+                  </label>
+                  <input
+                    id="items-per-page"
+                    type="number"
+                    min="50"
+                    value={form.itemsPerPage || 400}
+                    onChange={(e) => {
+                      const val = Math.max(50, Number(e.target.value));
+                      handleChange('itemsPerPage', val);
+                    }}
+                    required
+                    className="form-input text-[12px] py-2 px-3"
+                  />
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    Must be at least 50. Controls when catalog paginates to prevent infinite scrolling performance lag.
+                  </p>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="grid-cols">
+                    Desktop Grid columns (Items in a Row)
+                  </label>
+                  <select
+                    id="grid-cols"
+                    value={form.gridCols || 4}
+                    onChange={(e) => handleChange('gridCols', Number(e.target.value))}
+                    className="form-select text-[12px] py-2 px-3"
+                  >
+                    <option value={4}>4 items in a row (Default)</option>
+                    <option value={5}>5 items in a row</option>
+                    <option value={6}>6 items in a row</option>
+                  </select>
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    Configures row capacity on large desktop screens.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Form actions */}
             <div className="flex gap-3 justify-end">
@@ -637,51 +693,62 @@ export default function AdminConfiguratorPage() {
                 </div>
               )}
 
-              <div className="w-full relative z-10">
+              <div className="w-full relative z-10 max-w-[500px]">
                 {previewTab === 'listing' ? (
                   /* Listing Card Preview */
                   <div 
-                    className="flex flex-col transition-all duration-300 w-full max-w-[220px] mx-auto shadow-md"
+                    className="grid gap-3 w-full"
                     style={{
-                      borderRadius: form.borderRadius,
-                      borderWidth: form.borderWidth,
-                      borderColor: form.borderColor,
-                      borderStyle: 'solid',
-                      backgroundColor: 'var(--color-surface-container-lowest, #ffffff)',
-                      overflow: 'hidden',
+                      gridTemplateColumns: `repeat(${form.gridCols || 4}, minmax(0, 1fr))`,
                     }}
                   >
-                    <div 
-                      className="preview-aspect-box"
-                      style={{
-                        aspectRatio: form.listingImgAspect,
-                        borderRadius: '0px', // Handled by outer container
-                        borderWidth: '0px',
-                      }}
-                    >
-                      <span className="material-symbols-outlined text-outline-variant text-3xl">image</span>
-                    </div>
-                    <div className="p-4 flex flex-col gap-1 bg-surface-container-lowest">
-                      <span className="text-[9px] uppercase tracking-wider text-primary font-bold">Category Name</span>
-                      <h4 
-                        className="font-bold text-on-surface line-clamp-1 leading-snug"
-                        style={{ fontSize: form.titleSizeListing }}
-                      >
-                        Sample Product Name
-                      </h4>
-                      <p 
-                        className="text-on-surface-variant line-clamp-1 leading-normal"
-                        style={{ fontSize: form.descSizeListing }}
-                      >
-                        Short descriptive sample sentence representing design scale.
-                      </p>
+                    {Array.from({ length: form.gridCols || 4 }).map((_, i) => (
                       <div 
-                        className="font-bold text-on-surface mt-1"
-                        style={{ fontSize: form.priceSizeListing }}
+                        key={i}
+                        className="flex flex-col transition-all duration-300 w-full shadow-md animate-fade-in"
+                        style={{
+                          borderRadius: form.borderRadius,
+                          borderWidth: form.borderWidth,
+                          borderColor: form.borderColor,
+                          borderStyle: 'solid',
+                          backgroundColor: 'var(--color-surface-container-lowest, #ffffff)',
+                          overflow: 'hidden',
+                        }}
                       >
-                        ₹1,499.00
+                        <div 
+                          className="preview-aspect-box"
+                          style={{
+                            aspectRatio: form.listingImgAspect,
+                            borderRadius: '0px',
+                            borderWidth: '0px',
+                            minHeight: '40px',
+                          }}
+                        >
+                          <span className="material-symbols-outlined text-outline-variant text-[14px]">image</span>
+                        </div>
+                        {form.gridCols <= 4 ? (
+                          <div className="p-2 flex flex-col gap-0.5 bg-surface-container-lowest">
+                            <span className="text-[7px] uppercase tracking-wider text-primary font-bold leading-none">Category</span>
+                            <h4 
+                              className="font-bold text-on-surface line-clamp-1 leading-none"
+                              style={{ fontSize: `calc(${form.titleSizeListing} * 0.75)` }}
+                            >
+                              Sample Item
+                            </h4>
+                            <div 
+                              className="font-bold text-on-surface mt-0.5"
+                              style={{ fontSize: `calc(${form.priceSizeListing} * 0.75)` }}
+                            >
+                              ₹1,499
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-1 flex flex-col bg-surface-container-lowest text-center">
+                            <span className="font-bold text-on-surface text-[8px] leading-none">Item {i + 1}</span>
+                          </div>
+                        )}
                       </div>
-                    </div>
+                    ))}
                   </div>
                 ) : (
                   /* Details View Preview */
