@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -6,6 +7,14 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+
+const NAV_LINKS = [
+  { label: 'New Arrivals', to: '/products' },
+  { label: 'Sarees', to: '/products?category=Saree' },
+  { label: 'Lehengas', to: '/products?category=Lehenga' },
+  { label: 'Kurtis', to: '/products?category=Kurti' },
+];
 
 const categories = [
   {
@@ -205,13 +214,20 @@ export default function StorefrontPage() {
     inStock: product.sizes?.some((s) => s.stock > 0) ?? product.inStock,
   }));
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
     <>
       {/* TopNavBar */}
       <nav className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky z-50 transition-colors duration-300">
         <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
           {/* Mobile Menu Icon (Left) */}
-          <button className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
             <span className="material-symbols-outlined">menu</span>
           </button>
           {/* Brand Logo */}
@@ -232,6 +248,7 @@ export default function StorefrontPage() {
           </div>
         </div>
       </nav>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
 
       {/* Main Content */}
       <main className="w-full">

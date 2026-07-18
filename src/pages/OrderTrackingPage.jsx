@@ -9,6 +9,7 @@ import { subscribeToOrder } from '../services/orders.js';
 import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import './OrderTrackingPage.css';
 
 const NAV_LINKS = [
@@ -23,6 +24,7 @@ export default function OrderTrackingPage() {
   const [liveOrder, setLiveOrder] = useState(lastOrder);
   const { showToast } = useToast();
   const [downloading, setDownloading] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     setLiveOrder(lastOrder);
@@ -50,7 +52,7 @@ export default function OrderTrackingPage() {
   if (!liveOrder) {
     return (
       <>
-        <nav className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0">
+        <nav className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
             A2Z Collection
           </Link>
@@ -160,9 +162,17 @@ export default function OrderTrackingPage() {
       {/* TopNavBar */}
       <nav
         aria-label="Top Navigation"
-        className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0"
+        className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0"
       >
         <div className="flex items-center gap-6">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
             A2Z Collection
           </Link>
@@ -183,6 +193,7 @@ export default function OrderTrackingPage() {
           <ProfileButton className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 focus:scale-95 transition-transform" />
         </div>
       </nav>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
 
       {/* Main Content */}
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col gap-8">

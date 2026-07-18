@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import BotGate from './components/BotGate.jsx'
 import EntryGate from './components/EntryGate.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
@@ -17,7 +17,6 @@ import OrderTrackingPage from './pages/OrderTrackingPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
-import AIStudioPage from './pages/AIStudioPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
@@ -29,12 +28,10 @@ import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminReferrerDetailsPage from './pages/admin/AdminReferrerDetailsPage.jsx'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx'
 import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
-import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
 import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.jsx'
 import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
-import AdminImageConverterPage from './pages/admin/AdminImageConverterPage.jsx'
 import AdminConfiguratorPage from './pages/admin/AdminConfiguratorPage.jsx'
-import AdminWatermarkPage from './pages/admin/AdminWatermarkPage.jsx'
+import ImageStudioPage from './pages/admin/ImageStudioPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
@@ -69,12 +66,18 @@ const ADMIN_ROUTES = [
   { path: '/super/settings', Component: AdminSettingsPage },
   { path: '/super/tracking-partners', Component: AdminTrackingPartnersPage },
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
-  { path: '/super/image-converter', Component: AdminImageConverterPage },
   { path: '/super/configurator', Component: AdminConfiguratorPage },
-  { path: '/super/watermark-remover', Component: AdminWatermarkPage },
   { path: '/super/docs', Component: AdminDocsPage },
-  { path: '/super/upload-test', Component: AdminUploadTestPage },
-  { path: '/super/ai-studio', Component: AIStudioPage },
+  { path: '/super/image-studio', Component: ImageStudioPage },
+]
+
+// Old standalone routes for tools now living inside Image Studio tabs.
+// Kept as redirects so existing bookmarks/links keep working.
+const IMAGE_STUDIO_REDIRECTS = [
+  { path: '/super/ai-studio', tool: 'ai-studio' },
+  { path: '/super/image-converter', tool: 'image-converter' },
+  { path: '/super/watermark-remover', tool: 'watermark-studio' },
+  { path: '/super/upload-test', tool: 'upload-test' },
 ]
 
 function adminElement(Component) {
@@ -110,6 +113,9 @@ export default function App() {
               />
               {ADMIN_ROUTES.map(({ path, Component }) => (
                 <Route key={path} path={path} element={adminElement(Component)} />
+              ))}
+              {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
+                <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
               ))}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

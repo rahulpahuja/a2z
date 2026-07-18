@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function PrivacyPolicyPage() {
   return (
     <>
-      <header className="w-full px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto">
+      <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
           A2Z Collection
         </Link>

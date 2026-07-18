@@ -8,4 +8,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@imgly/background-removal'],
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    css: false,
+  },
 })

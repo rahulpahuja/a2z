@@ -38,7 +38,7 @@ export default function PaymentPage() {
 
   return (
     <>
-      <header className="w-full px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
+      <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
           A2Z Collection
         </Link>

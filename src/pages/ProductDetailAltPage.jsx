@@ -144,7 +144,7 @@ export default function ProductDetailAltPage() {
     <>
       {/* TopNavBar (Shared Component) */}
       <header className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky z-50">
-        <div className="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50">
+        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50">
           {/* Brand Logo */}
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
             A2Z Collection
