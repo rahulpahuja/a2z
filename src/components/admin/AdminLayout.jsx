@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 export const NAV_ITEMS = [
@@ -23,6 +23,7 @@ export const NAV_ITEMS = [
 export default function AdminLayout({ children }) {
   const { signOutUser } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }) {
             type="button"
             onClick={() => {
               if (window.confirm("Are you confirming that you want to log out?")) {
-                signOutUser();
+                signOutUser().then(() => navigate('/'));
               }
             }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-body-sm text-body-sm text-error hover:bg-surface-container-high transition-colors"
