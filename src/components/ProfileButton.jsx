@@ -169,7 +169,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                 onClick={() => {
                   setMenuOpen(false);
                   if (window.confirm("Are you confirming that you want to log out?")) {
-                    signOutUser();
+                    signOutUser().then(() => navigate('/'));
                   }
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2 font-body-sm text-body-sm text-error hover:bg-surface-container transition-colors"
