@@ -56,7 +56,11 @@ export default function AdminLayout({ children }) {
         <div className="p-unit border-t border-outline-variant">
           <button
             type="button"
-            onClick={signOutUser}
+            onClick={() => {
+              if (window.confirm("Are you confirming that you want to log out?")) {
+                signOutUser();
+              }
+            }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-body-sm text-body-sm text-error hover:bg-surface-container-high transition-colors"
           >
             <span className="material-symbols-outlined text-[20px]">logout</span>

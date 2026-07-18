@@ -93,6 +93,7 @@ export default function AdminConfiguratorPage() {
         backdropBg: 'rgba(0,0,0,0.5)',
         itemsPerPage: 150,
         gridCols: 6,
+        primaryColor: '#ff0055',
       };
 
       // Apply test parameters
@@ -102,7 +103,8 @@ export default function AdminConfiguratorPage() {
       assert('Theme state is populated with test configs', () => {
         const root = document.documentElement;
         return root.style.getPropertyValue('--custom-listing-img-aspect') === '16/9' &&
-               root.style.getPropertyValue('--custom-border-color') === '#ff0055';
+               root.style.getPropertyValue('--custom-border-color') === '#ff0055' &&
+               root.style.getPropertyValue('--color-primary') === '#ff0055';
       });
 
       // Assert DOM variables update
@@ -134,6 +136,11 @@ export default function AdminConfiguratorPage() {
       assert('DOM Root contains correct --custom-grid-cols value', () => {
         const value = document.documentElement.style.getPropertyValue('--custom-grid-cols');
         return value === '6';
+      });
+
+      assert('DOM Root contains correct --color-primary value', () => {
+        const value = document.documentElement.style.getPropertyValue('--color-primary');
+        return value === '#ff0055';
       });
 
       // Test Case 2: Reset and check defaults
@@ -569,6 +576,56 @@ export default function AdminConfiguratorPage() {
                     Accepts CSS transparency overlays (RGBA) or gradients applied behind gallery, detail layouts, or listings.
                   </p>
                 </div>
+
+                <div className="form-group sm:col-span-2 border-t border-outline-variant/20 pt-4 mt-2">
+                  <label className="form-label font-semibold text-primary">
+                    Branding Theme Primary Color (Site-wide highlights)
+                  </label>
+                  <div className="flex flex-col gap-3">
+                    <div className="color-picker-wrapper">
+                      <input
+                        type="color"
+                        value={form.primaryColor?.startsWith('#') ? form.primaryColor : '#ac2471'}
+                        onChange={(e) => handleChange('primaryColor', e.target.value)}
+                        className="color-picker-input"
+                      />
+                      <input
+                        type="text"
+                        value={form.primaryColor || '#ac2471'}
+                        onChange={(e) => handleChange('primaryColor', e.target.value)}
+                        placeholder="#ac2471"
+                        className="form-input text-[12px] py-1.5 px-3 flex-1"
+                      />
+                    </div>
+                    
+                    {/* Preset color swatches */}
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="text-[10px] text-on-surface-variant font-mono mr-1">Presets:</span>
+                      {[
+                        { label: 'Royal Pink', hex: '#ac2471' },
+                        { label: 'Luxury Gold', hex: '#c5a880' },
+                        { label: 'Indigo Royal', hex: '#3f51b5' },
+                        { label: 'Emerald Teal', hex: '#008080' },
+                        { label: 'Crimson Velvet', hex: '#b30000' },
+                        { label: 'Marigold Gold', hex: '#ff9f1c' },
+                      ].map((preset) => (
+                        <button
+                          key={preset.hex}
+                          type="button"
+                          onClick={() => handleChange('primaryColor', preset.hex)}
+                          className="px-2 py-1 rounded text-[10px] border border-outline-variant/30 hover:border-primary transition-all flex items-center gap-1.5"
+                          style={{ backgroundColor: `${preset.hex}15`, color: preset.hex }}
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.hex }} />
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    Sets the primary accent color applied site-wide to buttons, highlights, badges, star ratings, and links.
+                  </p>
+                </div>
               </div>
             </div>
             {/* Pagination & Grid Layout Settings */}
@@ -728,7 +785,12 @@ export default function AdminConfiguratorPage() {
                         </div>
                         {form.gridCols <= 4 ? (
                           <div className="p-2 flex flex-col gap-0.5 bg-surface-container-lowest">
-                            <span className="text-[7px] uppercase tracking-wider text-primary font-bold leading-none">Category</span>
+                            <span 
+                              className="text-[7px] uppercase tracking-wider font-bold leading-none"
+                              style={{ color: form.primaryColor || '#ac2471' }}
+                            >
+                              Category
+                            </span>
                             <h4 
                               className="font-bold text-on-surface line-clamp-1 leading-none"
                               style={{ fontSize: `calc(${form.titleSizeListing} * 0.75)` }}
@@ -772,11 +834,13 @@ export default function AdminConfiguratorPage() {
                       {Array.from({ length: 3 }).map((_, i) => (
                         <div 
                           key={i} 
-                          className={`border ${i === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant'} flex items-center justify-center bg-surface-container`}
+                          className="border flex items-center justify-center bg-surface-container"
                           style={{
                             width: form.galleryThumbW,
                             height: form.galleryThumbH,
                             borderRadius: form.borderRadiusSm,
+                            borderColor: i === 0 ? (form.primaryColor || '#ac2471') : 'var(--color-outline-variant)',
+                            boxShadow: i === 0 ? `0 0 0 2px ${(form.primaryColor || '#ac2471')}30` : 'none',
                           }}
                         >
                           <span className="material-symbols-outlined text-outline-variant text-[16px]">image</span>
