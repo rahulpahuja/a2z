@@ -1,23 +1,29 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { INSTAGRAM_HANDLE } from '../config/store.js';
 import { APP_VERSION, APP_BUILD } from '../constants/version.js';
+import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
 
 const LINK_CLASS =
   'font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm w-fit';
 
 const ABOUT_LINKS = [
-  'About Us',
-  'Contact Us',
-  'Store Appointment',
-  'Video Appointment',
-  'A2Z Stores',
-  'Custom Orders',
-  'Lookbooks',
-  'Careers',
-  'Feedback',
+  { label: 'About Us', to: '/about-us' },
+  { label: 'Contact Us', to: '/contact-us' },
+  { label: 'Store Appointment', to: '/store-appointment' },
+  { label: 'A2Z Stores', to: '/a2z-stores' },
+  { label: 'Careers', to: '/careers' },
+  { label: 'Feedback', to: '/feedback' },
 ];
 
-const POLICY_LINKS = ['Terms & Conditions', 'Shipping Policy', 'Return and Exchange Policy', 'Refund Policy', 'Size Chart', 'FAQs'];
+const POLICY_LINKS = [
+  { label: 'Terms & Conditions', to: null },
+  { label: 'Shipping Policy', to: null },
+  { label: 'Return and Exchange Policy', to: null },
+  { label: 'Refund Policy', to: null },
+  { label: 'Size Chart', to: '/size-chart' },
+  { label: 'FAQs', to: '/faqs' },
+];
 
 function FooterColumn({ title, children }) {
   return (
@@ -29,23 +35,44 @@ function FooterColumn({ title, children }) {
 }
 
 export default function SiteFooter() {
+  const [facebookUrl, setFacebookUrl] = useState(DEFAULT_STORE_SETTINGS.facebookUrl);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToStoreSettings((settings) => {
+      if (settings.facebookUrl) setFacebookUrl(settings.facebookUrl);
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <footer className="bg-surface-container-low dark:bg-surface-container-lowest full-width bottom mt-auto border-t border-surface-variant">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto">
         <FooterColumn title="About A2Z">
-          {ABOUT_LINKS.map((link) => (
-            <a key={link} className={LINK_CLASS} href="#">
-              {link}
-            </a>
-          ))}
+          {ABOUT_LINKS.map((link) =>
+            link.to ? (
+              <Link key={link.label} className={LINK_CLASS} to={link.to}>
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.label} className={LINK_CLASS} href="#">
+                {link.label}
+              </a>
+            )
+          )}
         </FooterColumn>
 
         <FooterColumn title="Policies">
-          {POLICY_LINKS.map((link) => (
-            <a key={link} className={LINK_CLASS} href="#">
-              {link}
-            </a>
-          ))}
+          {POLICY_LINKS.map((link) =>
+            link.to ? (
+              <Link key={link.label} className={LINK_CLASS} to={link.to}>
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.label} className={LINK_CLASS} href="#">
+                {link.label}
+              </a>
+            )
+          )}
           <Link className={LINK_CLASS} to="/privacy-policy">
             Privacy Policy
           </Link>
@@ -77,7 +104,7 @@ export default function SiteFooter() {
         </FooterColumn>
 
         <FooterColumn title="Follow Us">
-          <a className={LINK_CLASS} href="#">
+          <a className={LINK_CLASS} href={facebookUrl} target="_blank" rel="noopener noreferrer">
             Facebook
           </a>
           <a
@@ -94,6 +121,9 @@ export default function SiteFooter() {
       <div className="border-t border-surface-variant py-6 text-center flex flex-col items-center gap-1">
         <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
         <p className="text-[10px] text-on-surface-variant/50 font-mono">v{APP_VERSION} (Build #{APP_BUILD})</p>
+        <p className="text-[10px] text-on-surface-variant/50">
+          Powered by Mobile1x · Founder Rahul Pahuja · +91-8819091000
+        </p>
       </div>
     </footer>
   );

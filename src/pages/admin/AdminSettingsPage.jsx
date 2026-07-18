@@ -8,6 +8,7 @@ const FIELDS = [
   { key: 'address', label: 'Store Address', placeholder: '123 Heritage Lane, Bandra West, Mumbai 400050', type: 'textarea' },
   { key: 'phone', label: 'Store Phone Number', placeholder: '+91 98765 43210' },
   { key: 'gstNumber', label: 'GST Number', placeholder: '27AAAAA0000A1Z5' },
+  { key: 'facebookUrl', label: 'Facebook Page URL', placeholder: 'https://www.facebook.com/yourpage' },
 ];
 
 export default function AdminSettingsPage() {

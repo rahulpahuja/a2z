@@ -47,6 +47,14 @@
       ".read": "auth != null",
       ".write": "auth != null"
     },
+    "jobs": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "feedback": {
+      ".read": "auth != null",
+      ".write": true
+    },
     ".read": false,
     ".write": false
   }

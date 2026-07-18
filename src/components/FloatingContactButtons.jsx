@@ -1,5 +1,6 @@
 import { useToast } from '../context/ToastContext.jsx';
 import { WHATSAPP_NUMBER, INSTAGRAM_HANDLE } from '../config/store.js';
+import { buildWhatsAppLink } from '../utils/whatsapp.js';
 
 function WhatsAppIcon() {
   return (
@@ -27,12 +28,7 @@ export default function FloatingContactButtons() {
       showToast('WhatsApp number is not configured yet.');
       return;
     }
-    // Format the number to ensure it has only digits and prepends '91' for 10-digit Indian numbers
-    let cleanNumber = WHATSAPP_NUMBER.replace(/\D/g, '');
-    if (cleanNumber.length === 10) {
-      cleanNumber = '91' + cleanNumber;
-    }
-    window.open(`https://wa.me/${cleanNumber}`, '_blank', 'noopener,noreferrer');
+    window.open(buildWhatsAppLink(WHATSAPP_NUMBER), '_blank', 'noopener,noreferrer');
   };
 
   const handleInstagram = () => {
