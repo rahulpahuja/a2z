@@ -521,7 +521,7 @@ export default function AdminProductsPage() {
                 </button>
               )}
             </div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5" style={{ zoom: 0.75 }}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="md:col-span-2">
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-title">
