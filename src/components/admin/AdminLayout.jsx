@@ -1,24 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
   { to: '/super/sales', label: 'Sales Management', icon: 'bar_chart' },
   { to: '/super/carousel', label: 'Hero Carousel', icon: 'view_carousel' },
   { to: '/super/categories', label: 'Categories', icon: 'category' },
   { to: '/super/products', label: 'Products', icon: 'inventory_2' },
   { to: '/super/product-videos', label: 'Product Videos', icon: 'video_library' },
-  { to: '/super/ai-studio', label: 'AI Studio', icon: 'auto_awesome' },
+  { to: '/super/image-studio', label: 'Image Studio', icon: 'photo_library' },
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
   { to: '/super/referrers', label: 'Referrer Details', icon: 'person_add' },
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/tracking-partners', label: 'Tracking Partners', icon: 'local_shipping' },
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },
-  { to: '/super/image-converter', label: 'Image Converter', icon: 'image' },
   { to: '/super/configurator', label: 'Layout Configurator', icon: 'settings_accessibility' },
-  { to: '/super/watermark-remover', label: 'Watermark Remover', icon: 'auto_fix' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
-  { to: '/super/upload-test', label: 'R2 Upload Test', icon: 'cloud_upload' },
 ];
 
 export default function AdminLayout({ children }) {

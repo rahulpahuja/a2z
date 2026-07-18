@@ -4,7 +4,7 @@ import './NotFoundPage.css';
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col bg-surface overflow-hidden relative">
-      <header className="w-full px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto relative z-10">
+      <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto relative z-10">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair">
           A2Z Collection
         </Link>

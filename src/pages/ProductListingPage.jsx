@@ -7,6 +7,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import './ProductListingPage.css';
 
 const NAV_LINKS = [
@@ -59,6 +60,8 @@ export default function ProductListingPage() {
   const [sortBy, setSortBy] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleCount, setVisibleCount] = useState(50);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Reset pagination state when filters change
   useEffect(() => {
@@ -153,6 +156,14 @@ export default function ProductListingPage() {
     <>
       <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
         <div className="flex items-center gap-6">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
         </div>
         <nav className="hidden md:flex items-center gap-8">
@@ -174,13 +185,23 @@ export default function ProductListingPage() {
           <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
 
       <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
         <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
           {activeCategory === 'All' ? 'ALL PRODUCTS' : `${activeCategory.toUpperCase()}S`}
         </h1>
         <div className="mt-4 md:mt-0 flex items-center gap-3">
-          <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
+          <button
+            type="button"
+            onClick={() => setMobileFiltersOpen((open) => !open)}
+            aria-expanded={mobileFiltersOpen}
+            className="md:hidden flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm">tune</span>
+            Filters
+          </button>
+          <label className="hidden md:inline font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
           <div className="relative">
             <select
               className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
@@ -206,7 +227,7 @@ export default function ProductListingPage() {
           background: 'var(--custom-backdrop-bg, inherit)',
         }}
       >
-        <aside className="w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4">
+        <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} md:block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4`}>
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
               Category

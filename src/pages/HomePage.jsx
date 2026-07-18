@@ -10,7 +10,15 @@ import { getHighResUrl } from '../utils/image.js';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import './HomePage.css';
+
+const NAV_LINKS = [
+  { label: 'New Arrivals', to: '/products' },
+  { label: 'Sarees', to: '/products?category=Saree' },
+  { label: 'Lehengas', to: '/products?category=Lehenga' },
+  { label: 'Kurtis', to: '/products?category=Kurti' },
+];
 
 const categories = [
   {
@@ -132,6 +140,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState([]);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -172,8 +181,13 @@ export default function HomePage() {
         Enjoy Free Shipping on Orders Above ₹2,500
       </div>
       <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-[32px] z-50 flat no shadows border-b border-surface-variant">
-        <div className="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto h-[80px]">
-          <button className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200">
+        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto h-[80px]">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link
@@ -197,6 +211,7 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
       <main>
         {/* Hero Carousel */}
         <section className="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">
@@ -258,7 +273,7 @@ export default function HomePage() {
         </section>
 
         {/* Category Badges */}
-        <section className="py-16 px-margin-desktop max-w-container-max mx-auto overflow-hidden">
+        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
           <div className="flex overflow-x-auto hide-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
             {categories.map((category) => (
               <div key={category.name} className="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
@@ -279,7 +294,7 @@ export default function HomePage() {
         <TrendingProducts />
 
         {/* Featured Products Row 1 */}
-        <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
+        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
           <div className="relative mb-12">
             <h2 className="font-headline-md text-headline-md playfair text-center">Featured Elegance</h2>
             <Link
@@ -352,7 +367,7 @@ export default function HomePage() {
         </section>
 
         {/* Featured Products Row 2 */}
-        <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
+        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
           <div className="relative mb-12">
             <h2 className="font-headline-md text-headline-md playfair text-center">Heritage Masterpieces</h2>
             <Link
@@ -452,7 +467,7 @@ export default function HomePage() {
         </section>
 
         {/* Video Grid Lookbook Section */}
-        <section className="py-16 px-margin-desktop max-w-container-max mx-auto">
+        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
           <h2 className="font-headline-md text-headline-md playfair text-center mb-4">Stories in Motion</h2>
           <p className="font-body-lg text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-12">
             Hover over our lookbooks to witness traditional craftsmanship come to life.

@@ -5,6 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 
 const NAV_LINKS = [
   { label: 'New Arrivals', to: '/products' },
@@ -15,11 +16,11 @@ const NAV_LINKS = [
 
 function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove }) {
   return (
-    <div className="flex gap-gutter items-center border-b border-surface-variant pb-gutter">
-      <div className="w-[120px] h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
+    <div className="flex flex-col sm:flex-row gap-gutter sm:items-center border-b border-surface-variant pb-gutter">
+      <div className="w-[100px] h-[133px] sm:w-[120px] sm:h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
         <ProductImage className="w-full h-full object-cover" data-alt={item.alt} alt={item.alt} src={item.image} />
       </div>
-      <div className="flex-grow flex flex-col gap-[8px]">
+      <div className="flex-grow min-w-0 flex flex-col gap-[8px]">
         <h3 className="font-title-sm text-title-sm text-on-surface">{item.title}</h3>
         {item.color && <p className="font-body-sm text-body-sm text-on-surface-variant">Color: {item.color}</p>}
         {item.size && <p className="font-body-sm text-body-sm text-on-surface-variant">Size: {item.size}</p>}
@@ -35,7 +36,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
           </button>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-4">
+      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-4 w-full sm:w-auto">
         <span className="font-price-display text-price-display text-on-surface">
           {formatCurrency(item.price * item.quantity)}
         </span>
@@ -70,6 +71,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
 export default function CartPage() {
   const { items: cartItems, updateQuantity, removeItem } = useCart();
   const [couponCode, setCouponCode] = useState('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleIncrease = (id) => {
@@ -93,8 +95,16 @@ export default function CartPage() {
   return (
     <>
       {/* TopNavBar */}
-      <header className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto z-50 transition-all duration-300">
+      <header className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 transition-all duration-300">
         <div className="flex items-center gap-6">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
             A2Z Collection
           </Link>
@@ -115,6 +125,7 @@ export default function CartPage() {
           <ProfileButton className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
       {/* Main Content */}
       <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-[64px]">
         <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-gutter">
