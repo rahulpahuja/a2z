@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useStorefrontTheme, DEFAULT_THEME } from '../../context/StorefrontThemeContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useProducts } from '../../context/ProductsContext.jsx';
 import './AdminConfiguratorPage.css';
 
 export default function AdminConfiguratorPage() {
   const { theme, updateTheme, resetTheme, loading } = useStorefrontTheme();
   const { showToast } = useToast();
+  const { products } = useProducts();
 
   // Local form states (initialized when theme loads)
   const [form, setForm] = useState(DEFAULT_THEME);
@@ -15,6 +17,17 @@ export default function AdminConfiguratorPage() {
   // Diagnostic Test States
   const [diagStatus, setDiagStatus] = useState(null); // 'running', 'passed', 'failed'
   const [diagResults, setDiagResults] = useState([]);
+  const [productHasVideoMap, setProductHasVideoMap] = useState({});
+
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const map = {};
+      products.forEach((p) => {
+        map[p.id] = (p.videos && p.videos.length > 0);
+      });
+      setProductHasVideoMap(map);
+    }
+  }, [products]);
 
   useEffect(() => {
     if (theme) {
@@ -757,7 +770,7 @@ export default function AdminConfiguratorPage() {
                           onChange={(e) => {
                             const mode = e.target.value;
                             const updated = [...(form.lookbookVideos || [])];
-                            updated[idx] = { ...updated[idx], sourceMode: mode };
+                            updated[idx] = { ...updated[idx], sourceMode: mode, selectedProductId: '' };
                             handleChange('lookbookVideos', updated);
                           }}
                           className="form-select text-[11px] py-1.5 px-2"
@@ -765,6 +778,7 @@ export default function AdminConfiguratorPage() {
                           <option value="url">Paste Custom Video URL</option>
                           <option value="preset">Select Mixkit Luxury Preset</option>
                           <option value="upload">Upload Custom MP4 Video File</option>
+                          <option value="product">Select from Product Videos</option>
                         </select>
                       </div>
 
@@ -841,6 +855,79 @@ export default function AdminConfiguratorPage() {
                               Loaded: {video.originalName}
                             </span>
                           )}
+                        </div>
+                      )}
+
+                      {/* Product Video Selector */}
+                      {video.sourceMode === 'product' && (
+                        <div className="form-group">
+                          <label className="form-label text-[11px]" htmlFor={`video-product-${idx}`}>
+                            Select Product
+                          </label>
+                          <select
+                            id={`video-product-${idx}`}
+                            value={video.selectedProductId || ''}
+                            onChange={(e) => {
+                              const prodId = e.target.value;
+                              const prod = products.find((p) => p.id === prodId);
+                              const firstVid = prod?.videos?.[0] || '';
+                              const updated = [...(form.lookbookVideos || [])];
+                              updated[idx] = {
+                                ...updated[idx],
+                                selectedProductId: prodId,
+                                src: firstVid,
+                              };
+                              handleChange('lookbookVideos', updated);
+                            }}
+                            className="form-select text-[11px] py-1.5 px-2"
+                          >
+                            <option value="">-- Choose Product --</option>
+                            {products.map((p) => {
+                              const hasVideo = productHasVideoMap[p.id] || false;
+                              return (
+                                <option key={p.id} value={p.id}>
+                                  {p.name || p.title} {hasVideo ? '🎥' : '❌'}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Video list preview selector */}
+                      {video.sourceMode === 'product' && video.selectedProductId && (
+                        <div className="col-span-2 pt-2 border-t border-outline-variant/10 mt-1">
+                          <label className="form-label text-[10px] mb-1 font-semibold block text-primary">
+                            Attach Product Video Clip (Select one to preview &amp; bind)
+                          </label>
+                          <div className="flex gap-3 overflow-x-auto py-1.5">
+                            {(products.find((p) => p.id === video.selectedProductId)?.videos || []).map((vidSrc, vidIdx) => {
+                              const isActive = video.src === vidSrc;
+                              return (
+                                <div
+                                  key={vidIdx}
+                                  onClick={() => {
+                                    const updated = [...(form.lookbookVideos || [])];
+                                    updated[idx] = { ...updated[idx], src: vidSrc };
+                                    handleChange('lookbookVideos', updated);
+                                    showToast(`Attached Clip ${vidIdx + 1} from product video library!`);
+                                  }}
+                                  className={`flex-shrink-0 relative w-16 aspect-[9/16] rounded border cursor-pointer overflow-hidden transition-all shadow-sm ${
+                                    isActive ? 'border-primary ring-2 ring-primary/20 scale-95' : 'border-outline-variant/40 opacity-75 hover:opacity-100'
+                                  }`}
+                                >
+                                  <video src={vidSrc} className="w-full h-full object-cover" muted playsInline />
+                                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                                    {isActive ? (
+                                      <span className="material-symbols-outlined text-white text-[16px] fill-icon">check_circle</span>
+                                    ) : (
+                                      <span className="material-symbols-outlined text-white text-[16px] opacity-0 hover:opacity-100">play_circle</span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>
