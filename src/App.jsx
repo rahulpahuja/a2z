@@ -36,6 +36,7 @@ import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
 import LuxuryBackdrop from './components/LuxuryBackdrop.jsx'
+import SimulatedSmsToaster from './components/SimulatedSmsToaster.jsx'
 
 const ROUTES = [
   { path: '/', Component: HomePage },
@@ -105,6 +106,7 @@ export default function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <FloatingContactButtons />
+          <SimulatedSmsToaster />
         </EntryGate>
       </ProductsProvider>
     </BotGate>

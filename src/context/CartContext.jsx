@@ -89,6 +89,15 @@ export function CartProvider({ children }) {
     return order;
   };
 
+  const trackSpecificOrder = (order) => {
+    try {
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
+    } catch {
+      // ignore
+    }
+    setLastOrder(order);
+  };
+
   const itemCount = items.reduce((sum, line) => sum + line.quantity, 0);
   const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
 
@@ -105,6 +114,7 @@ export function CartProvider({ children }) {
       setShippingDetails,
       lastOrder,
       placeOrder,
+      trackSpecificOrder,
     }),
     [items, shippingDetails, lastOrder]
   );
