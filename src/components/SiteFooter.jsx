@@ -17,10 +17,10 @@ const ABOUT_LINKS = [
 ];
 
 const POLICY_LINKS = [
-  { label: 'Terms & Conditions', to: null },
-  { label: 'Shipping Policy', to: null },
-  { label: 'Return and Exchange Policy', to: null },
-  { label: 'Refund Policy', to: null },
+  { label: 'Terms & Conditions', to: '/terms-and-conditions' },
+  { label: 'Shipping Policy', to: '/shipping-policy' },
+  { label: 'Return and Exchange Policy', to: '/return-exchange-policy' },
+  { label: 'Refund Policy', to: '/refund-policy' },
   { label: 'Size Chart', to: '/size-chart' },
   { label: 'FAQs', to: '/faqs' },
 ];

@@ -104,7 +104,7 @@ export default function AdminJobsPage() {
                   className="form-input"
                   value={form.location}
                   onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
-                  placeholder="e.g. Jaipur, Rajasthan"
+                  placeholder="e.g. Indore, Madhya Pradesh"
                 />
               </div>
             </div>
