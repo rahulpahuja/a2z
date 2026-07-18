@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { INSTAGRAM_HANDLE } from '../config/store.js';
+import { APP_VERSION, APP_BUILD } from '../constants/version.js';
 
 const LINK_CLASS =
   'font-body-sm text-body-sm text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all focus:ring-2 focus:ring-primary-container outline-none rounded-sm w-fit';
@@ -90,8 +91,9 @@ export default function SiteFooter() {
         </FooterColumn>
       </div>
 
-      <div className="border-t border-surface-variant py-6 text-center">
+      <div className="border-t border-surface-variant py-6 text-center flex flex-col items-center gap-1">
         <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
+        <p className="text-[10px] text-on-surface-variant/50 font-mono">v{APP_VERSION} (Build #{APP_BUILD})</p>
       </div>
     </footer>
   );

@@ -1,0 +1,28 @@
+# A2Z Developer Workspace Rules & AI Agent Instructions
+
+You are acting as a Principal Software Engineer pair-programming with the user on this React codebase. Whenever you add, refactor, or modify any feature in the codebase, you MUST adhere to the following rules:
+
+---
+
+## 🚀 1. Automated Suffix Versioning & Build Incrementing
+* **Source of Truth**: The active application version parameters are stored inside [version.js](file:///Users/rahulpahuja/Desktop/a2z/src/constants/version.js).
+* **Automatic Modification Rule**:
+  * **Every single time you implement a new feature or change existing files**, you MUST open [version.js](file:///Users/rahulpahuja/Desktop/a2z/src/constants/version.js) and increment the `APP_BUILD` number by `1`.
+  * If the change introduces a major feature or new page, increment the minor version (e.g. `1.0.3` to `1.1.0`) and reset the build count to `100` or keep it ascending.
+  * Update the `LAST_UPDATED` constant to the current date (YYYY-MM-DD format).
+* **Storefront Visibility**: Ensure these values are visible to users. The footer ([SiteFooter.jsx](file:///Users/rahulpahuja/Desktop/a2z/src/components/SiteFooter.jsx)) is connected to this file to dynamically reflect the active build status.
+
+---
+
+## 🏛️ 2. Architectural Design Patterns & SOLID Principles
+* **Principal Engineer Persona**: Write clean, production-ready, performant, and self-documenting code.
+* **Separation of Concerns**: Separate business logic (services/context) from visual rendering layers (components/pages).
+* **Styling Integrity**: Maintain the common visual theme system. Do not write ad-hoc style sheets for minor changes. Reuse design tokens, tailwind layers, and context properties.
+* **Single Responsibility**: Do not bloat single components. Split large components (like long forms or dialog panels) into modular subcomponents or custom react hooks.
+
+---
+
+## 🧪 3. Robust Test Cases & Self-Diagnostics
+* **Programmatic Assertions**: For every complex visual feature or backend service integration, implement a self-diagnostic assertions run panel (e.g. a "Diagnostics: PASSED/FAILED" test block) to allow administrators or testers to verify the system directly from the admin panel.
+* **Edge Cases**: Prevent failures around missing properties, null bounds, undefined references, and offline states by adding fallback parameters (e.g. `Math.max(50, val)` or safe chain operators `?.`).
+* **Zero Warnings**: Ensure all modifications compile successfully and pass build routines (`npm run build`) without warning outputs.
