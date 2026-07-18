@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
-import { subscribeToOrders } from '../../services/orders.js';
+import { subscribeToOrders, updateFirebaseOrder } from '../../services/orders.js';
+import { subscribeToTrackingPartners } from '../../services/trackingPartners.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
+import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
+import './AdminSalesPage.css';
 
 export default function AdminSalesPage() {
   const [liveOrders, setLiveOrders] = useState([]);
@@ -25,6 +28,48 @@ export default function AdminSalesPage() {
   const [drillDownLabel, setDrillDownLabel] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null); // For detail view modal
+
+  const { showToast } = useToast();
+  const [trackingPartners, setTrackingPartners] = useState([]);
+  const [orderStatus, setOrderStatus] = useState('Processing');
+  const [trackingId, setTrackingId] = useState('');
+  const [trackingPartner, setTrackingPartner] = useState('');
+  const [isSavingTracking, setIsSavingTracking] = useState(false);
+
+  // Subscribe to tracking partners
+  useEffect(() => {
+    const unsubPartners = subscribeToTrackingPartners((data) => {
+      setTrackingPartners(data || []);
+    });
+    return unsubPartners;
+  }, []);
+
+  const handleSelectOrder = (order) => {
+    setSelectedOrder(order);
+    setOrderStatus(order.status || 'Processing');
+    setTrackingId(order.trackingId || '');
+    setTrackingPartner(order.trackingPartner || '');
+  };
+
+  const handleSaveTracking = async () => {
+    if (!selectedOrder) return;
+    setIsSavingTracking(true);
+    const updatedOrder = {
+      ...selectedOrder,
+      status: orderStatus,
+      trackingPartner: trackingPartner || null,
+      trackingId: trackingId || null,
+    };
+    try {
+      await updateFirebaseOrder(updatedOrder);
+      setSelectedOrder(updatedOrder);
+      showToast(`Order ${selectedOrder.id} status & tracking details updated.`);
+    } catch (err) {
+      showToast(err.message || 'Could not update order details.');
+    } finally {
+      setIsSavingTracking(false);
+    }
+  };
 
   // Subscribe to live orders
   useEffect(() => {
@@ -573,7 +618,7 @@ export default function AdminSalesPage() {
                       <tr 
                         key={order.id} 
                         className="hover:bg-surface-container-low transition-colors cursor-pointer"
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => handleSelectOrder(order)}
                       >
                         <td className="p-4 font-mono font-bold text-[12px] text-primary">{order.id}</td>
                         <td className="p-4 text-on-surface font-semibold whitespace-nowrap text-[12px]">{formattedTime}</td>
@@ -676,6 +721,75 @@ export default function AdminSalesPage() {
                   <p className="text-[10px] text-on-surface-variant uppercase font-semibold">Grand Total</p>
                   <p className="font-bold text-[14px] text-primary mt-0.5">{formatCurrency(selectedOrder.total)}</p>
                 </div>
+              </div>
+
+              {/* Order Status & Tracking Configuration */}
+              <div className="admin-card flex flex-col gap-4">
+                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px] text-primary">local_shipping</span>
+                  Manage Order Status &amp; Tracking
+                </h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Status Dropdown */}
+                  <div>
+                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                      Order Status
+                    </label>
+                    <select
+                      value={orderStatus}
+                      onChange={(e) => setOrderStatus(e.target.value)}
+                      className="form-select text-[12px] py-1.5 px-3"
+                    >
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="In Transit">In Transit</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+
+                  {/* Tracking Partner Dropdown */}
+                  <div>
+                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                      Tracking Partner
+                    </label>
+                    <select
+                      value={trackingPartner}
+                      onChange={(e) => setTrackingPartner(e.target.value)}
+                      className="form-select text-[12px] py-1.5 px-3"
+                    >
+                      <option value="">Select Partner</option>
+                      {trackingPartners.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Tracking ID Input */}
+                  <div>
+                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                      Tracking ID
+                    </label>
+                    <input
+                      type="text"
+                      value={trackingId}
+                      onChange={(e) => setTrackingId(e.target.value)}
+                      placeholder="e.g. 123456789"
+                      className="form-input text-[12px] py-1.5 px-3"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isSavingTracking}
+                  onClick={handleSaveTracking}
+                  className="btn btn-primary self-end py-1.5 px-4 text-[10px]"
+                >
+                  <span className="material-symbols-outlined text-[14px]">save</span>
+                  {isSavingTracking ? 'Saving…' : 'Save Status & Tracking'}
+                </button>
               </div>
 
               {/* Items List */}

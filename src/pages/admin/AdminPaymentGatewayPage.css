@@ -1,0 +1,16 @@
+/* Custom styles and animations specific to AdminPaymentGatewayPage */
+
+.gateway-card-anim {
+  animation: gatewayEnter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes gatewayEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

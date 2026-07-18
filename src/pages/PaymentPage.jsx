@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import { getActivePaymentGateway } from '../services/paymentGateway.js';
 
 const PAYMENT_METHODS = [
   { id: 'cod', label: 'Cash on Delivery', icon: 'payments' },
@@ -12,13 +13,25 @@ export default function PaymentPage() {
   const { items: cartItems, placeOrder } = useCart();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [activeGateway, setActiveGateway] = useState(null);
+
+  useEffect(() => {
+    getActivePaymentGateway().then((gateway) => {
+      if (gateway) {
+        setActiveGateway(gateway);
+      }
+    });
+  }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
   const handlePlaceOrder = () => {
-    const methodLabel = PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? paymentMethod;
+    let methodLabel = PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? paymentMethod;
+    if (paymentMethod !== 'cod' && activeGateway) {
+      methodLabel = `${methodLabel} (via ${activeGateway.name})`;
+    }
     placeOrder({ paymentMethod: methodLabel, placedAt: new Date().toISOString() });
     navigate('/orders/tracking');
   };
@@ -91,6 +104,63 @@ export default function PaymentPage() {
                 </label>
               ))}
             </div>
+
+            {paymentMethod !== 'cod' && activeGateway && (
+              <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex flex-col gap-3 shadow-sm animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
+                  <div>
+                    <h3 className="font-semibold text-on-surface text-[14px]">
+                      Secure Checkout via {activeGateway.name}
+                    </h3>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">
+                      Payments are processed securely using your registered gateway configuration in Firebase.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Gateway config indicator */}
+                <div className="flex items-center gap-1.5 font-mono text-[10px] text-on-surface-variant bg-surface-container border border-outline-variant/30 rounded-lg p-2.5 w-fit">
+                  <span className="font-sans font-bold text-outline mr-1">GATEWAY KEY:</span>
+                  {activeGateway.apiKey.substring(0, 8)}...{activeGateway.apiKey.substring(activeGateway.apiKey.length - 4)}
+                </div>
+
+                {/* Simulated payment inputs for credit card */}
+                {paymentMethod === 'card' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 font-body-sm">
+                    <input
+                      type="text"
+                      placeholder="Card Number"
+                      className="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        className="w-1/2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
+                      />
+                      <input
+                        type="password"
+                        placeholder="CVV"
+                        className="w-1/2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Simulated payment inputs for UPI */}
+                {paymentMethod === 'upi' && (
+                  <div className="mt-2 font-body-sm flex gap-3 max-w-sm">
+                    <input
+                      type="text"
+                      placeholder="e.g. mobile@upi"
+                      className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="pt-8">
               <button
                 onClick={handlePlaceOrder}

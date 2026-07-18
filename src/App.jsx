@@ -30,6 +30,8 @@ import AdminReferrerDetailsPage from './pages/admin/AdminReferrerDetailsPage.jsx
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx'
 import AdminDocsPage from './pages/admin/AdminDocsPage.jsx'
 import AdminUploadTestPage from './pages/admin/AdminUploadTestPage.jsx'
+import AdminTrackingPartnersPage from './pages/admin/AdminTrackingPartnersPage.jsx'
+import AdminPaymentGatewayPage from './pages/admin/AdminPaymentGatewayPage.jsx'
 import RequireAdmin from './components/RequireAdmin.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
 import { ProductsProvider } from './context/ProductsContext.jsx'
@@ -60,6 +62,8 @@ const ADMIN_ROUTES = [
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/referrers', Component: AdminReferrerDetailsPage },
   { path: '/super/settings', Component: AdminSettingsPage },
+  { path: '/super/tracking-partners', Component: AdminTrackingPartnersPage },
+  { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/upload-test', Component: AdminUploadTestPage },
   { path: '/super/ai-studio', Component: AIStudioPage },
