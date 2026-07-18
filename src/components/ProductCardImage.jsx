@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import ProductImage from './ProductImage.jsx';
-
-// After this many ms of continuous hover, start auto-sliding through the
-// product's other images (one slide in from the right per interval).
-const START_DELAY_MS = 1000;
-const SLIDE_INTERVAL_MS = 1800;
+import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 
 export default function ProductCardImage({ images, alt, className = '', loading = 'lazy', activeIndex = 0 }) {
+  const { theme } = useStorefrontTheme();
+  // After this many ms of continuous hover, start auto-sliding through the
+  // product's other images (one slide in from the right per interval).
+  const startDelayMs = Number(theme?.productHoverSlideDelayMs) || 1000;
+  const slideIntervalMs = Number(theme?.productHoverSlideIntervalMs) || 1800;
   const list = (images ?? []).filter(Boolean);
   const [index, setIndex] = useState(activeIndex);
   const startTimeout = useRef(null);
@@ -38,8 +39,8 @@ export default function ProductCardImage({ images, alt, className = '', loading 
     startTimeout.current = setTimeout(() => {
       slideInterval.current = setInterval(() => {
         setIndex((prev) => (prev + 1) % list.length);
-      }, SLIDE_INTERVAL_MS);
-    }, START_DELAY_MS);
+      }, slideIntervalMs);
+    }, startDelayMs);
   };
 
   const handleMouseLeave = () => {

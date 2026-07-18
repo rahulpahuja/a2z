@@ -709,6 +709,58 @@ export default function AdminConfiguratorPage() {
               </div>
             </div>
 
+            {/* Product Image Hover Auto-Slide */}
+            <div className="admin-card flex flex-col gap-5">
+              <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">animation</span>
+                Product Image Hover Auto-Slide
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="hover-slide-delay">
+                    Hover Delay Before Sliding (ms)
+                  </label>
+                  <input
+                    id="hover-slide-delay"
+                    type="number"
+                    min="0"
+                    step="100"
+                    value={form.productHoverSlideDelayMs ?? 1000}
+                    onChange={(e) => {
+                      const val = Math.max(0, Number(e.target.value));
+                      handleChange('productHoverSlideDelayMs', val);
+                    }}
+                    className="form-input text-[12px] py-2 px-3"
+                  />
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    How long a shopper must hover over a product image (gallery, homepage rows, product detail) before it starts auto-sliding through the other images.
+                  </p>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="hover-slide-interval">
+                    Time Between Slides (ms)
+                  </label>
+                  <input
+                    id="hover-slide-interval"
+                    type="number"
+                    min="200"
+                    step="100"
+                    value={form.productHoverSlideIntervalMs ?? 1800}
+                    onChange={(e) => {
+                      const val = Math.max(200, Number(e.target.value));
+                      handleChange('productHoverSlideIntervalMs', val);
+                    }}
+                    className="form-input text-[12px] py-2 px-3"
+                  />
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    How long each image stays visible once the auto-slide begins.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* 6. Stories in Motion Video Lookbooks */}
             <div className="admin-card flex flex-col gap-5">
               <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">

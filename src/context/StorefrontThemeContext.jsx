@@ -35,6 +35,10 @@ export const DEFAULT_THEME = {
   itemsPerPage: 400,
   gridCols: 4,
 
+  // Product image hover auto-slide (ms)
+  productHoverSlideDelayMs: 1000,
+  productHoverSlideIntervalMs: 1800,
+
   // Lookbook Videos
   lookbookVideos: [
     {
