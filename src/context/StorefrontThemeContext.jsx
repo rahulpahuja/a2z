@@ -28,6 +28,10 @@ export const DEFAULT_THEME = {
   storeBgColor: '#ffffff',
   backdropFilter: 'none',     // 'none', 'blur(8px)', 'blur(16px)'
   backdropBg: 'transparent',
+
+  // Pagination & Layout Grid Sizing
+  itemsPerPage: 400,
+  gridCols: 4,
 };
 
 const THEME_STORAGE_KEY = 'storefront_theme_settings';
@@ -59,6 +63,9 @@ export function StorefrontThemeProvider({ children }) {
     root.style.setProperty('--custom-store-bg', themeData.storeBgColor);
     root.style.setProperty('--custom-backdrop-filter', themeData.backdropFilter);
     root.style.setProperty('--custom-backdrop-bg', themeData.backdropBg);
+
+    // Custom pagination and grid settings
+    root.style.setProperty('--custom-grid-cols', themeData.gridCols);
   };
 
   // Subscribe to theme configurations
