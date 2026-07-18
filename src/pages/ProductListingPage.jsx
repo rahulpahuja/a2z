@@ -5,7 +5,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
-import ProductImage from '../components/ProductImage.jsx';
+import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import './ProductListingPage.css';
 
@@ -397,10 +397,9 @@ export default function ProductListingPage() {
                           aspectRatio: 'var(--custom-listing-img-aspect, 3/4)',
                         }}
                       >
-                        <ProductImage
+                        <ProductCardImage
+                          images={product.images && product.images.length > 0 ? product.images : [product.image]}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                          loading="lazy"
-                          src={product.image}
                           alt={product.alt}
                         />
                         {!isAvailable && (

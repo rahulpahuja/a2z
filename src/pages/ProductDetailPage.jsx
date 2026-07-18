@@ -7,6 +7,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import ProductImage from '../components/ProductImage.jsx';
+import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 
 const NAV_LINKS = [
@@ -200,11 +201,11 @@ export default function ProductDetailPage() {
             {mainMedia.type === 'video' ? (
               <VideoPlayer src={mainMedia.src} className="w-full h-full object-contain bg-black" />
             ) : (
-              <ProductImage
+              <ProductCardImage
+                images={images}
+                activeIndex={selectedThumbnail}
                 alt={product.name}
                 className="object-cover w-full h-full"
-                data-alt={product.alt}
-                src={mainMedia.src}
               />
             )}
             {mainMedia.type !== 'video' && (
@@ -470,10 +471,10 @@ export default function ProductDetailPage() {
               {relatedProducts.map((related) => (
                 <Link key={related.id} to={`/product/${related.id}`} className="group flex flex-col gap-3">
                   <div className="relative aspect-[3/4] rounded-[16px] overflow-hidden bg-surface-container border border-[#DCAE96]/30">
-                    <ProductImage
+                    <ProductCardImage
+                      images={related.images && related.images.length > 0 ? related.images : [related.image]}
                       alt={related.alt}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                      src={related.image}
                     />
                     {related.badge && (
                       <span className="absolute top-4 left-4 bg-tertiary text-on-tertiary font-label-caps text-[10px] px-3 py-1 rounded-[32px] uppercase tracking-widest">{related.badge}</span>
