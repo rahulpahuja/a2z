@@ -29,7 +29,7 @@ export default function AdminImageConverterPage() {
       }
 
       // Draw a test image
-      ctx.fillStyle = '#ac2471'; // Brand primary
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#ac2471'; // Brand primary
       ctx.fillRect(0, 0, 200, 200);
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();

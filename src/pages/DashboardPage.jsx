@@ -97,7 +97,7 @@ export default function DashboardPage() {
     const canvas = salesChartRef.current;
     if (!canvas) return undefined;
 
-    const primaryColor = '#ac2471'; // Hot Pink
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#ac2471';
     const surfaceColor = '#fcf9f8';
     const onSurfaceColor = '#1c1b1b';
     const gridColor = '#e5e2e1'; // outline-variant
@@ -106,8 +106,8 @@ export default function DashboardPage() {
 
     // Create gradient for line chart
     const gradient = ctxSales.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(172, 36, 113, 0.2)'); // primary with opacity
-    gradient.addColorStop(1, 'rgba(172, 36, 113, 0)');
+    gradient.addColorStop(0, primaryColor + '33'); // primary with opacity
+    gradient.addColorStop(1, primaryColor + '00');
 
     const chart = new Chart(ctxSales, {
       type: 'line',
@@ -178,7 +178,7 @@ export default function DashboardPage() {
     const canvas = productsChartRef.current;
     if (!canvas) return undefined;
 
-    const primaryColor = '#ac2471'; // Hot Pink
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#ac2471';
     const secondaryColor = '#486730'; // Sage Green
     const tertiaryColor = '#7a5642'; // Dusty Rose
     const onSurfaceColor = '#1c1b1b';

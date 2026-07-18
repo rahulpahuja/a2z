@@ -104,7 +104,18 @@ export function StorefrontThemeProvider({ children }) {
     
     root.style.setProperty('--custom-backdrop-filter', themeData.backdropFilter);
     root.style.setProperty('--custom-backdrop-bg', themeData.backdropBg);
-    root.style.setProperty('--color-primary', themeData.primaryColor);
+    
+    // Dynamically skin all primary accent sub-colors site-wide (including containers and fixed tones)
+    const prim = themeData.primaryColor || '#ac2471';
+    root.style.setProperty('--color-primary', prim);
+    root.style.setProperty('--color-surface-tint', prim);
+    root.style.setProperty('--color-primary-container', prim);
+    root.style.setProperty('--color-inverse-primary', prim);
+    if (prim.startsWith('#') && prim.length === 7) {
+      root.style.setProperty('--color-primary-fixed-dim', prim + 'cc');
+      root.style.setProperty('--color-primary-fixed', prim + '26');
+      root.style.setProperty('--color-on-primary-container', '#ffffff');
+    }
 
     // Custom pagination and grid settings
     root.style.setProperty('--custom-grid-cols', themeData.gridCols);
