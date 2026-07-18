@@ -25,6 +25,10 @@ import StoreAppointmentPage from './pages/StoreAppointmentPage.jsx'
 import A2ZStoresPage from './pages/A2ZStoresPage.jsx'
 import CareersPage from './pages/CareersPage.jsx'
 import FeedbackPage from './pages/FeedbackPage.jsx'
+import TermsConditionsPage from './pages/TermsConditionsPage.jsx'
+import ShippingPolicyPage from './pages/ShippingPolicyPage.jsx'
+import ReturnExchangePolicyPage from './pages/ReturnExchangePolicyPage.jsx'
+import RefundPolicyPage from './pages/RefundPolicyPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
@@ -69,6 +73,10 @@ const ROUTES = [
   { path: '/a2z-stores', Component: A2ZStoresPage },
   { path: '/careers', Component: CareersPage },
   { path: '/feedback', Component: FeedbackPage },
+  { path: '/terms-and-conditions', Component: TermsConditionsPage },
+  { path: '/shipping-policy', Component: ShippingPolicyPage },
+  { path: '/return-exchange-policy', Component: ReturnExchangePolicyPage },
+  { path: '/refund-policy', Component: RefundPolicyPage },
   { path: '/__trap__', Component: BotTrapPage },
 ]
 

@@ -49,13 +49,14 @@ export default function AboutUsPage() {
               Where We're From
             </h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
-              We're rooted in <strong className="text-on-surface font-semibold">Jaipur, Rajasthan</strong> — the
-              historic "Pink City," renowned for centuries of hand-block printing, Kundan jewellery-making, and
-              textile artistry. That heritage runs through every collection we design.
+              We're rooted in <strong className="text-on-surface font-semibold">Indore, Madhya Pradesh</strong> —
+              often called the "Manchester of Central India" for its rich textile trading history. That legacy of
+              craftsmanship and trade runs through every collection we design.
             </p>
             <p className="font-body-lg text-body-lg text-on-surface-variant">
               What began as a small family atelier has grown into a studio that partners with artisan clusters
-              across Rajasthan and Gujarat, bringing their work to customers across India and beyond.
+              across Madhya Pradesh, Rajasthan, and Gujarat, bringing their work to customers across India and
+              beyond.
             </p>
           </div>
           <div className="bg-surface-container-low border border-tertiary-container/30 rounded-xl p-8 flex flex-col gap-4">
@@ -70,17 +71,16 @@ export default function AboutUsPage() {
             </div>
             <div className="border-t border-outline-variant/30 pt-4 flex flex-col gap-1">
               <p className="font-body-sm text-body-sm text-on-surface">
-                A2Z Collection Studio, Bapu Bazaar Road,
+                A to Z Collection, 111, Main Road, near J K Mobiles,
                 <br />
-                Jaipur, Rajasthan 302003, India
+                Sindhi Colony, Indore, Madhya Pradesh 452001
               </p>
             </div>
             <div className="border-t border-outline-variant/30 pt-4 flex flex-col gap-1">
               <p className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">
                 Studio Hours
               </p>
-              <p className="font-body-sm text-body-sm text-on-surface">Mon – Sat, 10:00 AM – 8:00 PM IST</p>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">Closed on Sundays &amp; public holidays</p>
+              <p className="font-body-sm text-body-sm text-on-surface">Open Every Day, 10:00 AM – 8:00 PM IST</p>
             </div>
           </div>
         </div>
