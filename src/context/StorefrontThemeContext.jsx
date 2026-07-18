@@ -29,6 +29,7 @@ export const DEFAULT_THEME = {
   backdropFilter: 'none',     // 'none', 'blur(8px)', 'blur(16px)'
   backdropBg: 'transparent',
   primaryColor: '#ac2471',
+  themeMode: 'light',         // 'light' | 'dark' | 'midnight'
 
   // Pagination & Layout Grid Sizing
   itemsPerPage: 400,
@@ -61,7 +62,46 @@ export function StorefrontThemeProvider({ children }) {
     root.style.setProperty('--custom-font-title-size-detail', themeData.titleSizeDetail);
     root.style.setProperty('--custom-font-desc-size-detail', themeData.descSizeDetail);
     
-    root.style.setProperty('--custom-store-bg', themeData.storeBgColor);
+    // Apply dark/light/midnight theme modes
+    if (themeData.themeMode === 'dark') {
+      root.classList.add('dark');
+      root.style.setProperty('--color-background', '#121212');
+      root.style.setProperty('--color-on-background', '#f5f5f5');
+      root.style.setProperty('--color-on-surface', '#f5f5f5');
+      root.style.setProperty('--color-surface-container-lowest', '#1e1e1e');
+      root.style.setProperty('--color-surface-container-low', '#1c1b1b');
+      root.style.setProperty('--color-surface-container', '#2a2a2a');
+      root.style.setProperty('--color-surface-container-high', '#333333');
+      root.style.setProperty('--color-surface-container-highest', '#3a3a3a');
+      root.style.setProperty('--color-outline-variant', '#3a3a3a');
+      root.style.setProperty('--custom-store-bg', '#121212');
+    } else if (themeData.themeMode === 'midnight') {
+      root.classList.add('dark');
+      root.style.setProperty('--color-background', '#030712');
+      root.style.setProperty('--color-on-background', '#f9fafb');
+      root.style.setProperty('--color-on-surface', '#f9fafb');
+      root.style.setProperty('--color-surface-container-lowest', '#0b0f19');
+      root.style.setProperty('--color-surface-container-low', '#0a0d16');
+      root.style.setProperty('--color-surface-container', '#111827');
+      root.style.setProperty('--color-surface-container-high', '#1f2937');
+      root.style.setProperty('--color-surface-container-highest', '#374151');
+      root.style.setProperty('--color-outline-variant', '#1f2937');
+      root.style.setProperty('--custom-store-bg', '#030712');
+    } else {
+      // Light Mode (Default)
+      root.classList.remove('dark');
+      root.style.setProperty('--color-background', '#fcf9f826');
+      root.style.setProperty('--color-on-background', '#1c1b1b');
+      root.style.setProperty('--color-on-surface', '#1c1b1b');
+      root.style.setProperty('--color-surface-container-lowest', '#ffffffb3');
+      root.style.setProperty('--color-surface-container-low', '#f6f3f2a6');
+      root.style.setProperty('--color-surface-container', '#f0eded99');
+      root.style.setProperty('--color-surface-container-high', '#eae7e7b3');
+      root.style.setProperty('--color-surface-container-highest', '#e5e2e1cc');
+      root.style.setProperty('--color-outline-variant', '#dcbfc9');
+      root.style.setProperty('--custom-store-bg', themeData.storeBgColor || '#ffffff');
+    }
+    
     root.style.setProperty('--custom-backdrop-filter', themeData.backdropFilter);
     root.style.setProperty('--custom-backdrop-bg', themeData.backdropBg);
     root.style.setProperty('--color-primary', themeData.primaryColor);

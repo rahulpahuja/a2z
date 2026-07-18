@@ -106,7 +106,7 @@ function VideoCard({ src, poster, title, description }) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6">
         <h3 className="font-title-sm text-title-sm text-white playfair mb-1">{title}</h3>
         <p className="font-body-sm text-body-sm text-white/80 line-clamp-2">{description}</p>
-        <div className="mt-3 flex items-center gap-1.5 text-primary-container font-label-caps text-[11px] uppercase tracking-wider">
+        <div className="mt-3 flex items-center gap-1.5 font-label-caps text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-primary)' }}>
           <span className="material-symbols-outlined text-[16px] animate-pulse">
             {isPaused ? 'play_arrow' : 'pause'}
           </span>
