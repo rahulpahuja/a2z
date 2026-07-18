@@ -280,7 +280,16 @@ export default function HomePage() {
 
         {/* Featured Products Row 1 */}
         <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
-          <h2 className="font-headline-md text-headline-md playfair text-center mb-12">Featured Elegance</h2>
+          <div className="relative mb-12">
+            <h2 className="font-headline-md text-headline-md playfair text-center">Featured Elegance</h2>
+            <Link
+              to="/products"
+              className="absolute right-0 top-1/2 -translate-y-1/2 font-label-caps text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+            >
+              View All
+              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </Link>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {productsRow1.map((product) => {
               const isFavorited = !!favorites[product.id];
@@ -344,7 +353,16 @@ export default function HomePage() {
 
         {/* Featured Products Row 2 */}
         <section className="py-16 px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
-          <h2 className="font-headline-md text-headline-md playfair text-center mb-12">Heritage Masterpieces</h2>
+          <div className="relative mb-12">
+            <h2 className="font-headline-md text-headline-md playfair text-center">Heritage Masterpieces</h2>
+            <Link
+              to="/products"
+              className="absolute right-0 top-1/2 -translate-y-1/2 font-label-caps text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+            >
+              View All
+              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </Link>
+          </div>
           <div className="relative group/arrows">
             {/* Left scroll navigation */}
             <button
