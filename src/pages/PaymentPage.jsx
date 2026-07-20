@@ -1,39 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
-import { getActivePaymentGateway } from '../services/paymentGateway.js';
+import { useToast } from '../context/ToastContext.jsx';
+import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, isTestMode } from '../services/razorpay.js';
+import { isValidAmount } from '../utils/security.js';
 
 const PAYMENT_METHODS = [
   { id: 'cod', label: 'Cash on Delivery', icon: 'payments' },
-  { id: 'card', label: 'Credit / Debit Card', icon: 'credit_card' },
-  { id: 'upi', label: 'UPI', icon: 'qr_code_2' },
+  { id: 'razorpay', label: 'Card / UPI / Netbanking', icon: 'credit_card' },
 ];
 
 export default function PaymentPage() {
   const { items: cartItems, placeOrder } = useCart();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('cod');
-  const [activeGateway, setActiveGateway] = useState(null);
-
-  useEffect(() => {
-    getActivePaymentGateway().then((gateway) => {
-      if (gateway) {
-        setActiveGateway(gateway);
-      }
-    });
-  }, []);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
-  const handlePlaceOrder = () => {
-    let methodLabel = PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.label ?? paymentMethod;
-    if (paymentMethod !== 'cod' && activeGateway) {
-      methodLabel = `${methodLabel} (via ${activeGateway.name})`;
+  const handlePlaceOrder = async () => {
+    if (paymentMethod === 'cod') {
+      placeOrder({ paymentMethod: 'Cash on Delivery', placedAt: new Date().toISOString() });
+      navigate('/orders/tracking');
+      return;
     }
-    placeOrder({ paymentMethod: methodLabel, placedAt: new Date().toISOString() });
-    navigate('/orders/tracking');
+
+    if (!isValidAmount(total)) {
+      showToast('This order amount looks invalid. Please refresh your cart and try again.');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const order = await createRazorpayOrder(total, `receipt_${Date.now()}`);
+      openRazorpayCheckout({
+        order,
+        name: 'A2Z Collection',
+        description: `Order payment · ${cartItems.length} item${cartItems.length > 1 ? 's' : ''}`,
+        onSuccess: async (response) => {
+          try {
+            const verification = await verifyRazorpayPayment(response);
+            if (!verification.success) {
+              showToast('Payment verification failed. Please contact support before retrying.');
+              return;
+            }
+            placeOrder({
+              paymentMethod: 'Razorpay',
+              paymentId: isTestMode ? `test_${response.razorpay_payment_id}` : response.razorpay_payment_id,
+              placedAt: new Date().toISOString(),
+            });
+            navigate('/orders/tracking');
+          } catch (err) {
+            showToast(err.message || 'Could not verify payment.');
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        onFailure: (error) => {
+          showToast(error?.description || 'Payment failed. Please try again.');
+          setIsProcessing(false);
+        },
+        onDismiss: () => {
+          showToast('Payment cancelled.');
+          setIsProcessing(false);
+        },
+      });
+    } catch (err) {
+      showToast(err.message || 'Could not start payment.');
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -105,68 +143,27 @@ export default function PaymentPage() {
               ))}
             </div>
 
-            {paymentMethod !== 'cod' && activeGateway && (
-              <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex flex-col gap-3 shadow-sm animate-fade-in">
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
-                  <div>
-                    <h3 className="font-semibold text-on-surface text-[14px]">
-                      Secure Checkout via {activeGateway.name}
-                    </h3>
-                    <p className="text-[11px] text-on-surface-variant mt-0.5">
-                      Payments are processed securely using your registered gateway configuration in Firebase.
-                    </p>
-                  </div>
+            {paymentMethod === 'razorpay' && (
+              <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex items-center gap-3 shadow-sm animate-fade-in">
+                <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
+                <div>
+                  <h3 className="font-semibold text-on-surface text-[14px]">
+                    Secure Checkout via Razorpay
+                  </h3>
+                  <p className="text-[11px] text-on-surface-variant mt-0.5">
+                    You'll be redirected to Razorpay's secure payment window to complete your purchase.
+                  </p>
                 </div>
-                
-                {/* Gateway config indicator */}
-                <div className="flex items-center gap-1.5 font-mono text-[10px] text-on-surface-variant bg-surface-container border border-outline-variant/30 rounded-lg p-2.5 w-fit">
-                  <span className="font-sans font-bold text-outline mr-1">GATEWAY KEY:</span>
-                  {activeGateway.apiKey.substring(0, 8)}...{activeGateway.apiKey.substring(activeGateway.apiKey.length - 4)}
-                </div>
-
-                {/* Simulated payment inputs for credit card */}
-                {paymentMethod === 'card' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 font-body-sm">
-                    <input
-                      type="text"
-                      placeholder="Card Number"
-                      className="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
-                    />
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="MM/YY"
-                        className="w-1/2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
-                      />
-                      <input
-                        type="password"
-                        placeholder="CVV"
-                        className="w-1/2 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Simulated payment inputs for UPI */}
-                {paymentMethod === 'upi' && (
-                  <div className="mt-2 font-body-sm flex gap-3 max-w-sm">
-                    <input
-                      type="text"
-                      placeholder="e.g. mobile@upi"
-                      className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-xs focus:border-primary focus:ring-0 text-on-surface"
-                    />
-                  </div>
-                )}
               </div>
             )}
 
             <div className="pt-8">
               <button
                 onClick={handlePlaceOrder}
-                className="w-full md:w-auto bg-primary text-on-primary font-label-caps text-label-caps uppercase px-8 py-4 rounded-[12px] hover:bg-primary/90 transition-colors duration-200 shadow-[0px_4px_10px_rgba(172,36,113,0.2)]"
+                disabled={isProcessing}
+                className="w-full md:w-auto bg-primary text-on-primary font-label-caps text-label-caps uppercase px-8 py-4 rounded-[12px] hover:bg-primary/90 transition-colors duration-200 shadow-[0px_4px_10px_rgba(172,36,113,0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Place Order
+                {isProcessing ? 'Processing…' : 'Place Order'}
               </button>
             </div>
           </div>

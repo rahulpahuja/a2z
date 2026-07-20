@@ -275,6 +275,9 @@ export default function OrderTrackingPage() {
             <div className="flex items-center gap-4">
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 Payment: <span className="font-semibold text-on-background">{liveOrder.paymentMethod}</span>
+                {liveOrder.paymentId && (
+                  <span className="ml-2 font-mono text-[11px] text-on-surface-variant">({liveOrder.paymentId})</span>
+                )}
               </p>
             </div>
           </div>

@@ -52,7 +52,7 @@ export function CartProvider({ children }) {
 
 
 
-  const placeOrder = ({ paymentMethod, placedAt }) => {
+  const placeOrder = ({ paymentMethod, paymentId, placedAt }) => {
     const subtotalAtOrder = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
     const taxAtOrder = subtotalAtOrder * 0.18;
     orderSequence += 1;
@@ -63,6 +63,7 @@ export function CartProvider({ children }) {
       tax: taxAtOrder,
       total: subtotalAtOrder + taxAtOrder,
       paymentMethod,
+      paymentId: paymentId || null,
       placedAt,
       shippingDetails,
       status: 'Processing',

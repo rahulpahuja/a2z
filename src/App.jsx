@@ -4,6 +4,7 @@ import EntryGate from './components/EntryGate.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
+import TamperWarningBanner from './components/TamperWarningBanner.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import StorefrontPage from './pages/StorefrontPage.jsx'
@@ -127,6 +128,7 @@ export default function App() {
             <LuxuryBackdrop />
             <ScrollToTop />
             <HoneypotLink />
+            <TamperWarningBanner />
             <Routes>
               {ROUTES.map(({ path, Component }) => (
                 <Route key={path} path={path} element={<Component />} />
