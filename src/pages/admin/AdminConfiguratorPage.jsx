@@ -745,17 +745,20 @@ export default function AdminConfiguratorPage() {
                   <input
                     id="hover-slide-interval"
                     type="number"
-                    min="200"
+                    min="700"
                     step="100"
                     value={form.productHoverSlideIntervalMs ?? 1800}
                     onChange={(e) => {
-                      const val = Math.max(200, Number(e.target.value));
+                      // Below 700ms interrupts the slide's own transition
+                      // (also 700ms) before it finishes, which looks like
+                      // rapid flickering instead of a clean cycle.
+                      const val = Math.max(700, Number(e.target.value));
                       handleChange('productHoverSlideIntervalMs', val);
                     }}
                     className="form-input text-[12px] py-2 px-3"
                   />
                   <p className="text-[10px] text-on-surface-variant/60 mt-1">
-                    How long each image stays visible once the auto-slide begins.
+                    How long each image stays visible once the auto-slide begins. Minimum 700ms — the slide transition itself takes that long.
                   </p>
                 </div>
               </div>

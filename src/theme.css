@@ -180,8 +180,8 @@ article.group:hover,
 .group.relative.bg-surface-container-low:hover,
 .group.relative.bg-surface-container-lowest:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(172, 36, 113, 0.08) !important;
-  border-color: rgba(172, 36, 113, 0.2) !important;
+  box-shadow: 0 20px 40px rgba(var(--color-primary-rgb, 172, 36, 113), 0.08) !important;
+  border-color: rgba(var(--color-primary-rgb, 172, 36, 113), 0.2) !important;
 }
 
 /* Float Animations for backdrop blobs */

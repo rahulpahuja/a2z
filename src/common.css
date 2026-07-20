@@ -208,7 +208,7 @@
 }
 
 .status-badge-primary {
-  background-color: rgba(172, 36, 113, 0.1);
+  background-color: rgba(var(--color-primary-rgb, 172, 36, 113), 0.1);
   color: var(--color-primary);
 }
 
