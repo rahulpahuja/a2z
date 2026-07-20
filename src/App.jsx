@@ -5,6 +5,7 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
 import TamperWarningBanner from './components/TamperWarningBanner.jsx'
+import TestModeNotice from './components/TestModeNotice.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import StorefrontPage from './pages/StorefrontPage.jsx'
@@ -121,39 +122,42 @@ function adminElement(Component) {
 
 export default function App() {
   return (
-    <BotGate>
-      <ProductsProvider>
-        <StorefrontThemeProvider>
-          <EntryGate>
-            <LuxuryBackdrop />
-            <ScrollToTop />
-            <HoneypotLink />
-            <TamperWarningBanner />
-            <Routes>
-              {ROUTES.map(({ path, Component }) => (
-                <Route key={path} path={path} element={<Component />} />
-              ))}
-              <Route
-                path="/dashboard"
-                element={
-                  <RequireAdmin>
-                    <DashboardPage />
-                  </RequireAdmin>
-                }
-              />
-              {ADMIN_ROUTES.map(({ path, Component }) => (
-                <Route key={path} path={path} element={adminElement(Component)} />
-              ))}
-              {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
-                <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
-              ))}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-            <FloatingContactButtons />
-            <SimulatedSmsToaster />
-          </EntryGate>
-        </StorefrontThemeProvider>
-      </ProductsProvider>
-    </BotGate>
+    <>
+      <TestModeNotice />
+      <BotGate>
+        <ProductsProvider>
+          <StorefrontThemeProvider>
+            <EntryGate>
+              <LuxuryBackdrop />
+              <ScrollToTop />
+              <HoneypotLink />
+              <TamperWarningBanner />
+              <Routes>
+                {ROUTES.map(({ path, Component }) => (
+                  <Route key={path} path={path} element={<Component />} />
+                ))}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <RequireAdmin>
+                      <DashboardPage />
+                    </RequireAdmin>
+                  }
+                />
+                {ADMIN_ROUTES.map(({ path, Component }) => (
+                  <Route key={path} path={path} element={adminElement(Component)} />
+                ))}
+                {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
+                  <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
+                ))}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+              <FloatingContactButtons />
+              <SimulatedSmsToaster />
+            </EntryGate>
+          </StorefrontThemeProvider>
+        </ProductsProvider>
+      </BotGate>
+    </>
   )
 }
