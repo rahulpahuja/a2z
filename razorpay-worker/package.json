@@ -1,0 +1,13 @@
+{
+  "name": "razorpay-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for Razorpay order creation and payment signature verification",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.60.0"
+  }
+}

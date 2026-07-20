@@ -4,6 +4,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import { subscribeToReferrers } from '../services/referrers.js';
 import { INDIAN_STATES_AND_UT, STATE_CITIES } from '../data/indiaData.js';
+import { sanitizeShippingForm, isValidGstNumber } from '../utils/security.js';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
@@ -83,12 +84,16 @@ export default function CheckoutShippingPage() {
       errorsMap.phone = 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9';
     }
 
+    if (form.gstNumber && !isValidGstNumber(form.gstNumber)) {
+      errorsMap.gstNumber = 'Please enter a valid 15-character GST number';
+    }
+
     if (Object.keys(errorsMap).length > 0) {
       setErrors(errorsMap);
       return;
     }
 
-    setShippingDetails(form);
+    setShippingDetails(sanitizeShippingForm(form));
     navigate('/checkout/payment');
   };
 
@@ -234,6 +239,7 @@ export default function CheckoutShippingPage() {
                   placeholder="For a GST invoice, e.g. 27ABCDE1234F1Z5"
                   value={form.gstNumber}
                   onChange={handleChange}
+                  error={errors.gstNumber}
                 />
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="referredBy">
