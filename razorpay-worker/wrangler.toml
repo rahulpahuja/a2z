@@ -5,7 +5,8 @@ compatibility_date = "2024-01-01"
 [vars]
 # Razorpay Key ID is a public identifier (also used by the frontend checkout
 # modal) and is safe to commit here — the Key Secret is not.
-RAZORPAY_KEY_ID = "rzp_test_TFk94wiS7UoIb0"
+#RAZORPAY_KEY_ID = "rzp_test_TFk94wiS7UoIb0"
+RAZORPAY_KEY_ID = "rzp_live_TFqdNz2HJEn8dW"
 
 # RAZORPAY_KEY_SECRET must NOT be set in this file (it's committed to git).
 # For local development, put it in `.dev.vars` (gitignored):
