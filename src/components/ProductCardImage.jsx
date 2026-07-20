@@ -12,12 +12,16 @@ export default function ProductCardImage({ images, alt, className = '', loading 
   const [index, setIndex] = useState(activeIndex);
   const startTimeout = useRef(null);
   const slideInterval = useRef(null);
+  const leaveTimeout = useRef(null);
+  const isHovering = useRef(false);
 
   const clearTimers = () => {
     clearTimeout(startTimeout.current);
     clearInterval(slideInterval.current);
+    clearTimeout(leaveTimeout.current);
     startTimeout.current = null;
     slideInterval.current = null;
+    leaveTimeout.current = null;
   };
 
   useEffect(() => clearTimers, []);
@@ -35,7 +39,14 @@ export default function ProductCardImage({ images, alt, className = '', loading 
   }
 
   const handleMouseEnter = () => {
-    clearTimers();
+    isHovering.current = true;
+    // Cancel a pending "actually left" reset from a just-prior blip instead
+    // of restarting the whole cycle — a scroll or edge-jitter mouseleave
+    // immediately followed by re-enter shouldn't interrupt an in-progress
+    // slide, or it gets stuck oscillating between the first two images.
+    clearTimeout(leaveTimeout.current);
+    leaveTimeout.current = null;
+    if (startTimeout.current || slideInterval.current) return;
     startTimeout.current = setTimeout(() => {
       slideInterval.current = setInterval(() => {
         setIndex((prev) => (prev + 1) % list.length);
@@ -44,8 +55,12 @@ export default function ProductCardImage({ images, alt, className = '', loading 
   };
 
   const handleMouseLeave = () => {
-    clearTimers();
-    setIndex(activeIndex);
+    isHovering.current = false;
+    leaveTimeout.current = setTimeout(() => {
+      if (isHovering.current) return;
+      clearTimers();
+      setIndex(activeIndex);
+    }, 250);
   };
 
   return (
