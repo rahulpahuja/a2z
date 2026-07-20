@@ -2,12 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import ProductImage from './ProductImage.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 
+// Each slide's CSS transform transition (below) takes this long. An admin-
+// configured interval shorter than this interrupts every slide mid-motion
+// before it finishes, which reads as rapid flickering rather than a cycle.
+const SLIDE_TRANSITION_MS = 700;
+
 export default function ProductCardImage({ images, alt, className = '', loading = 'lazy', activeIndex = 0 }) {
   const { theme } = useStorefrontTheme();
   // After this many ms of continuous hover, start auto-sliding through the
   // product's other images (one slide in from the right per interval).
   const startDelayMs = Number(theme?.productHoverSlideDelayMs) || 1000;
-  const slideIntervalMs = Number(theme?.productHoverSlideIntervalMs) || 1800;
+  const slideIntervalMs = Math.max(Number(theme?.productHoverSlideIntervalMs) || 1800, SLIDE_TRANSITION_MS);
   const list = (images ?? []).filter(Boolean);
   const [index, setIndex] = useState(activeIndex);
   const startTimeout = useRef(null);
@@ -72,7 +77,7 @@ export default function ProductCardImage({ images, alt, className = '', loading 
           alt={alt}
           loading={loading}
           className={`absolute inset-0 ${className}`}
-          style={{ transform: `translateX(${(i - index) * 100}%)`, transition: 'transform 700ms ease-in-out' }}
+          style={{ transform: `translateX(${(i - index) * 100}%)`, transition: `transform ${SLIDE_TRANSITION_MS}ms ease-in-out` }}
         />
       ))}
     </div>

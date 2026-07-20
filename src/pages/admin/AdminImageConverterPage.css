@@ -2,7 +2,7 @@
 
 .dropzone-active {
   border-color: var(--color-primary);
-  background-color: rgba(172, 36, 113, 0.05);
+  background-color: rgba(var(--color-primary-rgb, 172, 36, 113), 0.05);
 }
 
 .converter-file-row {
@@ -33,7 +33,7 @@
 }
 
 .test-badge-running {
-  background-color: rgba(172, 36, 113, 0.1);
+  background-color: rgba(var(--color-primary-rgb, 172, 36, 113), 0.1);
   color: var(--color-primary);
-  border: 1px solid rgba(172, 36, 113, 0.2);
+  border: 1px solid rgba(var(--color-primary-rgb, 172, 36, 113), 0.2);
 }

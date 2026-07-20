@@ -30,8 +30,8 @@ export default function LuxuryBackdrop() {
         className="absolute inset-0 opacity-[0.25] transition-opacity duration-500"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(172, 36, 113, 0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(172, 36, 113, 0.04) 1px, transparent 1px)
+            linear-gradient(to right, rgba(var(--color-primary-rgb, 172, 36, 113), 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(var(--color-primary-rgb, 172, 36, 113), 0.04) 1px, transparent 1px)
           `,
           backgroundSize: '80px 80px',
         }}
@@ -42,7 +42,7 @@ export default function LuxuryBackdrop() {
       <div className="absolute right-[10%] top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
 
       {/* Floating Animated Mesh Gradient Blobs */}
-      {/* Pink/Rani Pink Glow */}
+      {/* Primary Brand Color Glow */}
       <div className="absolute top-[-10%] left-[5%] w-[600px] h-[600px] rounded-full bg-primary/[0.06] blur-[120px] animate-float-slow-1" />
 
       {/* Sage Green Glow */}
@@ -54,7 +54,7 @@ export default function LuxuryBackdrop() {
       {/* Interactive Cursor Spotlight */}
       {isHovered && (
         <div
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,176,208,0.08)_0%,rgba(201,238,169,0.04)_50%,transparent_100%)] blur-[50px] transition-opacity duration-300 pointer-events-none"
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(var(--color-primary-rgb,172,36,113),0.08)_0%,rgba(201,238,169,0.04)_50%,transparent_100%)] blur-[50px] transition-opacity duration-300 pointer-events-none"
           style={{
             left: `${mousePos.x}px`,
             top: `${mousePos.y}px`,
