@@ -173,9 +173,12 @@ export default function AdminSalesPage() {
 
   // Aggregate stats
   const stats = useMemo(() => {
-    const totalRev = allOrders.reduce((sum, o) => sum + o.total, 0);
+    // Cancelled orders never generated revenue, so they're excluded from
+    // revenue/AOV — but still counted in "Total Orders" since they did happen.
+    const revenueOrders = allOrders.filter((o) => o.status !== 'Cancelled');
+    const totalRev = revenueOrders.reduce((sum, o) => sum + o.total, 0);
     const totalOrders = allOrders.length;
-    const aov = totalOrders > 0 ? totalRev / totalOrders : 0;
+    const aov = revenueOrders.length > 0 ? totalRev / revenueOrders.length : 0;
     
     // Find top category by units sold in orders
     const categorySales = {};
@@ -213,7 +216,7 @@ export default function AdminSalesPage() {
       const date = new Date(order.placedAt);
       const dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       if (data[dateStr] !== undefined) {
-        data[dateStr].revenue += order.total;
+        if (order.status !== 'Cancelled') data[dateStr].revenue += order.total;
         data[dateStr].orders.push(order);
       }
     });
@@ -237,7 +240,7 @@ export default function AdminSalesPage() {
       const date = new Date(order.placedAt);
       if (date.getFullYear() === 2026) {
         const monthLabel = months[date.getMonth()];
-        data[monthLabel].revenue += order.total;
+        if (order.status !== 'Cancelled') data[monthLabel].revenue += order.total;
         data[monthLabel].orders.push(order);
       }
     });
@@ -268,7 +271,7 @@ export default function AdminSalesPage() {
         else if (month >= 6 && month <= 8) qKey = 'Q3 (Jul-Sep)';
         else if (month >= 9 && month <= 11) qKey = 'Q4 (Oct-Dec)';
 
-        data[qKey].revenue += order.total;
+        if (order.status !== 'Cancelled') data[qKey].revenue += order.total;
         data[qKey].orders.push(order);
       }
     });

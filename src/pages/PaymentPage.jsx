@@ -5,16 +5,10 @@ import { useToast } from '../context/ToastContext.jsx';
 import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, isTestMode } from '../services/razorpay.js';
 import { isValidAmount } from '../utils/security.js';
 
-const PAYMENT_METHODS = [
-  { id: 'cod', label: 'Cash on Delivery', icon: 'payments' },
-  { id: 'razorpay', label: 'Card / UPI / Netbanking', icon: 'credit_card' },
-];
-
 export default function PaymentPage() {
   const { items: cartItems, placeOrder } = useCart();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -22,12 +16,6 @@ export default function PaymentPage() {
   const total = subtotal + tax;
 
   const handlePlaceOrder = async () => {
-    if (paymentMethod === 'cod') {
-      placeOrder({ paymentMethod: 'Cash on Delivery', placedAt: new Date().toISOString() });
-      navigate('/orders/tracking');
-      return;
-    }
-
     if (!isValidAmount(total)) {
       showToast('This order amount looks invalid. Please refresh your cart and try again.');
       return;
@@ -121,41 +109,22 @@ export default function PaymentPage() {
             <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-8 text-on-surface">
               Payment Method
             </h1>
-            <div className="space-y-4">
-              {PAYMENT_METHODS.map((method) => (
-                <label
-                  key={method.id}
-                  className={`flex items-center gap-4 border rounded-[12px] px-6 py-4 cursor-pointer transition-colors ${
-                    paymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-primary'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value={method.id}
-                    checked={paymentMethod === method.id}
-                    onChange={() => setPaymentMethod(method.id)}
-                    className="w-5 h-5 text-primary focus:ring-primary"
-                  />
-                  <span className="material-symbols-outlined text-on-surface-variant">{method.icon}</span>
-                  <span className="font-title-sm text-title-sm text-on-surface">{method.label}</span>
-                </label>
-              ))}
+            <div className="flex items-center gap-4 border border-primary bg-primary/5 rounded-[12px] px-6 py-4">
+              <span className="material-symbols-outlined text-on-surface-variant">credit_card</span>
+              <span className="font-title-sm text-title-sm text-on-surface">Card / UPI / Netbanking</span>
             </div>
 
-            {paymentMethod === 'razorpay' && (
-              <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex items-center gap-3 shadow-sm animate-fade-in">
-                <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
-                <div>
-                  <h3 className="font-semibold text-on-surface text-[14px]">
-                    Secure Checkout via Razorpay
-                  </h3>
-                  <p className="text-[11px] text-on-surface-variant mt-0.5">
-                    You'll be redirected to Razorpay's secure payment window to complete your purchase.
-                  </p>
-                </div>
+            <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex items-center gap-3 shadow-sm">
+              <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
+              <div>
+                <h3 className="font-semibold text-on-surface text-[14px]">
+                  Secure Checkout via Razorpay
+                </h3>
+                <p className="text-[11px] text-on-surface-variant mt-0.5">
+                  You'll be redirected to Razorpay's secure payment window to complete your purchase.
+                </p>
               </div>
-            )}
+            </div>
 
             <div className="pt-8">
               <button
