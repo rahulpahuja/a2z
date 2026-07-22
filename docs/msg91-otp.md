@@ -58,6 +58,10 @@ resetOtpSession()                        // clears the cached reqId (call when t
 
 `reqId` defaults to the value cached by the last `sendOtp()` call, so most callers don't need to pass it explicitly — it's only relevant if you're running more than one OTP verification concurrently in the same session.
 
+## Troubleshooting
+
+- **`window.sendOtp is not a function`** — MSG91's widget attaches `sendOtp`/`retryOtp`/`verifyOtp` to `window` asynchronously after `initSendOTP()` runs; there's no ready-callback for it. `msg91Otp.js` polls for up to 15s after calling `initSendOTP` before resolving, and calls `initSendOTP` **at most once per page load** — retrying it (e.g. after a timeout) re-renders the widget's captcha into an already-rendered container, which breaks `hCaptcha` and leaves `window.sendOtp` undefined (you'll also see a `hCaptcha was already rendered. You may want to call 'reset()' first.` console warning when this happens). If you still hit this after the fix, do a hard refresh/restart of the dev server and check that `VITE_MSG91_WIDGET_ID`/`VITE_MSG91_TOKEN_AUTH` are correct and that `verify.msg91.com` isn't blocked (ad blocker/network).
+
 ## Notes / limitations
 
 - MSG91 verification does not produce a Firebase user — the resulting `user` object is a lightweight local record (`{ uid: 'msg91:<identifier>', phoneNumber, provider: 'msg91' }`), sufficient for the storefront's "logged in as / my orders" UI but not a Firebase-authenticated identity. If a backend needs to trust this login, verify the MSG91 `reqId`/token server-side rather than trusting the client-stored session.

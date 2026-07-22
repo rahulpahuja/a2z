@@ -11,13 +11,40 @@ const TOKEN_AUTH = import.meta.env.VITE_MSG91_TOKEN_AUTH || '';
 // blank to run without MSG91 (callers should fall back to another OTP path).
 export const isMsg91Enabled = Boolean(WIDGET_ID && TOKEN_AUTH);
 
+let scriptLoadPromise = null;
 let widgetReadyPromise = null;
+let initCalled = false;
 let lastReqId = null;
 
 function normalizeError(error) {
   if (error instanceof Error) return error;
   const message = typeof error === 'string' ? error : error?.message || 'OTP request failed.';
   return new Error(message);
+}
+
+// initSendOTP() kicks off an async call to MSG91 to validate the widget/token
+// and only attaches window.sendOtp/retryOtp/verifyOtp once that resolves —
+// there's no ready callback in their docs, so we poll for it.
+function waitForExposedMethods(timeoutMs = 15000, intervalMs = 100) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const check = () => {
+      if (typeof window.sendOtp === 'function' && typeof window.verifyOtp === 'function' && typeof window.retryOtp === 'function') {
+        resolve();
+        return;
+      }
+      if (Date.now() - start > timeoutMs) {
+        reject(
+          new Error(
+            'MSG91 OTP widget did not initialize in time. Check VITE_MSG91_WIDGET_ID / VITE_MSG91_TOKEN_AUTH and that verify.msg91.com is reachable.'
+          )
+        );
+        return;
+      }
+      setTimeout(check, intervalMs);
+    };
+    check();
+  });
 }
 
 function buildConfiguration(captchaRenderId) {
@@ -31,8 +58,34 @@ function buildConfiguration(captchaRenderId) {
   };
 }
 
-// Injects the widget script (once) and calls initSendOTP. Resolves once
-// window.sendOtp/retryOtp/verifyOtp are ready to use.
+// Injects the widget script exactly once. Resolves once window.initSendOTP exists.
+function loadScript() {
+  if (scriptLoadPromise) return scriptLoadPromise;
+
+  scriptLoadPromise = new Promise((resolve, reject) => {
+    if (typeof window.initSendOTP === 'function') {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = WIDGET_SCRIPT_URL;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load the MSG91 OTP widget script.'));
+    document.body.appendChild(script);
+  }).catch((err) => {
+    scriptLoadPromise = null;
+    throw err;
+  });
+
+  return scriptLoadPromise;
+}
+
+// Loads the script and calls initSendOTP (at most once per page load — calling
+// it again re-renders the captcha into an already-rendered container and
+// breaks hCaptcha/window.sendOtp). Resolves once window.sendOtp/retryOtp/verifyOtp
+// are ready to use.
 export function loadMsg91Widget({ captchaRenderId } = {}) {
   if (!isMsg91Enabled) {
     return Promise.reject(
@@ -41,29 +94,20 @@ export function loadMsg91Widget({ captchaRenderId } = {}) {
   }
   if (widgetReadyPromise) return widgetReadyPromise;
 
-  widgetReadyPromise = new Promise((resolve, reject) => {
-    const init = () => {
-      try {
+  widgetReadyPromise = loadScript()
+    .then(() => {
+      if (!initCalled) {
+        initCalled = true;
         window.initSendOTP(buildConfiguration(captchaRenderId));
-        resolve();
-      } catch (err) {
-        reject(err);
       }
-    };
-
-    if (typeof window.initSendOTP === 'function') {
-      init();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = WIDGET_SCRIPT_URL;
-    script.async = true;
-    script.onload = init;
-    script.onerror = () => reject(new Error('Failed to load the MSG91 OTP widget script.'));
-    document.body.appendChild(script);
-  });
+      return waitForExposedMethods();
+    })
+    .catch((err) => {
+      // Safe to retry the wait (or the script load, if that's what failed) —
+      // but never retry initSendOTP itself once it's been called.
+      widgetReadyPromise = null;
+      throw err;
+    });
 
   return widgetReadyPromise;
 }
