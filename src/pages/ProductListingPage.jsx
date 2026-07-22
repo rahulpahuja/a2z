@@ -409,6 +409,8 @@ export default function ProductListingPage() {
                         backgroundColor: 'var(--custom-backdrop-bg, var(--color-surface-container-lowest, #ffffff))',
                         backdropFilter: 'var(--custom-backdrop-filter, none)',
                         overflow: 'hidden',
+                        width: 'var(--custom-listing-img-size, 100%)',
+                        marginInline: 'auto',
                       }}
                     >
                       <Link

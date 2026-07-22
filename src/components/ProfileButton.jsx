@@ -2,20 +2,24 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
+import { useProfile } from '../context/ProfileContext.jsx';
 import { subscribeToOrders } from '../services/orders.js';
 import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import AuthModal from './AuthModal.jsx';
+import ProfileModal from './ProfileModal.jsx';
 
-function displayName(user) {
-  return user.displayName || user.email || user.phoneNumber || 'Account';
+function displayName(user, profile) {
+  return profile?.displayName || user.displayName || user.email || user.phoneNumber || 'Account';
 }
 
 export default function ProfileButton({ className = '', iconClassName = 'material-symbols-outlined' }) {
   const { user, isAdmin, signOutUser } = useAuth();
+  const { profile } = useProfile();
   const { trackSpecificOrder } = useCart();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [userOrders, setUserOrders] = useState([]);
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
             <div className="px-4 py-2 border-b border-outline-variant/60">
               <p className="font-body-sm text-[12px] text-on-surface-variant font-medium">Logged in as</p>
               <p className="font-body-sm text-body-sm text-on-surface font-semibold truncate mt-0.5">
-                {displayName(user)}
+                {displayName(user, profile)}
               </p>
             </div>
             
@@ -154,6 +158,17 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
 
             {/* Menu options */}
             <div className="border-t border-outline-variant/60 mt-1 pt-1 flex flex-col">
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setProfileModalOpen(true);
+                }}
+                className="flex items-center gap-2 w-full text-left px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px]">edit</span>
+                Edit Profile
+              </button>
               {isAdmin && (
                 <Link
                   to="/dashboard"
@@ -181,6 +196,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
           </div>
         </>
       )}
+      {profileModalOpen && <ProfileModal onClose={() => setProfileModalOpen(false)} />}
     </div>
   );
 }
