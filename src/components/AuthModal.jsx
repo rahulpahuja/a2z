@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { loadMsg91Widget } from '../services/msg91Otp.js';
-
-// Doubles as the Firebase RecaptchaVerifier container and the MSG91 widget's
-// captchaRenderId, depending on which OTP provider is active.
-const OTP_WIDGET_CONTAINER_ID = 'otp-widget-container';
+import { OTP_WIDGET_CONTAINER_ID, OTP_WIDGET_HOST_ID } from './OtpCaptchaHost.jsx';
 
 function GoogleIcon() {
   return (
@@ -37,6 +34,8 @@ export default function AuthModal({ onClose, dismissible = true }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [resendMessage, setResendMessage] = useState('');
+  const captchaSlotRef = useRef(null);
+  const relocatedNodeRef = useRef(null);
 
   // Initialize the MSG91 widget (and render its captcha checkbox into
   // OTP_WIDGET_CONTAINER_ID) as soon as the modal opens, so the captcha is
@@ -48,6 +47,28 @@ export default function AuthModal({ onClose, dismissible = true }) {
       // Surfaced properly later when sendOtp() is actually called.
     });
   }, [isMsg91Enabled]);
+
+  // Physically move the persistent captcha DOM node (owned by OtpCaptchaHost,
+  // mounted once at the app root) into this modal while it's open, and move
+  // it back on close — never destroy/recreate it, so a rendered captcha
+  // survives the modal being closed and reopened. useLayoutEffect's cleanup
+  // runs synchronously before React removes this modal's DOM, so the move-out
+  // always completes before the node would otherwise be torn down with it.
+  useLayoutEffect(() => {
+    const node = document.getElementById(OTP_WIDGET_CONTAINER_ID);
+    const slot = captchaSlotRef.current;
+    if (!node || !slot) return undefined;
+    slot.appendChild(node);
+    relocatedNodeRef.current = node;
+
+    return () => {
+      const host = document.getElementById(OTP_WIDGET_HOST_ID);
+      if (host && relocatedNodeRef.current) {
+        host.appendChild(relocatedNodeRef.current);
+      }
+      relocatedNodeRef.current = null;
+    };
+  }, []);
 
   const handleGoogle = async () => {
     setBusy(true);
@@ -226,7 +247,7 @@ export default function AuthModal({ onClose, dismissible = true }) {
 
         {error && <p className="font-body-sm text-body-sm text-error mt-4">{error}</p>}
 
-        <div id={OTP_WIDGET_CONTAINER_ID} />
+        <div ref={captchaSlotRef} />
       </div>
     </div>
   );
