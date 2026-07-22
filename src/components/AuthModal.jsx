@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { loadMsg91Widget } from '../services/msg91Otp.js';
 
 // Doubles as the Firebase RecaptchaVerifier container and the MSG91 widget's
 // captchaRenderId, depending on which OTP provider is active.
@@ -36,6 +37,17 @@ export default function AuthModal({ onClose, dismissible = true }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [resendMessage, setResendMessage] = useState('');
+
+  // Initialize the MSG91 widget (and render its captcha checkbox into
+  // OTP_WIDGET_CONTAINER_ID) as soon as the modal opens, so the captcha is
+  // ready before the user finishes typing their phone number — not only
+  // after they click "Send OTP".
+  useEffect(() => {
+    if (!isMsg91Enabled) return;
+    loadMsg91Widget({ captchaRenderId: OTP_WIDGET_CONTAINER_ID }).catch(() => {
+      // Surfaced properly later when sendOtp() is actually called.
+    });
+  }, [isMsg91Enabled]);
 
   const handleGoogle = async () => {
     setBusy(true);
