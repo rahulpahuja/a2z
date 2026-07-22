@@ -8,8 +8,51 @@ import {
   signOut,
 } from 'firebase/auth';
 import { auth, isFirebaseEnabled } from '../firebase.js';
+import {
+  isMsg91Enabled,
+  sendOtp as msg91SendOtp,
+  retryOtp as msg91RetryOtp,
+  verifyOtp as msg91VerifyOtp,
+  resetOtpSession as resetMsg91OtpSession,
+} from '../services/msg91Otp.js';
 
 const AuthContext = createContext(null);
+
+const MSG91_SESSION_KEY = 'a2z_msg91_session';
+const MSG91_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+function readMsg91Session() {
+  try {
+    const raw = localStorage.getItem(MSG91_SESSION_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    if (!session?.verifiedAt || Date.now() - session.verifiedAt > MSG91_SESSION_TTL_MS) {
+      localStorage.removeItem(MSG91_SESSION_KEY);
+      return null;
+    }
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+function writeMsg91Session(session) {
+  localStorage.setItem(MSG91_SESSION_KEY, JSON.stringify(session));
+}
+
+function clearMsg91Session() {
+  localStorage.removeItem(MSG91_SESSION_KEY);
+}
+
+function msg91SessionToUser(session) {
+  return {
+    uid: `msg91:${session.identifier}`,
+    phoneNumber: session.phoneNumber,
+    displayName: null,
+    email: null,
+    provider: 'msg91',
+  };
+}
 
 const _ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '')
   .split(',')
@@ -29,6 +72,8 @@ const _FIREBASE_DISABLED_MESSAGE = 'Sign-in is not configured yet. Add Firebase 
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
+    const msg91Session = readMsg91Session();
+    if (msg91Session) return msg91SessionToUser(msg91Session);
     if (!isFirebaseEnabled) {
       return {
         uid: 'mock-admin',
@@ -42,11 +87,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(isFirebaseEnabled);
   const confirmationRef = useRef(null);
   const recaptchaRef = useRef(null);
+  const pendingIdentifierRef = useRef(null);
 
   useEffect(() => {
     if (!isFirebaseEnabled) return undefined;
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser);
+      // Don't let Firebase's initial null callback clobber a live MSG91 session.
+      if (nextUser || !readMsg91Session()) {
+        setUser(nextUser);
+      }
       setLoading(false);
     });
     return unsubscribe;
@@ -73,6 +122,12 @@ export function AuthProvider({ children }) {
   };
 
   const sendOtp = async (phoneNumber, containerId) => {
+    if (isMsg91Enabled) {
+      const identifier = phoneNumber.replace(/^\+/, '');
+      pendingIdentifierRef.current = phoneNumber;
+      return msg91SendOtp(identifier, containerId);
+    }
+
     if (!isFirebaseEnabled) {
       confirmationRef.current = {
         confirm: async (code) => {
@@ -95,6 +150,22 @@ export function AuthProvider({ children }) {
   };
 
   const confirmOtp = async (code) => {
+    if (isMsg91Enabled) {
+      const data = await msg91VerifyOtp(code);
+      const identifier = pendingIdentifierRef.current;
+      const session = {
+        identifier,
+        phoneNumber: identifier,
+        token: data?.message || null,
+        verifiedAt: Date.now(),
+      };
+      writeMsg91Session(session);
+      setUser(msg91SessionToUser(session));
+      resetMsg91OtpSession();
+      pendingIdentifierRef.current = null;
+      return;
+    }
+
     if (!confirmationRef.current) {
       throw new Error('Request a code before confirming.');
     }
@@ -102,14 +173,26 @@ export function AuthProvider({ children }) {
     confirmationRef.current = null;
   };
 
+  const retryOtp = async (channel = null) => {
+    if (!isMsg91Enabled) {
+      throw new Error('Resend is only available when MSG91 OTP is configured.');
+    }
+    return msg91RetryOtp(channel);
+  };
+
   const resetPhoneFlow = () => {
     confirmationRef.current = null;
     recaptchaRef.current?.clear();
     recaptchaRef.current = null;
+    pendingIdentifierRef.current = null;
+    resetMsg91OtpSession();
   };
 
   const signOutUser = () => {
+    const hadMsg91Session = Boolean(readMsg91Session());
+    clearMsg91Session();
     if (isFirebaseEnabled) {
+      if (hadMsg91Session) setUser(null);
       return signOut(auth);
     } else {
       setUser(null);
@@ -122,9 +205,11 @@ export function AuthProvider({ children }) {
       user,
       loading,
       isAdmin: computeIsAdmin(user),
+      isMsg91Enabled,
       signInWithGoogle,
       sendOtp,
       confirmOtp,
+      retryOtp,
       resetPhoneFlow,
       signOutUser,
     }),

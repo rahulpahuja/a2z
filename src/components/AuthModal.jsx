@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const RECAPTCHA_CONTAINER_ID = 'recaptcha-container';
+// Doubles as the Firebase RecaptchaVerifier container and the MSG91 widget's
+// captchaRenderId, depending on which OTP provider is active.
+const OTP_WIDGET_CONTAINER_ID = 'otp-widget-container';
 
 function GoogleIcon() {
   return (
@@ -27,12 +29,13 @@ function GoogleIcon() {
 }
 
 export default function AuthModal({ onClose, dismissible = true }) {
-  const { signInWithGoogle, sendOtp, confirmOtp, resetPhoneFlow } = useAuth();
+  const { signInWithGoogle, sendOtp, confirmOtp, retryOtp, resetPhoneFlow, isMsg91Enabled } = useAuth();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState('start'); // 'start' | 'otp'
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [resendMessage, setResendMessage] = useState('');
 
   const handleGoogle = async () => {
     setBusy(true);
@@ -59,10 +62,24 @@ export default function AuthModal({ onClose, dismissible = true }) {
     setBusy(true);
     setError('');
     try {
-      await sendOtp('+91' + cleaned, RECAPTCHA_CONTAINER_ID);
+      await sendOtp('+91' + cleaned, OTP_WIDGET_CONTAINER_ID);
       setStep('otp');
     } catch (err) {
       setError(err.message || 'Could not send the code. Check the number and try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setBusy(true);
+    setError('');
+    setResendMessage('');
+    try {
+      await retryOtp(null);
+      setResendMessage('Code resent.');
+    } catch (err) {
+      setError(err.message || 'Could not resend the code.');
     } finally {
       setBusy(false);
     }
@@ -85,6 +102,7 @@ export default function AuthModal({ onClose, dismissible = true }) {
   const handleChangeNumber = () => {
     resetPhoneFlow();
     setOtp('');
+    setResendMessage('');
     setStep('start');
   };
 
@@ -169,19 +187,34 @@ export default function AuthModal({ onClose, dismissible = true }) {
             >
               Verify &amp; Sign In
             </button>
-            <button
-              type="button"
-              onClick={handleChangeNumber}
-              className="font-body-sm text-body-sm text-primary hover:underline self-center mt-1"
-            >
-              Use a different number
-            </button>
+            <div className="flex items-center justify-center gap-4 mt-1">
+              {isMsg91Enabled && (
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={busy}
+                  className="font-body-sm text-body-sm text-primary hover:underline disabled:opacity-50"
+                >
+                  Resend code
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleChangeNumber}
+                className="font-body-sm text-body-sm text-primary hover:underline"
+              >
+                Use a different number
+              </button>
+            </div>
+            {resendMessage && (
+              <p className="font-body-sm text-body-sm text-secondary text-center">{resendMessage}</p>
+            )}
           </form>
         )}
 
         {error && <p className="font-body-sm text-body-sm text-error mt-4">{error}</p>}
 
-        <div id={RECAPTCHA_CONTAINER_ID} />
+        <div id={OTP_WIDGET_CONTAINER_ID} />
       </div>
     </div>
   );
