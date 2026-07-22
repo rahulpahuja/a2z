@@ -54,6 +54,7 @@ import { ProductsProvider } from './context/ProductsContext.jsx'
 import { StorefrontThemeProvider } from './context/StorefrontThemeContext.jsx'
 import LuxuryBackdrop from './components/LuxuryBackdrop.jsx'
 import SimulatedSmsToaster from './components/SimulatedSmsToaster.jsx'
+import OtpCaptchaHost from './components/OtpCaptchaHost.jsx'
 
 const ROUTES = [
   { path: '/', Component: HomePage },
@@ -154,6 +155,7 @@ export default function App() {
               </Routes>
               <FloatingContactButtons />
               <SimulatedSmsToaster />
+              <OtpCaptchaHost />
             </EntryGate>
           </StorefrontThemeProvider>
         </ProductsProvider>
