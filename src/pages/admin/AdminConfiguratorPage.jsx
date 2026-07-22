@@ -89,6 +89,7 @@ export default function AdminConfiguratorPage() {
       // Test Case 1: Write Custom Parameters & Validate state
       const testParameters = {
         listingImgAspect: '16/9',
+        listingImgSize: '80%',
         detailImgAspect: '1/1',
         galleryThumbW: '72px',
         galleryThumbH: '90px',
@@ -128,6 +129,11 @@ export default function AdminConfiguratorPage() {
         return value === '16/9';
       });
 
+      assert('DOM Root contains correct --custom-listing-img-size value', () => {
+        const value = document.documentElement.style.getPropertyValue('--custom-listing-img-size');
+        return value === '80%';
+      });
+
       assert('DOM Root contains correct --custom-border-radius value', () => {
         const value = document.documentElement.style.getPropertyValue('--custom-border-radius');
         return value === '20px';
@@ -163,6 +169,11 @@ export default function AdminConfiguratorPage() {
       assert('Resetting parameters restores default --custom-listing-img-aspect value', () => {
         const value = document.documentElement.style.getPropertyValue('--custom-listing-img-aspect');
         return value === DEFAULT_THEME.listingImgAspect;
+      });
+
+      assert('Resetting parameters restores default --custom-listing-img-size value', () => {
+        const value = document.documentElement.style.getPropertyValue('--custom-listing-img-size');
+        return value === DEFAULT_THEME.listingImgSize;
       });
 
       assert('Resetting parameters restores default --custom-border-radius value', () => {
@@ -295,6 +306,25 @@ export default function AdminConfiguratorPage() {
                     <option value="4/3">Landscape (4:3)</option>
                     <option value="16/9">Widescreen (16:9)</option>
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="listing-img-size">
+                    Listing Grid Card Size
+                  </label>
+                  <select
+                    id="listing-img-size"
+                    value={form.listingImgSize || '100%'}
+                    onChange={(e) => handleChange('listingImgSize', e.target.value)}
+                    className="form-select text-[12px] py-2 px-3"
+                  >
+                    <option value="80%">Small (80%)</option>
+                    <option value="90%">Medium (90%)</option>
+                    <option value="100%">Full Width (Default)</option>
+                  </select>
+                  <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                    Shrinks the whole product card (image, title, price) within its grid cell — the card gets smaller, nothing crops or bleeds. To make cards bigger, reduce &quot;Desktop Grid columns&quot; below instead.
+                  </p>
                 </div>
 
                 <div className="form-group">
@@ -1083,22 +1113,24 @@ export default function AdminConfiguratorPage() {
                       {Array.from({ length: form.gridCols || 4 }).map((_, i) => (
                         <div 
                           key={i}
-                          className="flex flex-col transition-all duration-300 w-full shadow-md animate-fade-in"
+                          className="flex flex-col transition-all duration-300 shadow-md animate-fade-in"
                           style={{
                             borderRadius: form.borderRadius,
                             borderWidth: form.borderWidth,
                             borderColor: form.borderColor,
                             borderStyle: 'solid',
-                            backgroundColor: form.themeMode === 'dark' 
-                              ? '#1e1e1e' 
-                              : form.themeMode === 'midnight' 
-                                ? '#0b0f19' 
+                            backgroundColor: form.themeMode === 'dark'
+                              ? '#1e1e1e'
+                              : form.themeMode === 'midnight'
+                                ? '#0b0f19'
                                 : 'var(--color-surface-container-lowest, #ffffff)',
                             overflow: 'hidden',
+                            width: form.listingImgSize || '100%',
+                            marginInline: 'auto',
                           }}
                         >
-                          <div 
-                            className="preview-aspect-box"
+                          <div
+                            className="preview-aspect-box w-full"
                             style={{
                               aspectRatio: form.listingImgAspect,
                               borderRadius: '0px',

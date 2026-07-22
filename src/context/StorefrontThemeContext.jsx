@@ -7,6 +7,7 @@ const StorefrontThemeContext = createContext(null);
 export const DEFAULT_THEME = {
   // Sizing
   listingImgAspect: '3/4',    // '3/4', '1/1', '16/9', '4/3'
+  listingImgSize: '100%',     // '80%' small, '90%' medium, '100%' full width (default) — scales the whole card
   detailImgAspect: '3/4',     // '3/4', '1/1', '16/9', '4/3'
   galleryThumbW: '64px',
   galleryThumbH: '80px',
@@ -92,6 +93,7 @@ function hexToRgb(hex) {
 const applyThemeToDom = (themeData) => {
   const root = document.documentElement;
   root.style.setProperty('--custom-listing-img-aspect', themeData.listingImgAspect);
+  root.style.setProperty('--custom-listing-img-size', themeData.listingImgSize || '100%');
   root.style.setProperty('--custom-detail-img-aspect', themeData.detailImgAspect);
   root.style.setProperty('--custom-gallery-thumb-w', themeData.galleryThumbW);
   root.style.setProperty('--custom-gallery-thumb-h', themeData.galleryThumbH);

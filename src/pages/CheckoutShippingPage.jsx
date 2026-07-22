@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import { subscribeToReferrers } from '../services/referrers.js';
 import { INDIAN_STATES_AND_UT, STATE_CITIES } from '../data/indiaData.js';
 import { sanitizeShippingForm, isValidGstNumber } from '../utils/security.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useProfile } from '../context/ProfileContext.jsx';
+import AuthModal from '../components/AuthModal.jsx';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
@@ -31,6 +34,8 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange, err
 
 export default function CheckoutShippingPage() {
   const { items: cartItems, setShippingDetails } = useCart();
+  const { user } = useAuth();
+  const { profile, saveAddress } = useProfile();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: '',
@@ -46,11 +51,29 @@ export default function CheckoutShippingPage() {
   });
   const [referrers, setReferrers] = useState([]);
   const [errors, setErrors] = useState({});
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [saveAddressChecked, setSaveAddressChecked] = useState(true);
+  const prefilledRef = useRef(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToReferrers((rows) => setReferrers(rows));
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (prefilledRef.current) return;
+    const addresses = profile.addresses || [];
+    if (addresses.length === 0) return;
+    const defaultAddress = addresses[0];
+    setForm((prev) => ({ ...prev, ...defaultAddress }));
+    setSelectedAddressId(defaultAddress.id);
+    prefilledRef.current = true;
+  }, [profile.addresses]);
+
+  const applySavedAddress = (addr) => {
+    setForm((prev) => ({ ...prev, ...addr }));
+    setSelectedAddressId(addr.id);
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -93,9 +116,37 @@ export default function CheckoutShippingPage() {
       return;
     }
 
-    setShippingDetails(sanitizeShippingForm(form));
+    const sanitized = sanitizeShippingForm(form);
+    setShippingDetails(sanitized);
+
+    if (saveAddressChecked) {
+      const existingLabel = (profile.addresses || []).find((a) => a.id === selectedAddressId)?.label;
+      saveAddress({ ...sanitized, id: selectedAddressId || undefined, label: existingLabel || 'Home' });
+    }
+
     navigate('/checkout/payment');
   };
+
+  if (!user) {
+    return (
+      <>
+        <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
+          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            A2Z Collection
+          </Link>
+        </header>
+        <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 flex flex-col items-center text-center gap-3">
+          <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">
+            Sign In to Continue
+          </h1>
+          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+            Please sign in so we can save your order and shipping details to your account.
+          </p>
+        </main>
+        <AuthModal dismissible onClose={() => navigate('/cart')} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -134,9 +185,32 @@ export default function CheckoutShippingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
           {/* Left Panel: Shipping Form */}
           <div className="lg:col-span-7 xl:col-span-8">
-            <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-8 text-on-surface">
+            <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-2 text-on-surface">
               Shipping Address
             </h1>
+            {profile.displayName && (
+              <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                Hi {profile.displayName}, where should we deliver your order?
+              </p>
+            )}
+            {(profile.addresses || []).length > 0 && (
+              <div className={`flex flex-wrap gap-2 ${profile.displayName ? '' : 'mt-8'} mb-8`}>
+                {profile.addresses.map((addr) => (
+                  <button
+                    key={addr.id}
+                    type="button"
+                    onClick={() => applySavedAddress(addr)}
+                    className={`px-4 py-2 rounded-full border font-label-caps text-[11px] uppercase tracking-wider transition-colors ${
+                      selectedAddressId === addr.id
+                        ? 'bg-primary text-on-primary border-primary'
+                        : 'border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
+                    }`}
+                  >
+                    {addr.label || 'Address'}
+                  </button>
+                ))}
+              </div>
+            )}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextField
@@ -261,6 +335,14 @@ export default function CheckoutShippingPage() {
                   </select>
                 </div>
               </div>
+              <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <input
+                  type="checkbox"
+                  checked={saveAddressChecked}
+                  onChange={(e) => setSaveAddressChecked(e.target.checked)}
+                />
+                Save this address to my profile
+              </label>
               <div className="pt-6 flex flex-col-reverse md:flex-row items-center gap-4">
                 <Link
                   to="/cart"
