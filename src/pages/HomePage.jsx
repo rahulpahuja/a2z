@@ -10,16 +10,10 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import './HomePage.css';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
 
 const categories = [
   {
@@ -142,10 +136,18 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState([]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeToCarousel((slides) => {
@@ -198,10 +200,15 @@ export default function HomePage() {
             A2Z Collection
           </Link>
           <nav className="hidden md:flex space-x-8">
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products">New Arrivals</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Saree">Sarees</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Lehenga">Lehengas</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase" to="/products?category=Kurti">Kurtis</Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 font-label-caps text-label-caps uppercase"
+                to={link.to}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
           <div className="flex items-center space-x-6 text-primary dark:text-primary-fixed-dim">
             <button className="hover:opacity-80 transition-opacity duration-200 hidden md:block">
@@ -212,7 +219,7 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
       <main>
         {/* Hero Carousel */}
         <section className="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">
