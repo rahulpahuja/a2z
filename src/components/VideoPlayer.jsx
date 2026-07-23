@@ -1,5 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { getVideoMimeType } from '../utils/videoMime.js';
+
+// A cached video can already have data by the time React attaches the
+// onLoadedData listener, which would otherwise leave it stuck shimmering.
+function isAlreadyPlayable(video) {
+  return !!video && video.readyState >= 2; // HAVE_CURRENT_DATA or higher
+}
 
 // A <video> that plays MP4 (our transcoded storage format) and also gives
 // raw .mov/.webm/etc a fair shot — Safari can play HEVC .mov natively when
@@ -7,6 +13,21 @@ import { getVideoMimeType } from '../utils/videoMime.js';
 // fast into the fallback message instead of showing a stuck black box.
 export default function VideoPlayer({ src, className, autoPlay, loop, muted }) {
   const [unsupported, setUnsupported] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [lastSrc, setLastSrc] = useState(src);
+
+  // Reset the shimmer/error state synchronously when the src prop changes,
+  // so switching videos (e.g. a product's video list) shimmers again
+  // instead of showing the previous video's stale loaded/error state.
+  if (src !== lastSrc) {
+    setLastSrc(src);
+    setLoaded(false);
+    setUnsupported(false);
+  }
+
+  const checkAlreadyLoaded = useCallback((video) => {
+    if (isAlreadyPlayable(video)) setLoaded(true);
+  }, []);
 
   if (!src) return null;
 
@@ -22,18 +43,26 @@ export default function VideoPlayer({ src, className, autoPlay, loop, muted }) {
   }
 
   return (
-    <video
-      key={src}
-      controls
-      playsInline
-      autoPlay={autoPlay}
-      loop={loop}
-      muted={muted}
-      className={className}
-      onError={() => setUnsupported(true)}
-    >
-      <source src={src} type={getVideoMimeType(src)} />
-      Your browser doesn't support embedded video playback.
-    </video>
+    <div className="relative w-full h-full">
+      {!loaded && <div className="absolute inset-0 img-loading-shimmer" />}
+      <video
+        ref={checkAlreadyLoaded}
+        key={src}
+        controls
+        playsInline
+        autoPlay={autoPlay}
+        loop={loop}
+        muted={muted}
+        className={className}
+        onLoadedData={() => setLoaded(true)}
+        onError={() => {
+          setLoaded(true);
+          setUnsupported(true);
+        }}
+      >
+        <source src={src} type={getVideoMimeType(src)} />
+        Your browser doesn't support embedded video playback.
+      </video>
+    </div>
   );
 }

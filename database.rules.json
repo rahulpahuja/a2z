@@ -24,6 +24,10 @@
       ".read": true,
       ".write": "auth != null"
     },
+    "collections": {
+      ".read": true,
+      ".write": "auth != null"
+    },
     "subcategories": {
       ".read": true,
       ".write": "auth != null"

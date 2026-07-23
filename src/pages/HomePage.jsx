@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import TrendingProducts from '../components/TrendingProducts.jsx';
+import HomeCollections from '../components/HomeCollections.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
@@ -228,15 +229,19 @@ export default function HomePage() {
                 ></div>
                 <div className="absolute inset-0 bg-black/25"></div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <h1 className="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">
-                    {slide.title}
-                  </h1>
-                  <Link
-                    to={slide.link}
-                    className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
-                  >
-                    {slide.cta}
-                  </Link>
+                  {!slide.hideTitle && (
+                    <h1 className="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">
+                      {slide.title}
+                    </h1>
+                  )}
+                  {!slide.hideCta && (
+                    <Link
+                      to={slide.link}
+                      className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
+                    >
+                      {slide.cta}
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
@@ -292,6 +297,9 @@ export default function HomePage() {
 
         {/* Trending Now */}
         <TrendingProducts />
+
+        {/* Admin-curated Collections */}
+        <HomeCollections />
 
         {/* Featured Products Row 1 */}
         <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">

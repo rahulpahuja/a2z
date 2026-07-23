@@ -38,6 +38,7 @@ import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
 import AdminCarouselPage from './pages/admin/AdminCarouselPage.jsx'
+import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminReferrerDetailsPage from './pages/admin/AdminReferrerDetailsPage.jsx'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage.jsx'
@@ -90,6 +91,7 @@ const ADMIN_ROUTES = [
   { path: '/super/product-videos', Component: AdminProductVideosPage },
   { path: '/super/sales', Component: AdminSalesPage },
   { path: '/super/carousel', Component: AdminCarouselPage },
+  { path: '/super/collections', Component: AdminCollectionsPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/referrers', Component: AdminReferrerDetailsPage },
   { path: '/super/settings', Component: AdminSettingsPage },
