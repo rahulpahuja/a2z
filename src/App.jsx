@@ -37,7 +37,6 @@ import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
 import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
-import AdminCarouselPage from './pages/admin/AdminCarouselPage.jsx'
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminReferrerDetailsPage from './pages/admin/AdminReferrerDetailsPage.jsx'
@@ -90,7 +89,6 @@ const ADMIN_ROUTES = [
   { path: '/super/products', Component: AdminProductsPage },
   { path: '/super/product-videos', Component: AdminProductVideosPage },
   { path: '/super/sales', Component: AdminSalesPage },
-  { path: '/super/carousel', Component: AdminCarouselPage },
   { path: '/super/collections', Component: AdminCollectionsPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/referrers', Component: AdminReferrerDetailsPage },
@@ -111,6 +109,12 @@ const IMAGE_STUDIO_REDIRECTS = [
   { path: '/super/image-converter', tool: 'image-converter' },
   { path: '/super/watermark-remover', tool: 'watermark-studio' },
   { path: '/super/upload-test', tool: 'upload-test' },
+]
+
+// Hero Carousel now lives inside the Layout Configurator as a surface tab.
+// Kept as a redirect so existing bookmarks/links keep working.
+const CONFIGURATOR_REDIRECTS = [
+  { path: '/super/carousel', surface: 'hero' },
 ]
 
 function adminElement(Component) {
@@ -152,6 +156,9 @@ export default function App() {
                 ))}
                 {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
                   <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
+                ))}
+                {CONFIGURATOR_REDIRECTS.map(({ path, surface }) => (
+                  <Route key={path} path={path} element={<Navigate to={`/super/configurator?surface=${surface}`} replace />} />
                 ))}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

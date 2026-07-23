@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { subscribeToCategories, createCategory, deleteCategory, updateCategory } from '../../services/categories.js';
 import {
   subscribeToSubcategories,
@@ -6,7 +7,6 @@ import {
   deleteSubcategory,
   updateSubcategory,
 } from '../../services/subcategories.js';
-import { subscribeToTopNav, saveTopNav, DEFAULT_TOP_NAV_LINKS } from '../../services/topNav.js';
 import { useToast } from '../../context/ToastContext.jsx';
 
 export default function AdminCategoriesPage() {
@@ -29,13 +29,6 @@ export default function AdminCategoriesPage() {
   const [editingSubTitle, setEditingSubTitle] = useState('');
   const [updatingSub, setUpdatingSub] = useState(false);
 
-  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
-  const [topNavLoading, setTopNavLoading] = useState(true);
-  const [savingNav, setSavingNav] = useState(false);
-  const [newLinkType, setNewLinkType] = useState('category');
-  const [newLinkCategoryId, setNewLinkCategoryId] = useState('');
-  const [newLinkLabel, setNewLinkLabel] = useState('');
-
   useEffect(() => {
     const unsubscribe = subscribeToCategories((rows, error) => {
       setCategories(rows);
@@ -49,14 +42,6 @@ export default function AdminCategoriesPage() {
     const unsubscribe = subscribeToSubcategories((rows) => {
       setSubcategories(rows);
       setSubLoading(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = subscribeToTopNav((links) => {
-      setTopNavLinks(links);
-      setTopNavLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -168,54 +153,6 @@ export default function AdminCategoriesPage() {
       showToast(err.message || 'Could not update subcategory.');
     } finally {
       setUpdatingSub(false);
-    }
-  };
-
-  const handleAddNavLink = () => {
-    if (newLinkType === 'category') {
-      const category = categories.find((c) => c.id === newLinkCategoryId);
-      if (!category) return;
-      setTopNavLinks((prev) => [
-        ...prev,
-        { id: `nav_${Date.now()}`, label: newLinkLabel.trim() || category.title, type: 'category', category: category.title },
-      ]);
-    } else {
-      setTopNavLinks((prev) => [
-        ...prev,
-        { id: `nav_${Date.now()}`, label: newLinkLabel.trim() || 'All Products', type: 'all' },
-      ]);
-    }
-    setNewLinkLabel('');
-    setNewLinkCategoryId('');
-  };
-
-  const handleRemoveNavLink = (id) => {
-    setTopNavLinks((prev) => prev.filter((link) => link.id !== id));
-  };
-
-  const handleNavLinkLabelChange = (id, label) => {
-    setTopNavLinks((prev) => prev.map((link) => (link.id === id ? { ...link, label } : link)));
-  };
-
-  const handleMoveNavLink = (index, direction) => {
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= topNavLinks.length) return;
-    setTopNavLinks((prev) => {
-      const copy = [...prev];
-      [copy[index], copy[targetIndex]] = [copy[targetIndex], copy[index]];
-      return copy;
-    });
-  };
-
-  const handleSaveNavLinks = async () => {
-    setSavingNav(true);
-    try {
-      await saveTopNav(topNavLinks);
-      showToast('Top navigation bar updated.');
-    } catch (err) {
-      showToast(err.message || 'Could not save navigation links.');
-    } finally {
-      setSavingNav(false);
     }
   };
 
@@ -422,121 +359,19 @@ export default function AdminCategoriesPage() {
           )}
         </section>
 
-        <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
-          <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Top Navigation Bar</h2>
-          <p className="font-body-sm text-[12px] text-on-surface-variant mb-4">
-            Choose which links appear in the header and mobile menu, built only from categories that already exist above.
-          </p>
-
-          {topNavLoading ? (
-            <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
-          ) : (
-            <>
-              {topNavLinks.length === 0 ? (
-                <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">No nav links yet — add one below.</p>
-              ) : (
-                <ul className="divide-y divide-outline-variant/20 mb-4">
-                  {topNavLinks.map((link, idx) => (
-                    <li key={link.id} className="flex items-center gap-3 py-3">
-                      <div className="flex gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => handleMoveNavLink(idx, -1)}
-                          disabled={idx === 0}
-                          aria-label="Move up"
-                          className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
-                        >
-                          <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleMoveNavLink(idx, 1)}
-                          disabled={idx === topNavLinks.length - 1}
-                          aria-label="Move down"
-                          className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
-                        >
-                          <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
-                        </button>
-                      </div>
-                      <input
-                        value={link.label}
-                        onChange={(e) => handleNavLinkLabelChange(link.id, e.target.value)}
-                        className="flex-1 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
-                      />
-                      <span className="text-[10px] text-on-surface-variant/70 font-mono shrink-0 whitespace-nowrap">
-                        {link.type === 'all' ? 'All Products' : link.category}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveNavLink(link.id)}
-                        className="text-error font-label-caps text-[10px] hover:underline shrink-0"
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-end pt-4 border-t border-outline-variant/20">
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-label-caps text-[10px] text-on-surface-variant">Link Type</label>
-                  <select
-                    value={newLinkType}
-                    onChange={(e) => setNewLinkType(e.target.value)}
-                    className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
-                  >
-                    <option value="category">Existing Category</option>
-                    <option value="all">All Products (New Arrivals)</option>
-                  </select>
-                </div>
-
-                {newLinkType === 'category' && (
-                  <div className="flex flex-col gap-1.5 flex-1">
-                    <label className="font-label-caps text-[10px] text-on-surface-variant">Category</label>
-                    <select
-                      value={newLinkCategoryId}
-                      onChange={(e) => setNewLinkCategoryId(e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
-                    >
-                      <option value="">Select a category</option>
-                      {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.title}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <label className="font-label-caps text-[10px] text-on-surface-variant">Label (optional override)</label>
-                  <input
-                    value={newLinkLabel}
-                    onChange={(e) => setNewLinkLabel(e.target.value)}
-                    placeholder="e.g. Sarees"
-                    className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAddNavLink}
-                  disabled={newLinkType === 'category' && !newLinkCategoryId}
-                  className="bg-primary-container text-on-primary-container font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity disabled:opacity-50 shrink-0"
-                >
-                  Add Link
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSaveNavLinks}
-                disabled={savingNav}
-                className="mt-5 bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {savingNav ? 'Saving…' : 'Save Navigation'}
-              </button>
-            </>
-          )}
+        <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Top Navigation Bar</h2>
+            <p className="font-body-sm text-[12px] text-on-surface-variant">
+              Choosing which of these categories appear in the header nav now lives in the Layout Configurator.
+            </p>
+          </div>
+          <Link
+            to="/super/configurator?surface=topnav"
+            className="bg-primary-container text-on-primary-container font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity shrink-0"
+          >
+            Open in Layout Configurator
+          </Link>
         </section>
       </main>
     </div>
