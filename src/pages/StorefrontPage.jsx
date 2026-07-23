@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -8,13 +8,7 @@ import { getHighResUrl } from '../utils/image.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 
 const categories = [
   {
@@ -215,6 +209,13 @@ export default function StorefrontPage() {
   }));
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
 
   return (
     <>
@@ -236,10 +237,15 @@ export default function StorefrontPage() {
           </Link>
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products">New Arrivals</Link>
-            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Saree">Sarees</Link>
-            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Lehenga">Lehengas</Link>
-            <Link className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Kurti">Kurtis</Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+                to={link.to}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
           {/* Trailing Icons */}
           <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
@@ -248,7 +254,7 @@ export default function StorefrontPage() {
           </div>
         </div>
       </nav>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       {/* Main Content */}
       <main className="w-full">
