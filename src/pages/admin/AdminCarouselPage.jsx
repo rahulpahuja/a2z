@@ -1,8 +1,61 @@
 import { useEffect, useRef, useState } from 'react';
 import { subscribeToCarousel, saveCarousel, DEFAULT_CAROUSEL_SLIDES } from '../../services/carousel.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { useProducts } from '../../context/ProductsContext.jsx';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
+
+// A slide's actual destination is always stored in `link` (a path string) so
+// HomePage's <Link to={slide.link}> never has to know about link types. The
+// admin form below just offers a friendlier, structured way to build that
+// path instead of hand-typing it, and infers the type back out of an old
+// slide's saved link so editing shows the right picker option.
+function inferLinkType(link) {
+  if (!link) return 'products';
+  if (link === '/') return 'home';
+  if (link === '/products') return 'products';
+  if (link.startsWith('/products?category=')) return 'category';
+  if (link.startsWith('/product/')) return 'product';
+  return 'custom';
+}
+
+function inferLinkCategory(link) {
+  const match = link?.match(/^\/products\?category=(.+)$/);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
+function inferLinkProductId(link) {
+  const match = link?.match(/^\/product\/(.+)$/);
+  return match ? match[1] : '';
+}
+
+function buildLink({ linkType, linkCategory, linkProductId, linkCustom }) {
+  switch (linkType) {
+    case 'home':
+      return '/';
+    case 'products':
+      return '/products';
+    case 'category':
+      return linkCategory ? `/products?category=${encodeURIComponent(linkCategory)}` : '/products';
+    case 'product':
+      return linkProductId ? `/product/${linkProductId}` : '/products';
+    case 'custom':
+    default:
+      return linkCustom || '/products';
+  }
+}
+
+function withLinkFields(slide) {
+  return {
+    hideTitle: false,
+    hideCta: false,
+    linkType: inferLinkType(slide.link),
+    linkCategory: inferLinkCategory(slide.link),
+    linkProductId: inferLinkProductId(slide.link),
+    linkCustom: slide.link || '',
+    ...slide,
+  };
+}
 
 // R2 Image Uploader Function
 const uploadImageToExternalServer = async (file, customName, signal) => {
@@ -39,6 +92,7 @@ const uploadImageToExternalServer = async (file, customName, signal) => {
 
 export default function AdminCarouselPage() {
   const { showToast } = useToast();
+  const { products, categories } = useProducts();
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,7 +117,7 @@ export default function AdminCarouselPage() {
         };
         slidesCopy.push(defaultSlide);
       }
-      setSlides(slidesCopy.slice(0, 4));
+      setSlides(slidesCopy.slice(0, 4).map(withLinkFields));
       setLoading(false);
     });
     return unsub;
@@ -73,6 +127,18 @@ export default function AdminCarouselPage() {
     setSlides((prev) => {
       const copy = [...prev];
       copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  };
+
+  // Recomputes the stored `link` path whenever the destination type or one
+  // of its supporting fields (category/product/custom url) changes.
+  const handleLinkFieldChange = (index, field, value) => {
+    setSlides((prev) => {
+      const copy = [...prev];
+      const nextSlide = { ...copy[index], [field]: value };
+      nextSlide.link = buildLink(nextSlide);
+      copy[index] = nextSlide;
       return copy;
     });
   };
@@ -152,7 +218,7 @@ export default function AdminCarouselPage() {
 
   const handleReset = () => {
     if (window.confirm('Are you sure you want to reset all slides to default demo configurations?')) {
-      setSlides(DEFAULT_CAROUSEL_SLIDES);
+      setSlides(DEFAULT_CAROUSEL_SLIDES.map(withLinkFields));
       showToast('Reset to defaults. Remember to click Save to apply changes.');
     }
   };
@@ -303,8 +369,30 @@ export default function AdminCarouselPage() {
                   />
                 </div>
 
-                {/* CTA & Link row */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* Visibility toggles */}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1">
+                  <label className="flex items-center gap-2 text-[11px] text-on-surface-variant cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!slide.hideTitle}
+                      onChange={(e) => handleFieldChange(idx, 'hideTitle', e.target.checked)}
+                      className="accent-primary"
+                    />
+                    Hide headline text
+                  </label>
+                  <label className="flex items-center gap-2 text-[11px] text-on-surface-variant cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!slide.hideCta}
+                      onChange={(e) => handleFieldChange(idx, 'hideCta', e.target.checked)}
+                      className="accent-primary"
+                    />
+                    Hide CTA button
+                  </label>
+                </div>
+
+                {/* CTA label (only meaningful while the button is shown) */}
+                {!slide.hideCta && (
                   <div className="flex flex-col gap-1.5">
                     <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`cta-${idx}`}>
                       Button CTA Label
@@ -318,19 +406,81 @@ export default function AdminCarouselPage() {
                       className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
                     />
                   </div>
+                )}
+
+                {/* Destination picker — always applies, since the whole slide is still clickable even with the button hidden */}
+                <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`link-${idx}`}>
-                      Destination Link
+                    <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`link-type-${idx}`}>
+                      Where should this slide land?
                     </label>
-                    <input
-                      id={`link-${idx}`}
-                      type="text"
-                      value={slide.link}
-                      onChange={(e) => handleFieldChange(idx, 'link', e.target.value)}
-                      placeholder="e.g. /products?category=Saree"
+                    <select
+                      id={`link-type-${idx}`}
+                      value={slide.linkType || 'products'}
+                      onChange={(e) => handleLinkFieldChange(idx, 'linkType', e.target.value)}
                       className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
-                    />
+                    >
+                      <option value="home">Home Page</option>
+                      <option value="products">All Products</option>
+                      <option value="category">A Specific Category</option>
+                      <option value="product">A Specific Product</option>
+                      <option value="custom">Custom URL</option>
+                    </select>
                   </div>
+
+                  {slide.linkType === 'category' && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`link-category-${idx}`}>
+                        Category
+                      </label>
+                      <select
+                        id={`link-category-${idx}`}
+                        value={slide.linkCategory || ''}
+                        onChange={(e) => handleLinkFieldChange(idx, 'linkCategory', e.target.value)}
+                        className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
+                      >
+                        <option value="">-- Choose Category --</option>
+                        {categories.filter((c) => c !== 'All').map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {slide.linkType === 'product' && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`link-product-${idx}`}>
+                        Product
+                      </label>
+                      <select
+                        id={`link-product-${idx}`}
+                        value={slide.linkProductId || ''}
+                        onChange={(e) => handleLinkFieldChange(idx, 'linkProductId', e.target.value)}
+                        className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
+                      >
+                        <option value="">-- Choose Product --</option>
+                        {products.map((p) => (
+                          <option key={p.id} value={p.id}>{p.name || p.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {slide.linkType === 'custom' && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor={`link-custom-${idx}`}>
+                        Custom Path
+                      </label>
+                      <input
+                        id={`link-custom-${idx}`}
+                        type="text"
+                        value={slide.linkCustom || ''}
+                        onChange={(e) => handleLinkFieldChange(idx, 'linkCustom', e.target.value)}
+                        placeholder="e.g. /about-us"
+                        className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -404,15 +554,19 @@ export default function AdminCarouselPage() {
 
                 {/* Centered slide texts */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-10 select-none">
-                  <h1 className="font-display-lg text-white mb-6 max-w-xl drop-shadow-lg font-bold leading-snug playfair" style={{ fontSize: 'calc(1.5vw + 16px)' }}>
-                    {previewingSlide.title || 'Your Slide Headline Goes Here'}
-                  </h1>
-                  <button
-                    type="button"
-                    className="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-caps text-[10px] uppercase tracking-widest hover:opacity-90 shadow-md cursor-default pointer-events-none"
-                  >
-                    {previewingSlide.cta || 'Shop Now'}
-                  </button>
+                  {!previewingSlide.hideTitle && (
+                    <h1 className="font-display-lg text-white mb-6 max-w-xl drop-shadow-lg font-bold leading-snug playfair" style={{ fontSize: 'calc(1.5vw + 16px)' }}>
+                      {previewingSlide.title || 'Your Slide Headline Goes Here'}
+                    </h1>
+                  )}
+                  {!previewingSlide.hideCta && (
+                    <button
+                      type="button"
+                      className="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-caps text-[10px] uppercase tracking-widest hover:opacity-90 shadow-md cursor-default pointer-events-none"
+                    >
+                      {previewingSlide.cta || 'Shop Now'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
