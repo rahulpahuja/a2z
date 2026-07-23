@@ -4,6 +4,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import { useProducts } from '../../context/ProductsContext.jsx';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
+import { isGifFile } from '../../utils/gif.js';
 
 // A slide's actual destination is always stored in `link` (a path string) so
 // HomePage's <Link to={slide.link}> never has to know about link types. The
@@ -154,6 +155,22 @@ export default function AdminCarouselPage() {
 
     let localPreviewUrl = null;
     try {
+      if (isGifFile(file)) {
+        // GIFs are uploaded as-is — running one through the compression
+        // canvas would flatten it to a single static frame and lose the
+        // animation entirely.
+        localPreviewUrl = URL.createObjectURL(file);
+        setUploadPreview({ idx: index, url: localPreviewUrl });
+
+        showToast('Uploading animated GIF…');
+        const customName = `carousel_slide_${index + 1}_${Date.now()}.gif`;
+        const uploadedUrl = await uploadImageToExternalServer(file, customName, controller.signal);
+
+        handleFieldChange(index, 'image', uploadedUrl);
+        showToast(`GIF for Slide ${index + 1} uploaded successfully!`);
+        return;
+      }
+
       // HEIC conversion if needed
       if (isHeicFile(file)) {
         showToast('Converting HEIC image…');
@@ -252,6 +269,9 @@ export default function AdminCarouselPage() {
             </p>
             <p className="font-body-sm text-[11px] text-on-surface-variant/80 mt-1 leading-relaxed">
               * Note: The hero carousel scales cover-style (`background-size: cover`) to stay responsive. Keep key visual subjects (models, faces, jewelry) in the <strong>center</strong> of your image so they do not clip on mobile screens.
+            </p>
+            <p className="font-body-sm text-[11px] text-on-surface-variant/80 mt-1 leading-relaxed">
+              * Animated <strong>GIFs</strong> are supported — they upload as-is (no compression pass), so the animation is preserved.
             </p>
           </div>
         </section>
