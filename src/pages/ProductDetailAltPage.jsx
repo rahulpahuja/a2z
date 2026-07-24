@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import { getHighResUrl } from '../utils/image.js';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductDetailAltPage.css';
 
 const PRODUCT = { id: 'crop-shirt-side-dori', title: 'Crop Shirt with Side Dori', price: 360 };
@@ -113,11 +114,19 @@ export default function ProductDetailAltPage() {
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [viewCount, setViewCount] = useState(null);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
   useEffect(() => {
     recordView(PRODUCT.id);
     return subscribeToProductStats(PRODUCT.id, (stats) => setViewCount(stats.views));
   }, []);
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   const toggleAccordion = (key) => {
     setOpenSection((prev) => (prev === key ? null : key));
@@ -151,10 +160,15 @@ export default function ProductDetailAltPage() {
           </Link>
           {/* Navigation Links (Desktop) */}
           <nav className="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products">New Arrivals</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Saree">Sarees</Link>
-            <Link className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" to="/products?category=Lehenga">Lehengas</Link>
-            <Link className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:opacity-80 transition-opacity duration-200 scale-95 transition-transform" to="/products?category=Kurti">Kurtis</Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+                to={link.to}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
           {/* Trailing Icons */}
           <div className="flex gap-4 items-center text-primary dark:text-primary-fixed-dim">

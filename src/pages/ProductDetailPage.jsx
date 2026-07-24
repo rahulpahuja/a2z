@@ -10,13 +10,7 @@ import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -48,6 +42,15 @@ const ACCORDION_ITEMS = [
 
 function TopNav() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
+
   return (
     <>
       <nav className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 docked full-width top-0 sticky flat no shadows">
@@ -63,7 +66,7 @@ function TopNav() {
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
         </div>
         <div className="hidden md:flex gap-gutter items-center">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.label}
               className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200 uppercase"
@@ -78,7 +81,7 @@ function TopNav() {
           <ProfileButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
         </div>
       </nav>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
     </>
   );
 }

@@ -8,14 +8,8 @@ import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductListingPage.css';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
 
 const COLORS = [
   { id: 'red', label: 'Red', className: 'bg-red-600' },
@@ -62,6 +56,14 @@ export default function ProductListingPage() {
   const [visibleCount, setVisibleCount] = useState(50);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   // Reset pagination state when filters change
   useEffect(() => {
@@ -167,7 +169,7 @@ export default function ProductListingPage() {
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
         </div>
         <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.label}
               className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim font-body-lg text-body-lg hover:opacity-80 transition-opacity duration-200"
@@ -185,7 +187,7 @@ export default function ProductListingPage() {
           <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
         <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">

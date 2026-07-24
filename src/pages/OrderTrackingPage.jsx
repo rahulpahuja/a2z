@@ -10,14 +10,8 @@ import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './OrderTrackingPage.css';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
 
 export default function OrderTrackingPage() {
   const { lastOrder } = useCart();
@@ -25,6 +19,14 @@ export default function OrderTrackingPage() {
   const { showToast } = useToast();
   const [downloading, setDownloading] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   useEffect(() => {
     setLiveOrder(lastOrder);
@@ -177,7 +179,7 @@ export default function OrderTrackingPage() {
             A2Z Collection
           </Link>
           <div className="hidden md:flex gap-6 ml-8">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.label}
                 className="font-label-caps text-label-caps text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity duration-200 hover:opacity-80"
@@ -193,7 +195,7 @@ export default function OrderTrackingPage() {
           <ProfileButton className="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 focus:scale-95 transition-transform" />
         </div>
       </nav>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       {/* Main Content */}
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col gap-8">
