@@ -40,7 +40,7 @@ export default function PaymentPage() {
               paymentId: isTestMode ? `test_${response.razorpay_payment_id}` : response.razorpay_payment_id,
               placedAt: new Date().toISOString(),
             });
-            navigate('/orders/tracking');
+            navigate('/orders/tracking', { state: { justPlaced: true } });
           } catch (err) {
             showToast(err.message || 'Could not verify payment.');
           } finally {

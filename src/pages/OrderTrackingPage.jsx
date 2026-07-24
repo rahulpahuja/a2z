@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
@@ -10,16 +10,19 @@ import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import OrderSuccessCelebration from '../components/OrderSuccessCelebration.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './OrderTrackingPage.css';
 
 export default function OrderTrackingPage() {
   const { lastOrder } = useCart();
+  const location = useLocation();
   const [liveOrder, setLiveOrder] = useState(lastOrder);
   const { showToast } = useToast();
   const [downloading, setDownloading] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+  const [showCelebration, setShowCelebration] = useState(Boolean(location.state?.justPlaced));
 
   useEffect(() => {
     const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
@@ -161,6 +164,9 @@ export default function OrderTrackingPage() {
 
   return (
     <>
+      {showCelebration && (
+        <OrderSuccessCelebration orderId={liveOrder.id} onClose={() => setShowCelebration(false)} />
+      )}
       {/* TopNavBar */}
       <nav
         aria-label="Top Navigation"
