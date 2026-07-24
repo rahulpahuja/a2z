@@ -28,14 +28,9 @@ const ACCORDION_ITEMS = [
     tone: 'text-on-surface-variant',
   },
   {
-    title: 'Return / Refund',
-    body: 'Please note: Due to the delicate handcrafted nature of this item, NO RETURNS are accepted unless the product is defective upon arrival.',
-    tone: 'text-error',
-  },
-  {
-    title: 'Exchange Policy',
-    body: 'Size exchanges are permitted within 7 days of delivery, subject to inventory availability. The item must be unworn with original tags attached.',
-    tone: 'text-on-surface-variant',
+    title: 'Return & Exchange Policy',
+    body: 'We sell quality products and we believe in no returns and no exchanges. There are strictly no returns or exchanges accepted under any circumstances — even if you receive a faulty product, there is no exchange for that. No order cancellations permitted.',
+    tone: 'text-error font-medium',
   },
 ];
 
@@ -502,7 +497,7 @@ export default function ProductDetailPage() {
                     )}
                   </div>
                   <div>
-                    <h4 className="font-title-sm text-title-sm text-on-surface">{related.name}</h4>
+                    <h4 className="font-title-sm text-title-sm text-on-surface line-clamp-1">{related.name || related.title}</h4>
                     <p className="font-price-display text-[16px] text-primary mt-1">{formatCurrency(related.price)}</p>
                   </div>
                 </Link>

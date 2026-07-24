@@ -54,10 +54,10 @@ const accordionItems = [
   },
   {
     key: 'returns',
-    icon: 'restart_alt',
-    title: 'Returns & Exchange Policy',
+    icon: 'block',
+    title: 'Return & Exchange Policy',
     content:
-      'Enjoy a hassle-free 7-day return and exchange policy. Garments must be unwashed, unworn, and with original tags intact.',
+      'We sell quality products and we believe in no returns and no exchanges. There are strictly no returns or exchanges accepted under any circumstances — even if you receive a faulty product, there is no exchange for that. No order cancellations permitted.',
   },
   {
     key: 'material',
