@@ -11,6 +11,19 @@ export const DEFAULT_STORE_SETTINGS = {
   phone: '',
   gstNumber: '',
   facebookUrl: FACEBOOK_URL,
+  // Structured warehouse address used as the pickupAddress for shipping
+  // (ShipPrime etc.) — the free-text `address`/`location` fields above
+  // aren't reliably parseable into courier-required fields.
+  pickupAddress: {
+    name: '',
+    phone: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: 'India',
+  },
 };
 
 function getLocalStoreSettings() {
