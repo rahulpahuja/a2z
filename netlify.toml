@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # VITE_ADMIN_PHONES isn't a real secret (all VITE_* vars ship in the public
+  # JS bundle already) — it only tripped the scanner because the same number
+  # is hardcoded as the WhatsApp fallback in src/config/store.js.
+  SECRETS_SCAN_OMIT_KEYS = "VITE_ADMIN_PHONES"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
