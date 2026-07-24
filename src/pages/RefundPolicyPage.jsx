@@ -1,7 +1,35 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { subscribeToStoreSettings, DEFAULT_REFUND_POLICY } from '../services/storeSettings.js';
 
 export default function RefundPolicyPage() {
+  const [refundPolicy, setRefundPolicy] = useState(DEFAULT_REFUND_POLICY);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToStoreSettings((settings) => {
+      if (settings && settings.refundPolicy) {
+        setRefundPolicy(settings.refundPolicy);
+      } else {
+        setRefundPolicy(DEFAULT_REFUND_POLICY);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  // Format policy into structured sections by splitting on double newlines
+  const sections = refundPolicy
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
+      if (lines.length > 1 && !lines[0].includes('.')) {
+        return { title: lines[0], content: lines.slice(1).join(' ') };
+      }
+      return { title: null, content: block };
+    });
+
   return (
     <>
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto">
@@ -14,36 +42,46 @@ export default function RefundPolicyPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16">
-        <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-8">
-          Refund Policy
-        </h1>
+        <div className="mb-8">
+          <span className="font-label-caps text-label-caps text-primary uppercase tracking-widest">Store Policy</span>
+          <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mt-2 mb-4">
+            Refund &amp; Return Policy
+          </h1>
+        </div>
+
+        {/* Highlight Banner */}
+        <div className="bg-error-container/20 border border-error/30 rounded-xl p-5 md:p-6 mb-10 flex items-start gap-4">
+          <span className="material-symbols-outlined text-error text-2xl shrink-0 mt-0.5">verified</span>
+          <div>
+            <h2 className="font-title-sm text-title-sm text-on-surface font-semibold mb-1">
+              Quality Assurance • No Returns &amp; No Exchanges Policy
+            </h2>
+            <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Our policy is that we sell quality products and we believe in no returns and no exchanges under any circumstances — even if you receive a faulty product.
+            </p>
+          </div>
+        </div>
 
         <div className="font-body-lg text-body-lg text-on-surface-variant space-y-8">
-          <section>
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">When Refunds Apply</h2>
-            <p>
-              Refunds are issued only for items that arrive defective or damaged, in line with our{' '}
-              <Link to="/return-exchange-policy" className="text-primary hover:underline">Return and Exchange
-              Policy</Link>. We do not offer refunds for change of mind, sizing issues, or preference — size
-              exchanges are available instead within 7 days of delivery.
-            </p>
-          </section>
+          {sections.map((sec, idx) => (
+            <section key={idx} className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6">
+              {sec.title && (
+                <h2 className="font-title-sm text-title-sm text-on-surface font-semibold mb-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-xl">info</span>
+                  {sec.title}
+                </h2>
+              )}
+              <p className="leading-relaxed whitespace-pre-line text-on-surface-variant">
+                {sec.content}
+              </p>
+            </section>
+          ))}
 
-          <section>
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Processing Time</h2>
-            <p>
-              Once a defective item is received and inspected, eligible refunds are processed within 5-7 business
-              days back to your original payment method. Cash on Delivery orders are refunded via bank transfer or
-              UPI.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">How to Request a Refund</h2>
-            <p>
-              <Link to="/contact-us" className="text-primary hover:underline">Contact us</Link> within 48 hours of
-              delivery with your order ID and photos of the defect. Our team will confirm eligibility and start
-              the refund process.
+          <section className="bg-surface-container-low border border-outline-variant/30 rounded-xl p-6">
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-2 font-semibold">Have Questions?</h2>
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              If you have any questions or need assistance regarding your shipment, feel free to reach out to us via our{' '}
+              <Link to="/contact-us" className="text-primary hover:underline font-medium">Contact Us</Link> page.
             </p>
           </section>
         </div>

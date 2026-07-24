@@ -20,29 +20,13 @@ export default function ReturnExchangePolicyPage() {
 
         <div className="font-body-lg text-body-lg text-on-surface-variant space-y-8">
           <section>
-            <h2 className="font-title-sm text-title-sm text-error mb-3">Returns</h2>
+            <h2 className="font-title-sm text-title-sm text-error mb-3 font-semibold">No Returns &amp; No Exchanges</h2>
             <p>
-              Due to the delicate handcrafted nature of our products, <strong className="text-on-surface font-semibold">NO RETURNS</strong> are
-              accepted unless the product is defective or damaged upon arrival. If you receive a defective item,
-              contact us within 48 hours of delivery with photos of the issue and we will arrange a replacement or
-              refund.
+              Our policy is that we sell quality products and we believe in no returns and no exchanges. There are strictly no returns or exchanges accepted under any circumstances. Even if you receive a faulty or defective product, there is no exchange for that.
             </p>
-          </section>
-
-          <section>
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Exchanges</h2>
-            <p>
-              Size exchanges are permitted within 7 days of delivery, subject to inventory availability. The item
-              must be unworn, unwashed, and returned with its original tags attached.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">How to Request an Exchange or Report a Defect</h2>
-            <p>
-              <Link to="/contact-us" className="text-primary hover:underline">Contact us</Link> with your order ID,
-              the item you'd like to exchange or report, and clear photos where applicable. We'll guide you
-              through the next steps.
+            <p className="mt-3">
+              For complete details regarding cancellations, delivery reattempts, undelivered parcels, and resend charges, please refer to our{' '}
+              <Link to="/refund-policy" className="text-primary hover:underline font-medium">Refund Policy</Link>.
             </p>
           </section>
         </div>

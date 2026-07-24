@@ -7,19 +7,19 @@ const FAQ_SECTIONS = [
     title: 'Returns & Refunds',
     items: [
       {
-        question: 'What is your return policy?',
+        question: 'What is your return & refund policy?',
         answer:
-          'Due to the delicate handcrafted nature of our products, NO RETURNS are accepted unless the product is defective or damaged upon arrival. If you receive a defective item, contact us within 48 hours of delivery with photos of the issue and we will arrange a replacement or refund.',
+          'We sell quality products and we believe in no returns and no exchanges. There are no returns, exchanges, or refunds offered under any circumstances — even if you receive a faulty product. If you miss a delivery, reattempts will be made by our courier partner. If a parcel is returned to us, you can request a resend (resend shipping charges apply).',
       },
       {
-        question: 'Can I exchange an item for a different size?',
+        question: 'Can I exchange a product if it is faulty or defective?',
         answer:
-          'Yes. Size exchanges are permitted within 7 days of delivery, subject to inventory availability. The item must be unworn, unwashed, and returned with its original tags attached.',
+          'No. We sell quality products and we believe in no returns and no exchanges. If you get a faulty product, there is no exchange for that.',
       },
       {
-        question: 'How long do refunds take to process?',
+        question: 'Can I cancel my order after placing it?',
         answer:
-          'Refunds for eligible defective items are processed within 5-7 business days of us receiving and inspecting the returned product.',
+          'There is no provision for order cancellation once an order is placed.',
       },
     ],
   },
