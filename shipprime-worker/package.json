@@ -1,0 +1,13 @@
+{
+  "name": "shipprime-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker proxy for the ShipPrime shipping API (create/track/cancel forward AWBs)",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.60.0"
+  }
+}

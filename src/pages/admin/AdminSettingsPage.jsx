@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
+
+const PICKUP_FIELDS = [
+  { key: 'name', label: 'Warehouse Contact Name', placeholder: 'Acme WH' },
+  { key: 'phone', label: 'Warehouse Phone (10 digits)', placeholder: '9000000001' },
+  { key: 'address1', label: 'Address Line 1', placeholder: 'Plot 45, Phase II' },
+  { key: 'address2', label: 'Address Line 2 (optional)', placeholder: 'Udyog Vihar' },
+  { key: 'pincode', label: 'Pincode (6 digits)', placeholder: '122002' },
+];
 
 const FIELDS = [
   { key: 'storeName', label: 'Store Name', placeholder: 'A2Z Collection' },
@@ -28,6 +37,12 @@ export default function AdminSettingsPage() {
   }, []);
 
   const updateField = (key) => (event) => setSettings((prev) => ({ ...prev, [key]: event.target.value }));
+
+  const updatePickupField = (key) => (event) =>
+    setSettings((prev) => ({
+      ...prev,
+      pickupAddress: { ...DEFAULT_STORE_SETTINGS.pickupAddress, ...prev.pickupAddress, [key]: event.target.value },
+    }));
 
   const handleSave = async (event) => {
     event.preventDefault();
@@ -86,6 +101,58 @@ export default function AdminSettingsPage() {
               )}
             </div>
           ))}
+
+          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Pickup Address (for shipping)</h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+              Used as the courier pickup point when a shipment is booked. Must be a real, structured address — the free-text fields above aren't used for this.
+            </p>
+            <div className="flex flex-col gap-5">
+              {PICKUP_FIELDS.map((field) => (
+                <div key={field.key}>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={`pickup-${field.key}`}>
+                    {field.label}
+                  </label>
+                  <input
+                    id={`pickup-${field.key}`}
+                    value={settings.pickupAddress?.[field.key] ?? ''}
+                    onChange={updatePickupField(field.key)}
+                    placeholder={field.placeholder}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                  />
+                </div>
+              ))}
+              <div>
+                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="pickup-city">
+                  City
+                </label>
+                <input
+                  id="pickup-city"
+                  value={settings.pickupAddress?.city ?? ''}
+                  onChange={updatePickupField('city')}
+                  placeholder="Gurgaon"
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="pickup-state">
+                  State
+                </label>
+                <select
+                  id="pickup-state"
+                  value={settings.pickupAddress?.state ?? ''}
+                  onChange={updatePickupField('state')}
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                >
+                  <option value="">Select a state</option>
+                  {INDIAN_STATES_AND_UT.map((s) => (
+                    <option key={s.code} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={saving}

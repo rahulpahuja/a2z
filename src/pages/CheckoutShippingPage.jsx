@@ -83,6 +83,12 @@ export default function CheckoutShippingPage() {
       if (errors.phone) {
         setErrors((prev) => ({ ...prev, phone: '' }));
       }
+    } else if (name === 'zip') {
+      const digits = value.replace(/\D/g, '').slice(0, 6);
+      setForm((prev) => ({ ...prev, [name]: digits }));
+      if (errors.zip) {
+        setErrors((prev) => ({ ...prev, zip: '' }));
+      }
     } else if (name === 'state') {
       setForm((prev) => ({ ...prev, state: value, city: '' }));
     } else {
@@ -109,6 +115,12 @@ export default function CheckoutShippingPage() {
 
     if (form.gstNumber && !isValidGstNumber(form.gstNumber)) {
       errorsMap.gstNumber = 'Please enter a valid 15-character GST number';
+    }
+
+    if (!form.zip) {
+      errorsMap.zip = 'Pincode is required';
+    } else if (form.zip.length !== 6) {
+      errorsMap.zip = 'Pincode must be exactly 6 digits';
     }
 
     if (Object.keys(errorsMap).length > 0) {
@@ -294,6 +306,7 @@ export default function CheckoutShippingPage() {
                     placeholder="Zip Code"
                     value={form.zip}
                     onChange={handleChange}
+                    error={errors.zip}
                   />
                 </div>
               </div>

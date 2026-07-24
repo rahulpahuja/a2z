@@ -7,6 +7,9 @@ import { formatCurrency } from '../../context/CartContext.jsx';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
+import { getStoreSettingsOnce } from '../../services/storeSettings.js';
+import { createForwardShipment, trackShipment, cancelShipment, buildDeliveryAddress } from '../../services/shipprime.js';
+import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
 import './AdminSalesPage.css';
 
 export default function AdminSalesPage() {
@@ -35,6 +38,7 @@ export default function AdminSalesPage() {
   const [trackingId, setTrackingId] = useState('');
   const [trackingPartner, setTrackingPartner] = useState('');
   const [isSavingTracking, setIsSavingTracking] = useState(false);
+  const [shipmentBusy, setShipmentBusy] = useState(false);
 
   const [selectedOrderIds, setSelectedOrderIds] = useState([]);
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
@@ -147,6 +151,84 @@ export default function AdminSalesPage() {
       showToast(err.message || 'Could not update order details.');
     } finally {
       setIsSavingTracking(false);
+    }
+  };
+
+  const handleCreateShipment = async () => {
+    if (!selectedOrder) return;
+    setShipmentBusy(true);
+    try {
+      const storeSettings = await getStoreSettingsOnce();
+      const pickupAddress = storeSettings.pickupAddress;
+      if (!pickupAddress?.address1 || !pickupAddress?.pincode) {
+        throw new Error('Store pickup address is not set up (Store Settings > Pickup Address).');
+      }
+      const stateName = INDIAN_STATES_AND_UT.find((s) => s.code === selectedOrder.shippingDetails?.state)?.name;
+      const deliveryAddress = buildDeliveryAddress(selectedOrder.shippingDetails, stateName);
+      const result = await createForwardShipment({ order: selectedOrder, pickupAddress, deliveryAddress });
+      const updatedOrder = {
+        ...selectedOrder,
+        shipment: {
+          status: 'created',
+          awb: result.awb,
+          courier: result.courier,
+          labelUrl: result.labelUrl,
+          createdAt: new Date().toISOString(),
+        },
+      };
+      await updateFirebaseOrder(updatedOrder);
+      setSelectedOrder(updatedOrder);
+      showToast('Shipment created.');
+    } catch (err) {
+      const updatedOrder = { ...selectedOrder, shipment: { status: 'failed', error: err.message } };
+      await updateFirebaseOrder(updatedOrder).catch(() => {});
+      setSelectedOrder(updatedOrder);
+      showToast(err.message || 'Could not create shipment.');
+    } finally {
+      setShipmentBusy(false);
+    }
+  };
+
+  const handleRefreshTracking = async () => {
+    if (!selectedOrder?.shipment?.awb) return;
+    setShipmentBusy(true);
+    try {
+      const result = await trackShipment(selectedOrder.shipment.awb);
+      const updatedOrder = {
+        ...selectedOrder,
+        shipment: {
+          ...selectedOrder.shipment,
+          currentStatus: result?.currentStatus,
+          history: result?.history || [],
+          lastTrackedAt: new Date().toISOString(),
+        },
+      };
+      await updateFirebaseOrder(updatedOrder);
+      setSelectedOrder(updatedOrder);
+    } catch (err) {
+      showToast(err.message || 'Could not refresh tracking.');
+    } finally {
+      setShipmentBusy(false);
+    }
+  };
+
+  const handleCancelShipment = async () => {
+    if (!selectedOrder?.shipment?.awb) return;
+    if (!window.confirm(`Cancel shipment ${selectedOrder.shipment.awb}? This cannot be undone.`)) return;
+    setShipmentBusy(true);
+    try {
+      await cancelShipment(selectedOrder.shipment.awb);
+      const updatedOrder = {
+        ...selectedOrder,
+        shipment: { ...selectedOrder.shipment, status: 'cancelled' },
+      };
+      await updateFirebaseOrder(updatedOrder);
+      setSelectedOrder(updatedOrder);
+      showToast('Shipment cancelled.');
+    } catch (err) {
+      showToast(err.message || 'Could not cancel shipment.');
+    } finally {
+      setShipmentBusy(false);
     }
   };
 
@@ -916,6 +998,86 @@ export default function AdminSalesPage() {
                   <span className="material-symbols-outlined text-[14px]">save</span>
                   {isSavingTracking ? 'Saving…' : 'Save Status & Tracking'}
                 </button>
+              </div>
+
+              {/* Shipping (ShipPrime) */}
+              <div className="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col gap-4">
+                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-primary">local_shipping</span>
+                  Shipping (ShipPrime)
+                </h4>
+
+                {(!selectedOrder.shipment || selectedOrder.shipment.status === 'failed') && (
+                  <div className="flex flex-col gap-3">
+                    {selectedOrder.shipment?.status === 'failed' && (
+                      <p className="text-[12px] text-error">
+                        Automatic shipment creation failed: {selectedOrder.shipment.error}
+                      </p>
+                    )}
+                    {!selectedOrder.shipment && (
+                      <p className="text-[12px] text-on-surface-variant">No shipment created yet.</p>
+                    )}
+                    <button
+                      type="button"
+                      disabled={shipmentBusy}
+                      onClick={handleCreateShipment}
+                      className="btn btn-primary self-start py-1.5 px-4 text-[10px]"
+                    >
+                      {shipmentBusy ? 'Creating…' : 'Create Shipment'}
+                    </button>
+                  </div>
+                )}
+
+                {selectedOrder.shipment && selectedOrder.shipment.status !== 'failed' && (
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+                      <div>
+                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">AWB</span>
+                        <span className="font-mono text-on-surface">{selectedOrder.shipment.awb}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">Courier</span>
+                        <span className="text-on-surface">{selectedOrder.shipment.courier}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">Status</span>
+                        <span className="text-on-surface">
+                          {selectedOrder.shipment.status === 'cancelled' ? 'Cancelled' : (selectedOrder.shipment.currentStatus || 'Created')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedOrder.shipment.labelUrl && (
+                        <a
+                          href={selectedOrder.shipment.labelUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-secondary py-1.5 px-4 text-[10px]"
+                        >
+                          Print Label
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        disabled={shipmentBusy}
+                        onClick={handleRefreshTracking}
+                        className="btn btn-secondary py-1.5 px-4 text-[10px]"
+                      >
+                        {shipmentBusy ? 'Refreshing…' : 'Refresh Tracking'}
+                      </button>
+                      {selectedOrder.shipment.status !== 'cancelled' && (
+                        <button
+                          type="button"
+                          disabled={shipmentBusy}
+                          onClick={handleCancelShipment}
+                          className="btn py-1.5 px-4 text-[10px] text-error border border-error/30 hover:bg-error/10"
+                        >
+                          Cancel Shipment
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Items List */}
