@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -6,13 +6,7 @@ import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
-
-const NAV_LINKS = [
-  { label: 'New Arrivals', to: '/products' },
-  { label: 'Sarees', to: '/products?category=Saree' },
-  { label: 'Lehengas', to: '/products?category=Lehenga' },
-  { label: 'Kurtis', to: '/products?category=Kurti' },
-];
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 
 function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove }) {
   return (
@@ -72,7 +66,15 @@ export default function CartPage() {
   const { items: cartItems, updateQuantity, removeItem } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   const handleIncrease = (id) => {
     const line = cartItems.find((item) => item.id === id);
@@ -109,7 +111,7 @@ export default function CartPage() {
             A2Z Collection
           </Link>
           <nav className="hidden md:flex gap-6 font-body-lg text-body-lg">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.label}
                 className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
@@ -125,7 +127,7 @@ export default function CartPage() {
           <ProfileButton className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
-      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={NAV_LINKS} />
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
       {/* Main Content */}
       <main className="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-[64px]">
         <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-gutter">
