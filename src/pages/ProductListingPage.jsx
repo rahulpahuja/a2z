@@ -51,7 +51,28 @@ export default function ProductListingPage() {
     [activeCategory]
   );
 
-  const [priceValue, setPriceValue] = useState(2500);
+  // Dynamic min and max catalog price limits
+  const { minCatalogPrice, maxCatalogPrice } = useMemo(() => {
+    if (!CATALOG || CATALOG.length === 0) return { minCatalogPrice: 0, maxCatalogPrice: 50000 };
+    const prices = CATALOG.map((p) => Number(p.price) || 0).filter((p) => p > 0);
+    if (prices.length === 0) return { minCatalogPrice: 0, maxCatalogPrice: 50000 };
+    return {
+      minCatalogPrice: Math.floor(Math.min(...prices)),
+      maxCatalogPrice: Math.ceil(Math.max(...prices)),
+    };
+  }, [CATALOG]);
+
+  const [selectedGender, setSelectedGender] = useState(searchParams.get('gender') ?? 'All');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(50000);
+
+  // Sync default maxPrice once catalog prices are calculated
+  useEffect(() => {
+    if (maxCatalogPrice > 0 && maxPrice === 50000) {
+      setMaxPrice(maxCatalogPrice);
+    }
+  }, [maxCatalogPrice]);
+
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [favorites, setFavorites] = useState({});
@@ -73,7 +94,7 @@ export default function ProductListingPage() {
   useEffect(() => {
     setCurrentPage(1);
     setVisibleCount(50);
-  }, [activeCategory, activeSubcategory, selectedColor, priceValue, selectedSize, sortBy]);
+  }, [activeCategory, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColor, selectedSize, sortBy]);
 
   const setActiveCategory = (category) => {
     const next = {};
@@ -107,9 +128,33 @@ export default function ProductListingPage() {
     let base = activeCategoryList.length === 0
       ? CATALOG
       : CATALOG.filter((p) => activeCategoryList.includes(p.category || p.categoryTitle));
+
     if (activeSubcategory !== 'All') {
       base = base.filter((p) => p.subcategoryTitle === activeSubcategory);
     }
+
+    if (selectedGender !== 'All') {
+      base = base.filter((p) => {
+        const g = (p.gender || 'Unisex').toString().trim().toLowerCase();
+        const sel = selectedGender.toLowerCase();
+        if (sel === 'male' || sel === 'men') {
+          return g === 'male' || g === 'men' || g === 'unisex';
+        }
+        if (sel === 'female' || sel === 'women') {
+          return g === 'female' || g === 'women' || g === 'unisex';
+        }
+        if (sel === 'unisex') {
+          return g === 'unisex';
+        }
+        return g === sel;
+      });
+    }
+
+    base = base.filter((p) => {
+      const price = Number(p.price) || 0;
+      return price >= minPrice && price <= maxPrice;
+    });
+
     if (selectedColorLabel) {
       base = base.filter((p) => (p.colors ?? []).some((c) => String(c).toLowerCase() === selectedColorLabel.toLowerCase()));
     }
@@ -117,7 +162,7 @@ export default function ProductListingPage() {
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
-  }, [CATALOG, activeCategoryList, activeSubcategory, selectedColorLabel, sortBy]);
+  }, [CATALOG, activeCategoryList, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColorLabel, sortBy]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -195,10 +240,19 @@ export default function ProductListingPage() {
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
-      <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
-        <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
-          {activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
-        </h1>
+      <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4">
+        <div>
+          <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
+            {activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
+          </h1>
+          {/* Top Counter Banner showing X of Y products */}
+          <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm font-semibold">
+            <span className="material-symbols-outlined text-base">inventory_2</span>
+            <span>
+              Showing <strong className="font-bold">{lazyLoadedProducts.length}</strong> of <strong className="font-bold">{filteredProducts.length}</strong> products
+            </span>
+          </div>
+        </div>
         <div className="mt-4 md:mt-0 flex items-center gap-3">
           <button
             type="button"
@@ -236,6 +290,7 @@ export default function ProductListingPage() {
         }}
       >
         <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} md:block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4`}>
+          {/* Category Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
               Category
@@ -252,6 +307,30 @@ export default function ProductListingPage() {
                     name="category"
                   />
                   <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">{category}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Gender Filter on Left Side */}
+          <div className="space-y-4 border-b border-surface-variant pb-6">
+            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+              Gender
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+            </h3>
+            <div className="space-y-3">
+              {['All', 'Male', 'Female', 'Unisex'].map((genderOption) => (
+                <label key={genderOption} className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    checked={selectedGender === genderOption}
+                    onChange={() => setSelectedGender(genderOption)}
+                    className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                    type="radio"
+                    name="gender"
+                  />
+                  <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">
+                    {genderOption === 'Male' ? 'Male / Men' : genderOption === 'Female' ? 'Female / Women' : genderOption}
+                  </span>
                 </label>
               ))}
             </div>
@@ -290,23 +369,67 @@ export default function ProductListingPage() {
             </div>
           )}
 
+          {/* Dual-Bound Price Range Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
               Price Range
               <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
             </h3>
-            <div className="pt-2">
-              <input
-                className="range-slider mb-4"
-                max="4999"
-                min="299"
-                type="range"
-                value={priceValue}
-                onChange={(e) => setPriceValue(Number(e.target.value))}
-              />
-              <div className="flex justify-between items-center font-body-sm text-body-sm text-on-surface-variant">
-                <span>₹299</span>
-                <span>₹4,999</span>
+            <div className="pt-1 space-y-4">
+              <div className="flex items-center justify-between text-xs font-semibold text-primary">
+                <span>Min: ₹{minPrice.toLocaleString('en-IN')}</span>
+                <span>Max: ₹{maxPrice.toLocaleString('en-IN')}</span>
+              </div>
+
+              {/* Sliders */}
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] text-on-surface-variant mb-1 font-medium">Low Price (Min)</label>
+                  <input
+                    className="range-slider"
+                    max={maxPrice}
+                    min={minCatalogPrice}
+                    type="range"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-on-surface-variant mb-1 font-medium">High Price (Max)</label>
+                  <input
+                    className="range-slider"
+                    max={Math.max(maxCatalogPrice, 50000)}
+                    min={minPrice}
+                    type="range"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice))}
+                  />
+                </div>
+              </div>
+
+              {/* Numeric Inputs */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Min Price (₹)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={maxPrice}
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(Math.max(0, Math.min(Number(e.target.value) || 0, maxPrice)))}
+                    className="w-full bg-surface-container-lowest border border-outline rounded-lg px-3 py-1.5 text-xs text-on-surface outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Max Price (₹)</label>
+                  <input
+                    type="number"
+                    min={minPrice}
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Math.max(minPrice, Number(e.target.value) || 0))}
+                    className="w-full bg-surface-container-lowest border border-outline rounded-lg px-3 py-1.5 text-xs text-on-surface outline-none focus:border-primary"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -365,7 +488,9 @@ export default function ProductListingPage() {
             className="w-full py-3 rounded-xl border border-primary text-primary font-label-caps text-label-caps uppercase tracking-widest hover:bg-primary/5 transition-colors"
             onClick={() => {
               setSearchParams({});
-              setPriceValue(2500);
+              setSelectedGender('All');
+              setMinPrice(minCatalogPrice);
+              setMaxPrice(maxCatalogPrice || 50000);
               setSelectedColor(null);
               setSelectedSize(null);
             }}
@@ -375,11 +500,33 @@ export default function ProductListingPage() {
         </aside>
 
         <div className="flex-grow">
-          <div className="flex flex-wrap gap-2 mb-6 hidden md:flex">
+          <div className="flex flex-wrap gap-2 mb-6 items-center">
+            {selectedGender !== 'All' && (
+              <span className="px-3 py-1 rounded-[32px] bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm flex items-center gap-1">
+                Gender: {selectedGender}{' '}
+                <button className="hover:text-error ml-0.5" onClick={() => setSelectedGender('All')}>
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              </span>
+            )}
+            {(minPrice > minCatalogPrice || maxPrice < maxCatalogPrice) && (
+              <span className="px-3 py-1 rounded-[32px] bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm flex items-center gap-1">
+                Price: ₹{minPrice.toLocaleString('en-IN')} - ₹{maxPrice.toLocaleString('en-IN')}{' '}
+                <button
+                  className="hover:text-error ml-0.5"
+                  onClick={() => {
+                    setMinPrice(minCatalogPrice);
+                    setMaxPrice(maxCatalogPrice || 50000);
+                  }}
+                >
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              </span>
+            )}
             {selectedColorLabel && (
               <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
-                {selectedColorLabel}{' '}
-                <button className="hover:text-error" onClick={() => setSelectedColor(null)}>
+                Color: {selectedColorLabel}{' '}
+                <button className="hover:text-error ml-0.5" onClick={() => setSelectedColor(null)}>
                   <span className="material-symbols-outlined text-[16px]">close</span>
                 </button>
               </span>
@@ -387,7 +534,7 @@ export default function ProductListingPage() {
             {selectedSizeLabel && (
               <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
                 Size: {selectedSizeLabel}{' '}
-                <button className="hover:text-error" onClick={() => setSelectedSize(null)}>
+                <button className="hover:text-error ml-0.5" onClick={() => setSelectedSize(null)}>
                   <span className="material-symbols-outlined text-[16px]">close</span>
                 </button>
               </span>

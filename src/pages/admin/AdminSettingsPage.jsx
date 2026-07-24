@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS } from '../../services/storeSettings.js';
+import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
 
@@ -101,6 +101,33 @@ export default function AdminSettingsPage() {
               )}
             </div>
           ))}
+
+          {/* Refund Policy Provision for Super User */}
+          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+            <div className="flex justify-between items-center mb-1">
+              <h2 className="font-title-sm text-title-sm text-on-surface">Refund &amp; Return Policy</h2>
+              <button
+                type="button"
+                onClick={() => setSettings((prev) => ({ ...prev, refundPolicy: DEFAULT_REFUND_POLICY }))}
+                className="text-xs text-primary hover:underline font-label-caps uppercase tracking-wider"
+              >
+                Reset to Default Policy
+              </button>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+              Super User setting to alter the refund policy displayed on <code className="text-xs font-mono bg-surface-container-high px-1 rounded">/refund-policy</code>.
+            </p>
+            <div>
+              <textarea
+                id="refundPolicy"
+                rows={12}
+                value={settings.refundPolicy ?? DEFAULT_REFUND_POLICY}
+                onChange={updateField('refundPolicy')}
+                placeholder="Enter custom refund policy..."
+                className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-mono text-sm text-on-surface transition-colors leading-relaxed"
+              />
+            </div>
+          </div>
 
           <div className="border-t border-outline-variant/30 pt-5 mt-1">
             <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Pickup Address (for shipping)</h2>
