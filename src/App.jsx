@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './context/AuthContext.jsx'
 import BotGate from './components/BotGate.jsx'
 import EntryGate from './components/EntryGate.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
@@ -129,6 +131,14 @@ function adminElement(Component) {
 }
 
 export default function App() {
+  const { user } = useAuth();
+
+  // Visible cue that you're signed in: darken the top bars while logged in,
+  // revert on logout.
+  useEffect(() => {
+    document.body.classList.toggle('user-signed-in', Boolean(user));
+  }, [user]);
+
   return (
     <>
       <BotGate>

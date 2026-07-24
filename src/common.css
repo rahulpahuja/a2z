@@ -281,3 +281,11 @@
   border-bottom: 1px solid rgba(220, 191, 201, 0.2);
   font-size: 14px;
 }
+
+/* Storefront top bars all share the "docked" marker class. Darken them
+   slightly while signed in so the logged-in state is visible at a glance,
+   without touching the shared --color-surface tokens used elsewhere. */
+body.user-signed-in .docked {
+  filter: brightness(0.93);
+  transition: filter 0.2s ease;
+}

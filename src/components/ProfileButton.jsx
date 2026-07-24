@@ -14,7 +14,7 @@ function displayName(user, profile) {
 }
 
 export default function ProfileButton({ className = '', iconClassName = 'material-symbols-outlined' }) {
-  const { user, isAdmin, signOutUser } = useAuth();
+  const { user, signOutUser } = useAuth();
   const { profile } = useProfile();
   const { trackSpecificOrder } = useCart();
   const navigate = useNavigate();
@@ -163,16 +163,6 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                 <span className="material-symbols-outlined text-[16px]">edit</span>
                 Edit Profile
               </button>
-              {isAdmin && (
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[16px]">dashboard</span>
-                  Admin Dashboard
-                </Link>
-              )}
               <button
                 type="button"
                 onClick={() => {

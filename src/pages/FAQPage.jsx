@@ -49,7 +49,12 @@ const FAQ_SECTIONS = [
       },
       {
         question: 'What payment methods do you accept?',
-        answer: 'We accept major credit/debit cards, UPI, popular digital wallets, and Cash on Delivery (COD) where available.',
+        answer: 'We accept major credit/debit cards, UPI, and popular digital wallets — all orders are prepaid at checkout.',
+      },
+      {
+        question: 'Why don’t you offer Cash on Delivery (COD)?',
+        answer:
+          'We sell quality products and stand by them, and we’d rather serve customers who value that the same way we do. COD tends to attract low-intent orders and a high rate of refused deliveries, which drives up costs for everyone and slows down genuine customers. Paying upfront keeps our pricing fair and our service reliable — if you want a quality product, that commitment starts at checkout.',
       },
       {
         question: 'How do I find my size?',
