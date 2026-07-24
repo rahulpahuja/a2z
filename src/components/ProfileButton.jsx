@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import { subscribeToOrders } from '../services/orders.js';
 import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
+import { orderBelongsToUser } from '../utils/orderMatch.js';
 import AuthModal from './AuthModal.jsx';
 import ProfileModal from './ProfileModal.jsx';
 
@@ -28,21 +29,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
       return;
     }
     const unsubscribe = subscribeToOrders((orders) => {
-      const filtered = orders.filter((o) => {
-        // Filter orders by matching shipping details phone or email, or username matching first name
-        const userPhoneDigits = user.phoneNumber ? user.phoneNumber.replace(/\D/g, '') : '';
-        const shippingPhoneDigits = o.shippingDetails?.phone ? o.shippingDetails.phone.replace(/\D/g, '') : '';
-        
-        const phoneMatches = userPhoneDigits && shippingPhoneDigits && (userPhoneDigits.endsWith(shippingPhoneDigits) || shippingPhoneDigits.endsWith(userPhoneDigits));
-        const emailMatches = user.email && o.shippingDetails?.email?.toLowerCase() === user.email.toLowerCase();
-        
-        // Fallback matching to let mock admin see mock orders or guest orders that match
-        const nameMatches = user.displayName && o.shippingDetails?.firstName && 
-          o.shippingDetails.firstName.toLowerCase().includes(user.displayName.split(' ')[0].toLowerCase());
-          
-        return phoneMatches || emailMatches || nameMatches || o.customerId === user.uid;
-      });
-      setUserOrders(filtered);
+      setUserOrders(orders.filter((o) => orderBelongsToUser(o, user)));
     });
     return unsubscribe;
   }, [user]);
@@ -154,6 +141,13 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                   ))}
                 </div>
               )}
+              <Link
+                to="/orders"
+                onClick={() => setMenuOpen(false)}
+                className="text-[11px] text-primary hover:underline font-semibold self-start mt-0.5"
+              >
+                View All Orders →
+              </Link>
             </div>
 
             {/* Menu options */}

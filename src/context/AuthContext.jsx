@@ -64,8 +64,21 @@ const _ADMIN_PHONES = (import.meta.env.VITE_ADMIN_PHONES || '')
   .map((value) => value.trim())
   .filter(Boolean);
 
-function computeIsAdmin(_user) {
-  return true; // Bypass admin auth check, always allow admin access
+function computeIsAdmin(user) {
+  if (!user) return false;
+  // Firebase disabled = local/demo mode (no real backend) — keep the frictionless
+  // mock-admin login working rather than requiring VITE_ADMIN_* to be set.
+  if (!isFirebaseEnabled) return true;
+  const email = user.email?.toLowerCase();
+  if (email && _ADMIN_EMAILS.includes(email)) return true;
+  const phoneDigits = user.phoneNumber ? user.phoneNumber.replace(/\D/g, '') : '';
+  if (phoneDigits && _ADMIN_PHONES.some((p) => {
+    const adminDigits = p.replace(/\D/g, '');
+    return adminDigits && (phoneDigits.endsWith(adminDigits) || adminDigits.endsWith(phoneDigits));
+  })) {
+    return true;
+  }
+  return false;
 }
 
 const _FIREBASE_DISABLED_MESSAGE = 'Sign-in is not configured yet. Add Firebase credentials to .env to enable it.';
