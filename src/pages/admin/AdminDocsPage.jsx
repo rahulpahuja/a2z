@@ -123,10 +123,10 @@ export default function AdminDocsPage() {
               </li>
               <li>
                 If the signed-in account's email or phone number is in <Code>VITE_ADMIN_EMAILS</Code> /{' '}
-                <Code>VITE_ADMIN_PHONES</Code>, an <strong>Admin Dashboard</strong> link appears in the account menu
-                and <Code>/super</Code>, <Code>/dashboard</Code> become reachable.
+                <Code>VITE_ADMIN_PHONES</Code>, navigating directly to <Code>/super</Code> (or <Code>/dashboard</Code>)
+                works — there's no link to it in the customer account menu, by design.
               </li>
-              <li>Otherwise, visiting an admin route shows an "Access Denied" screen with a sign-out button.</li>
+              <li>Otherwise, visiting an admin route silently redirects to the homepage.</li>
             </ol>
             <p>
               Relevant source: <Code>src/context/AuthContext.jsx</Code> (sign-in logic + <Code>isAdmin</Code>),{' '}
