@@ -149,7 +149,7 @@ export default function AdminConfiguratorPage() {
   const [topNavLoading, setTopNavLoading] = useState(true);
   const [navSaving, setNavSaving] = useState(false);
   const [newLinkType, setNewLinkType] = useState('category');
-  const [newLinkCategoryId, setNewLinkCategoryId] = useState('');
+  const [newLinkCategoryIds, setNewLinkCategoryIds] = useState([]);
   const [newLinkLabel, setNewLinkLabel] = useState('');
 
   useEffect(() => {
@@ -345,11 +345,11 @@ export default function AdminConfiguratorPage() {
   // Top Navigation handlers
   const handleAddNavLink = () => {
     if (newLinkType === 'category') {
-      const category = categoryRows.find((c) => c.id === newLinkCategoryId);
-      if (!category) return;
+      const titles = categoryRows.filter((c) => newLinkCategoryIds.includes(c.id)).map((c) => c.title);
+      if (titles.length === 0) return;
       setTopNavLinks((prev) => [
         ...prev,
-        { id: `nav_${Date.now()}`, label: newLinkLabel.trim() || category.title, type: 'category', category: category.title },
+        { id: `nav_${Date.now()}`, label: newLinkLabel.trim() || titles.join(' + '), type: 'category', categories: titles },
       ]);
     } else {
       setTopNavLinks((prev) => [
@@ -358,7 +358,13 @@ export default function AdminConfiguratorPage() {
       ]);
     }
     setNewLinkLabel('');
-    setNewLinkCategoryId('');
+    setNewLinkCategoryIds([]);
+  };
+
+  const handleToggleNavLinkCategory = (categoryId) => {
+    setNewLinkCategoryIds((prev) =>
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]
+    );
   };
 
   const handleRemoveNavLink = (id) => {
@@ -845,7 +851,7 @@ export default function AdminConfiguratorPage() {
                                 className="form-input text-[12px] py-2 px-3 flex-1"
                               />
                               <span className="text-[10px] text-on-surface-variant/70 font-mono shrink-0 whitespace-nowrap">
-                                {link.type === 'all' ? 'All Products' : link.category}
+                                {link.type === 'all' ? 'All Products' : (link.categories?.length ? link.categories.join(', ') : link.category)}
                               </span>
                               <button
                                 type="button"
@@ -870,13 +876,20 @@ export default function AdminConfiguratorPage() {
 
                         {newLinkType === 'category' && (
                           <div className="form-group flex-1">
-                            <label className="form-label text-[11px]">Category</label>
-                            <select value={newLinkCategoryId} onChange={(e) => setNewLinkCategoryId(e.target.value)} className="form-select text-[12px] py-2 px-3">
-                              <option value="">Select a category</option>
+                            <label className="form-label text-[11px]">Categories</label>
+                            <div className="flex flex-wrap gap-x-4 gap-y-2 border border-outline-variant/40 rounded-lg px-3 py-2.5">
                               {categoryRows.map((c) => (
-                                <option key={c.id} value={c.id}>{c.title}</option>
+                                <label key={c.id} className="flex items-center gap-1.5 text-[12px] text-on-surface cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={newLinkCategoryIds.includes(c.id)}
+                                    onChange={() => handleToggleNavLinkCategory(c.id)}
+                                    className="filter-checkbox rounded border-outline w-4 h-4 text-primary focus:ring-primary"
+                                  />
+                                  {c.title}
+                                </label>
                               ))}
-                            </select>
+                            </div>
                           </div>
                         )}
 
@@ -893,7 +906,7 @@ export default function AdminConfiguratorPage() {
                         <button
                           type="button"
                           onClick={handleAddNavLink}
-                          disabled={newLinkType === 'category' && !newLinkCategoryId}
+                          disabled={newLinkType === 'category' && newLinkCategoryIds.length === 0}
                           className="bg-primary-container text-on-primary-container font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity disabled:opacity-50 shrink-0"
                         >
                           Add Link

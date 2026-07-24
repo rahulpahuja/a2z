@@ -55,11 +55,16 @@ export function saveTopNav(links) {
   return set(ref(db, PATH), links);
 }
 
-// A nav link only ever references a category by name (never a free-form
-// URL), so this can only ever resolve to an in-catalog products view.
+// A nav link only ever references one or more categories by name (never a
+// free-form URL), so this can only ever resolve to an in-catalog products
+// view. `categories` (array) is preferred; `category` (single string) is
+// kept for links saved before multi-category support was added.
 export function topNavLinkToPath(link) {
-  if (link.type === 'category' && link.category) {
-    return `/products?category=${encodeURIComponent(link.category)}`;
+  if (link.type === 'category') {
+    const categories = link.categories?.length ? link.categories : (link.category ? [link.category] : []);
+    if (categories.length) {
+      return `/products?category=${encodeURIComponent(categories.join(','))}`;
+    }
   }
   return '/products';
 }
