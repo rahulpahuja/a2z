@@ -5,7 +5,6 @@ import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
 import TamperWarningBanner from './components/TamperWarningBanner.jsx'
-import TestModeNotice from './components/TestModeNotice.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import StorefrontPage from './pages/StorefrontPage.jsx'
@@ -130,7 +129,6 @@ function adminElement(Component) {
 export default function App() {
   return (
     <>
-      <TestModeNotice />
       <BotGate>
         <ProductsProvider>
           <StorefrontThemeProvider>
