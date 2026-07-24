@@ -46,10 +46,14 @@ export default function ProductListingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') ?? 'All';
   const activeSubcategory = searchParams.get('subcategory') ?? 'All';
+  const activeCategoryList = useMemo(
+    () => (activeCategory === 'All' ? [] : activeCategory.split(',')),
+    [activeCategory]
+  );
 
   const [priceValue, setPriceValue] = useState(2500);
   const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedSize, setSelectedSize] = useState('m');
+  const [selectedSize, setSelectedSize] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [sortBy, setSortBy] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,15 +96,17 @@ export default function ProductListingPage() {
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
 
   const subcategoryOptions = useMemo(() => {
-    const relevant = activeCategory === 'All'
+    const relevant = activeCategoryList.length === 0
       ? SUBCATEGORIES
-      : SUBCATEGORIES.filter((s) => s.categoryTitle === activeCategory);
+      : SUBCATEGORIES.filter((s) => activeCategoryList.includes(s.categoryTitle));
     const titles = [...new Set(relevant.map((s) => s.title))];
     return titles;
-  }, [SUBCATEGORIES, activeCategory]);
+  }, [SUBCATEGORIES, activeCategoryList]);
 
   const filteredProducts = useMemo(() => {
-    let base = activeCategory === 'All' ? CATALOG : CATALOG.filter((p) => (p.category || p.categoryTitle) === activeCategory);
+    let base = activeCategoryList.length === 0
+      ? CATALOG
+      : CATALOG.filter((p) => activeCategoryList.includes(p.category || p.categoryTitle));
     if (activeSubcategory !== 'All') {
       base = base.filter((p) => p.subcategoryTitle === activeSubcategory);
     }
@@ -111,7 +117,7 @@ export default function ProductListingPage() {
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
-  }, [CATALOG, activeCategory, activeSubcategory, selectedColorLabel, sortBy]);
+  }, [CATALOG, activeCategoryList, activeSubcategory, selectedColorLabel, sortBy]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -191,7 +197,7 @@ export default function ProductListingPage() {
 
       <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant">
         <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
-          {activeCategory === 'All' ? 'ALL PRODUCTS' : `${activeCategory.toUpperCase()}S`}
+          {activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
         </h1>
         <div className="mt-4 md:mt-0 flex items-center gap-3">
           <button
@@ -239,7 +245,7 @@ export default function ProductListingPage() {
               {CATEGORY_OPTIONS.map((category) => (
                 <label key={category} className="flex items-center gap-3 cursor-pointer group">
                   <input
-                    checked={activeCategory === category}
+                    checked={category === 'All' ? activeCategory === 'All' : activeCategoryList.length === 1 && activeCategoryList[0] === category}
                     onChange={() => setActiveCategory(category)}
                     className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                     type="radio"

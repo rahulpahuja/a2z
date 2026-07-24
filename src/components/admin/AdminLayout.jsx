@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 
 export const NAV_ITEMS = [
   { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
+  { to: '/super/configurator', label: 'Layout Configurator', icon: 'settings_accessibility' },
   { to: '/super/sales', label: 'Sales Management', icon: 'bar_chart' },
   { to: '/super/collections', label: 'Collections', icon: 'collections_bookmark' },
   { to: '/super/categories', label: 'Categories', icon: 'category' },
@@ -16,7 +17,6 @@ export const NAV_ITEMS = [
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
   { to: '/super/tracking-partners', label: 'Tracking Partners', icon: 'local_shipping' },
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },
-  { to: '/super/configurator', label: 'Layout Configurator', icon: 'settings_accessibility' },
   { to: '/super/docs', label: 'Docs', icon: 'menu_book' },
 ];
 
