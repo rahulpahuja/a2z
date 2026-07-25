@@ -226,12 +226,12 @@ export default function ProductDetailPage() {
             )}
           </div>
           {media.length > 1 && (
-            <div className="grid grid-cols-5 gap-unit">
+            <div className="flex flex-wrap gap-unit sm:grid sm:grid-cols-5">
               {media.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedThumbnail(index)}
-                  className={`relative overflow-hidden border transition-all ${
+                  className={`relative overflow-hidden border transition-all shrink-0 ${
                     selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
                   }`}
                   style={{
