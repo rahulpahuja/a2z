@@ -27,6 +27,8 @@ export const DEFAULT_STORE_SETTINGS = {
   gstNumber: '',
   facebookUrl: FACEBOOK_URL,
   refundPolicy: DEFAULT_REFUND_POLICY,
+  // Days a deleted product sits in Trash before it's auto-purged for good.
+  trashRetentionDays: 60,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.

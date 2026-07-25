@@ -126,6 +126,15 @@ categories.forEach((c) => {
   c.image = getHighResUrl(c.image);
 });
 
+function EmptySegment({ message }) {
+  return (
+    <div className="flex flex-col items-center gap-4 py-16 text-center">
+      <span className="material-symbols-outlined text-6xl text-on-surface-variant">inventory_2</span>
+      <p className="font-body-lg text-body-lg text-on-surface-variant">{message}</p>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { products } = useProducts();
   const { theme } = useStorefrontTheme();
@@ -328,6 +337,9 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </Link>
           </div>
+          {productsRow1.length === 0 ? (
+            <EmptySegment message="No featured products yet — check back soon." />
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {productsRow1.map((product) => {
               const isFavorited = !!favorites[product.id];
@@ -387,6 +399,7 @@ export default function HomePage() {
               );
             })}
           </div>
+          )}
         </section>
 
         {/* Featured Products Row 2 */}
@@ -401,6 +414,9 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </Link>
           </div>
+          {productsRow2.length === 0 ? (
+            <EmptySegment message="No heritage pieces here yet — check back soon." />
+          ) : (
           <div className="relative group/arrows">
             {/* Left scroll navigation */}
             <button
@@ -487,6 +503,7 @@ export default function HomePage() {
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
+          )}
         </section>
 
         {/* Video Grid Lookbook Section */}

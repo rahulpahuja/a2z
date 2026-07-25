@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
   { to: '/super/collections', label: 'Collections', icon: 'collections_bookmark' },
   { to: '/super/categories', label: 'Categories', icon: 'category' },
   { to: '/super/products', label: 'Products', icon: 'inventory_2' },
+  { to: '/super/trash', label: 'Trash', icon: 'delete' },
   { to: '/super/product-videos', label: 'Product Videos', icon: 'video_library' },
   { to: '/super/image-studio', label: 'Image Studio', icon: 'photo_library' },
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
