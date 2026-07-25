@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCategories } from '../../services/categories.js';
 import { subscribeToSubcategories } from '../../services/subcategories.js';
-import { subscribeToAdminProducts, createAdminProduct, deleteAdminProduct, createFileMetadata } from '../../services/adminProducts.js';
+import { subscribeToAdminProducts, createAdminProduct, moveProductToTrash, createFileMetadata } from '../../services/adminProducts.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
+import { getR2KeyFromUrl } from '../../utils/productImages.js';
 import ProductImage from '../../components/ProductImage.jsx';
 
 const uploadImageToExternalServer = async (file, customName) => {
@@ -74,36 +75,6 @@ export default function AdminProductsPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
-  const getR2KeyFromUrl = (url) => {
-    try {
-      const parsed = new URL(url);
-      const parts = parsed.pathname.split('/');
-      return parts[parts.length - 1]; // gets filename
-    } catch {
-      return null;
-    }
-  };
-
-  const deleteProductAndImages = async (product) => {
-    const urls = product.images || (product.image ? [product.image] : []);
-    const deletePromises = urls.map(async (url) => {
-      const key = getR2KeyFromUrl(url);
-      if (key) {
-        try {
-          const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
-          if (apiUrl) {
-            await fetch(`${apiUrl}/${key}`, {
-              method: 'DELETE',
-            });
-          }
-        } catch (e) {
-          console.error(`Failed to delete R2 file: ${key}`, e);
-        }
-      }
-    });
-    await Promise.all(deletePromises);
-    await deleteAdminProduct(product.id);
-  };
 
   const handleStartEdit = (product) => {
     setEditingProductId(product.id);
@@ -250,23 +221,23 @@ export default function AdminProductsPage() {
   const handleBulkDelete = async () => {
     if (selectedProductIds.length === 0) return;
     const confirmed = window.confirm(
-      `Are you sure you want to permanently delete the ${selectedProductIds.length} selected products? This will remove all associated database records and images from R2 storage. This action cannot be undone.`
+      `Move the ${selectedProductIds.length} selected products to Trash? You can restore them from there, or they'll be deleted for good after the configured retention period.`
     );
     if (!confirmed) return;
 
     setSaving(true);
     try {
-      const deletePromises = selectedProductIds.map(async (id) => {
+      const trashPromises = selectedProductIds.map(async (id) => {
         const product = products.find((p) => p.id === id);
         if (product) {
-          await deleteProductAndImages(product);
+          await moveProductToTrash(product);
         }
       });
-      await Promise.all(deletePromises);
-      showToast(`${selectedProductIds.length} products deleted successfully.`);
+      await Promise.all(trashPromises);
+      showToast(`${selectedProductIds.length} products moved to Trash.`);
       setSelectedProductIds([]);
     } catch (err) {
-      showToast(err.message || 'Could not delete some products.');
+      showToast(err.message || 'Could not move some products to Trash.');
     } finally {
       setSaving(false);
     }
@@ -592,16 +563,16 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (product) => {
     const confirmed = window.confirm(
-      `Are you sure you want to permanently delete "${product.title || product.name}"? This will remove all associated database records and images from R2 storage. This action cannot be undone.`
+      `Move "${product.title || product.name}" to Trash? You can restore it from there, or it'll be deleted for good after the configured retention period.`
     );
     if (!confirmed) return;
 
     setSaving(true);
     try {
-      await deleteProductAndImages(product);
-      showToast('Product deleted.');
+      await moveProductToTrash(product);
+      showToast('Product moved to Trash.');
     } catch (err) {
-      showToast(err.message || 'Could not delete product.');
+      showToast(err.message || 'Could not move product to Trash.');
     } finally {
       setSaving(false);
     }
@@ -963,6 +934,14 @@ export default function AdminProductsPage() {
               </h2>
               <span className="font-body-sm text-[11px] text-on-surface-variant">Select all on this page</span>
             </div>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/super/trash"
+                className="flex items-center gap-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+              >
+                <span className="material-symbols-outlined text-[18px]">delete</span>
+                View Trash
+              </Link>
             {selectedProductIds.length > 0 && (
               <div className="flex items-center gap-3">
                 <button
@@ -981,10 +960,11 @@ export default function AdminProductsPage() {
                   className="flex items-center gap-2 bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-[18px]">delete</span>
-                  Delete Selected ({selectedProductIds.length})
+                  Move to Trash ({selectedProductIds.length})
                 </button>
               </div>
             )}
+            </div>
           </div>
 
           <div className="relative mb-4 max-w-sm">
@@ -1102,7 +1082,7 @@ export default function AdminProductsPage() {
                             onClick={() => handleDelete(product)}
                             className="font-label-caps text-label-caps text-error hover:underline"
                           >
-                            Delete
+                            Move to Trash
                           </button>
                         </div>
                       </div>

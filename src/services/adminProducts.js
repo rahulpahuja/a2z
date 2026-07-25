@@ -1,8 +1,9 @@
-import { onValue, ref, remove, serverTimestamp, set, get } from 'firebase/database';
+import { onValue, ref, remove, serverTimestamp, set, get, update } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { PRODUCTS } from '../data/products.js';
 
 const ROOT = 'adminProducts';
+const TRASH_ROOT = 'trashedProducts';
 const generateSku = () => `A2Z-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
 
 function getLocalProducts() {
@@ -116,6 +117,97 @@ export function deleteAdminProduct(id) {
     return Promise.resolve();
   }
   return remove(ref(db, `${ROOT}/${id}`));
+}
+
+function getLocalTrash() {
+  try {
+    const data = localStorage.getItem(TRASH_ROOT);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setLocalTrash(items) {
+  localStorage.setItem(TRASH_ROOT, JSON.stringify(items));
+}
+
+const trashListeners = new Set();
+function notifyTrashListeners() {
+  const items = getLocalTrash();
+  items.sort((a, b) => (b.trashedAtMs ?? 0) - (a.trashedAtMs ?? 0));
+  trashListeners.forEach((listener) => listener(items, null));
+}
+
+export function subscribeToTrashedProducts(callback) {
+  if (!isFirebaseEnabled) {
+    trashListeners.add(callback);
+    const items = getLocalTrash();
+    items.sort((a, b) => (b.trashedAtMs ?? 0) - (a.trashedAtMs ?? 0));
+    callback(items, null);
+    return () => {
+      trashListeners.delete(callback);
+    };
+  }
+  return onValue(
+    ref(db, TRASH_ROOT),
+    (snapshot) => {
+      const rows = [];
+      snapshot.forEach((child) => {
+        rows.push({ id: child.key, ...child.val() });
+      });
+      rows.sort((a, b) => (b.trashedAtMs ?? 0) - (a.trashedAtMs ?? 0));
+      callback(rows, null);
+    },
+    (error) => callback([], error)
+  );
+}
+
+// Soft-delete: moves a product out of the live catalog into trashedProducts,
+// stamped with when it was trashed. Images are deliberately left alone in R2
+// here — they're only cleaned up on permanent delete/expiry, since a trashed
+// product can still be restored.
+export function moveProductToTrash(product) {
+  const { id } = product;
+  if (!isFirebaseEnabled) {
+    setLocalProducts(getLocalProducts().filter((p) => p.id !== id));
+    notifyLocalListeners();
+    const trash = getLocalTrash().filter((p) => p.id !== id);
+    trash.push({ ...product, trashedAtMs: Date.now() });
+    setLocalTrash(trash);
+    notifyTrashListeners();
+    return Promise.resolve();
+  }
+  return update(ref(db), {
+    [`${TRASH_ROOT}/${id}`]: { ...product, trashedAt: serverTimestamp(), trashedAtMs: Date.now() },
+    [`${ROOT}/${id}`]: null,
+  });
+}
+
+export function restoreProductFromTrash(trashedProduct) {
+  const { id, trashedAt: _trashedAt, trashedAtMs: _trashedAtMs, ...product } = trashedProduct;
+  if (!isFirebaseEnabled) {
+    setLocalTrash(getLocalTrash().filter((p) => p.id !== id));
+    notifyTrashListeners();
+    const products = getLocalProducts().filter((p) => p.id !== id);
+    products.push({ id, ...product });
+    setLocalProducts(products);
+    notifyLocalListeners();
+    return Promise.resolve();
+  }
+  return update(ref(db), {
+    [`${ROOT}/${id}`]: product,
+    [`${TRASH_ROOT}/${id}`]: null,
+  });
+}
+
+export function permanentlyDeleteTrashedProduct(id) {
+  if (!isFirebaseEnabled) {
+    setLocalTrash(getLocalTrash().filter((p) => p.id !== id));
+    notifyTrashListeners();
+    return Promise.resolve();
+  }
+  return remove(ref(db, `${TRASH_ROOT}/${id}`));
 }
 
 export function updateProductVideos(productId, videos) {
