@@ -35,7 +35,8 @@ const uploadImageToExternalServer = async (file, customName) => {
 };
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
-const PRODUCTS_PER_PAGE = 20;
+const DEFAULT_PAGE_SIZE = 200;
+const PAGE_SIZE_OPTIONS = [20, 50, 100, 200, 500];
 
 const EMPTY_FORM = {
   title: '',
@@ -70,6 +71,7 @@ export default function AdminProductsPage() {
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [titleFilter, setTitleFilter] = useState('');
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
   const getR2KeyFromUrl = (url) => {
@@ -407,7 +409,7 @@ export default function AdminProductsPage() {
     return products.filter((p) => (p.title || p.name || '').toLowerCase().includes(needle));
   }, [products, titleFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
 
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages));
@@ -415,11 +417,11 @@ export default function AdminProductsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [titleFilter]);
+  }, [titleFilter, pageSize]);
 
   const paginatedProducts = useMemo(
-    () => filteredProducts.slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE),
-    [filteredProducts, currentPage]
+    () => filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filteredProducts, currentPage, pageSize]
   );
 
   const updateField = (field) => (event) => {
@@ -1120,32 +1122,50 @@ export default function AdminProductsPage() {
             </div>
           )}
 
-          {!loading && !loadError && filteredProducts.length > PRODUCTS_PER_PAGE && (
+          {!loading && !loadError && filteredProducts.length > 0 && (
             <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-outline-variant/20">
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Showing {(currentPage - 1) * PRODUCTS_PER_PAGE + 1}–
-                {Math.min(currentPage * PRODUCTS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} products
+                Showing {(currentPage - 1) * pageSize + 1}–
+                {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} products
               </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  Prev
-                </button>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  Next
-                </button>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                  Per page
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                    className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-2 py-1.5 font-body-sm text-body-sm text-on-surface"
+                  >
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Prev
+                    </button>
+                    <span className="font-body-sm text-body-sm text-on-surface-variant">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
