@@ -189,11 +189,17 @@ export default function AdminProductsPage() {
     );
   };
 
-  const toggleSelectAll = () => {
-    if (selectedProductIds.length === products.length) {
-      setSelectedProductIds([]);
+  // Selects/deselects only the products visible on the current page — with
+  // pagination, silently selecting the entire catalog behind a "select all"
+  // checkbox that only shows 20 products at a time would be a bulk-delete
+  // footgun.
+  const toggleSelectAllOnPage = () => {
+    const pageIds = paginatedProducts.map((p) => p.id);
+    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedProductIds.includes(id));
+    if (allSelected) {
+      setSelectedProductIds((prev) => prev.filter((id) => !pageIds.includes(id)));
     } else {
-      setSelectedProductIds(products.map((p) => p.id));
+      setSelectedProductIds((prev) => [...new Set([...prev, ...pageIds])]);
     }
   };
 
