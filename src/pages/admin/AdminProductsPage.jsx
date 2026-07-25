@@ -69,6 +69,7 @@ export default function AdminProductsPage() {
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [titleFilter, setTitleFilter] = useState('');
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
   const getR2KeyFromUrl = (url) => {
@@ -400,15 +401,25 @@ export default function AdminProductsPage() {
     [subcategories, form.categoryId]
   );
 
-  const totalPages = Math.max(1, Math.ceil(products.length / PRODUCTS_PER_PAGE));
+  const filteredProducts = useMemo(() => {
+    const needle = titleFilter.trim().toLowerCase();
+    if (!needle) return products;
+    return products.filter((p) => (p.title || p.name || '').toLowerCase().includes(needle));
+  }, [products, titleFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
 
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages));
   }, [totalPages]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [titleFilter]);
+
   const paginatedProducts = useMemo(
-    () => products.slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE),
-    [products, currentPage]
+    () => filteredProducts.slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE),
+    [filteredProducts, currentPage]
   );
 
   const updateField = (field) => (event) => {
@@ -974,6 +985,24 @@ export default function AdminProductsPage() {
             )}
           </div>
 
+          <div className="relative mb-4 max-w-sm">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">
+              search
+            </span>
+            <input
+              type="text"
+              value={titleFilter}
+              onChange={(e) => setTitleFilter(e.target.value)}
+              placeholder="Filter by title…"
+              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg pl-10 pr-4 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+            />
+            {titleFilter && (
+              <p className="font-body-sm text-[11px] text-on-surface-variant mt-1">
+                {filteredProducts.length} of {products.length} products match "{titleFilter.trim()}"
+              </p>
+            )}
+          </div>
+
           {loading ? (
             <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
           ) : loadError ? (
@@ -982,6 +1011,8 @@ export default function AdminProductsPage() {
             </p>
           ) : products.length === 0 ? (
             <p className="font-body-sm text-body-sm text-on-surface-variant">No products yet.</p>
+          ) : filteredProducts.length === 0 ? (
+            <p className="font-body-sm text-body-sm text-on-surface-variant">No products match "{titleFilter.trim()}".</p>
           ) : (
             <div className="flex flex-col gap-4">
               {paginatedProducts.map((product) => {
@@ -1089,11 +1120,11 @@ export default function AdminProductsPage() {
             </div>
           )}
 
-          {!loading && !loadError && products.length > PRODUCTS_PER_PAGE && (
+          {!loading && !loadError && filteredProducts.length > PRODUCTS_PER_PAGE && (
             <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-outline-variant/20">
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 Showing {(currentPage - 1) * PRODUCTS_PER_PAGE + 1}–
-                {Math.min(currentPage * PRODUCTS_PER_PAGE, products.length)} of {products.length} products
+                {Math.min(currentPage * PRODUCTS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} products
               </p>
               <div className="flex items-center gap-2">
                 <button
