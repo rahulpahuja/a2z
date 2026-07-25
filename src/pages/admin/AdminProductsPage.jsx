@@ -35,6 +35,7 @@ const uploadImageToExternalServer = async (file, customName) => {
 };
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+const PRODUCTS_PER_PAGE = 20;
 
 const EMPTY_FORM = {
   title: '',
@@ -67,6 +68,7 @@ export default function AdminProductsPage() {
   const [editingProductId, setEditingProductId] = useState(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
   const getR2KeyFromUrl = (url) => {
@@ -390,6 +392,17 @@ export default function AdminProductsPage() {
   const subcategoryOptions = useMemo(
     () => subcategories.filter((s) => s.categoryId === form.categoryId),
     [subcategories, form.categoryId]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(products.length / PRODUCTS_PER_PAGE));
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
+  const paginatedProducts = useMemo(
+    () => products.slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE),
+    [products, currentPage]
   );
 
   const updateField = (field) => (event) => {
@@ -963,7 +976,7 @@ export default function AdminProductsPage() {
             <p className="font-body-sm text-body-sm text-on-surface-variant">No products yet.</p>
           ) : (
             <div className="flex flex-col gap-4">
-              {products.map((product) => {
+              {paginatedProducts.map((product) => {
                 const totalStock = (product.sizes ?? []).reduce((sum, s) => sum + (s.stock ?? 0), 0);
                 const isSelected = selectedProductIds.includes(product.id);
                 return (
@@ -1065,6 +1078,36 @@ export default function AdminProductsPage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {!loading && !loadError && products.length > PRODUCTS_PER_PAGE && (
+            <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t border-outline-variant/20">
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Showing {(currentPage - 1) * PRODUCTS_PER_PAGE + 1}–
+                {Math.min(currentPage * PRODUCTS_PER_PAGE, products.length)} of {products.length} products
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Prev
+                </button>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="font-label-caps text-label-caps text-primary px-3 py-2 rounded-lg hover:bg-surface-container disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </section>
