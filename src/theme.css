@@ -117,10 +117,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Shared base + utilities used by two or more pages. Page-only rules live in that page's own CSS file. */
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-body-lg);
   background-color: transparent;
   color: var(--color-on-background);
+  overflow-x: hidden;
 }
 
 .playfair {

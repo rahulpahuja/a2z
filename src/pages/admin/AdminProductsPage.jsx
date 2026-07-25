@@ -65,6 +65,7 @@ export default function AdminProductsPage() {
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
   const [imageColors, setImageColors] = useState(['', '', '', '', '']);
   const [editingProductId, setEditingProductId] = useState(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
 
@@ -101,6 +102,7 @@ export default function AdminProductsPage() {
 
   const handleStartEdit = (product) => {
     setEditingProductId(product.id);
+    setIsDuplicating(false);
     setProductId(product.id);
     setForm({
       title: product.title || product.name || '',
@@ -136,6 +138,47 @@ export default function AdminProductsPage() {
     setImageColors(initialColors);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDuplicate = (product) => {
+    setEditingProductId(null);
+    setIsDuplicating(true);
+    setProductId(generateProductId());
+    setForm({
+      title: `${product.title || product.name || ''} (Copy)`,
+      description: product.description || '',
+      categoryId: product.categoryId || '',
+      subcategoryId: product.subcategoryId || '',
+      price: product.price || '',
+      hsnCode: product.hsnCode || '',
+      hashtagsInput: (product.hashtags ?? []).join(', '),
+      gender: product.gender || 'Unisex',
+    });
+    setSizes(product.sizes ?? []);
+    setImageFiles([null, null, null, null, null]);
+
+    const initialPreviews = ['', '', '', '', ''];
+    const initialNames = ['', '', '', '', ''];
+    const initialColors = ['', '', '', '', ''];
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((url, idx) => {
+        if (idx < 5) {
+          initialPreviews[idx] = url;
+          initialNames[idx] = getR2KeyFromUrl(url) || '';
+          initialColors[idx] = product.imageColors?.[idx] || '';
+        }
+      });
+    } else if (product.image) {
+      initialPreviews[0] = product.image;
+      initialNames[0] = getR2KeyFromUrl(product.image) || '';
+      initialColors[0] = product.imageColors?.[0] || product.colors?.[0] || '';
+    }
+    setImagePreviews(initialPreviews);
+    setImageNames(initialNames);
+    setImageColors(initialColors);
+    setRemovedImageKeys([]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Duplicated — review the details and save to create a new product.');
   };
 
   const toggleSelectProduct = (id) => {
@@ -216,9 +259,11 @@ export default function AdminProductsPage() {
         if (previousUrl) {
           if (previousUrl.startsWith('blob:')) {
             URL.revokeObjectURL(previousUrl);
-          } else {
+          } else if (!isDuplicating) {
             // Replacing an already-uploaded image — queue the old file for
-            // deletion from R2 once the product save succeeds.
+            // deletion from R2 once the product save succeeds. Skipped while
+            // duplicating: the pre-filled URL still belongs to the source
+            // product, which hasn't been touched.
             const key = getR2KeyFromUrl(previousUrl);
             if (key) setRemovedImageKeys((keys) => [...keys, key]);
           }
@@ -263,7 +308,9 @@ export default function AdminProductsPage() {
       if (previousUrl) {
         if (previousUrl.startsWith('blob:')) {
           URL.revokeObjectURL(previousUrl);
-        } else {
+        } else if (!isDuplicating) {
+          // Skipped while duplicating: the pre-filled URL still belongs to
+          // the source product, which hasn't been touched.
           const key = getR2KeyFromUrl(previousUrl);
           if (key) setRemovedImageKeys((keys) => [...keys, key]);
         }
@@ -341,6 +388,7 @@ export default function AdminProductsPage() {
     setRemovedImageKeys([]);
     setProductId(generateProductId());
     setEditingProductId(null);
+    setIsDuplicating(false);
   };
 
   const handleSubmit = async (event) => {
@@ -509,15 +557,15 @@ export default function AdminProductsPage() {
           <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-title-sm text-title-sm text-on-surface">
-                {editingProductId ? 'Edit Product' : 'New Product'}
+                {editingProductId ? 'Edit Product' : isDuplicating ? 'New Product (Duplicated)' : 'New Product'}
               </h2>
-              {editingProductId && (
+              {(editingProductId || isDuplicating) && (
                 <button
                   type="button"
                   onClick={resetForm}
                   className="font-label-caps text-label-caps text-error hover:underline"
                 >
-                  Cancel Edit
+                  {isDuplicating ? 'Discard Draft' : 'Cancel Edit'}
                 </button>
               )}
             </div>
@@ -921,6 +969,13 @@ export default function AdminProductsPage() {
                             className="font-label-caps text-label-caps text-primary hover:underline"
                           >
                             Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDuplicate(product)}
+                            className="font-label-caps text-label-caps text-primary hover:underline"
+                          >
+                            Duplicate
                           </button>
                           <button
                             type="button"

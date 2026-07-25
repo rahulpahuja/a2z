@@ -227,7 +227,7 @@ export default function OrderTrackingPage() {
               Order #<span className="font-semibold text-primary">{liveOrder.id}</span>
             </p>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <button
               onClick={handleDownloadReceipt}
               disabled={downloading}
