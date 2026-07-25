@@ -940,13 +940,15 @@ export default function AdminProductsPage() {
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
-                checked={products.length > 0 && selectedProductIds.length === products.length}
-                onChange={toggleSelectAll}
+                aria-label="Select all products on this page"
+                checked={paginatedProducts.length > 0 && paginatedProducts.every((p) => selectedProductIds.includes(p.id))}
+                onChange={toggleSelectAllOnPage}
                 className="rounded border-outline w-5 h-5 text-primary focus:ring-primary cursor-pointer"
               />
               <h2 className="font-title-sm text-title-sm text-on-surface">
                 All Products ({products.length})
               </h2>
+              <span className="font-body-sm text-[11px] text-on-surface-variant">Select all on this page</span>
             </div>
             {selectedProductIds.length > 0 && (
               <div className="flex items-center gap-3">
