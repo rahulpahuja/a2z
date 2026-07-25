@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import CartIconButton from '../components/CartIconButton.jsx';
+import ProfileButton from '../components/ProfileButton.jsx';
+import AuthModal from '../components/AuthModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import { INDIAN_STATES_AND_UT, STATE_CITIES } from '../data/indiaData.js';
@@ -110,8 +114,9 @@ function AddressForm({ initial, onCancel, onSave }) {
   );
 }
 
-export default function ProfileModal({ onClose }) {
+export default function ProfilePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { profile, setDisplayName, saveAddress, removeAddress } = useProfile();
   const [name, setName] = useState(profile.displayName || '');
   const [editingAddress, setEditingAddress] = useState(null); // null | 'new' | address object
@@ -129,19 +134,49 @@ export default function ProfileModal({ onClose }) {
     setEditingAddress(null);
   };
 
+  if (!user) {
+    return (
+      <>
+        <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
+          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            A2Z Collection
+          </Link>
+        </header>
+        <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 flex flex-col items-center text-center gap-3">
+          <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">
+            Sign In to View Your Profile
+          </h1>
+        </main>
+        <AuthModal dismissible onClose={() => navigate('/')} />
+      </>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-[300] bg-on-surface/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-surface w-full max-w-lg rounded-2xl shadow-xl p-8 relative max-h-[90vh] overflow-y-auto">
+    <>
+      <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 docked full-width top-0 sticky">
+        <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+          A2Z Collection
+        </Link>
+        <div className="flex items-center gap-unit text-primary dark:text-primary-fixed-dim">
+          <CartIconButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
+          <ProfileButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16">
         <button
           type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-on-surface-variant hover:text-primary transition-colors"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors mb-6"
         >
-          <span className="material-symbols-outlined">close</span>
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          Back
         </button>
 
-        <h1 className="font-headline-md text-headline-md text-primary playfair mb-6">My Profile</h1>
+        <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-8">
+          My Profile
+        </h1>
 
         <form onSubmit={handleSaveName} className="flex flex-col gap-3 mb-8 pb-8 border-b border-outline-variant">
           <label className="block font-label-caps text-label-caps text-on-surface-variant" htmlFor="profile-name">
@@ -223,7 +258,7 @@ export default function ProfileModal({ onClose }) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </main>
+    </>
   );
 }

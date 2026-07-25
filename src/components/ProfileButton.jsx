@@ -7,7 +7,6 @@ import { subscribeToOrders } from '../services/orders.js';
 import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
 import { orderBelongsToUser } from '../utils/orderMatch.js';
 import AuthModal from './AuthModal.jsx';
-import ProfileModal from './ProfileModal.jsx';
 
 function displayName(user, profile) {
   return profile?.displayName || user.displayName || user.email || user.phoneNumber || 'Account';
@@ -20,7 +19,6 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [userOrders, setUserOrders] = useState([]);
 
   useEffect(() => {
@@ -156,7 +154,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  setProfileModalOpen(true);
+                  navigate('/profile');
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors"
               >
@@ -180,7 +178,6 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
           </div>
         </>
       )}
-      {profileModalOpen && <ProfileModal onClose={() => setProfileModalOpen(false)} />}
     </div>
   );
 }

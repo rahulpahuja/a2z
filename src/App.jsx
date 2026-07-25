@@ -18,6 +18,7 @@ import CheckoutShippingPage from './pages/CheckoutShippingPage.jsx'
 import PaymentPage from './pages/PaymentPage.jsx'
 import OrderTrackingPage from './pages/OrderTrackingPage.jsx'
 import MyOrdersPage from './pages/MyOrdersPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
@@ -69,6 +70,7 @@ const ROUTES = [
   { path: '/checkout/payment', Component: PaymentPage },
   { path: '/orders/tracking', Component: OrderTrackingPage },
   { path: '/orders', Component: MyOrdersPage },
+  { path: '/profile', Component: ProfilePage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
   { path: '/contact-us', Component: ContactUsPage },
