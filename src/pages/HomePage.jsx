@@ -13,6 +13,7 @@ import { subscribeToCarousel } from '../services/carousel.js';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import SearchModal from '../components/SearchModal.jsx';
 import './HomePage.css';
 
 const categories = [
@@ -136,6 +137,7 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState([]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
   const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
@@ -211,7 +213,12 @@ export default function HomePage() {
             ))}
           </nav>
           <div className="flex items-center space-x-6 text-primary dark:text-primary-fixed-dim">
-            <button className="hover:opacity-80 transition-opacity duration-200 hidden md:block">
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+              className="hover:opacity-80 transition-opacity duration-200 hidden md:block"
+            >
               <span className="material-symbols-outlined">search</span>
             </button>
             <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
@@ -220,6 +227,7 @@ export default function HomePage() {
         </div>
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main>
         {/* Hero Carousel */}
         <section className="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">

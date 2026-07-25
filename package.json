@@ -19,6 +19,7 @@
     "chart.js": "^4.5.1",
     "firebase": "^12.16.0",
     "framer-motion": "^12.42.2",
+    "fuse.js": "^7.5.0",
     "heic2any": "^0.0.4",
     "jsbarcode": "^3.12.3",
     "jspdf": "^4.2.1",

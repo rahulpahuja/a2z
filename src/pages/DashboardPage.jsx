@@ -5,6 +5,7 @@ import { subscribeToOrders } from '../services/orders.js';
 import { subscribeToAdminProducts } from '../services/adminProducts.js';
 import { MOCK_ORDERS } from '../data/mockOrders.js';
 import { formatCurrency } from '../context/CartContext.jsx';
+import { searchProducts } from '../utils/productSearch.js';
 import './DashboardPage.css';
 
 const NAV_ITEMS = [
@@ -47,6 +48,11 @@ export default function DashboardPage() {
 
   const [liveOrders, setLiveOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [headerSearchQuery, setHeaderSearchQuery] = useState('');
+  const headerSearchResults = useMemo(
+    () => searchProducts(products, headerSearchQuery, 6),
+    [products, headerSearchQuery]
+  );
 
   useEffect(() => {
     const unsubscribe = subscribeToOrders((rows) => setLiveOrders(rows || []));
@@ -386,7 +392,32 @@ export default function DashboardPage() {
                 className="pl-10 pr-4 py-2 bg-surface-container border-none rounded-full font-body-sm text-body-sm focus:ring-2 focus:ring-primary w-64 text-on-surface placeholder:text-on-surface-variant"
                 placeholder="Search orders, products..."
                 type="text"
+                value={headerSearchQuery}
+                onChange={(e) => setHeaderSearchQuery(e.target.value)}
               />
+              {headerSearchQuery.trim() && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-surface rounded-xl shadow-xl border border-outline-variant py-2 z-50 max-h-80 overflow-y-auto">
+                  {headerSearchResults.length === 0 ? (
+                    <p className="px-4 py-3 font-body-sm text-body-sm text-on-surface-variant">No products matched.</p>
+                  ) : (
+                    headerSearchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        to={`/product/${product.id}`}
+                        onClick={() => setHeaderSearchQuery('')}
+                        className="block px-4 py-2 hover:bg-surface-container transition-colors"
+                      >
+                        <p className="font-body-sm text-body-sm text-on-surface truncate">
+                          {product.title || product.name}
+                        </p>
+                        <p className="font-body-sm text-[11px] text-on-surface-variant truncate">
+                          {(product.categoryTitle || product.category) ?? ''} · {formatCurrency(product.price)}
+                        </p>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </header>
