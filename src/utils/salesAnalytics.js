@@ -1,3 +1,5 @@
+import { searchProducts as fuzzySearchProducts } from './productSearch.js';
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 const isSameCalendarDay = (a, b) =>
@@ -22,17 +24,7 @@ export function findOrderById(orders, query) {
 }
 
 export function searchProducts(products, query, limit = 5) {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return [];
-  return products
-    .filter(
-      (p) =>
-        p.id.toLowerCase().includes(needle) ||
-        (p.name || p.title || '').toLowerCase().includes(needle) ||
-        (p.category || p.categoryTitle || '').toLowerCase().includes(needle) ||
-        (p.description || '').toLowerCase().includes(needle)
-    )
-    .slice(0, limit);
+  return fuzzySearchProducts(products, query, limit);
 }
 
 // Real cart line ids look like `${productId}-${color}-${size}`; seed data uses

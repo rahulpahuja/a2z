@@ -8,6 +8,7 @@ import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductListingPage.css';
 
@@ -80,6 +81,7 @@ export default function ProductListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleCount, setVisibleCount] = useState(50);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
@@ -231,7 +233,12 @@ export default function ProductListingPage() {
           ))}
         </nav>
         <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
-          <button aria-label="Search" className="hover:opacity-80 transition-opacity duration-200">
+          <button
+            type="button"
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+            className="hover:opacity-80 transition-opacity duration-200"
+          >
             <span className="material-symbols-outlined">search</span>
           </button>
           <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
@@ -239,6 +246,7 @@ export default function ProductListingPage() {
         </div>
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4">
         <div>
