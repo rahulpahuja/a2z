@@ -4,6 +4,7 @@ import { useStorefrontTheme, DEFAULT_THEME } from '../../context/StorefrontTheme
 import { useToast } from '../../context/ToastContext.jsx';
 import { useProducts } from '../../context/ProductsContext.jsx';
 import { subscribeToCarousel, saveCarousel, DEFAULT_CAROUSEL_SLIDES } from '../../services/carousel.js';
+import { subscribeToCategoryBubbles, saveCategoryBubbles, DEFAULT_CATEGORY_BUBBLES } from '../../services/categoryBubbles.js';
 import { subscribeToCategories } from '../../services/categories.js';
 import { subscribeToTopNav, saveTopNav, DEFAULT_TOP_NAV_LINKS } from '../../services/topNav.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
@@ -98,6 +99,7 @@ function withLinkFields(slide) {
 
 const SURFACES = [
   { key: 'hero', label: 'Hero Carousel', icon: 'view_carousel' },
+  { key: 'categoryBubbles', label: 'Category Bubbles', icon: 'category' },
   { key: 'topnav', label: 'Top Navigation', icon: 'menu' },
   { key: 'listing', label: 'Listing Page', icon: 'grid_on' },
   { key: 'detail', label: 'Product Detail Page', icon: 'photo_size_select_large' },
@@ -143,6 +145,14 @@ export default function AdminConfiguratorPage() {
   const [heroPreviewIdx, setHeroPreviewIdx] = useState(0);
   const uploadControllerRef = useRef(null);
 
+  // Category Bubble states
+  const [categoryBubbles, setCategoryBubbles] = useState([]);
+  const [bubblesLoading, setBubblesLoading] = useState(true);
+  const [bubblesSaving, setBubblesSaving] = useState(false);
+  const [uploadingBubbleIdx, setUploadingBubbleIdx] = useState(null);
+  const [bubbleUploadPreview, setBubbleUploadPreview] = useState(null);
+  const bubbleUploadControllerRef = useRef(null);
+
   // Top Navigation states
   const [categoryRows, setCategoryRows] = useState([]); // {id, title} — source list for the nav link picker
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
@@ -184,6 +194,14 @@ export default function AdminConfiguratorPage() {
       }
       setHeroSlides(slidesCopy.slice(0, 4).map(withLinkFields));
       setHeroLoading(false);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const unsub = subscribeToCategoryBubbles((bubbles) => {
+      setCategoryBubbles(bubbles.map(withLinkFields));
+      setBubblesLoading(false);
     });
     return unsub;
   }, []);
@@ -338,6 +356,121 @@ export default function AdminConfiguratorPage() {
   const handleHeroReset = () => {
     if (window.confirm('Are you sure you want to reset all slides to default demo configurations?')) {
       setHeroSlides(DEFAULT_CAROUSEL_SLIDES.map(withLinkFields));
+      showToast('Reset to defaults. Remember to click Save to apply changes.');
+    }
+  };
+
+  // Category Bubble handlers
+  const handleBubbleFieldChange = (index, field, value) => {
+    setCategoryBubbles((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  };
+
+  const handleBubbleLinkFieldChange = (index, field, value) => {
+    setCategoryBubbles((prev) => {
+      const copy = [...prev];
+      const nextBubble = { ...copy[index], [field]: value };
+      nextBubble.link = buildLink(nextBubble);
+      copy[index] = nextBubble;
+      return copy;
+    });
+  };
+
+  const handleBubbleImageUpload = async (index, event) => {
+    let file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const controller = new AbortController();
+    bubbleUploadControllerRef.current = controller;
+    setUploadingBubbleIdx(index);
+
+    let localPreviewUrl = null;
+    try {
+      if (isHeicFile(file)) {
+        showToast('Converting HEIC image…');
+        file = await convertHeicFileToPng(file);
+      }
+
+      showToast('Compressing image…');
+      const compressed = await compressImageFile(file);
+      localPreviewUrl = compressed.previewUrl;
+      setBubbleUploadPreview({ idx: index, url: localPreviewUrl });
+
+      showToast('Uploading to R2...');
+      const customName = `category_bubble_${index + 1}_${Date.now()}${compressed.extension}`;
+      const uploadedUrl = await uploadImageToExternalServer(compressed.file, customName, controller.signal);
+
+      handleBubbleFieldChange(index, 'image', uploadedUrl);
+      showToast(`Image for "${categoryBubbles[index]?.name || `Bubble ${index + 1}`}" uploaded successfully!`);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        showToast('Upload cancelled.');
+      } else {
+        console.error(err);
+        showToast(err.message || 'Image upload failed.');
+      }
+    } finally {
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      setBubbleUploadPreview(null);
+      setUploadingBubbleIdx(null);
+      bubbleUploadControllerRef.current = null;
+    }
+  };
+
+  const handleBubbleCancelUpload = () => {
+    bubbleUploadControllerRef.current?.abort();
+  };
+
+  const handleAddBubble = () => {
+    setCategoryBubbles((prev) => [
+      ...prev,
+      withLinkFields({ id: `bubble_${Date.now()}`, name: '', alt: '', image: '', link: '/products' }),
+    ]);
+  };
+
+  const handleRemoveBubble = (index) => {
+    setCategoryBubbles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveBubble = (index, direction) => {
+    setCategoryBubbles((prev) => {
+      const target = index + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const copy = [...prev];
+      [copy[index], copy[target]] = [copy[target], copy[index]];
+      return copy;
+    });
+  };
+
+  const handleBubblesSave = async () => {
+    for (let i = 0; i < categoryBubbles.length; i++) {
+      if (!categoryBubbles[i].image.trim()) {
+        showToast(`Please upload an image for "${categoryBubbles[i].name || `Bubble ${i + 1}`}".`);
+        return;
+      }
+      if (!categoryBubbles[i].name.trim()) {
+        showToast(`Please name Bubble ${i + 1}.`);
+        return;
+      }
+    }
+    setBubblesSaving(true);
+    try {
+      await saveCategoryBubbles(categoryBubbles);
+      showToast('Category Bubbles saved successfully!');
+    } catch (err) {
+      showToast(err.message || 'Could not save category bubbles.');
+    } finally {
+      setBubblesSaving(false);
+    }
+  };
+
+  const handleBubblesReset = () => {
+    if (window.confirm('Are you sure you want to reset category bubbles to the default demo configuration?')) {
+      setCategoryBubbles(DEFAULT_CATEGORY_BUBBLES.map(withLinkFields));
       showToast('Reset to defaults. Remember to click Save to apply changes.');
     }
   };
@@ -800,6 +933,219 @@ export default function AdminConfiguratorPage() {
                     </button>
                     <button type="button" onClick={handleHeroSave} disabled={heroSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
                       {heroSaving ? 'Saving…' : 'Save Hero Carousel'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {activeSurface === 'categoryBubbles' && (
+                <div className="admin-card flex flex-col gap-5">
+                  <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[20px]">category</span>
+                    Homepage Category Bubbles
+                  </h3>
+                  <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    The circular "shop by category" row under the hero carousel. Square images work best (they're cropped into a circle).
+                  </p>
+
+                  {bubblesLoading ? (
+                    <p className="text-[12px] text-on-surface-variant">Loading…</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {categoryBubbles.map((bubble, idx) => {
+                        const isUploading = uploadingBubbleIdx === idx;
+                        return (
+                          <div key={bubble.id || idx} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 flex flex-col gap-3">
+                            <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                              <h4 className="font-title-sm text-[12px] text-primary font-bold uppercase tracking-wider">
+                                {bubble.name || `Bubble ${idx + 1}`}
+                              </h4>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveBubble(idx, -1)}
+                                  disabled={idx === 0}
+                                  className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
+                                  aria-label="Move earlier"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveBubble(idx, 1)}
+                                  disabled={idx === categoryBubbles.length - 1}
+                                  className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
+                                  aria-label="Move later"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveBubble(idx)}
+                                  className="w-7 h-7 rounded border border-error/40 flex items-center justify-center text-error hover:bg-error/10 transition-colors"
+                                  aria-label="Remove bubble"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">delete</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3 items-center">
+                              <div className="w-24 h-24 rounded-full bg-surface-container overflow-hidden border border-outline-variant/40 relative shrink-0">
+                                {(isUploading && bubbleUploadPreview?.idx === idx ? bubbleUploadPreview.url : bubble.image) ? (
+                                  <img
+                                    src={isUploading && bubbleUploadPreview?.idx === idx ? bubbleUploadPreview.url : bubble.image}
+                                    alt={`${bubble.name || 'Bubble'} thumbnail`}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = 'https://placehold.co/200x200?text=Image';
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant/40 bg-surface-container-high">
+                                    <span className="material-symbols-outlined text-[24px]">image</span>
+                                  </div>
+                                )}
+                                {isUploading && (
+                                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                    <span className="animate-spin inline-block w-5 h-5 border-2 border-t-transparent border-white rounded-full"></span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 w-full flex flex-col gap-2">
+                                {isUploading ? (
+                                  <button
+                                    type="button"
+                                    onClick={handleBubbleCancelUpload}
+                                    className="border border-error text-error font-label-caps text-[10px] px-3 py-2 rounded hover:bg-error/10 uppercase transition-colors"
+                                  >
+                                    Cancel Upload
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => document.getElementById(`bubble-upload-${idx}`).click()}
+                                    disabled={uploadingBubbleIdx !== null}
+                                    className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-2 rounded hover:opacity-90 uppercase transition-opacity border border-outline-variant/20 disabled:opacity-50"
+                                  >
+                                    {bubble.image ? 'Replace Image' : 'Upload Image'}
+                                  </button>
+                                )}
+                                <input
+                                  id={`bubble-upload-${idx}`}
+                                  type="file"
+                                  accept="image/*,.heic,.heif"
+                                  onChange={(e) => handleBubbleImageUpload(idx, e)}
+                                  className="hidden"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label text-[11px]" htmlFor={`bubble-name-${idx}`}>Name</label>
+                              <input
+                                id={`bubble-name-${idx}`}
+                                type="text"
+                                value={bubble.name}
+                                onChange={(e) => handleBubbleFieldChange(idx, 'name', e.target.value)}
+                                placeholder="e.g. Bags"
+                                className="form-input text-[12px] py-2 px-3"
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label text-[11px]" htmlFor={`bubble-alt-${idx}`}>Image Alt Description</label>
+                              <input
+                                id={`bubble-alt-${idx}`}
+                                type="text"
+                                value={bubble.alt}
+                                onChange={(e) => handleBubbleFieldChange(idx, 'alt', e.target.value)}
+                                placeholder="Describe what is shown…"
+                                className="form-input text-[12px] py-2 px-3"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div className="form-group">
+                                <label className="form-label text-[11px]" htmlFor={`bubble-link-type-${idx}`}>Where should this land?</label>
+                                <select
+                                  id={`bubble-link-type-${idx}`}
+                                  value={bubble.linkType || 'products'}
+                                  onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkType', e.target.value)}
+                                  className="form-select text-[12px] py-2 px-3"
+                                >
+                                  <option value="home">Home Page</option>
+                                  <option value="products">All Products</option>
+                                  <option value="category">A Specific Category</option>
+                                  <option value="product">A Specific Product</option>
+                                  <option value="custom">Custom URL</option>
+                                </select>
+                              </div>
+
+                              {bubble.linkType === 'category' && (
+                                <div className="form-group">
+                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-cat-${idx}`}>Category</label>
+                                  <select
+                                    id={`bubble-link-cat-${idx}`}
+                                    value={bubble.linkCategory || ''}
+                                    onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkCategory', e.target.value)}
+                                    className="form-select text-[12px] py-2 px-3"
+                                  >
+                                    <option value="">-- Choose Category --</option>
+                                    {categories.filter((c) => c !== 'All').map((c) => (
+                                      <option key={c} value={c}>{c}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+
+                              {bubble.linkType === 'product' && (
+                                <div className="form-group">
+                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-prod-${idx}`}>Product</label>
+                                  <select
+                                    id={`bubble-link-prod-${idx}`}
+                                    value={bubble.linkProductId || ''}
+                                    onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkProductId', e.target.value)}
+                                    className="form-select text-[12px] py-2 px-3"
+                                  >
+                                    <option value="">-- Choose Product --</option>
+                                    {products.map((p) => (
+                                      <option key={p.id} value={p.id}>{p.name || p.title}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+
+                              {bubble.linkType === 'custom' && (
+                                <div className="form-group">
+                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-custom-${idx}`}>Custom Path</label>
+                                  <input
+                                    id={`bubble-link-custom-${idx}`}
+                                    type="text"
+                                    value={bubble.linkCustom || ''}
+                                    onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkCustom', e.target.value)}
+                                    placeholder="e.g. /about-us"
+                                    className="form-input text-[12px] py-2 px-3"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 justify-start pt-2 border-t border-outline-variant/20 flex-wrap">
+                    <button type="button" onClick={handleAddBubble} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+                      + Add Bubble
+                    </button>
+                    <button type="button" onClick={handleBubblesReset} disabled={bubblesSaving} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+                      Reset Defaults
+                    </button>
+                    <button type="button" onClick={handleBubblesSave} disabled={bubblesSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
+                      {bubblesSaving ? 'Saving…' : 'Save Category Bubbles'}
                     </button>
                   </div>
                 </div>
@@ -1738,6 +2084,25 @@ export default function AdminConfiguratorPage() {
                           )}
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {activeSurface === 'categoryBubbles' && !bubblesLoading && (
+                    <div className="flex gap-5 overflow-x-auto hide-scrollbar w-full py-2 px-1">
+                      {categoryBubbles.map((bubble, idx) => (
+                        <div key={bubble.id || idx} className="flex flex-col items-center gap-2 min-w-[80px]">
+                          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary bg-surface-container-high">
+                            {bubble.image ? (
+                              <img src={bubble.image} alt={bubble.alt} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
+                                <span className="material-symbols-outlined text-[20px]">image</span>
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-center opacity-80">{bubble.name || `Bubble ${idx + 1}`}</span>
+                        </div>
+                      ))}
                     </div>
                   )}
 

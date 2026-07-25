@@ -10,50 +10,13 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
+import { subscribeToCategoryBubbles, DEFAULT_CATEGORY_BUBBLES } from '../services/categoryBubbles.js';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import './HomePage.css';
-
-const categories = [
-  {
-    name: 'Bags',
-    alt: 'A close-up product shot of a luxury, artisanal embroidered clutch bag featuring traditional Indian motifs in gold and Dusty Rose. Set against a clean, off-white minimalist background with soft studio lighting. High-end fashion aesthetic.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBpGsco9fEpO7fBmbPz1f4WPhiBRCzE1yC-LdMULIAPj1oqU3lfvN3uW1OTgOf8XGauNEf60TzYn_zruaXYYiAgwTpgyEpBBz-YxV32Gsy6MVJkCMq_rm4WSfGj2nzOp9dRwph9cXMeePowLBWAap4YT_A6pwbcO3UMOxuKHGmvy4optk8AZwfbDwRkDs9o7nH-ZriqLJ3ThdC6_ih_QFrL67RmXwKJj9BmZ93cRqDs1gOr8QcixZxl3A',
-  },
-  {
-    name: 'Best Sellers',
-    alt: 'A close-up detailed shot of a best-selling intricate Kundan jewelry set and a folded silk fabric piece in vibrant Hot Pink. Minimalist off-white background, soft premium lighting, high visual fidelity.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDZJtx7cbsa-MVraxiDeswXCPttghVa_D3gmW5QD6L0KoHo_5mstPG-bRrOnzuIjtQWCuRRgIVRAZ7Lplm6AdviVFeBo7ECADEqzUpw91leHwUvbHW0F5LYWKZaYY1pDI_JPxpiKM_7mSrht17kz4I5GOtsRNBihTMt9KFsvnBUal_U54a1gGtOcxHV4M9Wsvn-u7MgORQhHPoBh434MfS1geJJkUDbJWJEDXWoxyRQYurpemwEASfPcw',
-  },
-  {
-    name: 'Coords',
-    alt: 'A stylish, contemporary Indian coordinated set (coord) in Sage Green with subtle artisanal embroidery, displayed neatly folded or on a minimalist hanger against a clean white background. High-end boutique feel.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAapWrtxtpoZLXabbFvrHMqCEyyeVbb5bDIedIyh6taScQaZzribPGI8x5SXkyLNP_iWKAAiGwNki6pETcpqW1eLoy6CmQ8_UtpymntauMUMZgxLX1_uFhEVVgKuukhyMs-_Oo4WSSiFukIHBtv2c6UWizNIVcIfAa8Tj3rYrhMv78JYEN7sVy4DCMq2P0LscHMifD-1z36kJvwxWPUgS_i3AztQzcz76HbzLuIrmY7pz6cDY-3b0vdVg',
-  },
-  {
-    name: 'New Arrivals',
-    alt: 'A macro shot of a new arrival traditional textile, showcasing vibrant rich colors and intricate weaving patterns, possibly a close up of a Saree pallu. Soft, bright lighting, luxury gallery aesthetic.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD3VetkJP_eWca_ztCnWaCquOYSWAk1yXdxkzQ0BAGxUk727Cjv38MxiVDrH5fovo6z1AlfgEBNLLeghJ66uv6qTr7gbWPd9M_e9pRSycSYyZ2zhuki1e9sKWOT_S0Vqg6iKkp9FJsxUqLsyB5o2khg8c-4BudANR2IJdi2VAKLjdUp2xXKHjO7_PADSHX0bR_HkKfB8vZWCvekT_ieHLap-wHcI7S4jIOJkfrpAEK0QAWszA_nhAlhAg',
-  },
-  {
-    name: 'Tops',
-    alt: 'A beautifully crafted contemporary Indian top or Kurti featuring delicate hand-block prints in Dusty Rose and off-white. Clean, minimalist presentation, high-quality fabric texture visible.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDo72VPkQwTN-Nmw1841eShwujwrb6VLMYl1AgelJas6CTCahaUnpIbtUUyhDIhebhC4yNc2fN2Ty-cI7wQh3QCgKJ-htnxBBQWO3-IeXU0srtoApCiVFxKri75kPFYnBa7BBywf8dWlL9G-OmTfjFUfBLaMPEbuWQBK7Eu_5ZjR1pmDJ81P6JojGEaK0AQqqX5fm_8Ik6x0b0FEDr7MXCFjzhpFlMwyxD7XYu_UtzFb_j0a9LtG1bnoQ',
-  },
-  {
-    name: 'Trousers',
-    alt: 'A pair of tailored, elegant trousers with a subtle traditional Indian print trim, presented in a minimalist, modern aesthetic against a bright, clean background. Premium fashion product photography.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAByvkDLFfLo4dnG7PGvRQ0FIcxM8lm3ZuLwOJpAcO4v_lp9eNrz6TLunpW4W7xUeVbltFq4jSWl2jT4yfsMeW_hCaqZrIh1y9e6y31imuerfXQMNnr56c9-wquxsPfgGoVG4ocOyAYoNjvCIQSVHPXdzZUarn3Zvy8FKoHQKyBU9x4YqLVMuUJlMDiDkHXT1Mp7F3tHA3-T29yUWGbdqOkusu17LSvGbGq7Kv-k7Qc80cflf50nA-Kew',
-  },
-];
 
 // Product slices are computed inside the component using the useProducts hook
 
@@ -122,19 +85,6 @@ function VideoCard({ src, poster, title, description }) {
   );
 }
 
-categories.forEach((c) => {
-  c.image = getHighResUrl(c.image);
-});
-
-function EmptySegment({ message }) {
-  return (
-    <div className="flex flex-col items-center gap-4 py-16 text-center">
-      <span className="material-symbols-outlined text-6xl text-on-surface-variant">inventory_2</span>
-      <p className="font-body-lg text-body-lg text-on-surface-variant">{message}</p>
-    </div>
-  );
-}
-
 export default function HomePage() {
   const { products } = useProducts();
   const { theme } = useStorefrontTheme();
@@ -145,6 +95,7 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState([]);
+  const [categoryBubbles, setCategoryBubbles] = useState(DEFAULT_CATEGORY_BUBBLES);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
@@ -167,6 +118,13 @@ export default function HomePage() {
         image: getHighResUrl(s.image)
       }));
       setHeroSlides(processed);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const unsub = subscribeToCategoryBubbles((bubbles) => {
+      setCategoryBubbles(bubbles.map((b) => ({ ...b, image: getHighResUrl(b.image) })));
     });
     return unsub;
   }, []);
@@ -304,8 +262,12 @@ export default function HomePage() {
         {/* Category Badges */}
         <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
           <div className="flex overflow-x-auto hide-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
-            {categories.map((category) => (
-              <div key={category.name} className="flex flex-col items-center gap-4 min-w-[120px] carousel-item">
+            {categoryBubbles.map((category) => (
+              <Link
+                key={category.id || category.name}
+                to={category.link || '/products'}
+                className="flex flex-col items-center gap-4 min-w-[120px] carousel-item"
+              >
                 <div className="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
                   <div
                     className="w-full h-full rounded-full bg-cover bg-center"
@@ -314,7 +276,7 @@ export default function HomePage() {
                   ></div>
                 </div>
                 <span className="font-title-sm text-title-sm text-on-surface text-center">{category.name}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

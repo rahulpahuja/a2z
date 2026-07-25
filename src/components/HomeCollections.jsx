@@ -5,6 +5,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import ProductCardImage from './ProductCardImage.jsx';
 import ProductImage from './ProductImage.jsx';
+import EmptySegment from './EmptySegment.jsx';
 
 function CollectionRow({ collection, products }) {
   const scrollRef = useRef(null);
@@ -12,8 +13,6 @@ function CollectionRow({ collection, products }) {
   const collectionProducts = collection.productIds
     .map((id) => products.find((p) => p.id === id))
     .filter(Boolean);
-
-  if (collectionProducts.length === 0) return null;
 
   return (
     <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
@@ -30,6 +29,9 @@ function CollectionRow({ collection, products }) {
         <h2 className="font-headline-md text-headline-md playfair text-center">{collection.name}</h2>
       </div>
 
+      {collectionProducts.length === 0 ? (
+        <EmptySegment message="No products in this collection yet — check back soon." />
+      ) : (
       <div className="relative group/arrows">
         <button
           type="button"
@@ -75,6 +77,7 @@ function CollectionRow({ collection, products }) {
           <span className="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
+      )}
     </section>
   );
 }
