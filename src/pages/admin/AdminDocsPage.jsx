@@ -103,10 +103,10 @@ export default function AdminDocsPage() {
           <Section id="overview" title="Overview">
             <p>
               The storefront has no customer accounts — the only sign-in flow is for admins. Clicking the profile
-              (person) icon anywhere on the site opens a sign-in modal offering <strong>Google sign-in</strong> or{' '}
-              <strong>phone number + OTP</strong>, both via Firebase Authentication. Whether a signed-in user counts
-              as an admin is decided entirely by an allow-list of emails/phone numbers in <Code>.env</Code> — there
-              are no roles or a users database.
+              (person) icon anywhere on the site opens a sign-in modal offering{' '}
+              <strong>phone number + OTP</strong> via Firebase Authentication (or MSG91, if configured). Whether a
+              signed-in user counts as an admin is decided entirely by an allow-list of emails/phone numbers in{' '}
+              <Code>.env</Code> — there are no roles or a users database.
             </p>
             <p>
               Two things are gated behind this: the legacy <Code>/dashboard</Code> page and the full admin panel
@@ -118,8 +118,8 @@ export default function AdminDocsPage() {
             <ol className="list-decimal list-inside space-y-2">
               <li>Click the person icon in the header on any page.</li>
               <li>
-                Choose <strong>Continue with Google</strong> (opens a popup), or enter a phone number in E.164 format
-                (e.g. <Code>+919876543210</Code>) and tap <strong>Send OTP</strong>, then enter the 6-digit code.
+                Enter a phone number in E.164 format (e.g. <Code>+919876543210</Code>) and tap{' '}
+                <strong>Send OTP</strong>, then enter the 6-digit code.
               </li>
               <li>
                 If the signed-in account's email or phone number is in <Code>VITE_ADMIN_EMAILS</Code> /{' '}

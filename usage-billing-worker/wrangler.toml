@@ -1,0 +1,24 @@
+name = "usage-billing-worker"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Public, safe to commit — none of these are secrets, just identifiers.
+CLOUDFLARE_ACCOUNT_ID = "REPLACE_WITH_YOUR_CLOUDFLARE_ACCOUNT_ID"
+R2_BUCKET_NAME = "a2z"
+FIREBASE_PROJECT_ID = "REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID"
+NETLIFY_TEAM_SLUG = "REPLACE_WITH_YOUR_NETLIFY_TEAM_SLUG"
+
+# The following secrets must NOT be set in this file (it's committed to git).
+# For local development, put them in `.dev.vars` (gitignored):
+#   APP_SHARED_KEY=some_random_string
+#   CLOUDFLARE_API_TOKEN=your_cloudflare_api_token   (scope: Account Analytics: Read)
+#   MSG91_AUTH_KEY=your_msg91_authkey
+#   FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}   (the full JSON key, as one line)
+#   NETLIFY_ACCESS_TOKEN=your_netlify_personal_access_token
+# For production, set them with:
+#   wrangler secret put APP_SHARED_KEY
+#   wrangler secret put CLOUDFLARE_API_TOKEN
+#   wrangler secret put MSG91_AUTH_KEY
+#   wrangler secret put FIREBASE_SERVICE_ACCOUNT_JSON
+#   wrangler secret put NETLIFY_ACCESS_TOKEN

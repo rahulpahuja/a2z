@@ -1,0 +1,13 @@
+{
+  "name": "usage-billing-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker proxy that reports usage/estimated cost for R2, MSG91, Firebase, Netlify, and (pending) ShipPrime",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.60.0"
+  }
+}

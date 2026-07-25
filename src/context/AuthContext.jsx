@@ -1,10 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  GoogleAuthProvider,
   RecaptchaVerifier,
   onAuthStateChanged,
   signInWithPhoneNumber,
-  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { auth, isFirebaseEnabled } from '../firebase.js';
@@ -114,19 +112,6 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const signInWithGoogle = async () => {
-    if (!isFirebaseEnabled) {
-      setUser({
-        uid: 'mock-admin',
-        email: 'admin@a2z.com',
-        displayName: 'Store Admin',
-        phoneNumber: '+919999999999',
-      });
-      return;
-    }
-    await signInWithPopup(auth, new GoogleAuthProvider());
-  };
-
   const ensureRecaptcha = (containerId) => {
     if (!recaptchaRef.current) {
       recaptchaRef.current = new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
@@ -219,7 +204,6 @@ export function AuthProvider({ children }) {
       loading,
       isAdmin: computeIsAdmin(user),
       isMsg91Enabled,
-      signInWithGoogle,
       sendOtp,
       confirmOtp,
       retryOtp,
