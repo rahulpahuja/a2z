@@ -195,6 +195,47 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleBulkDuplicate = async () => {
+    if (selectedProductIds.length === 0) return;
+    const confirmed = window.confirm(
+      `Duplicate the ${selectedProductIds.length} selected products? This will create ${selectedProductIds.length} new products with the same details, images, and stock.`
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    try {
+      const selected = products.filter((p) => selectedProductIds.includes(p.id));
+      await Promise.all(
+        selected.map((product) =>
+          createAdminProduct({
+            id: generateProductId(),
+            title: `${product.title || product.name || ''} (Copy)`,
+            description: product.description || '',
+            gender: product.gender || 'Unisex',
+            hashtags: product.hashtags ?? [],
+            categoryId: product.categoryId || '',
+            categoryTitle: product.categoryTitle || '',
+            subcategoryId: product.subcategoryId || null,
+            subcategoryTitle: product.subcategoryTitle || '',
+            price: product.price || 0,
+            hsnCode: product.hsnCode || '',
+            colors: product.colors ?? [],
+            sizes: product.sizes ?? [],
+            image: product.image || (product.images ?? [])[0],
+            images: product.images ?? (product.image ? [product.image] : []),
+            imageColors: product.imageColors ?? [],
+          })
+        )
+      );
+      showToast(`${selected.length} product${selected.length === 1 ? '' : 's'} duplicated.`);
+      setSelectedProductIds([]);
+    } catch (err) {
+      showToast(err.message || 'Could not duplicate some products.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleBulkDelete = async () => {
     if (selectedProductIds.length === 0) return;
     const confirmed = window.confirm(
@@ -889,14 +930,26 @@ export default function AdminProductsPage() {
               </h2>
             </div>
             {selectedProductIds.length > 0 && (
-              <button
-                type="button"
-                onClick={handleBulkDelete}
-                className="flex items-center gap-2 bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors"
-              >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
-                Delete Selected ({selectedProductIds.length})
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleBulkDuplicate}
+                  disabled={saving}
+                  className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                  Duplicate Selected ({selectedProductIds.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkDelete}
+                  disabled={saving}
+                  className="flex items-center gap-2 bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  Delete Selected ({selectedProductIds.length})
+                </button>
+              </div>
             )}
           </div>
 
