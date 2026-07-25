@@ -4,6 +4,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { subscribeToTopProducts } from '../services/productStats.js';
 import ProductCardImage from './ProductCardImage.jsx';
+import EmptySegment from './EmptySegment.jsx';
 
 const TABS = [
   { key: 'views', label: 'Most Viewed', statLabel: 'views', icon: 'visibility' },
@@ -67,6 +68,9 @@ export default function TrendingProducts() {
         </Link>
       </div>
 
+      {products.length === 0 ? (
+        <EmptySegment message={`No ${tab.label.toLowerCase()} yet — check back soon.`} icon={tab.icon} />
+      ) : (
       <div className="relative group/arrows">
         {/* Left scroll navigation */}
         <button
@@ -119,6 +123,7 @@ export default function TrendingProducts() {
           <span className="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
+      )}
     </section>
   );
 }

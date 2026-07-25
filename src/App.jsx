@@ -39,6 +39,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage.jsx'
 import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminTrashPage from './pages/admin/AdminTrashPage.jsx'
+import AdminUsageBillingPage from './pages/admin/AdminUsageBillingPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
@@ -103,6 +104,7 @@ const ADMIN_ROUTES = [
   { path: '/super/tracking-partners', Component: AdminTrackingPartnersPage },
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
   { path: '/super/configurator', Component: AdminConfiguratorPage },
+  { path: '/super/usage-billing', Component: AdminUsageBillingPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/image-studio', Component: ImageStudioPage },
   { path: '/super/jobs', Component: AdminJobsPage },

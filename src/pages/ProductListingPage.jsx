@@ -8,6 +8,7 @@ import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductListingPage.css';
@@ -549,7 +550,10 @@ export default function ProductListingPage() {
             )}
           </div>
 
-          {productGroups.map((group, groupIdx) => (
+          {filteredProducts.length === 0 ? (
+            <EmptySegment message="No products match your filters — check back soon or try a different filter." />
+          ) : (
+          productGroups.map((group, groupIdx) => (
             <div key={group.title ?? `group-${groupIdx}`} className={groupIdx > 0 ? 'mt-10' : ''}>
               {group.title && (
                 <h2 className="font-title-md text-title-md text-on-surface mb-4 pb-2 border-b border-surface-variant">
@@ -689,7 +693,8 @@ export default function ProductListingPage() {
                 })}
               </div>
             </div>
-          ))}
+          ))
+          )}
           {/* Lazy Load Trigger Button */}
           {visibleCount < paginatedProducts.length && (
             <div className="mt-8 flex flex-col items-center gap-2">
