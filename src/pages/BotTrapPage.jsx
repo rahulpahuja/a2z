@@ -1,11 +1,4 @@
-import { useEffect } from 'react';
-import { flagAsBot } from '../utils/botDetection.js';
-
 export default function BotTrapPage() {
-  useEffect(() => {
-    flagAsBot('honeypot-link');
-  }, []);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="max-w-md text-center">
