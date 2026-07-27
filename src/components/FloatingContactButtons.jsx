@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext.jsx';
 import { WHATSAPP_NUMBER, INSTAGRAM_HANDLE } from '../config/store.js';
 import { buildWhatsAppLink } from '../utils/whatsapp.js';
@@ -24,6 +24,10 @@ function InstagramIcon() {
 export default function FloatingContactButtons() {
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  // The Shots feed has its own bottom-right "Buy Now" bar — sit higher there
+  // so this stack doesn't cover it.
+  const bottomOffsetClass = location.pathname === '/shots' ? 'bottom-32' : 'bottom-6';
 
   const handleWhatsApp = () => {
     if (!WHATSAPP_NUMBER) {
@@ -42,7 +46,7 @@ export default function FloatingContactButtons() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[150] flex flex-col gap-3">
+    <div className={`fixed ${bottomOffsetClass} right-6 z-[150] flex flex-col gap-3 transition-[bottom]`}>
       <button
         type="button"
         aria-label="Watch Shots"
