@@ -242,7 +242,7 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={goToPrevMedia}
                   aria-label="Previous"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
                   <span className="material-symbols-outlined">chevron_left</span>
                 </button>
@@ -250,7 +250,7 @@ export default function ProductDetailPage() {
                   type="button"
                   onClick={goToNextMedia}
                   aria-label="Next"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
                   <span className="material-symbols-outlined">chevron_right</span>
                 </button>
