@@ -347,59 +347,80 @@ export default function AdminWatermarkPage() {
     showToast('Mask cleared.');
   };
 
-  // AI Inpainting Remover Algorithm
+  // AI Inpainting Remover Algorithm — runs the diffusion only over the masked
+  // region's bounding box (not the whole canvas) and yields back to the
+  // browser between batches of iterations, so a large canvas/brush stroke
+  // can't freeze the tab for long enough to trigger a "Page Unresponsive"
+  // prompt.
   const handleRemoveWatermark = async () => {
     if (!imageLoaded || !hasMask) return;
     setIsProcessing(true);
-    
+
     await new Promise((resolve) => setTimeout(resolve, 150));
-    
+
     try {
       const imgCanvas = imageCanvasRef.current;
       const maskCanvas = maskCanvasRef.current;
-      
+
       const width = imgCanvas.width;
       const height = imgCanvas.height;
-      
+
       const ctxImg = imgCanvas.getContext('2d');
       const ctxMask = maskCanvas.getContext('2d');
-      
+
       // Copy base clean image (excluding any adder overlays)
       ctxImg.clearRect(0, 0, width, height);
       ctxImg.drawImage(loadedImageRef.current, 0, 0, width, height);
-      
+
       const imgData = ctxImg.getImageData(0, 0, width, height);
       const maskData = ctxMask.getImageData(0, 0, width, height);
-      
+
       const imgPixels = imgData.data;
       const maskPixels = maskData.data;
-      
+
       const workingBuffer = new Uint8ClampedArray(imgPixels);
       const isMasked = new Uint8Array(width * height);
-      
+
       let totalMasked = 0;
+      let minX = width, minY = height, maxX = 0, maxY = 0;
       for (let i = 0; i < maskPixels.length; i += 4) {
         if (maskPixels[i + 3] > 10) {
-          isMasked[i / 4] = 1;
+          const idx = i / 4;
+          isMasked[idx] = 1;
           totalMasked++;
+          const x = idx % width;
+          const y = (idx - x) / width;
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
         }
       }
-      
+
       if (totalMasked === 0) {
         setIsProcessing(false);
         showToast('Draw a line over the watermark first.');
         return;
       }
-      
+
+      // Expand the bounding box by a small margin so the diffusion has real
+      // neighbor colors to pull from right at the mask's edge, clamped to canvas.
+      const margin = 4;
+      const boxMinX = Math.max(1, minX - margin);
+      const boxMinY = Math.max(1, minY - margin);
+      const boxMaxX = Math.min(width - 2, maxX + margin);
+      const boxMaxY = Math.min(height - 2, maxY + margin);
+
       const iterations = 80;
+      const iterationsPerBatch = 8;
       for (let iter = 0; iter < iterations; iter++) {
-        for (let y = 1; y < height - 1; y++) {
-          for (let x = 1; x < width - 1; x++) {
+        for (let y = boxMinY; y <= boxMaxY; y++) {
+          for (let x = boxMinX; x <= boxMaxX; x++) {
             const idx = y * width + x;
             if (isMasked[idx]) {
               let rSum = 0, gSum = 0, bSum = 0;
               let count = 0;
-              
+
               const neighbors = [idx - 1, idx + 1, idx - width, idx + width];
               for (let n of neighbors) {
                 rSum += workingBuffer[n * 4];
@@ -407,7 +428,7 @@ export default function AdminWatermarkPage() {
                 bSum += workingBuffer[n * 4 + 2];
                 count++;
               }
-              
+
               if (count > 0) {
                 workingBuffer[idx * 4] = Math.round(rSum / count);
                 workingBuffer[idx * 4 + 1] = Math.round(gSum / count);
@@ -416,15 +437,19 @@ export default function AdminWatermarkPage() {
             }
           }
         }
+
+        if (iter % iterationsPerBatch === iterationsPerBatch - 1) {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+        }
       }
-      
+
       const outputCanvas = document.createElement('canvas');
       outputCanvas.width = width;
       outputCanvas.height = height;
       const outCtx = outputCanvas.getContext('2d');
       const finalImgData = new ImageData(workingBuffer, width, height);
       outCtx.putImageData(finalImgData, 0, 0);
-      
+
       outputCanvas.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
@@ -433,7 +458,7 @@ export default function AdminWatermarkPage() {
         }
         setIsProcessing(false);
       }, 'image/jpeg', 0.95);
-      
+
     } catch (err) {
       showToast(`AI Inpainting failed: ${err.message}`);
       setIsProcessing(false);
