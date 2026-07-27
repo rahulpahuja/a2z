@@ -21,6 +21,7 @@ import MyOrdersPage from './pages/MyOrdersPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import WatchAndBuyModalPage from './pages/WatchAndBuyModalPage.jsx'
+import ShotsPage from './pages/ShotsPage.jsx'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage.jsx'
 import ContactUsPage from './pages/ContactUsPage.jsx'
 import AboutUsPage from './pages/AboutUsPage.jsx'
@@ -41,6 +42,7 @@ import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminTrashPage from './pages/admin/AdminTrashPage.jsx'
 import AdminUsageBillingPage from './pages/admin/AdminUsageBillingPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
+import AdminShotsPage from './pages/admin/AdminShotsPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
@@ -74,6 +76,7 @@ const ROUTES = [
   { path: '/orders', Component: MyOrdersPage },
   { path: '/profile', Component: ProfilePage },
   { path: '/watch-and-buy', Component: WatchAndBuyModalPage },
+  { path: '/shots', Component: ShotsPage },
   { path: '/privacy-policy', Component: PrivacyPolicyPage },
   { path: '/contact-us', Component: ContactUsPage },
   { path: '/about-us', Component: AboutUsPage },
@@ -96,6 +99,7 @@ const ADMIN_ROUTES = [
   { path: '/super/products', Component: AdminProductsPage },
   { path: '/super/trash', Component: AdminTrashPage },
   { path: '/super/product-videos', Component: AdminProductVideosPage },
+  { path: '/super/shots', Component: AdminShotsPage },
   { path: '/super/sales', Component: AdminSalesPage },
   { path: '/super/collections', Component: AdminCollectionsPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
