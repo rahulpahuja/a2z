@@ -33,7 +33,7 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange, err
 }
 
 export default function CheckoutShippingPage() {
-  const { items: cartItems, setShippingDetails } = useCart();
+  const { items: cartItems, setShippingDetails, taxRatePercent } = useCart();
   const { user } = useAuth();
   const { profile, saveAddress } = useProfile();
   const navigate = useNavigate();
@@ -97,7 +97,7 @@ export default function CheckoutShippingPage() {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.18;
+  const tax = subtotal * (taxRatePercent / 100);
   const grandTotal = subtotal + tax;
 
   const handleSubmit = (event) => {
