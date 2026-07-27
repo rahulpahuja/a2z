@@ -38,6 +38,11 @@ export default function AdminSettingsPage() {
 
   const updateField = (key) => (event) => setSettings((prev) => ({ ...prev, [key]: event.target.value }));
 
+  const updateTaxRate = (event) => {
+    const value = event.target.value;
+    setSettings((prev) => ({ ...prev, taxRatePercent: value === '' ? '' : Number(value) }));
+  };
+
   const updatePickupField = (key) => (event) =>
     setSettings((prev) => ({
       ...prev,
@@ -48,7 +53,8 @@ export default function AdminSettingsPage() {
     event.preventDefault();
     setSaving(true);
     try {
-      await saveStoreSettings(settings);
+      const taxRatePercent = Math.min(100, Math.max(0, Number(settings.taxRatePercent) || 0));
+      await saveStoreSettings({ ...settings, taxRatePercent });
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -101,6 +107,30 @@ export default function AdminSettingsPage() {
               )}
             </div>
           ))}
+
+          {/* Tax Rate applied to every order's subtotal at checkout */}
+          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Tax Rate</h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+              Percentage applied to the subtotal at checkout (e.g. GST). Shown to customers as "Tax ({settings.taxRatePercent === '' ? '—' : settings.taxRatePercent}%)".
+            </p>
+            <div className="max-w-[200px]">
+              <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="taxRatePercent">
+                Tax Rate (%)
+              </label>
+              <input
+                id="taxRatePercent"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={settings.taxRatePercent ?? ''}
+                onChange={updateTaxRate}
+                placeholder="18"
+                className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+              />
+            </div>
+          </div>
 
           {/* Refund Policy Provision for Super User */}
           <div className="border-t border-outline-variant/30 pt-5 mt-1">

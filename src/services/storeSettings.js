@@ -26,6 +26,8 @@ export const DEFAULT_STORE_SETTINGS = {
   phone: '',
   gstNumber: '',
   facebookUrl: FACEBOOK_URL,
+  // Percentage applied to the subtotal at checkout (e.g. 18 for 18% GST).
+  taxRatePercent: 18,
   refundPolicy: DEFAULT_REFUND_POLICY,
   // Days a deleted product sits in Trash before it's auto-purged for good.
   trashRetentionDays: 60,

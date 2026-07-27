@@ -1,8 +1,8 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
 import { createFirebaseOrder, updateFirebaseOrder } from '../services/orders.js';
 import { reduceProductStock } from '../services/adminProducts.js';
-import { getStoreSettingsOnce } from '../services/storeSettings.js';
+import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
 import { createForwardShipment, buildDeliveryAddress } from '../services/shipprime.js';
 import { INDIAN_STATES_AND_UT } from '../data/indiaData.js';
 
@@ -69,6 +69,14 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [shippingDetails, setShippingDetails] = useState(null);
   const [lastOrder, setLastOrder] = useState(readStoredLastOrder);
+  const [taxRatePercent, setTaxRatePercent] = useState(DEFAULT_STORE_SETTINGS.taxRatePercent);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToStoreSettings((settings) => {
+      setTaxRatePercent(settings.taxRatePercent ?? DEFAULT_STORE_SETTINGS.taxRatePercent);
+    });
+    return unsubscribe;
+  }, []);
 
 
   const addItem = (product, quantity = 1) => {
@@ -96,7 +104,7 @@ export function CartProvider({ children }) {
 
   const placeOrder = ({ paymentMethod, paymentId, placedAt }) => {
     const subtotalAtOrder = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
-    const taxAtOrder = subtotalAtOrder * 0.18;
+    const taxAtOrder = subtotalAtOrder * (taxRatePercent / 100);
     const order = {
       id: generateOrderId(),
       items,
@@ -158,8 +166,9 @@ export function CartProvider({ children }) {
       lastOrder,
       placeOrder,
       trackSpecificOrder,
+      taxRatePercent,
     }),
-    [items, shippingDetails, lastOrder]
+    [items, shippingDetails, lastOrder, taxRatePercent]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
