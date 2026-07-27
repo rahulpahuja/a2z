@@ -10,7 +10,6 @@ export const NAV_ITEMS = [
   { to: '/super/products', label: 'Products', icon: 'inventory_2' },
   { to: '/super/trash', label: 'Trash', icon: 'delete' },
   { to: '/super/product-videos', label: 'Product Videos', icon: 'video_library' },
-  { to: '/super/shots', label: 'Shots', icon: 'movie_filter' },
   { to: '/super/image-studio', label: 'Image Studio', icon: 'photo_library' },
   { to: '/super/bill-template', label: 'Bill Template', icon: 'receipt_long' },
   { to: '/super/referrers', label: 'Referrer Details', icon: 'person_add' },

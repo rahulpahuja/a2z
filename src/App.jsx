@@ -39,7 +39,6 @@ import AdminProductsPage from './pages/admin/AdminProductsPage.jsx'
 import AdminTrashPage from './pages/admin/AdminTrashPage.jsx'
 import AdminUsageBillingPage from './pages/admin/AdminUsageBillingPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
-import AdminShotsPage from './pages/admin/AdminShotsPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
@@ -96,7 +95,6 @@ const ADMIN_ROUTES = [
   { path: '/super/products', Component: AdminProductsPage },
   { path: '/super/trash', Component: AdminTrashPage },
   { path: '/super/product-videos', Component: AdminProductVideosPage },
-  { path: '/super/shots', Component: AdminShotsPage },
   { path: '/super/sales', Component: AdminSalesPage },
   { path: '/super/collections', Component: AdminCollectionsPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
