@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
-import EntryGate from './components/EntryGate.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
-import ShotsFab from './components/ShotsFab.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
 import TamperWarningBanner from './components/TamperWarningBanner.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
@@ -153,39 +151,36 @@ export default function App() {
     <>
       <ProductsProvider>
         <StorefrontThemeProvider>
-          <EntryGate>
-            <LuxuryBackdrop />
-            <ScrollToTop />
-            <HoneypotLink />
-            <TamperWarningBanner />
-            <Routes>
-              {ROUTES.map(({ path, Component }) => (
-                <Route key={path} path={path} element={<Component />} />
-              ))}
-              <Route
-                path="/dashboard"
-                element={
-                  <RequireAdmin>
-                    <DashboardPage />
-                  </RequireAdmin>
-                }
-              />
-              {ADMIN_ROUTES.map(({ path, Component }) => (
-                <Route key={path} path={path} element={adminElement(Component)} />
-              ))}
-              {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
-                <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
-              ))}
-              {CONFIGURATOR_REDIRECTS.map(({ path, surface }) => (
-                <Route key={path} path={path} element={<Navigate to={`/super/configurator?surface=${surface}`} replace />} />
-              ))}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-            <FloatingContactButtons />
-            <ShotsFab />
-            <SimulatedSmsToaster />
-            <OtpCaptchaHost />
-          </EntryGate>
+          <LuxuryBackdrop />
+          <ScrollToTop />
+          <HoneypotLink />
+          <TamperWarningBanner />
+          <Routes>
+            {ROUTES.map(({ path, Component }) => (
+              <Route key={path} path={path} element={<Component />} />
+            ))}
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAdmin>
+                  <DashboardPage />
+                </RequireAdmin>
+              }
+            />
+            {ADMIN_ROUTES.map(({ path, Component }) => (
+              <Route key={path} path={path} element={adminElement(Component)} />
+            ))}
+            {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
+              <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
+            ))}
+            {CONFIGURATOR_REDIRECTS.map(({ path, surface }) => (
+              <Route key={path} path={path} element={<Navigate to={`/super/configurator?surface=${surface}`} replace />} />
+            ))}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          <FloatingContactButtons />
+          <SimulatedSmsToaster />
+          <OtpCaptchaHost />
         </StorefrontThemeProvider>
       </ProductsProvider>
     </>

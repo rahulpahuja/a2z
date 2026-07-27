@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext.jsx';
 import { WHATSAPP_NUMBER, INSTAGRAM_HANDLE } from '../config/store.js';
 import { buildWhatsAppLink } from '../utils/whatsapp.js';
@@ -22,6 +23,7 @@ function InstagramIcon() {
 
 export default function FloatingContactButtons() {
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const handleWhatsApp = () => {
     if (!WHATSAPP_NUMBER) {
@@ -41,6 +43,17 @@ export default function FloatingContactButtons() {
 
   return (
     <div className="fixed bottom-6 right-6 z-[150] flex flex-col gap-3">
+      <button
+        type="button"
+        aria-label="Watch Shots"
+        onClick={() => navigate('/shots')}
+        className="md:hidden w-14 h-14 rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
+      >
+        <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+          bolt
+        </span>
+        <span className="text-[9px] font-bold uppercase tracking-wide leading-none">Shots</span>
+      </button>
       <button
         type="button"
         aria-label="Chat on WhatsApp"
