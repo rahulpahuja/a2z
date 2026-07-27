@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subscribeToShots } from '../services/shots.js';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 
@@ -60,16 +59,23 @@ function ShotSlide({ shot, product, active }) {
 }
 
 export default function ShotsPage() {
-  const [shots, setShots] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef(null);
   const { products } = useProducts();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsub = subscribeToShots((rows) => setShots(rows.filter((s) => s.enabled)));
-    return unsub;
-  }, []);
+  // Auto-populated from every product that has a video uploaded (via Product
+  // Videos) — no separate admin curation step, so newly uploaded product
+  // videos show up here automatically.
+  const shots = useMemo(() => {
+    const rows = [];
+    products.forEach((product) => {
+      (product.videos ?? []).forEach((videoUrl, index) => {
+        rows.push({ id: `${product.id}_${index}`, productId: product.id, videoUrl });
+      });
+    });
+    return rows;
+  }, [products]);
 
   const productsById = useMemo(() => {
     const map = new Map();

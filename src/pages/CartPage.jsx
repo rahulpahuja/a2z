@@ -63,7 +63,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
 }
 
 export default function CartPage() {
-  const { items: cartItems, updateQuantity, removeItem } = useCart();
+  const { items: cartItems, updateQuantity, removeItem, taxRatePercent } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
@@ -91,7 +91,7 @@ export default function CartPage() {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.18;
+  const tax = subtotal * (taxRatePercent / 100);
   const grandTotal = subtotal + tax;
 
   return (
@@ -186,7 +186,7 @@ export default function CartPage() {
                   <span className="font-body-lg text-body-lg text-secondary font-semibold">Free</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-body-lg text-body-lg text-on-surface-variant">Tax (18%)</span>
+                  <span className="font-body-lg text-body-lg text-on-surface-variant">Tax ({taxRatePercent}%)</span>
                   <span className="font-price-display text-price-display text-on-surface text-[16px]">
                     {formatCurrency(tax)}
                   </span>
