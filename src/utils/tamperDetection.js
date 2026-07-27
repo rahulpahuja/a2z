@@ -1,4 +1,4 @@
-// Best-effort, client-side-only heuristics — same caveat as botDetection.js.
+// Best-effort, client-side-only heuristics.
 // Both signals here are trivially bypassed by anyone motivated to (undock
 // devtools, strip frame-busting) and can false-positive for legitimate users
 // (narrow windows, accessibility tooling, legitimate embeds). This is a weak
