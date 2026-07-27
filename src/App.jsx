@@ -151,44 +151,43 @@ export default function App() {
 
   return (
     <>
-      <BotGate>
-        <ProductsProvider>
-          <StorefrontThemeProvider>
-            <EntryGate>
-              <LuxuryBackdrop />
-              <ScrollToTop />
-              <HoneypotLink />
-              <TamperWarningBanner />
-              <Routes>
-                {ROUTES.map(({ path, Component }) => (
-                  <Route key={path} path={path} element={<Component />} />
-                ))}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <RequireAdmin>
-                      <DashboardPage />
-                    </RequireAdmin>
-                  }
-                />
-                {ADMIN_ROUTES.map(({ path, Component }) => (
-                  <Route key={path} path={path} element={adminElement(Component)} />
-                ))}
-                {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
-                  <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
-                ))}
-                {CONFIGURATOR_REDIRECTS.map(({ path, surface }) => (
-                  <Route key={path} path={path} element={<Navigate to={`/super/configurator?surface=${surface}`} replace />} />
-                ))}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-              <FloatingContactButtons />
-              <SimulatedSmsToaster />
-              <OtpCaptchaHost />
-            </EntryGate>
-          </StorefrontThemeProvider>
-        </ProductsProvider>
-      </BotGate>
+      <ProductsProvider>
+        <StorefrontThemeProvider>
+          <EntryGate>
+            <LuxuryBackdrop />
+            <ScrollToTop />
+            <HoneypotLink />
+            <TamperWarningBanner />
+            <Routes>
+              {ROUTES.map(({ path, Component }) => (
+                <Route key={path} path={path} element={<Component />} />
+              ))}
+              <Route
+                path="/dashboard"
+                element={
+                  <RequireAdmin>
+                    <DashboardPage />
+                  </RequireAdmin>
+                }
+              />
+              {ADMIN_ROUTES.map(({ path, Component }) => (
+                <Route key={path} path={path} element={adminElement(Component)} />
+              ))}
+              {IMAGE_STUDIO_REDIRECTS.map(({ path, tool }) => (
+                <Route key={path} path={path} element={<Navigate to={`/super/image-studio?tool=${tool}`} replace />} />
+              ))}
+              {CONFIGURATOR_REDIRECTS.map(({ path, surface }) => (
+                <Route key={path} path={path} element={<Navigate to={`/super/configurator?surface=${surface}`} replace />} />
+              ))}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <FloatingContactButtons />
+            <ShotsFab />
+            <SimulatedSmsToaster />
+            <OtpCaptchaHost />
+          </EntryGate>
+        </StorefrontThemeProvider>
+      </ProductsProvider>
     </>
   )
 }
