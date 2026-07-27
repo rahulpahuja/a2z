@@ -125,7 +125,8 @@ export default function AdminProductVideosPage() {
     return products.filter((p) => {
       const title = (p.title || p.name || '').toLowerCase();
       const sku = (p.sku || '').toLowerCase();
-      return title.includes(term) || sku.includes(term);
+      const id = (p.id || '').toLowerCase();
+      return title.includes(term) || sku.includes(term) || id.includes(term);
     });
   }, [products, query]);
 
@@ -323,7 +324,7 @@ export default function AdminProductVideosPage() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by product title or SKU…"
+                placeholder="Search by product title, SKU, or ID…"
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
               <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
