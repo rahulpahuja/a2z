@@ -383,7 +383,7 @@ export default function OrderTrackingPage() {
                   <span className="text-secondary font-semibold">Free</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Tax (18%)</span>
+                  <span>Tax (GST)</span>
                   <span>{formatCurrency(liveOrder.tax)}</span>
                 </div>
                 <div className="flex justify-between border-t border-surface-dim pt-3 font-semibold text-on-background text-base">
