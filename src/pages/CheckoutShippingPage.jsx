@@ -424,7 +424,7 @@ export default function CheckoutShippingPage() {
                   <span>Free</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Tax (18%)</span>
+                  <span>Tax ({taxRatePercent}%)</span>
                   <span>{formatCurrency(tax)}</span>
                 </div>
               </div>

@@ -6,13 +6,13 @@ import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, isTes
 import { isValidAmount } from '../utils/security.js';
 
 export default function PaymentPage() {
-  const { items: cartItems, placeOrder } = useCart();
+  const { items: cartItems, placeOrder, taxRatePercent } = useCart();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.18;
+  const tax = subtotal * (taxRatePercent / 100);
   const total = subtotal + tax;
 
   const handlePlaceOrder = async () => {
@@ -153,7 +153,7 @@ export default function PaymentPage() {
                   <span>Free</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Tax (18%)</span>
+                  <span>Tax ({taxRatePercent}%)</span>
                   <span>{formatCurrency(tax)}</span>
                 </div>
               </div>

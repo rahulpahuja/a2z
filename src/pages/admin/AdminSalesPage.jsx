@@ -1133,7 +1133,7 @@ export default function AdminSalesPage() {
                   <span>{formatCurrency(selectedOrder.subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Estimated Tax (18% GST)</span>
+                  <span>Tax (GST)</span>
                   <span>{formatCurrency(selectedOrder.tax)}</span>
                 </div>
                 <div className="flex justify-between text-[14px] font-bold text-on-surface pt-2 border-t border-dashed border-outline-variant/30">

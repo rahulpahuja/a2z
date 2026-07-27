@@ -135,7 +135,7 @@ export async function generateReceiptPdf(order) {
   doc.text('Subtotal', marginX, y);
   doc.text(formatCurrency(order.subtotal), pageWidth - marginX, y, { align: 'right' });
   y += 14;
-  doc.text('Tax (18%)', marginX, y);
+  doc.text('Tax (GST)', marginX, y);
   doc.text(formatCurrency(order.tax), pageWidth - marginX, y, { align: 'right' });
   y += 14;
   doc.setFont('helvetica', 'bold');
