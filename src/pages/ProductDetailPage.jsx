@@ -158,6 +158,9 @@ export default function ProductDetailPage() {
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
 
+  const goToPrevMedia = () => setSelectedThumbnail((i) => (i - 1 + media.length) % media.length);
+  const goToNextMedia = () => setSelectedThumbnail((i) => (i + 1) % media.length);
+
   const handleSelectColor = (colorName) => {
     setSelectedColor(colorName);
     const matchIndex = (product.imageColors ?? []).findIndex(
@@ -189,7 +192,7 @@ export default function ProductDetailPage() {
       <TopNav />
 
       {/* Main Content Canvas */}
-      <main 
+      <main
         className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter"
         style={{
           backgroundColor: 'var(--custom-store-bg, transparent)',
@@ -197,6 +200,15 @@ export default function ProductDetailPage() {
           background: 'var(--custom-backdrop-bg, inherit)',
         }}
       >
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+        >
+          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+          Back
+        </button>
+
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="md:col-span-7 flex flex-col gap-unit">
           <div 
@@ -223,6 +235,26 @@ export default function ProductDetailPage() {
               <button className="absolute top-4 right-4 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100 transition-opacity">
                 <span className="material-symbols-outlined">zoom_in</span>
               </button>
+            )}
+            {media.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={goToPrevMedia}
+                  aria-label="Previous"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100"
+                >
+                  <span className="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={goToNextMedia}
+                  aria-label="Next"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100"
+                >
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </>
             )}
           </div>
           {media.length > 1 && (

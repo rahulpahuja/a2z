@@ -262,6 +262,15 @@ export default function HomePage() {
         {/* Category Badges */}
         <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
           <div className="flex overflow-x-auto hide-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
+            <Link
+              to="/shots"
+              className="flex flex-col items-center gap-4 min-w-[120px] carousel-item"
+            >
+              <div className="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300 bg-inverse-surface flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-[40px]">smart_display</span>
+              </div>
+              <span className="font-title-sm text-title-sm text-on-surface text-center">Shots</span>
+            </Link>
             {categoryBubbles.map((category) => (
               <Link
                 key={category.id || category.name}
