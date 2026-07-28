@@ -1,7 +1,2 @@
 .carousel-container { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 .carousel-item { scroll-snap-align: start; }
-
-.product-row-scroll > * {
-  min-width: 140px;
-  width: calc((100% - (var(--products-per-row, 8) - 1) * 24px) / var(--products-per-row, 8));
-}
