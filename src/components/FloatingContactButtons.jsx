@@ -46,7 +46,7 @@ export default function FloatingContactButtons() {
   };
 
   return (
-    <div className={`fixed ${bottomOffsetClass} right-6 z-[150] flex flex-row-reverse items-end gap-3 transition-[bottom]`}>
+    <div className={`fixed ${bottomOffsetClass} right-6 z-[150] flex flex-col gap-3 transition-[bottom]`}>
       <button
         type="button"
         aria-label="Watch Shots"
