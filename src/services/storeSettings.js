@@ -31,6 +31,9 @@ export const DEFAULT_STORE_SETTINGS = {
   refundPolicy: DEFAULT_REFUND_POLICY,
   // Days a deleted product sits in Trash before it's auto-purged for good.
   trashRetentionDays: 60,
+  // Number of product cards shown per row in the home page product rows
+  // (Trending Now, Featured Elegance, Heritage Masterpieces).
+  homeProductsPerRow: 8,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.
