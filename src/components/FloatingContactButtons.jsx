@@ -51,7 +51,7 @@ export default function FloatingContactButtons() {
         type="button"
         aria-label="Watch Shots"
         onClick={() => navigate('/shots')}
-        className="md:hidden w-14 h-14 rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
+        className="w-14 h-14 rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
       >
         <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
           bolt
