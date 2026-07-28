@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 
-function ShotSlide({ shot, product, active }) {
+function ShotSlide({ shot, product, active, muted, onToggleMute }) {
   const videoRef = useRef(null);
-  const [muted, setMuted] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,11 +27,11 @@ function ShotSlide({ shot, product, active }) {
         loop
         playsInline
         muted={muted}
-        onClick={() => setMuted((m) => !m)}
+        onClick={onToggleMute}
       />
       <button
         type="button"
-        onClick={() => setMuted((m) => !m)}
+        onClick={onToggleMute}
         aria-label={muted ? 'Unmute' : 'Mute'}
         className="absolute top-4 right-4 z-10 bg-black/40 text-white rounded-full p-2 hover:bg-black/60 transition-colors"
       >
@@ -60,6 +59,7 @@ function ShotSlide({ shot, product, active }) {
 
 export default function ShotsPage() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [muted, setMuted] = useState(true);
   const containerRef = useRef(null);
   const { products } = useProducts();
   const navigate = useNavigate();
@@ -122,7 +122,14 @@ export default function ShotsPage() {
           className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth hide-scrollbar"
         >
           {shots.map((shot, index) => (
-            <ShotSlide key={shot.id} shot={shot} product={productsById.get(shot.productId)} active={index === activeIndex} />
+            <ShotSlide
+              key={shot.id}
+              shot={shot}
+              product={productsById.get(shot.productId)}
+              active={index === activeIndex}
+              muted={muted}
+              onToggleMute={() => setMuted((m) => !m)}
+            />
           ))}
         </div>
       )}
