@@ -43,6 +43,11 @@ export default function AdminSettingsPage() {
     setSettings((prev) => ({ ...prev, taxRatePercent: value === '' ? '' : Number(value) }));
   };
 
+  const updateHomeProductsPerRow = (event) => {
+    const value = event.target.value;
+    setSettings((prev) => ({ ...prev, homeProductsPerRow: value === '' ? '' : Number(value) }));
+  };
+
   const updatePickupField = (key) => (event) =>
     setSettings((prev) => ({
       ...prev,
@@ -54,7 +59,8 @@ export default function AdminSettingsPage() {
     setSaving(true);
     try {
       const taxRatePercent = Math.min(100, Math.max(0, Number(settings.taxRatePercent) || 0));
-      await saveStoreSettings({ ...settings, taxRatePercent });
+      const homeProductsPerRow = Math.min(10, Math.max(4, Number(settings.homeProductsPerRow) || 8));
+      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow });
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -127,6 +133,30 @@ export default function AdminSettingsPage() {
                 value={settings.taxRatePercent ?? ''}
                 onChange={updateTaxRate}
                 placeholder="18"
+                className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Home Page Layout Provision for Super User */}
+          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Home Page Layout</h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
+              Super User setting — number of product cards shown per row in the Trending Now, Featured Elegance, and Heritage Masterpieces sections on the home page. Default 8.
+            </p>
+            <div className="max-w-[200px]">
+              <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="homeProductsPerRow">
+                Products Per Row (Home Page)
+              </label>
+              <input
+                id="homeProductsPerRow"
+                type="number"
+                min="4"
+                max="10"
+                step="1"
+                value={settings.homeProductsPerRow ?? ''}
+                onChange={updateHomeProductsPerRow}
+                placeholder="8"
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
             </div>

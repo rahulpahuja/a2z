@@ -11,20 +11,21 @@ const TABS = [
   { key: 'purchases', label: 'Best Sellers', statLabel: 'sold', icon: 'shopping_bag' },
 ];
 
-export default function TrendingProducts() {
+export default function TrendingProducts({ productsPerRow = 8 }) {
   const { products: allProducts } = useProducts();
   const [activeTab, setActiveTab] = useState('views');
   const [rows, setRows] = useState({ views: [], purchases: [] });
   const scrollRef = useRef(null);
 
   useEffect(() => {
+    const fetchLimit = Math.max(20, productsPerRow);
     const unsubscribers = TABS.map((tab) =>
-      subscribeToTopProducts(tab.key, 20, (stats) => {
+      subscribeToTopProducts(tab.key, fetchLimit, (stats) => {
         setRows((prev) => ({ ...prev, [tab.key]: stats }));
       })
     );
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
-  }, []);
+  }, [productsPerRow]);
 
   const tab = TABS.find((t) => t.key === activeTab);
   const products = rows[activeTab]
@@ -71,7 +72,7 @@ export default function TrendingProducts() {
       {products.length === 0 ? (
         <EmptySegment message={`No ${tab.label.toLowerCase()} yet — check back soon.`} icon={tab.icon} />
       ) : (
-      <div className="relative group/arrows">
+      <div className="relative group/arrows" style={{ '--products-per-row': productsPerRow }}>
         {/* Left scroll navigation */}
         <button
           type="button"
@@ -85,10 +86,10 @@ export default function TrendingProducts() {
         {/* Scrolling horizontal list */}
         <div
           ref={scrollRef}
-          className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+          className="product-row-scroll flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
         >
           {products.map((product) => (
-            <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
+            <div key={product.id} className="shrink-0 snap-start">
               <Link
                 to={`/product/${product.id}`}
                 className="group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
