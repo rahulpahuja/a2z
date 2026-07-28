@@ -160,6 +160,18 @@ export default function AdminSettingsPage() {
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
             </div>
+
+            <label className="flex items-center gap-3 mt-5 cursor-pointer w-fit">
+              <input
+                type="checkbox"
+                checked={settings.showCategoryBubbles ?? true}
+                onChange={(event) => setSettings((prev) => ({ ...prev, showCategoryBubbles: event.target.checked }))}
+                className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary"
+              />
+              <span className="font-body-sm text-body-sm text-on-surface">
+                Show the category row (Shots, Bags, Best Sellers, Coords, New Arrivals, Tops, Trousers) on the home page
+              </span>
+            </label>
           </div>
 
           {/* Refund Policy Provision for Super User */}

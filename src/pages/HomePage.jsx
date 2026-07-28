@@ -100,6 +100,7 @@ export default function HomePage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const [homeProductsPerRow, setHomeProductsPerRow] = useState(DEFAULT_STORE_SETTINGS.homeProductsPerRow);
+  const [showCategoryBubbles, setShowCategoryBubbles] = useState(DEFAULT_STORE_SETTINGS.showCategoryBubbles);
 
   const productsRow1 = products.slice(0, homeProductsPerRow);
   const productsRow2 = products.slice(homeProductsPerRow, homeProductsPerRow + 20);
@@ -118,6 +119,7 @@ export default function HomePage() {
   useEffect(() => {
     const unsub = subscribeToStoreSettings((data) => {
       setHomeProductsPerRow(data.homeProductsPerRow || DEFAULT_STORE_SETTINGS.homeProductsPerRow);
+      setShowCategoryBubbles(data.showCategoryBubbles ?? DEFAULT_STORE_SETTINGS.showCategoryBubbles);
     });
     return unsub;
   }, []);
@@ -271,6 +273,7 @@ export default function HomePage() {
         </section>
 
         {/* Category Badges */}
+        {showCategoryBubbles && (
         <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
           <div className="flex overflow-x-auto hide-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
             <Link
@@ -300,6 +303,7 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+        )}
 
         {/* Trending Now */}
         <TrendingProducts productsPerRow={homeProductsPerRow} />

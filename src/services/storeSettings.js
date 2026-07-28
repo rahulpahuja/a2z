@@ -34,6 +34,9 @@ export const DEFAULT_STORE_SETTINGS = {
   // Number of product cards shown per row in the home page product rows
   // (Trending Now, Featured Elegance, Heritage Masterpieces).
   homeProductsPerRow: 8,
+  // Whether the circular "shop by category" bubbles row (Shots, Bags, Best
+  // Sellers, Coords, New Arrivals, Tops, Trousers) shows on the home page.
+  showCategoryBubbles: true,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.
