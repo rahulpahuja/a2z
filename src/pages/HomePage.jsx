@@ -89,8 +89,6 @@ function VideoCard({ src, poster, title, description }) {
 export default function HomePage() {
   const { products } = useProducts();
   const { theme } = useStorefrontTheme();
-  const productsRow1 = products.slice(0, 20);
-  const productsRow2 = products.slice(20, 40);
   const heritageScrollRef = useRef(null);
   const featuredScrollRef = useRef(null);
 
@@ -102,6 +100,9 @@ export default function HomePage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const [homeProductsPerRow, setHomeProductsPerRow] = useState(DEFAULT_STORE_SETTINGS.homeProductsPerRow);
+
+  const productsRow1 = products.slice(0, homeProductsPerRow);
+  const productsRow2 = products.slice(homeProductsPerRow, homeProductsPerRow + 20);
 
   const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
@@ -321,7 +322,7 @@ export default function HomePage() {
           {productsRow1.length === 0 ? (
             <EmptySegment message="No featured products yet — check back soon." />
           ) : (
-          <div className="relative group/arrows" style={{ '--products-per-row': homeProductsPerRow }}>
+          <div className="relative group/arrows">
             {/* Left scroll navigation */}
             <button
               type="button"
@@ -335,13 +336,13 @@ export default function HomePage() {
             {/* Scrolling horizontal list */}
             <div
               ref={featuredScrollRef}
-              className="product-row-scroll flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
             >
               {productsRow1.map((product) => {
                 const isFavorited = !!favorites[product.id];
                 const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
                 return (
-                  <div key={product.id} className="shrink-0 snap-start">
+                  <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/product/${product.id}`}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
@@ -425,7 +426,7 @@ export default function HomePage() {
           {productsRow2.length === 0 ? (
             <EmptySegment message="No heritage pieces here yet — check back soon." />
           ) : (
-          <div className="relative group/arrows" style={{ '--products-per-row': homeProductsPerRow }}>
+          <div className="relative group/arrows">
             {/* Left scroll navigation */}
             <button
               type="button"
@@ -439,13 +440,13 @@ export default function HomePage() {
             {/* Scrolling horizontal list */}
             <div
               ref={heritageScrollRef}
-              className="product-row-scroll flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
             >
               {productsRow2.map((product) => {
                 const isFavorited = !!favorites[product.id];
                 const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
                 return (
-                  <div key={product.id} className="shrink-0 snap-start">
+                  <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/product/${product.id}`}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
