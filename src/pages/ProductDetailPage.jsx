@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -211,7 +212,15 @@ export default function ProductDetailPage() {
 
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="md:col-span-7 flex flex-col gap-unit">
-          <div 
+          <motion.div
+            key={product.id}
+            initial={{ opacity: 0, scale: 1.06, y: 18 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{
+              opacity: { duration: 0.5, ease: 'easeOut' },
+              scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+              y: { type: 'spring', duration: 0.6, bounce: 0.25 },
+            }}
             className="relative w-full bg-surface-container overflow-hidden group"
             style={{
               aspectRatio: 'var(--custom-detail-img-aspect, 3/4)',
@@ -256,7 +265,7 @@ export default function ProductDetailPage() {
                 </button>
               </>
             )}
-          </div>
+          </motion.div>
           {media.length > 1 && (
             <div className="flex flex-wrap gap-unit sm:grid sm:grid-cols-5">
               {media.map((item, index) => (
@@ -295,7 +304,20 @@ export default function ProductDetailPage() {
                 <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
               )}
             </div>
-            <h1 className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface" style={{ fontSize: 'var(--custom-font-title-size-detail, 28px)' }}>{product.name || product.title}</h1>
+            <motion.h1
+              key={product.id}
+              initial={{ opacity: 0, x: -18, y: -6 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{
+                opacity: { duration: 0.5, ease: 'easeOut' },
+                x: { type: 'spring', duration: 0.55, bounce: 0.25 },
+                y: { type: 'spring', duration: 0.55, bounce: 0.25, delay: 0.05 },
+              }}
+              className="font-headline-md text-headline-md md:font-display-lg md:text-display-lg text-on-surface"
+              style={{ fontSize: 'var(--custom-font-title-size-detail, 28px)' }}
+            >
+              {product.name || product.title}
+            </motion.h1>
             {product.description && (
               <p className="font-body-sm text-body-sm text-on-surface-variant mt-1" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
             )}
