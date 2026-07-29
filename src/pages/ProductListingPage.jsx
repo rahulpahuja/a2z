@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
@@ -45,6 +45,7 @@ export default function ProductListingPage() {
 
   const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
   const { addItem } = useCart();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') ?? 'All';
   const activeSubcategory = searchParams.get('subcategory') ?? 'All';
@@ -564,6 +565,18 @@ export default function ProductListingPage() {
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
                   const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                  const handleBuyNow = () => {
+                    addItem({
+                      id: product.id,
+                      title: product.name || product.title,
+                      price: product.price,
+                      image: product.image,
+                      alt: product.alt,
+                      color: null,
+                      size: null,
+                    });
+                    navigate('/checkout/shipping');
+                  };
                   return (
                     <article
                       key={product.id}
@@ -666,22 +679,30 @@ export default function ProductListingPage() {
                           </div>
                         )}
                     {(product.sizes?.some((s) => s.stock > 0) ?? product.inStock) ? (
-                      <button
-                        onClick={() =>
-                          addItem({
-                            id: product.id,
-                            title: product.name || product.title,
-                            price: product.price,
-                            image: product.image,
-                            alt: product.alt,
-                            color: null,
-                            size: null,
-                          })
-                        }
-                        className="mt-4 w-full py-3 rounded-xl bg-primary text-white font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
-                      >
-                        Add to Cart
-                      </button>
+                      <div className="mt-4 flex flex-col gap-2">
+                        <button
+                          onClick={handleBuyNow}
+                          className="w-full py-3 rounded-xl bg-primary text-white font-label-caps text-label-caps uppercase hover:opacity-90 transition-opacity focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
+                        >
+                          Buy Now
+                        </button>
+                        <button
+                          onClick={() =>
+                            addItem({
+                              id: product.id,
+                              title: product.name || product.title,
+                              price: product.price,
+                              image: product.image,
+                              alt: product.alt,
+                              color: null,
+                              size: null,
+                            })
+                          }
+                          className="w-full py-3 rounded-xl border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     ) : (
                       <button disabled className="mt-4 w-full py-3 rounded-xl border-2 border-primary text-primary font-label-caps text-label-caps uppercase opacity-60 cursor-not-allowed focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none">
                         Out of Stock
