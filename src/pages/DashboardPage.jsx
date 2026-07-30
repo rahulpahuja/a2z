@@ -403,7 +403,7 @@ export default function DashboardPage() {
                     headerSearchResults.map((product) => (
                       <Link
                         key={product.id}
-                        to={`/product/${product.id}`}
+                        to={`/products/${product.id}`}
                         onClick={() => setHeaderSearchQuery('')}
                         className="block px-4 py-2 hover:bg-surface-container transition-colors"
                       >

@@ -55,7 +55,7 @@ function inferLinkType(link) {
   if (link === '/') return 'home';
   if (link === '/products') return 'products';
   if (link.startsWith('/products?category=')) return 'category';
-  if (link.startsWith('/product/')) return 'product';
+  if (link.startsWith('/products/')) return 'product';
   return 'custom';
 }
 
@@ -65,7 +65,7 @@ function inferLinkCategory(link) {
 }
 
 function inferLinkProductId(link) {
-  const match = link?.match(/^\/product\/(.+)$/);
+  const match = link?.match(/^\/products\/(.+)$/);
   return match ? match[1] : '';
 }
 
@@ -78,7 +78,7 @@ function buildLink({ linkType, linkCategory, linkProductId, linkCustom }) {
     case 'category':
       return linkCategory ? `/products?category=${encodeURIComponent(linkCategory)}` : '/products';
     case 'product':
-      return linkProductId ? `/product/${linkProductId}` : '/products';
+      return linkProductId ? `/products/${linkProductId}` : '/products';
     case 'custom':
     default:
       return linkCustom || '/products';

@@ -100,7 +100,7 @@ function ProductCard({ product }) {
   const isAvailable = product.inStock;
   return (
     <article className={`group relative flex flex-col bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}>
-      <Link to={`/product/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl bg-surface-variant block">
+      <Link to={`/products/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl bg-surface-variant block">
         <ProductImage
           className={`object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ${!isAvailable ? 'grayscale opacity-50' : ''}`}
           alt={product.alt}
@@ -136,7 +136,7 @@ function ProductCard({ product }) {
             {product.category}
           </span>
         )}
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/products/${product.id}`}>
           <h3 className="font-title-sm text-title-sm text-on-background mb-1 truncate">{product.name}</h3>
         </Link>
         <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 flex-grow">{product.desc}</p>

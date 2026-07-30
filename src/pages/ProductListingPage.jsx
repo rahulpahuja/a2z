@@ -594,7 +594,7 @@ export default function ProductListingPage() {
                       }}
                     >
                       <Link
-                        to={`/product/${product.id}`}
+                        to={`/products/${product.id}`}
                         className="relative w-full overflow-hidden product-card-img-wrapper bg-surface-container block"
                         style={{
                           aspectRatio: 'var(--custom-listing-img-aspect, 3/4)',
@@ -636,7 +636,7 @@ export default function ProductListingPage() {
                         <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
                           {product.category || product.categoryTitle}
                         </span>
-                        <Link to={`/product/${product.id}`}>
+                        <Link to={`/products/${product.id}`}>
                           <h2
                             className="text-on-surface mb-1 line-clamp-1 font-semibold"
                             style={{ fontSize: 'var(--custom-font-title-size, 14px)' }}

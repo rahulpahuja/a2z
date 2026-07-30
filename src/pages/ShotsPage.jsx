@@ -46,7 +46,7 @@ function ShotSlide({ shot, product, active, muted, onToggleMute }) {
           </div>
           <button
             type="button"
-            onClick={() => navigate(`/product/${product.id}`)}
+            onClick={() => navigate(`/products/${product.id}`)}
             className="shrink-0 bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-full uppercase tracking-widest hover:opacity-90 transition-opacity shadow-lg"
           >
             Buy Now

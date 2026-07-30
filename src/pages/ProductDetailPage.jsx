@@ -539,7 +539,7 @@ export default function ProductDetailPage() {
             <h2 className="font-headline-md text-headline-md text-center text-on-surface mb-10">You May Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
               {relatedProducts.map((related) => (
-                <Link key={related.id} to={`/product/${related.id}`} className="group flex flex-col gap-3">
+                <Link key={related.id} to={`/products/${related.id}`} className="group flex flex-col gap-3">
                   <div className="relative aspect-[3/4] rounded-[16px] overflow-hidden bg-surface-container border border-[#DCAE96]/30">
                     <ProductCardImage
                       images={related.images && related.images.length > 0 ? related.images : [related.image]}
