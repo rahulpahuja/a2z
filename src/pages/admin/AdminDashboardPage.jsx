@@ -312,7 +312,7 @@ export default function AdminDashboardPage() {
                             {product.category || product.categoryTitle} · {formatCurrency(product.price)} · {isAvailable ? 'In Stock' : 'Out of Stock'}
                           </p>
                         </div>
-                        <Link to={`/product/${product.id}`} className="font-label-caps text-label-caps text-primary hover:underline">
+                        <Link to={`/products/${product.id}`} className="font-label-caps text-label-caps text-primary hover:underline">
                           View on Storefront
                         </Link>
                       </div>

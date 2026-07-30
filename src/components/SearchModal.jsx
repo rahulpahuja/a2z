@@ -87,7 +87,7 @@ export default function SearchModal({ open, onClose }) {
           {results.map((product) => (
             <Link
               key={product.id}
-              to={`/product/${product.id}`}
+              to={`/products/${product.id}`}
               onClick={onClose}
               className="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container transition-colors"
             >

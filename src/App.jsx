@@ -63,7 +63,7 @@ const ROUTES = [
   { path: '/', Component: HomePage },
   { path: '/storefront', Component: StorefrontPage },
   { path: '/products', Component: ProductListingPage },
-  { path: '/product/:id', Component: ProductDetailPage },
+  { path: '/products/:id', Component: ProductDetailPage },
   { path: '/product-alt', Component: ProductDetailAltPage },
   { path: '/cart', Component: CartPage },
   { path: '/checkout/shipping', Component: CheckoutShippingPage },
