@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import AnalyticsListener from './components/AnalyticsListener.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
@@ -150,6 +151,7 @@ export default function App() {
         <StorefrontThemeProvider>
           <LuxuryBackdrop />
           <ScrollToTop />
+          <AnalyticsListener />
           <HoneypotLink />
           <Routes>
             {ROUTES.map(({ path, Component }) => (

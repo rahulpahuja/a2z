@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
+import { getAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,6 +11,7 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Feature flag: admin login (Firebase Auth) and the Realtime Database-backed
@@ -27,3 +29,11 @@ if (isFirebaseEnabled) {
 }
 
 export const db = isFirebaseEnabled ? getDatabase(firebaseApp) : null;
+
+// getAnalytics() requires an async support check (it fails in browsers without
+// cookie/IndexedDB support, and can't run at all outside a browser), so it's
+// exposed as a promise rather than a plain export like `auth`/`db` above.
+export const analyticsPromise =
+  isFirebaseEnabled && firebaseConfig.measurementId
+    ? isAnalyticsSupported().then((supported) => (supported ? getAnalytics(firebaseApp) : null))
+    : Promise.resolve(null);
