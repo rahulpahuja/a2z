@@ -224,6 +224,20 @@ export function updateProductVideos(productId, videos) {
   return set(ref(db, `${ROOT}/${productId}/videos`), videos);
 }
 
+export function updateProductOutOfStock(productId, outOfStock) {
+  if (!isFirebaseEnabled) {
+    const products = getLocalProducts();
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      product.outOfStock = outOfStock;
+      setLocalProducts(products);
+      notifyLocalListeners();
+    }
+    return Promise.resolve();
+  }
+  return set(ref(db, `${ROOT}/${productId}/outOfStock`), outOfStock);
+}
+
 export function reduceProductStock(productId, size, quantity) {
   if (!isFirebaseEnabled) {
     const products = getLocalProducts();

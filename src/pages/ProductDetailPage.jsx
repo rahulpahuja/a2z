@@ -154,7 +154,8 @@ export default function ProductDetailPage() {
     ? product.colors.map((c) => typeof c === 'string' ? { name: c, hex: null } : c)
     : COLORS;
 
-  const selectedSizeStock = product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999;
+  const isProductOutOfStock = Boolean(product.outOfStock);
+  const selectedSizeStock = isProductOutOfStock ? 0 : (product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999);
 
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
@@ -237,8 +238,15 @@ export default function ProductDetailPage() {
                 images={images}
                 activeIndex={selectedThumbnail}
                 alt={product.name}
-                className="object-cover w-full h-full"
+                className={`object-cover w-full h-full ${isProductOutOfStock ? 'grayscale opacity-60' : ''}`}
               />
+            )}
+            {isProductOutOfStock && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+                  Out of Stock
+                </span>
+              </div>
             )}
             {mainMedia.type !== 'video' && (
               <button className="absolute top-4 right-4 bg-surface/80 p-2 rounded-full text-on-surface hover:text-primary transition-colors backdrop-blur-sm shadow-[0_10px_30px_rgba(172,36,113,0.05)] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -356,7 +364,7 @@ export default function ProductDetailPage() {
               <div className="flex gap-2 flex-wrap">
                 {availableSizes.map((s) => {
                   const isSelected = selectedSize === s.size;
-                  const isOutOfStock = s.stock === 0;
+                  const isOutOfStock = isProductOutOfStock || s.stock === 0;
                   return (
                     <button
                       key={s.size}
@@ -524,7 +532,7 @@ export default function ProductDetailPage() {
                 </div>
                 <div>
                   <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Availability</span>
-                  <span className="font-body-sm text-body-sm text-on-surface">{product.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                  <span className="font-body-sm text-body-sm text-on-surface">{!isProductOutOfStock && product.inStock !== false ? 'In Stock' : 'Out of Stock'}</span>
                 </div>
                 <div>
                   <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Origin</span>

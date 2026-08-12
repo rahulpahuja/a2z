@@ -344,7 +344,7 @@ export default function HomePage() {
             >
               {productsRow1.map((product) => {
                 const isFavorited = !!favorites[product.id];
-                const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                 return (
                   <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
                     <Link
@@ -448,7 +448,7 @@ export default function HomePage() {
             >
               {productsRow2.map((product) => {
                 const isFavorited = !!favorites[product.id];
-                const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                 return (
                   <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
                     <Link

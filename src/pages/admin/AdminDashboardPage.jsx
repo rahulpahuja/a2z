@@ -300,7 +300,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col gap-4">
               {productMatches.map((product) => {
                 const stat = statsForProduct(product.id);
-                const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                 return (
                   <div key={product.id} className="flex gap-4 border border-outline-variant/30 rounded-lg p-4">
                     <ProductImage src={product.images?.[0] || product.image} alt={product.name || product.title} className="w-16 h-20 object-cover rounded-md shrink-0" />

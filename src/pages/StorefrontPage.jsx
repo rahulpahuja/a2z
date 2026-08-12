@@ -205,7 +205,7 @@ export default function StorefrontPage() {
     desc: product.description,
     price: formatCurrency(product.price),
     priceValue: product.price,
-    inStock: product.sizes?.some((s) => s.stock > 0) ?? product.inStock,
+    inStock: !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock),
   }));
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);

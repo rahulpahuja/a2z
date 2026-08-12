@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCategories } from '../../services/categories.js';
 import { subscribeToSubcategories } from '../../services/subcategories.js';
-import { subscribeToAdminProducts, createAdminProduct, moveProductToTrash, createFileMetadata } from '../../services/adminProducts.js';
+import { subscribeToAdminProducts, createAdminProduct, moveProductToTrash, createFileMetadata, updateProductOutOfStock } from '../../services/adminProducts.js';
+import { subscribeToCollections } from '../../services/collections.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
@@ -74,6 +75,12 @@ export default function AdminProductsPage() {
   const [titleFilter, setTitleFilter] = useState('');
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [removedImageKeys, setRemovedImageKeys] = useState([]);
+  const [collectionsList, setCollectionsList] = useState([]);
+  const [genderFilter, setGenderFilter] = useState('All');
+  const [colorFilter, setColorFilter] = useState('All');
+  const [minPriceFilter, setMinPriceFilter] = useState('');
+  const [maxPriceFilter, setMaxPriceFilter] = useState('');
+  const [collectionFilter, setCollectionFilter] = useState('All');
 
 
   const handleStartEdit = (product) => {
@@ -357,6 +364,7 @@ export default function AdminProductsPage() {
     setProductId(generateProductId());
     const unsubCategories = subscribeToCategories((rows) => setCategories(rows));
     const unsubSubcategories = subscribeToSubcategories((rows) => setSubcategories(rows));
+    const unsubCollections = subscribeToCollections((rows) => setCollectionsList(rows));
     const unsubProducts = subscribeToAdminProducts((rows, error) => {
       setProducts(rows);
       setLoadError(error);
@@ -365,6 +373,7 @@ export default function AdminProductsPage() {
     return () => {
       unsubCategories();
       unsubSubcategories();
+      unsubCollections();
       unsubProducts();
     };
   }, []);
@@ -374,11 +383,45 @@ export default function AdminProductsPage() {
     [subcategories, form.categoryId]
   );
 
+  const colorOptions = useMemo(() => {
+    const colors = new Set();
+    products.forEach((p) => (p.colors ?? []).forEach((c) => c && colors.add(c)));
+    return [...colors].sort();
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
+    let result = products;
+
     const needle = titleFilter.trim().toLowerCase();
-    if (!needle) return products;
-    return products.filter((p) => (p.title || p.name || '').toLowerCase().includes(needle));
-  }, [products, titleFilter]);
+    if (needle) {
+      result = result.filter((p) => (p.title || p.name || '').toLowerCase().includes(needle));
+    }
+
+    if (genderFilter !== 'All') {
+      result = result.filter((p) => (p.gender || 'Unisex') === genderFilter);
+    }
+
+    if (colorFilter !== 'All') {
+      result = result.filter((p) => (p.colors ?? []).includes(colorFilter));
+    }
+
+    const min = minPriceFilter !== '' ? Number(minPriceFilter) : null;
+    const max = maxPriceFilter !== '' ? Number(maxPriceFilter) : null;
+    if (min !== null) {
+      result = result.filter((p) => Number(p.price) >= min);
+    }
+    if (max !== null) {
+      result = result.filter((p) => Number(p.price) <= max);
+    }
+
+    if (collectionFilter !== 'All') {
+      const collection = collectionsList.find((c) => c.id === collectionFilter);
+      const idSet = new Set(collection?.productIds ?? []);
+      result = result.filter((p) => idSet.has(p.id));
+    }
+
+    return result;
+  }, [products, titleFilter, genderFilter, colorFilter, minPriceFilter, maxPriceFilter, collectionFilter, collectionsList]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
 
@@ -388,7 +431,7 @@ export default function AdminProductsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [titleFilter, pageSize]);
+  }, [titleFilter, genderFilter, colorFilter, minPriceFilter, maxPriceFilter, collectionFilter, pageSize]);
 
   const paginatedProducts = useMemo(
     () => filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize),
@@ -558,6 +601,16 @@ export default function AdminProductsPage() {
       showToast(err.message || 'Could not save product.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleToggleOutOfStock = async (product) => {
+    const nextOutOfStock = !product.outOfStock;
+    try {
+      await updateProductOutOfStock(product.id, nextOutOfStock);
+      showToast(nextOutOfStock ? 'Product marked as out of stock.' : 'Product marked as in stock.');
+    } catch (err) {
+      showToast(err.message || 'Could not update stock status.');
     }
   };
 
@@ -985,6 +1038,96 @@ export default function AdminProductsPage() {
             )}
           </div>
 
+          <div className="flex flex-wrap items-end gap-4 mb-6">
+            <div className="flex flex-col gap-1">
+              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-gender">Gender</label>
+              <select
+                id="filter-gender"
+                value={genderFilter}
+                onChange={(e) => setGenderFilter(e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+              >
+                {['All', 'Male', 'Female', 'Unisex'].map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-color">Color</label>
+              <select
+                id="filter-color"
+                value={colorFilter}
+                onChange={(e) => setColorFilter(e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+              >
+                <option value="All">All</option>
+                {colorOptions.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-min-price">Min Price (₹)</label>
+              <input
+                id="filter-min-price"
+                type="number"
+                min={0}
+                value={minPriceFilter}
+                onChange={(e) => setMinPriceFilter(e.target.value)}
+                placeholder="0"
+                className="w-28 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-max-price">Max Price (₹)</label>
+              <input
+                id="filter-max-price"
+                type="number"
+                min={0}
+                value={maxPriceFilter}
+                onChange={(e) => setMaxPriceFilter(e.target.value)}
+                placeholder="Any"
+                className="w-28 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+              />
+            </div>
+
+            {collectionsList.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-collection">Collection</label>
+                <select
+                  id="filter-collection"
+                  value={collectionFilter}
+                  onChange={(e) => setCollectionFilter(e.target.value)}
+                  className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg pl-3 pr-8 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
+                >
+                  <option value="All">All</option>
+                  {collectionsList.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {(genderFilter !== 'All' || colorFilter !== 'All' || minPriceFilter !== '' || maxPriceFilter !== '' || collectionFilter !== 'All') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setGenderFilter('All');
+                  setColorFilter('All');
+                  setMinPriceFilter('');
+                  setMaxPriceFilter('');
+                  setCollectionFilter('All');
+                }}
+                className="font-label-caps text-label-caps text-primary hover:underline py-2"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+
           {loading ? (
             <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>
           ) : loadError ? (
@@ -999,6 +1142,7 @@ export default function AdminProductsPage() {
             <div className="flex flex-col gap-4">
               {paginatedProducts.map((product) => {
                 const totalStock = (product.sizes ?? []).reduce((sum, s) => sum + (s.stock ?? 0), 0);
+                const isOutOfStock = Boolean(product.outOfStock) || totalStock === 0;
                 const isSelected = selectedProductIds.includes(product.id);
                 return (
                   <div 
@@ -1020,10 +1164,10 @@ export default function AdminProductsPage() {
                       <div className="w-16 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/30 relative">
                         <ProductImage
                           src={product.image}
-                          className={`w-full h-full object-cover ${totalStock === 0 ? 'grayscale opacity-60' : ''}`}
+                          className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale opacity-60' : ''}`}
                           alt={product.title}
                         />
-                        {totalStock === 0 && (
+                        {isOutOfStock && (
                           <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[9px] font-bold uppercase tracking-wider">
                             OOS
                           </span>
@@ -1035,7 +1179,7 @@ export default function AdminProductsPage() {
                         <div>
                           <h3 className="font-title-sm text-title-sm text-on-surface flex items-center gap-2">
                             {product.title}
-                            {totalStock === 0 && (
+                            {isOutOfStock && (
                               <span className="text-[10px] font-bold bg-error/10 text-error px-2 py-0.5 rounded-full uppercase">
                                 Out of Stock
                               </span>
@@ -1079,6 +1223,13 @@ export default function AdminProductsPage() {
                           </Link>
                           <button
                             type="button"
+                            onClick={() => handleToggleOutOfStock(product)}
+                            className={`font-label-caps text-label-caps hover:underline ${product.outOfStock ? 'text-primary' : 'text-error'}`}
+                          >
+                            {product.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleDelete(product)}
                             className="font-label-caps text-label-caps text-error hover:underline"
                           >
@@ -1090,7 +1241,7 @@ export default function AdminProductsPage() {
                         Colors: {(product.colors ?? []).join(', ') || '—'}
                       </p>
                       <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: <span className={totalStock === 0 ? "text-error font-semibold" : ""}>{totalStock}</span>
+                        Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: <span className={isOutOfStock ? "text-error font-semibold" : ""}>{totalStock}</span>
                       </p>
                       {product.hashtags?.length > 0 && (
                         <p className="font-body-sm text-body-sm text-secondary">{product.hashtags.join(' ')}</p>
