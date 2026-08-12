@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { subscribeToCollections } from '../services/collections.js';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
@@ -78,6 +79,8 @@ export default function ProductListingPage() {
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [collections, setCollections] = useState([]);
+  const [selectedCollectionId, setSelectedCollectionId] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [sortBy, setSortBy] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,13 +95,20 @@ export default function ProductListingPage() {
     return unsub;
   }, []);
 
+  useEffect(() => {
+    const unsub = subscribeToCollections((rows) => setCollections(rows));
+    return unsub;
+  }, []);
+
+  const publishedCollections = useMemo(() => collections.filter((c) => c.published), [collections]);
+
   const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   // Reset pagination state when filters change
   useEffect(() => {
     setCurrentPage(1);
     setVisibleCount(50);
-  }, [activeCategory, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColor, selectedSize, sortBy]);
+  }, [activeCategory, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColor, selectedSize, selectedCollectionId, sortBy]);
 
   const setActiveCategory = (category) => {
     const next = {};
@@ -119,6 +129,7 @@ export default function ProductListingPage() {
 
   const selectedColorLabel = COLORS.find((c) => c.id === selectedColor)?.label ?? null;
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
+  const selectedCollection = publishedCollections.find((c) => c.id === selectedCollectionId) ?? null;
 
   const subcategoryOptions = useMemo(() => {
     const relevant = activeCategoryList.length === 0
@@ -162,11 +173,15 @@ export default function ProductListingPage() {
     if (selectedColorLabel) {
       base = base.filter((p) => (p.colors ?? []).some((c) => String(c).toLowerCase() === selectedColorLabel.toLowerCase()));
     }
+    if (selectedCollection) {
+      const idSet = new Set(selectedCollection.productIds ?? []);
+      base = base.filter((p) => idSet.has(p.id));
+    }
     if (sortBy === 'price-asc') return [...base].sort((a, b) => a.price - b.price);
     if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
-  }, [CATALOG, activeCategoryList, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColorLabel, sortBy]);
+  }, [CATALOG, activeCategoryList, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColorLabel, selectedCollection, sortBy]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -379,6 +394,39 @@ export default function ProductListingPage() {
             </div>
           )}
 
+          {publishedCollections.length > 0 && (
+            <div className="space-y-4 border-b border-surface-variant pb-6">
+              <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+                Collection
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    checked={!selectedCollectionId}
+                    onChange={() => setSelectedCollectionId(null)}
+                    className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                    type="radio"
+                    name="collection"
+                  />
+                  <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">All</span>
+                </label>
+                {publishedCollections.map((collection) => (
+                  <label key={collection.id} className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      checked={selectedCollectionId === collection.id}
+                      onChange={() => setSelectedCollectionId(collection.id)}
+                      className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                      type="radio"
+                      name="collection"
+                    />
+                    <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">{collection.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Dual-Bound Price Range Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
@@ -503,6 +551,7 @@ export default function ProductListingPage() {
               setMaxPrice(maxCatalogPrice || 50000);
               setSelectedColor(null);
               setSelectedSize(null);
+              setSelectedCollectionId(null);
             }}
           >
             Clear Filters
@@ -549,6 +598,14 @@ export default function ProductListingPage() {
                 </button>
               </span>
             )}
+            {selectedCollection && (
+              <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
+                Collection: {selectedCollection.name}{' '}
+                <button className="hover:text-error ml-0.5" onClick={() => setSelectedCollectionId(null)}>
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              </span>
+            )}
           </div>
 
           {filteredProducts.length === 0 ? (
@@ -564,7 +621,7 @@ export default function ProductListingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 custom-product-grid">
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
-                  const isAvailable = product.sizes?.some((s) => s.stock > 0) ?? product.inStock;
+                  const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                   const handleBuyNow = () => {
                     addItem({
                       id: product.id,
@@ -678,7 +735,7 @@ export default function ProductListingPage() {
                             )}
                           </div>
                         )}
-                    {(product.sizes?.some((s) => s.stock > 0) ?? product.inStock) ? (
+                    {(!product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock)) ? (
                       <div className="mt-4 flex flex-col gap-2">
                         <button
                           onClick={handleBuyNow}
