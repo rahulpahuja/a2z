@@ -12,6 +12,7 @@ import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
+import { normalizeColors, isColorOutOfStock } from '../utils/productColors.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -120,7 +121,11 @@ export default function ProductDetailPage() {
       } else {
         setSelectedSize('M');
       }
-      const initialColor = product.colors && product.colors.length > 0 ? product.colors[0] : 'Pink';
+      const normalizedColors = normalizeColors(product.colors);
+      const initialColorObj = normalizedColors.length > 0
+        ? (normalizedColors.find((c) => !isColorOutOfStock(c)) || normalizedColors[0])
+        : null;
+      const initialColor = initialColorObj ? initialColorObj.name : 'Pink';
       setSelectedColor(initialColor);
       const matchIndex = (product.imageColors ?? []).findIndex(
         (c) => c && c.toLowerCase() === initialColor.toLowerCase()
@@ -150,12 +155,14 @@ export default function ProductDetailPage() {
   const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
   const availableSizes = product.sizes ?? SIZES.map((size) => ({ size, stock: 100 }));
-  const availableColors = product.colors 
-    ? product.colors.map((c) => typeof c === 'string' ? { name: c, hex: null } : c)
-    : COLORS;
+  const availableColors = product.colors && product.colors.length > 0 ? normalizeColors(product.colors) : COLORS;
 
   const isProductOutOfStock = Boolean(product.outOfStock);
-  const selectedSizeStock = isProductOutOfStock ? 0 : (product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999);
+  const selectedColorObj = availableColors.find((c) => c.name === selectedColor) ?? null;
+  const isSelectedColorOutOfStock = selectedColorObj ? isColorOutOfStock(selectedColorObj) : false;
+  const sizeStock = product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999;
+  const colorStock = selectedColorObj?.stock ?? Infinity;
+  const selectedSizeStock = isProductOutOfStock || isSelectedColorOutOfStock ? 0 : Math.min(sizeStock, colorStock);
 
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
@@ -399,27 +406,40 @@ export default function ProductDetailPage() {
               <div className="flex gap-3 flex-wrap">
                 {availableColors.map((color) => {
                   const isSelected = selectedColor === color.name;
+                  const colorOutOfStock = isColorOutOfStock(color);
                   if (color.hex) {
                     return (
                       <button
                         key={color.name}
-                        aria-label={color.name}
+                        aria-label={`${color.name}${colorOutOfStock ? ' (out of stock)' : ''}`}
+                        disabled={colorOutOfStock}
                         onClick={() => handleSelectColor(color.name)}
-                        className={`w-8 h-8 rounded-full border ring-2 ring-offset-2 transition-all ${
-                          isSelected
+                        className={`w-8 h-8 rounded-full border ring-2 ring-offset-2 transition-all relative ${
+                          colorOutOfStock
+                            ? 'opacity-40 cursor-not-allowed border-outline-variant ring-transparent'
+                            : isSelected
                             ? 'border-primary ring-primary'
                             : 'border-outline-variant ring-transparent hover:ring-outline-variant'
                         }`}
                         style={{ backgroundColor: color.hex }}
-                      ></button>
+                      >
+                        {colorOutOfStock && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="w-full h-px bg-error rotate-45"></span>
+                          </span>
+                        )}
+                      </button>
                     );
                   }
                   return (
                     <button
                       key={color.name}
+                      disabled={colorOutOfStock}
                       onClick={() => handleSelectColor(color.name)}
                       className={`px-4 py-2 rounded-lg border font-body-sm text-body-sm flex items-center justify-center transition-colors uppercase ${
-                        isSelected
+                        colorOutOfStock
+                          ? 'opacity-40 border-outline-variant text-on-surface-variant cursor-not-allowed line-through'
+                          : isSelected
                           ? 'border-primary bg-primary/10 text-primary font-semibold'
                           : 'border-outline-variant text-on-surface hover:border-primary'
                       }`}

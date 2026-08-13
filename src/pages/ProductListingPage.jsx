@@ -12,6 +12,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
+import { getColorName } from '../utils/productColors.js';
 import './ProductListingPage.css';
 
 const COLORS = [
@@ -171,7 +172,9 @@ export default function ProductListingPage() {
     });
 
     if (selectedColorLabel) {
-      base = base.filter((p) => (p.colors ?? []).some((c) => String(c).toLowerCase() === selectedColorLabel.toLowerCase()));
+      base = base.filter((p) =>
+        (p.colors ?? []).some((c) => getColorName(c).toLowerCase() === selectedColorLabel.toLowerCase())
+      );
     }
     if (selectedCollection) {
       const idSet = new Set(selectedCollection.productIds ?? []);

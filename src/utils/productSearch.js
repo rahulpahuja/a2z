@@ -1,4 +1,5 @@
 import Fuse from 'fuse.js';
+import { getColorName } from './productColors.js';
 
 // Weighted so a hit on the product's name/hashtags ranks far above an
 // incidental hit buried in the description. `getFn` papers over the two
@@ -13,7 +14,7 @@ const SEARCH_KEYS = [
   { name: 'categoryOrLegacy', weight: 0.12, getFn: (p) => p.categoryTitle || p.category || '' },
   { name: 'subcategoryTitle', weight: 0.08 },
   { name: 'sku', weight: 0.1 },
-  { name: 'colors', weight: 0.05 },
+  { name: 'colors', weight: 0.05, getFn: (p) => (p.colors ?? []).map(getColorName).filter(Boolean) },
   { name: 'id', weight: 0.05 },
   { name: 'description', weight: 0.05 },
 ];
