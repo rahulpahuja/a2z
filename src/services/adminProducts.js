@@ -21,7 +21,11 @@ function getLocalProducts() {
         price: p.price,
         hsnCode: '6204',
         sku: `A2Z-${p.id.toUpperCase().replace(/[^A-Z0-9]/g, '')}`,
-        colors: ['Rani Pink', 'Emerald Green', 'Dusty Rose'],
+        colors: [
+          { name: 'Rani Pink', stock: 8, outOfStock: false },
+          { name: 'Emerald Green', stock: 6, outOfStock: false },
+          { name: 'Dusty Rose', stock: 4, outOfStock: false },
+        ],
         sizes: [
           { size: 'S', stock: 5 },
           { size: 'M', stock: 10 },
@@ -74,7 +78,10 @@ export function subscribeToAdminProducts(callback) {
 }
 
 // product: { title, description, hashtags: string[], categoryId, categoryTitle,
-//            price: number, hsnCode, colors: string[], sizes: [{ size, stock }] }
+//            price: number, hsnCode,
+//            colors: [{ name, hex, stock: number|null, outOfStock: bool }],
+//            sizes: [{ size, stock }] }
+// colors[].stock === null means stock isn't tracked for that color (always available).
 export function createAdminProduct(product) {
   const productId = product.id || `prod_${Date.now()}`;
   if (!isFirebaseEnabled) {
@@ -238,17 +245,31 @@ export function updateProductOutOfStock(productId, outOfStock) {
   return set(ref(db, `${ROOT}/${productId}/outOfStock`), outOfStock);
 }
 
-export function reduceProductStock(productId, size, quantity) {
+// Colors with stock: null aren't tracked and are left untouched — only
+// colors the admin has given an explicit stock count get decremented.
+function reduceColorStock(colors, colorName, quantity) {
+  if (!colors || !colorName) return colors;
+  return colors.map((c) => {
+    if (typeof c === 'string') return c;
+    if (c.name !== colorName || c.stock === null || c.stock === undefined) return c;
+    return { ...c, stock: Math.max(0, c.stock - quantity) };
+  });
+}
+
+export function reduceProductStock(productId, size, quantity, color) {
   if (!isFirebaseEnabled) {
     const products = getLocalProducts();
     const product = products.find((p) => p.id === productId);
-    if (product && product.sizes) {
-      product.sizes = product.sizes.map((s) => {
-        if (s.size === size) {
-          return { ...s, stock: Math.max(0, s.stock - quantity) };
-        }
-        return s;
-      });
+    if (product) {
+      if (product.sizes) {
+        product.sizes = product.sizes.map((s) => {
+          if (s.size === size) {
+            return { ...s, stock: Math.max(0, s.stock - quantity) };
+          }
+          return s;
+        });
+      }
+      product.colors = reduceColorStock(product.colors, color, quantity);
       setLocalProducts(products);
       notifyLocalListeners();
     }
@@ -259,15 +280,53 @@ export function reduceProductStock(productId, size, quantity) {
   return get(productRef).then((snapshot) => {
     if (snapshot.exists()) {
       const product = snapshot.val();
+      const updates = {};
       if (product.sizes) {
-        const updatedSizes = product.sizes.map((s) => {
+        updates[`${ROOT}/${productId}/sizes`] = product.sizes.map((s) => {
           if (s.size === size) {
             return { ...s, stock: Math.max(0, s.stock - quantity) };
           }
           return s;
         });
-        return set(ref(db, `${ROOT}/${productId}/sizes`), updatedSizes);
       }
+      if (product.colors) {
+        updates[`${ROOT}/${productId}/colors`] = reduceColorStock(product.colors, color, quantity);
+      }
+      if (Object.keys(updates).length > 0) {
+        return update(ref(db), updates);
+      }
+    }
+  });
+}
+
+// Sets an explicit "stock out" override for one color on a product,
+// independent of that color's stock count — mirrors updateProductOutOfStock
+// but scoped to a single color instead of the whole product.
+export function updateProductColorOutOfStock(productId, colorName, outOfStock) {
+  const applyToColors = (colors) =>
+    (colors ?? []).map((c) => {
+      const name = typeof c === 'string' ? c : c.name;
+      if (name !== colorName) return c;
+      const base = typeof c === 'string' ? { name: c, hex: null, stock: null } : c;
+      return { ...base, outOfStock };
+    });
+
+  if (!isFirebaseEnabled) {
+    const products = getLocalProducts();
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      product.colors = applyToColors(product.colors);
+      setLocalProducts(products);
+      notifyLocalListeners();
+    }
+    return Promise.resolve();
+  }
+
+  const productRef = ref(db, `${ROOT}/${productId}`);
+  return get(productRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const product = snapshot.val();
+      return set(ref(db, `${ROOT}/${productId}/colors`), applyToColors(product.colors));
     }
   });
 }

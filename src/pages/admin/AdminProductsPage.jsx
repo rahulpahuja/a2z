@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCategories } from '../../services/categories.js';
 import { subscribeToSubcategories } from '../../services/subcategories.js';
-import { subscribeToAdminProducts, createAdminProduct, moveProductToTrash, createFileMetadata, updateProductOutOfStock } from '../../services/adminProducts.js';
+import { subscribeToAdminProducts, createAdminProduct, moveProductToTrash, createFileMetadata, updateProductOutOfStock, updateProductColorOutOfStock } from '../../services/adminProducts.js';
 import { subscribeToCollections } from '../../services/collections.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
@@ -10,6 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
+import { getColorName, normalizeColors, isColorOutOfStock } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
 
 const uploadImageToExternalServer = async (file, customName) => {
@@ -61,6 +62,7 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [sizes, setSizes] = useState([]); // [{ size, stock }]
   const [customSize, setCustomSize] = useState('');
+  const [colorStocks, setColorStocks] = useState({}); // { [colorName]: { stock: '' | number, outOfStock: bool } }
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
   const [productId, setProductId] = useState('');
@@ -83,6 +85,17 @@ export default function AdminProductsPage() {
   const [collectionFilter, setCollectionFilter] = useState('All');
 
 
+  // Rehydrates the per-color stock/out-of-stock editor from a saved product's
+  // colors, tolerating the old plain-string shape (no stock recorded yet).
+  const colorStocksFromProduct = (product) => {
+    const next = {};
+    normalizeColors(product.colors).forEach((c) => {
+      if (!c.name) return;
+      next[c.name] = { stock: c.stock === null ? '' : c.stock, outOfStock: c.outOfStock };
+    });
+    return next;
+  };
+
   const handleStartEdit = (product) => {
     setEditingProductId(product.id);
     setIsDuplicating(false);
@@ -98,6 +111,7 @@ export default function AdminProductsPage() {
       gender: product.gender || 'Unisex',
     });
     setSizes(product.sizes ?? []);
+    setColorStocks(colorStocksFromProduct(product));
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -114,7 +128,7 @@ export default function AdminProductsPage() {
     } else if (product.image) {
       initialPreviews[0] = product.image;
       initialNames[0] = getR2KeyFromUrl(product.image) || '';
-      initialColors[0] = product.imageColors?.[0] || product.colors?.[0] || '';
+      initialColors[0] = product.imageColors?.[0] || getColorName(product.colors?.[0]) || '';
     }
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
@@ -138,6 +152,7 @@ export default function AdminProductsPage() {
       gender: product.gender || 'Unisex',
     });
     setSizes(product.sizes ?? []);
+    setColorStocks(colorStocksFromProduct(product));
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -154,7 +169,7 @@ export default function AdminProductsPage() {
     } else if (product.image) {
       initialPreviews[0] = product.image;
       initialNames[0] = getR2KeyFromUrl(product.image) || '';
-      initialColors[0] = product.imageColors?.[0] || product.colors?.[0] || '';
+      initialColors[0] = product.imageColors?.[0] || getColorName(product.colors?.[0]) || '';
     }
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
@@ -385,7 +400,10 @@ export default function AdminProductsPage() {
 
   const colorOptions = useMemo(() => {
     const colors = new Set();
-    products.forEach((p) => (p.colors ?? []).forEach((c) => c && colors.add(c)));
+    products.forEach((p) => (p.colors ?? []).forEach((c) => {
+      const name = getColorName(c);
+      if (name) colors.add(name);
+    }));
     return [...colors].sort();
   }, [products]);
 
@@ -402,7 +420,7 @@ export default function AdminProductsPage() {
     }
 
     if (colorFilter !== 'All') {
-      result = result.filter((p) => (p.colors ?? []).includes(colorFilter));
+      result = result.filter((p) => (p.colors ?? []).some((c) => getColorName(c) === colorFilter));
     }
 
     const min = minPriceFilter !== '' ? Number(minPriceFilter) : null;
@@ -459,10 +477,34 @@ export default function AdminProductsPage() {
 
   const removeSize = (size) => setSizes((prev) => prev.filter((s) => s.size !== size));
 
+  // The colors a product ships in are driven by the color tagged on each
+  // uploaded image (imageColors). This mirrors that set so the "Colors &
+  // Stock" section can offer a stock qty + out-of-stock toggle per color
+  // without asking the admin to re-type color names a second time.
+  const derivedColorNames = useMemo(
+    () => [...new Set(imageColors.map((c) => c.trim()).filter(Boolean))],
+    [imageColors]
+  );
+
+  const updateColorStock = (name, stock) => {
+    setColorStocks((prev) => ({
+      ...prev,
+      [name]: { ...prev[name], stock: stock === '' ? '' : Math.max(0, Number(stock) || 0) },
+    }));
+  };
+
+  const toggleColorOutOfStock = (name) => {
+    setColorStocks((prev) => ({
+      ...prev,
+      [name]: { ...prev[name], outOfStock: !prev[name]?.outOfStock },
+    }));
+  };
+
   const resetForm = () => {
     setForm(EMPTY_FORM);
     setSizes([]);
     setCustomSize('');
+    setColorStocks({});
     imagePreviews.forEach((preview) => {
       if (preview && preview.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
@@ -540,7 +582,15 @@ export default function AdminProductsPage() {
       const uploadedFiles = (await Promise.all(uploadPromises)).filter((f) => f.url);
       const uploadedUrls = uploadedFiles.map((f) => f.url);
       const uploadedColors = uploadedFiles.map((f) => f.color);
-      const derivedColors = [...new Set(uploadedColors.filter(Boolean))];
+      const derivedColorNamesAtSubmit = [...new Set(uploadedColors.filter(Boolean))];
+      const colorsPayload = derivedColorNamesAtSubmit.map((name) => {
+        const entry = colorStocks[name];
+        return {
+          name,
+          stock: !entry || entry.stock === '' || entry.stock === undefined ? null : Number(entry.stock),
+          outOfStock: Boolean(entry?.outOfStock),
+        };
+      });
 
       await createAdminProduct({
         id: productId,
@@ -558,7 +608,7 @@ export default function AdminProductsPage() {
         subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
-        colors: derivedColors,
+        colors: colorsPayload,
         sizes,
         image: uploadedUrls[0],
         images: uploadedUrls,
@@ -611,6 +661,16 @@ export default function AdminProductsPage() {
       showToast(nextOutOfStock ? 'Product marked as out of stock.' : 'Product marked as in stock.');
     } catch (err) {
       showToast(err.message || 'Could not update stock status.');
+    }
+  };
+
+  const handleToggleColorOutOfStock = async (product, colorName, currentlyOutOfStock) => {
+    const nextOutOfStock = !currentlyOutOfStock;
+    try {
+      await updateProductColorOutOfStock(product.id, colorName, nextOutOfStock);
+      showToast(nextOutOfStock ? `${colorName} marked as out of stock.` : `${colorName} marked as in stock.`);
+    } catch (err) {
+      showToast(err.message || 'Could not update color stock status.');
     }
   };
 
@@ -960,6 +1020,48 @@ export default function AdminProductsPage() {
                 )}
               </div>
 
+              {/* Colors + per-color stock */}
+              <div>
+                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
+                  Colors &amp; Stock
+                </label>
+                {derivedColorNames.length === 0 ? (
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Tag a color on at least one image above to manage its stock here.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {derivedColorNames.map((name) => {
+                      const entry = colorStocks[name] ?? { stock: '', outOfStock: false };
+                      return (
+                        <div key={name} className="flex items-center gap-3 border border-outline-variant/30 rounded-lg px-4 py-2">
+                          <span className="font-body-sm text-body-sm text-on-surface w-32 truncate">{name}</span>
+                          <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor={`color-stock-${name}`}>
+                            Stock
+                          </label>
+                          <input
+                            id={`color-stock-${name}`}
+                            type="number"
+                            min="0"
+                            placeholder="Unlimited"
+                            value={entry.stock}
+                            onChange={(e) => updateColorStock(name, e.target.value)}
+                            className="w-28 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-1 font-body-sm text-body-sm text-on-surface transition-colors"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => toggleColorOutOfStock(name)}
+                            className={`ml-auto font-label-caps text-label-caps hover:underline ${entry.outOfStock ? 'text-primary' : 'text-error'}`}
+                          >
+                            {entry.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
               <button
                 type="submit"
                 disabled={saving}
@@ -1237,9 +1339,33 @@ export default function AdminProductsPage() {
                           </button>
                         </div>
                       </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Colors: {(product.colors ?? []).join(', ') || '—'}
-                      </p>
+                      {(product.colors ?? []).length > 0 ? (
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">Colors:</span>
+                          {normalizeColors(product.colors).map((c) => {
+                            const colorOut = isColorOutOfStock(c);
+                            return (
+                              <span
+                                key={c.name}
+                                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-body-sm text-body-sm ${
+                                  colorOut ? 'border-error/40 text-error' : 'border-outline-variant/40 text-on-surface-variant'
+                                }`}
+                              >
+                                {c.name}{c.stock !== null ? ` (${c.stock})` : ''}
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleColorOutOfStock(product, c.name, colorOut)}
+                                  className="font-label-caps text-[10px] uppercase text-primary hover:underline"
+                                >
+                                  {colorOut ? 'Mark In Stock' : 'Mark Out'}
+                                </button>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">Colors: —</p>
+                      )}
                       <p className="font-body-sm text-body-sm text-on-surface-variant">
                         Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: <span className={isOutOfStock ? "text-error font-semibold" : ""}>{totalStock}</span>
                       </p>

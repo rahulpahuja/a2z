@@ -125,7 +125,7 @@ export function CartProvider({ children }) {
     // Update stock levels in Firebase
     items.forEach((line) => {
       if (line.size) {
-        reduceProductStock(line.id, line.size, line.quantity);
+        reduceProductStock(line.productId ?? line.id, line.size, line.quantity, line.color);
       }
     });
 
