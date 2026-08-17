@@ -103,14 +103,14 @@ export default function CartPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
             A2Z Collection
           </Link>
-          <nav className="hidden md:flex gap-6 font-body-lg text-body-lg">
+          <nav className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-6 font-body-lg text-body-lg">
             {navLinks.map((link) => (
               <Link
                 key={link.label}

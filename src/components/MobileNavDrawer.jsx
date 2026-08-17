@@ -54,7 +54,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[300] md:hidden transition-all duration-300 ${
+      className={`fixed inset-0 z-[300] md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!block transition-all duration-300 ${
         open ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
       }`}
       aria-hidden={!open}

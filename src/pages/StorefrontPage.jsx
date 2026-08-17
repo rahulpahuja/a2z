@@ -227,7 +227,7 @@ export default function StorefrontPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -236,7 +236,7 @@ export default function StorefrontPage() {
             A2Z Collection
           </Link>
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -250,7 +250,7 @@ export default function StorefrontPage() {
           {/* Trailing Icons */}
           <div className="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
             <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
-            <ProfileButton className="hover:opacity-80 transition-opacity duration-200 hidden md:block" />
+            <ProfileButton className="hover:opacity-80 transition-opacity duration-200 hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden" />
           </div>
         </div>
       </nav>

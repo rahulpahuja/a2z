@@ -162,28 +162,28 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[11px] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words">
+      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[11px] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words [@media(orientation:landscape)_and_(max-height:500px)]:!py-1">
         Enjoy Free Shipping on Orders Above ₹2,500
       </div>
       <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-0 md:top-[32px] z-50 flat no shadows border-b border-surface-variant w-full max-w-full">
-        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-3 md:py-4 max-w-container-max mx-auto h-[64px] md:h-[80px]">
+        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-3 md:py-4 max-w-container-max mx-auto h-[64px] md:h-[80px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[52px] [@media(orientation:landscape)_and_(max-height:500px)]:!py-2">
           <div className="flex items-center gap-3">
             <button
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileNavOpen(true)}
-              className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+              className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
             >
               <span className="material-symbols-outlined text-[26px]">menu</span>
             </button>
             <Link
               to="/"
-              className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight truncate"
+              className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md [@media(orientation:landscape)_and_(max-height:500px)]:!font-headline-md-mobile [@media(orientation:landscape)_and_(max-height:500px)]:!text-headline-md-mobile font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight truncate"
             >
               A2Z Collection
             </Link>
           </div>
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 [@media(orientation:landscape)_and_(max-height:500px)]:!hidden">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -199,7 +199,7 @@ export default function HomePage() {
               type="button"
               aria-label="Search"
               onClick={() => setSearchOpen(true)}
-              className="hover:opacity-80 transition-opacity duration-200 hidden md:block"
+              className="hover:opacity-80 transition-opacity duration-200 hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden"
             >
               <span className="material-symbols-outlined">search</span>
             </button>
@@ -212,7 +212,7 @@ export default function HomePage() {
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="w-full max-w-full overflow-x-clip">
         {/* Hero Carousel */}
-        <section className="relative w-full max-w-full h-[52vh] min-h-[360px] sm:h-[65vh] sm:min-h-[460px] md:h-[70vh] md:min-h-[500px] bg-surface-container overflow-hidden">
+        <section className="relative w-full max-w-full h-[52vh] min-h-[360px] sm:h-[65vh] sm:min-h-[460px] md:h-[70vh] md:min-h-[500px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
           <div
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -234,14 +234,14 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-black/25"></div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {!slide.hideTitle && (
-                    <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-tertiary playfair mb-3 md:mb-6 max-w-3xl drop-shadow-lg px-2 break-words text-center">
+                    <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg [@media(orientation:landscape)_and_(max-height:500px)]:!font-display-lg-mobile [@media(orientation:landscape)_and_(max-height:500px)]:!text-display-lg-mobile text-on-tertiary playfair mb-3 md:mb-6 [@media(orientation:landscape)_and_(max-height:500px)]:!mb-2 max-w-3xl drop-shadow-lg px-2 break-words text-center">
                       {slide.title}
                     </h1>
                   )}
                   {!slide.hideCta && (
                     <Link
                       to={slide.link}
-                      className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
+                      className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 [@media(orientation:landscape)_and_(max-height:500px)]:!px-5 [@media(orientation:landscape)_and_(max-height:500px)]:!py-2 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
                     >
                       {slide.cta}
                     </Link>
