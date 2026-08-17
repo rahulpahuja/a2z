@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import { getHighResUrl } from '../utils/image.js';
 import SiteFooter from '../components/SiteFooter.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductDetailAltPage.css';
 
@@ -114,6 +115,7 @@ export default function ProductDetailAltPage() {
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [viewCount, setViewCount] = useState(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
   useEffect(() => {
@@ -154,10 +156,20 @@ export default function ProductDetailAltPage() {
       {/* TopNavBar (Shared Component) */}
       <header className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky z-50">
         <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50">
-          {/* Brand Logo */}
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
-          </Link>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileNavOpen(true)}
+              className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+            {/* Brand Logo */}
+            <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+              A2Z Collection
+            </Link>
+          </div>
           {/* Navigation Links (Desktop) */}
           <nav className="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
             {navLinks.map((link) => (
@@ -177,6 +189,7 @@ export default function ProductDetailAltPage() {
           </div>
         </div>
       </header>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       {/* Main Canvas: Product Detail Page */}
       <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
