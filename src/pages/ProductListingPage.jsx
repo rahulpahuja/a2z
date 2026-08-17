@@ -90,6 +90,7 @@ export default function ProductListingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileViewMode, setMobileViewMode] = useState('grid'); // 'list' | 'grid' — mobile-only layout toggle
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
   useEffect(() => {
@@ -291,6 +292,15 @@ export default function ProductListingPage() {
           >
             <span className="material-symbols-outlined text-sm">tune</span>
             Filters
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
+            aria-pressed={mobileViewMode === 'grid'}
+            className="md:hidden flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+            {mobileViewMode === 'grid' ? 'List' : 'Grid'}
           </button>
           <label className="hidden md:inline font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
           <div className="relative">
@@ -622,7 +632,7 @@ export default function ProductListingPage() {
                   {group.title}
                 </h2>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 custom-product-grid">
+              <div className={`grid ${mobileViewMode === 'grid' ? 'grid-cols-2 gap-3' : 'grid-cols-1 gap-6'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 sm:gap-6 custom-product-grid`}>
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
                   const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
