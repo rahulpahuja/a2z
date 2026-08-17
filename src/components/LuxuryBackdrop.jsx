@@ -1,22 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function LuxuryBackdrop() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
+  const spotlightRef = useRef(null);
 
   useEffect(() => {
+    let animationFrameId = null;
+
     const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      if (animationFrameId) return;
+      animationFrameId = requestAnimationFrame(() => {
+        if (spotlightRef.current) {
+          spotlightRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+        }
+        animationFrameId = null;
+      });
     };
 
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = () => setIsHovered(false);
+    const handleMouseEnter = () => {
+      if (spotlightRef.current) spotlightRef.current.style.opacity = '1';
+    };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    const handleMouseLeave = () => {
+      if (spotlightRef.current) spotlightRef.current.style.opacity = '0';
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.body.addEventListener('mouseenter', handleMouseEnter);
     document.body.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       document.body.removeEventListener('mouseenter', handleMouseEnter);
       document.body.removeEventListener('mouseleave', handleMouseLeave);
@@ -43,32 +56,20 @@ export default function LuxuryBackdrop() {
 
       {/* Floating Animated Mesh Gradient Blobs */}
       {/* Primary Brand Color Glow */}
-      <div className="absolute top-[-10%] left-[5%] w-[600px] h-[600px] rounded-full bg-primary/[0.06] blur-[120px] animate-float-slow-1" />
+      <div className="absolute top-[-10%] left-[5%] w-[600px] h-[600px] rounded-full bg-primary/[0.06] blur-[100px] animate-float-slow-1 will-change-transform transform-gpu" />
 
       {/* Sage Green Glow */}
-      <div className="absolute bottom-[10%] right-[-5%] w-[650px] h-[650px] rounded-full bg-secondary/[0.05] blur-[140px] animate-float-slow-2" />
+      <div className="absolute bottom-[10%] right-[-5%] w-[650px] h-[650px] rounded-full bg-secondary/[0.05] blur-[120px] animate-float-slow-2 will-change-transform transform-gpu" />
 
       {/* Terracotta/Peach Glow */}
-      <div className="absolute top-[35%] right-[15%] w-[500px] h-[500px] rounded-full bg-[#ecbda4]/[0.12] blur-[100px] animate-float-slow-3" />
+      <div className="absolute top-[35%] right-[15%] w-[500px] h-[500px] rounded-full bg-[#ecbda4]/[0.12] blur-[90px] animate-float-slow-3 will-change-transform transform-gpu" />
 
-      {/* Interactive Cursor Spotlight */}
-      {isHovered && (
-        <div
-          className="absolute -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle_at_center,rgba(var(--color-primary-rgb,172,36,113),0.08)_0%,rgba(201,238,169,0.04)_50%,transparent_100%)] blur-[50px] transition-opacity duration-300 pointer-events-none"
-          style={{
-            left: `${mousePos.x}px`,
-            top: `${mousePos.y}px`,
-          }}
-        />
-      )}
-
-      {/* SVG Fine-grain Film Noise Overlay */}
-      <svg className="absolute inset-0 opacity-[0.015] mix-blend-overlay w-full h-full">
-        <filter id="noiseFilter">
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
-        </filter>
-        <rect width="100%" height="100%" filter="url(#noiseFilter)" />
-      </svg>
+      {/* Interactive Cursor Spotlight (zero React re-renders) */}
+      <div
+        ref={spotlightRef}
+        className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle_at_center,rgba(var(--color-primary-rgb,172,36,113),0.07)_0%,rgba(201,238,169,0.03)_50%,transparent_100%)] blur-[40px] opacity-0 transition-opacity duration-300 pointer-events-none will-change-transform transform-gpu"
+        style={{ transform: 'translate3d(-1000px, -1000px, 0)' }}
+      />
     </div>
   );
 }

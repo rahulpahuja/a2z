@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import AuthModal from '../components/AuthModal.jsx';
+import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { subscribeToOrders } from '../services/orders.js';
@@ -19,6 +21,15 @@ export default function MyOrdersPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+
+  useEffect(() => {
+    const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
+    return unsub;
+  }, []);
+
+  const navLinks = topNavLinks.map((link) => ({ label: link.label, to: topNavLinkToPath(link) }));
 
   useEffect(() => {
     if (!user) {
@@ -44,11 +55,22 @@ export default function MyOrdersPage() {
   if (!user) {
     return (
       <>
-        <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
-          </Link>
+        <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileNavOpen(true)}
+              className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+            <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+              A2Z Collection
+            </Link>
+          </div>
         </header>
+        <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
         <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 flex flex-col items-center text-center gap-3">
           <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">
             Sign In to View Your Orders
@@ -62,14 +84,36 @@ export default function MyOrdersPage() {
   return (
     <>
       <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 docked full-width top-0 sticky">
-        <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-          A2Z Collection
-        </Link>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMobileNavOpen(true)}
+            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+          >
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            A2Z Collection
+          </Link>
+        </div>
+        <nav className="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              className="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+              to={link.to}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
         <div className="flex items-center gap-unit text-primary dark:text-primary-fixed-dim">
           <CartIconButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
           <ProfileButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
+      <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16">
         <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-8">

@@ -51,6 +51,7 @@ export default function ProductListingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') ?? 'All';
   const activeSubcategory = searchParams.get('subcategory') ?? 'All';
+  const activeFilter = searchParams.get('filter');
   const activeCategoryList = useMemo(
     () => (activeCategory === 'All' ? [] : activeCategory.split(',')),
     [activeCategory]
@@ -271,7 +272,7 @@ export default function ProductListingPage() {
       <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4">
         <div>
           <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
-            {activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
+            {activeFilter === 'new-arrivals' ? 'NEW ARRIVALS' : activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
           </h1>
           {/* Top Counter Banner showing X of Y products */}
           <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm font-semibold">

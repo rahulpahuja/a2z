@@ -10,17 +10,38 @@ export const DEFAULT_TOP_NAV_LINKS = [
   { id: 'nav_kurti', label: 'Kurtis', type: 'category', category: 'Kurti' },
 ];
 
+function normalizeNavLinks(val) {
+  let list = [];
+  if (Array.isArray(val)) {
+    list = [...val];
+  } else if (val && typeof val === 'object') {
+    list = Object.values(val);
+  } else {
+    list = [...DEFAULT_TOP_NAV_LINKS];
+  }
+
+  // Guarantee 'New Arrivals' is always present in top navigation
+  if (!list.some((item) => item?.type === 'all' || item?.label?.toLowerCase() === 'new arrivals')) {
+    list.unshift({ id: 'nav_new_arrivals', label: 'New Arrivals', type: 'all' });
+  }
+  return list;
+}
+
 function getLocalTopNav() {
   try {
     const data = localStorage.getItem(PATH);
-    return data ? JSON.parse(data) : DEFAULT_TOP_NAV_LINKS;
+    return data ? normalizeNavLinks(JSON.parse(data)) : DEFAULT_TOP_NAV_LINKS;
   } catch {
     return DEFAULT_TOP_NAV_LINKS;
   }
 }
 
 function setLocalTopNav(links) {
-  localStorage.setItem(PATH, JSON.stringify(links));
+  try {
+    localStorage.setItem(PATH, JSON.stringify(links));
+  } catch {
+    // Ignore localStorage errors
+  }
 }
 
 const listeners = new Set();
@@ -30,19 +51,30 @@ function notifyListeners() {
 }
 
 export function subscribeToTopNav(callback) {
+  // Always invoke immediately with local/default links for instant 0ms render
+  const initial = getLocalTopNav();
+  try {
+    callback(initial, null);
+  } catch {
+    // Ignore callback errors on initial invocation
+  }
+
   if (!isFirebaseEnabled) {
     listeners.add(callback);
-    callback(getLocalTopNav(), null);
     return () => {
       listeners.delete(callback);
     };
   }
+
   return onValue(
     ref(db, PATH),
     (snapshot) => {
-      callback(snapshot.exists() ? snapshot.val() : DEFAULT_TOP_NAV_LINKS, null);
+      const raw = snapshot.exists() ? snapshot.val() : DEFAULT_TOP_NAV_LINKS;
+      const normalized = normalizeNavLinks(raw);
+      setLocalTopNav(normalized);
+      callback(normalized, null);
     },
-    (error) => callback(DEFAULT_TOP_NAV_LINKS, error)
+    (error) => callback(initial, error)
   );
 }
 
@@ -65,6 +97,9 @@ export function topNavLinkToPath(link) {
     if (categories.length) {
       return `/products?category=${encodeURIComponent(categories.join(','))}`;
     }
+  }
+  if (link.type === 'all' && (link.label?.toLowerCase() === 'new arrivals' || link.id === 'nav_new_arrivals')) {
+    return '/products?filter=new-arrivals';
   }
   return '/products';
 }
