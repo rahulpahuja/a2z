@@ -218,9 +218,16 @@ export default function HomePage() {
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {heroSlides.map((slide, index) => (
-              <div key={slide.id || index} className="w-full h-full flex-shrink-0 relative">
+              <div key={slide.id || index} className="w-full h-full flex-shrink-0 relative overflow-hidden">
+                {/* Blurred, scaled copy fills the frame so the sharp image below never needs to crop */}
                 <div
-                  className="bg-cover bg-center bg-no-repeat w-full h-full"
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-cover bg-center scale-110 blur-2xl opacity-60"
+                  style={{ backgroundImage: `url('${slide.image}')` }}
+                ></div>
+                {/* Full, uncropped slide image */}
+                <div
+                  className="absolute inset-0 bg-contain bg-center bg-no-repeat"
                   data-alt={slide.alt}
                   style={{ backgroundImage: `url('${slide.image}')` }}
                 ></div>
