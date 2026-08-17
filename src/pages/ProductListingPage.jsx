@@ -283,26 +283,8 @@ export default function ProductListingPage() {
             </span>
           </div>
         </div>
-        <div className="mt-4 md:mt-0 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setMobileFiltersOpen((open) => !open)}
-            aria-expanded={mobileFiltersOpen}
-            className="md:hidden flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm">tune</span>
-            Filters
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
-            aria-pressed={mobileViewMode === 'grid'}
-            className="md:hidden flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
-            {mobileViewMode === 'grid' ? 'List' : 'Grid'}
-          </button>
-          <label className="hidden md:inline font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
+        <div className="hidden md:flex mt-4 md:mt-0 items-center gap-3">
+          <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
           <div className="relative">
             <select
               className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
@@ -320,7 +302,43 @@ export default function ProductListingPage() {
         </div>
       </div>
 
-      <main 
+      {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
+      <div className="md:hidden sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setMobileFiltersOpen((open) => !open)}
+          aria-expanded={mobileFiltersOpen}
+          className="flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+        >
+          <span className="material-symbols-outlined text-sm">tune</span>
+          Filters
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
+          aria-pressed={mobileViewMode === 'grid'}
+          className="flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+        >
+          <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+          {mobileViewMode === 'grid' ? 'List' : 'Grid'}
+        </button>
+        <div className="relative ml-auto">
+          <select
+            className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+            id="sort-by-mobile"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="newest">Newest</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="popular">Popularity</option>
+          </select>
+          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+        </div>
+      </div>
+
+      <main
         className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row gap-8"
         style={{
           backgroundColor: 'var(--custom-store-bg, transparent)',
