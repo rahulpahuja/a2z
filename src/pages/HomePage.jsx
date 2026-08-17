@@ -162,25 +162,27 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="bg-primary text-on-primary py-2 text-center text-label-caps font-label-caps uppercase sticky top-0 z-[60]">
+      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[11px] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words">
         Enjoy Free Shipping on Orders Above ₹2,500
       </div>
-      <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-[32px] z-50 flat no shadows border-b border-surface-variant">
-        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto h-[80px]">
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileNavOpen(true)}
-            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
-          >
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-          <Link
-            to="/"
-            className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight"
-          >
-            A2Z Collection
-          </Link>
+      <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-0 md:top-[32px] z-50 flat no shadows border-b border-surface-variant w-full max-w-full">
+        <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-3 md:py-4 max-w-container-max mx-auto h-[64px] md:h-[80px]">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileNavOpen(true)}
+              className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            >
+              <span className="material-symbols-outlined text-[26px]">menu</span>
+            </button>
+            <Link
+              to="/"
+              className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight truncate"
+            >
+              A2Z Collection
+            </Link>
+          </div>
           <nav className="hidden md:flex space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -192,7 +194,7 @@ export default function HomePage() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center space-x-6 text-primary dark:text-primary-fixed-dim">
+          <div className="flex items-center space-x-3 md:space-x-6 text-primary dark:text-primary-fixed-dim">
             <button
               type="button"
               aria-label="Search"
@@ -208,9 +210,9 @@ export default function HomePage() {
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
-      <main>
+      <main className="w-full max-w-full overflow-x-clip">
         {/* Hero Carousel */}
-        <section className="relative w-full h-[70vh] min-h-[500px] bg-surface-container overflow-hidden">
+        <section className="relative w-full max-w-full h-[52vh] min-h-[360px] sm:h-[65vh] sm:min-h-[460px] md:h-[70vh] md:min-h-[500px] bg-surface-container overflow-hidden">
           <div
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -225,14 +227,14 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-black/25"></div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {!slide.hideTitle && (
-                    <h1 className="font-display-lg text-display-lg text-on-tertiary playfair mb-6 max-w-3xl drop-shadow-lg">
+                    <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-tertiary playfair mb-3 md:mb-6 max-w-3xl drop-shadow-lg px-2 break-words text-center">
                       {slide.title}
                     </h1>
                   )}
                   {!slide.hideCta && (
                     <Link
                       to={slide.link}
-                      className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
+                      className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
                     >
                       {slide.cta}
                     </Link>
@@ -243,13 +245,13 @@ export default function HomePage() {
           </div>
 
           {/* Dots Indicator */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  currentSlide === index ? 'bg-primary w-6' : 'bg-white/50 hover:bg-white'
+                className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${
+                  currentSlide === index ? 'bg-primary w-5 sm:w-6' : 'bg-white/50 hover:bg-white w-2 sm:w-3'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -258,47 +260,47 @@ export default function HomePage() {
 
           <button
             onClick={handlePrevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 bg-surface/50 backdrop-blur-sm rounded-full hidden sm:flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
             aria-label="Previous Slide"
           >
-            <span className="material-symbols-outlined">chevron_left</span>
+            <span className="material-symbols-outlined text-sm md:text-base">chevron_left</span>
           </button>
           <button
             onClick={handleNextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/50 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-12 md:h-12 bg-surface/50 backdrop-blur-sm rounded-full hidden sm:flex items-center justify-center text-on-surface hover:bg-surface transition-colors z-20"
             aria-label="Next Slide"
           >
-            <span className="material-symbols-outlined">chevron_right</span>
+            <span className="material-symbols-outlined text-sm md:text-base">chevron_right</span>
           </button>
         </section>
 
         {/* Category Badges */}
         {showCategoryBubbles && (
-        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
-          <div className="flex overflow-x-auto hide-scrollbar gap-8 justify-start md:justify-center px-4 carousel-container pb-4">
+        <section className="py-8 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden w-full max-w-full">
+          <div className="flex overflow-x-auto hide-scrollbar gap-4 sm:gap-8 justify-start md:justify-center px-1 carousel-container pb-3 min-w-0 max-w-full">
             <Link
               to="/shots"
-              className="flex flex-col items-center gap-4 min-w-[120px] carousel-item"
+              className="flex flex-col items-center gap-2.5 sm:gap-4 min-w-[90px] sm:min-w-[120px] carousel-item"
             >
-              <div className="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300 bg-inverse-surface flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-[40px]">smart_display</span>
+              <div className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300 bg-inverse-surface flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-[30px] sm:text-[40px]">smart_display</span>
               </div>
-              <span className="font-title-sm text-title-sm text-on-surface text-center">Shots</span>
+              <span className="font-title-sm text-xs sm:text-title-sm text-on-surface text-center">Shots</span>
             </Link>
             {categoryBubbles.map((category) => (
               <Link
                 key={category.id || category.name}
                 to={category.link || '/products'}
-                className="flex flex-col items-center gap-4 min-w-[120px] carousel-item"
+                className="flex flex-col items-center gap-2.5 sm:gap-4 min-w-[90px] sm:min-w-[120px] carousel-item"
               >
-                <div className="w-[120px] h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
+                <div className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
                   <div
                     className="w-full h-full rounded-full bg-cover bg-center"
                     data-alt={category.alt}
                     style={{ backgroundImage: `url('${category.image}')` }}
                   ></div>
                 </div>
-                <span className="font-title-sm text-title-sm text-on-surface text-center">{category.name}</span>
+                <span className="font-title-sm text-xs sm:text-title-sm text-on-surface text-center">{category.name}</span>
               </Link>
             ))}
           </div>
@@ -312,41 +314,43 @@ export default function HomePage() {
         <HomeCollections />
 
         {/* Featured Products Row 1 */}
-        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
-          <div className="relative mb-12">
-            <h2 className="font-headline-md text-headline-md playfair text-center">Featured Elegance</h2>
+        <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
+          <div className="flex justify-between items-center mb-6 md:mb-12 gap-2">
+            <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-on-surface">
+              Featured Elegance
+            </h2>
             <Link
               to="/products"
-              className="absolute right-0 top-1/2 -translate-y-1/2 font-label-caps text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+              className="font-label-caps text-[11px] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
             >
               View All
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
             </Link>
           </div>
           {productsRow1.length === 0 ? (
             <EmptySegment message="No featured products yet — check back soon." />
           ) : (
-          <div className="relative group/arrows">
+          <div className="relative group/arrows w-full max-w-full min-w-0">
             {/* Left scroll navigation */}
             <button
               type="button"
               onClick={() => featuredScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
               aria-label="Scroll Left"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <span className="material-symbols-outlined text-sm md:text-base">chevron_left</span>
             </button>
 
             {/* Scrolling horizontal list */}
             <div
               ref={featuredScrollRef}
-              className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
             >
               {productsRow1.map((product) => {
                 const isFavorited = !!favorites[product.id];
                 const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                 return (
-                  <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
+                  <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/products/${product.id}`}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
@@ -365,7 +369,7 @@ export default function HomePage() {
                           </div>
                         )}
                         {product.badge && (
-                          <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
+                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[10px] md:text-label-caps uppercase">{product.badge}</div>
                         )}
                         <button
                           type="button"
@@ -374,27 +378,27 @@ export default function HomePage() {
                             event.preventDefault();
                             toggleFavorite(product.id);
                           }}
-                          className={`absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                          className={`absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                         >
-                          <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
+                          <span className="material-symbols-outlined text-[18px] md:text-[20px]" data-weight={isFavorited ? 'fill' : undefined}>
                             {isFavorited ? 'favorite' : 'favorite_border'}
                           </span>
                         </button>
                       </div>
-                      <div className="p-4 flex flex-col gap-2 mt-auto">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
+                      <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
+                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block truncate">
                           {product.category || product.categoryTitle}
                         </span>
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
+                        <div className="flex justify-between items-start gap-1">
+                          <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
                           {product.rating && (
-                            <div className="flex items-center text-secondary gap-1 shrink-0">
-                              <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
-                              <span className="font-body-sm text-body-sm">{product.rating}</span>
+                            <div className="flex items-center text-secondary gap-0.5 shrink-0">
+                              <span className="material-symbols-outlined text-[15px] fill-icon">star</span>
+                              <span className="font-body-sm text-xs md:text-body-sm">{product.rating}</span>
                             </div>
                           )}
                         </div>
-                        <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
+                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(product.price)}</p>
                       </div>
                     </Link>
                   </div>
@@ -406,51 +410,53 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => featuredScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
               aria-label="Scroll Right"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <span className="material-symbols-outlined text-sm md:text-base">chevron_right</span>
             </button>
           </div>
           )}
         </section>
 
         {/* Featured Products Row 2 */}
-        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10">
-          <div className="relative mb-12">
-            <h2 className="font-headline-md text-headline-md playfair text-center">Heritage Masterpieces</h2>
+        <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
+          <div className="flex justify-between items-center mb-6 md:mb-12 gap-2">
+            <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-on-surface">
+              Heritage Masterpieces
+            </h2>
             <Link
               to="/products"
-              className="absolute right-0 top-1/2 -translate-y-1/2 font-label-caps text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1"
+              className="font-label-caps text-[11px] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
             >
               View All
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
             </Link>
           </div>
           {productsRow2.length === 0 ? (
             <EmptySegment message="No heritage pieces here yet — check back soon." />
           ) : (
-          <div className="relative group/arrows">
+          <div className="relative group/arrows w-full max-w-full min-w-0">
             {/* Left scroll navigation */}
             <button
               type="button"
               onClick={() => heritageScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
               aria-label="Scroll Left"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <span className="material-symbols-outlined text-sm md:text-base">chevron_left</span>
             </button>
 
             {/* Scrolling horizontal list */}
             <div
               ref={heritageScrollRef}
-              className="flex gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
             >
               {productsRow2.map((product) => {
                 const isFavorited = !!favorites[product.id];
                 const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
                 return (
-                  <div key={product.id} className="min-w-[250px] sm:min-w-[270px] w-[270px] shrink-0 snap-start">
+                  <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/products/${product.id}`}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
@@ -469,7 +475,7 @@ export default function HomePage() {
                           </div>
                         )}
                         {product.badge && (
-                          <div className="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-caps text-label-caps uppercase">{product.badge}</div>
+                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[10px] md:text-label-caps uppercase">{product.badge}</div>
                         )}
                         <button
                           type="button"
@@ -478,27 +484,27 @@ export default function HomePage() {
                             event.preventDefault();
                             toggleFavorite(product.id);
                           }}
-                          className={`absolute top-4 right-4 w-10 h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                          className={`absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                         >
-                          <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
+                          <span className="material-symbols-outlined text-[18px] md:text-[20px]" data-weight={isFavorited ? 'fill' : undefined}>
                             {isFavorited ? 'favorite' : 'favorite_border'}
                           </span>
                         </button>
                       </div>
-                      <div className="p-4 flex flex-col gap-2 mt-auto">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block">
+                      <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
+                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block truncate">
                           {product.category || product.categoryTitle}
                         </span>
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-title-sm text-title-sm text-on-surface truncate pr-2">{product.name || product.title}</h3>
+                        <div className="flex justify-between items-start gap-1">
+                          <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
                           {product.rating && (
-                            <div className="flex items-center text-secondary gap-1 shrink-0">
-                              <span className="material-symbols-outlined text-[16px] fill-icon">star</span>
-                              <span className="font-body-sm text-body-sm">{product.rating}</span>
+                            <div className="flex items-center text-secondary gap-0.5 shrink-0">
+                              <span className="material-symbols-outlined text-[15px] fill-icon">star</span>
+                              <span className="font-body-sm text-xs md:text-body-sm">{product.rating}</span>
                             </div>
                           )}
                         </div>
-                        <p className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</p>
+                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(product.price)}</p>
                       </div>
                     </Link>
                   </div>
@@ -510,22 +516,24 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => heritageScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
               aria-label="Scroll Right"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <span className="material-symbols-outlined text-sm md:text-base">chevron_right</span>
             </button>
           </div>
           )}
         </section>
 
         {/* Video Grid Lookbook Section */}
-        <section className="py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-          <h2 className="font-headline-md text-headline-md playfair text-center mb-4">Stories in Motion</h2>
-          <p className="font-body-lg text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-12">
+        <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full max-w-full overflow-hidden">
+          <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-center mb-2 md:mb-4">
+            Stories in Motion
+          </h2>
+          <p className="font-body-sm text-body-sm md:font-body-lg md:text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-8 md:mb-12 px-2">
             Hover over our lookbooks to witness traditional craftsmanship come to life.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-gutter w-full max-w-full">
             {(theme.lookbookVideos || []).map((video, idx) => (
               <VideoCard
                 key={video.id || idx}
