@@ -182,7 +182,7 @@ export default function ProfilePage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
             A2Z Collection
           </Link>
         </div>
-        <nav className="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
+        <nav className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-8 items-center font-label-caps text-label-caps">
           {navLinks.map((link) => (
             <Link
               key={link.label}

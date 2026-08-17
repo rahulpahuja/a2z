@@ -237,13 +237,13 @@ export default function ProductListingPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
         </div>
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 [@media(orientation:landscape)_and_(max-height:500px)]:!hidden">
           {navLinks.map((link) => (
             <Link
               key={link.label}
@@ -283,7 +283,7 @@ export default function ProductListingPage() {
             </span>
           </div>
         </div>
-        <div className="hidden md:flex mt-4 md:mt-0 items-center gap-3">
+        <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden mt-4 md:mt-0 items-center gap-3">
           <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
           <div className="relative">
             <select
@@ -303,7 +303,7 @@ export default function ProductListingPage() {
       </div>
 
       {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="md:hidden sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3">
+      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3">
         <button
           type="button"
           onClick={() => setMobileFiltersOpen((open) => !open)}
@@ -346,7 +346,11 @@ export default function ProductListingPage() {
           background: 'var(--custom-backdrop-bg, inherit)',
         }}
       >
-        <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} md:block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4`}>
+        <aside className={
+          mobileFiltersOpen
+            ? 'block md:block [@media(orientation:landscape)_and_(max-height:500px)]:!block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
+            : 'hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
+        }>
           {/* Category Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
