@@ -48,18 +48,27 @@ function CollectionRow({ collection, products }) {
           ref={scrollRef}
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
-          {collectionProducts.map((product) => (
+          {collectionProducts.map((product) => {
+            const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+            return (
             <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
               <Link
                 to={`/products/${product.id}`}
-                className="group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+                className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
                   <ProductCardImage
                     images={product.images && product.images.length > 0 ? product.images : [product.image]}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                     alt={product.alt}
                   />
+                  {!isAvailable && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                      <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
                   <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
@@ -67,7 +76,8 @@ function CollectionRow({ collection, products }) {
                 </div>
               </Link>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <button
