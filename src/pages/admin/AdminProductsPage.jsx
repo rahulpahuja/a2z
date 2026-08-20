@@ -38,6 +38,10 @@ const uploadImageToExternalServer = async (file, customName) => {
 };
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+// Waist/chest sizing (in inches) for categories sold by inch size rather than
+// S/M/L, e.g. Jeans and Shirts — steps of 2, matching how these are labeled
+// on the garment tag.
+const INCH_SIZES = Array.from({ length: (52 - 26) / 2 + 1 }, (_, i) => String(26 + i * 2));
 const DEFAULT_PAGE_SIZE = 200;
 const PAGE_SIZE_OPTIONS = [20, 50, 100, 200, 500];
 
@@ -707,6 +711,15 @@ export default function AdminProductsPage() {
     ? displayImageIndex
     : activeSlotIndices[0] ?? 0;
 
+  // Jeans and shirts are sold by waist/chest inch size rather than S/M/L —
+  // swap in the inch-size quick-add buttons whenever the selected category
+  // is one of those (but not e.g. T-Shirts, which still use S/M/L).
+  const selectedCategoryTitle = (categories.find((c) => c.id === form.categoryId)?.title || '').toLowerCase();
+  const usesInchSizes =
+    selectedCategoryTitle.includes('jean') ||
+    (selectedCategoryTitle.includes('shirt') && !selectedCategoryTitle.replace(/[\s-]/g, '').includes('tshirt'));
+  const quickSizeOptions = usesInchSizes ? INCH_SIZES : QUICK_SIZES;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6">
@@ -998,7 +1011,7 @@ export default function AdminProductsPage() {
                   Sizes &amp; Stock
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {QUICK_SIZES.map((size) => (
+                  {quickSizeOptions.map((size) => (
                     <button
                       key={size}
                       type="button"
@@ -1006,7 +1019,7 @@ export default function AdminProductsPage() {
                       disabled={sizes.some((s) => s.size === size)}
                       className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label-caps text-label-caps hover:border-primary hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {size}
+                      {usesInchSizes ? `${size}"` : size}
                     </button>
                   ))}
                   <div className="flex gap-2">
