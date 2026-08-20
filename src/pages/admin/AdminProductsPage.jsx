@@ -70,6 +70,7 @@ export default function AdminProductsPage() {
   const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
   const [imageColors, setImageColors] = useState(['', '', '', '', '']);
+  const [displayImageIndex, setDisplayImageIndex] = useState(0);
   const [editingProductId, setEditingProductId] = useState(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -133,6 +134,7 @@ export default function AdminProductsPage() {
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
     setImageColors(initialColors);
+    setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -174,6 +176,7 @@ export default function AdminProductsPage() {
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
     setImageColors(initialColors);
+    setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     showToast('Duplicated — review the details and save to create a new product.');
@@ -375,6 +378,8 @@ export default function AdminProductsPage() {
     });
   };
 
+  const chooseDisplayImage = (index) => setDisplayImageIndex(index);
+
   useEffect(() => {
     setProductId(generateProductId());
     const unsubCategories = subscribeToCategories((rows) => setCategories(rows));
@@ -514,6 +519,7 @@ export default function AdminProductsPage() {
     setImagePreviews(['', '', '', '', '']);
     setImageNames(['', '', '', '', '']);
     setImageColors(['', '', '', '', '']);
+    setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     setProductId(generateProductId());
     setEditingProductId(null);
@@ -554,7 +560,12 @@ export default function AdminProductsPage() {
     const subcategory = subcategories.find((s) => s.id === form.subcategoryId);
     setSaving(true);
     try {
-      const uploadPromises = activeSlots.map(async (idx) => {
+      // Grids render whichever image lands first in the array, so the
+      // admin-chosen display image is moved to the front here rather than
+      // requiring images to be re-uploaded into Box 1.
+      const displaySlot = activeSlots.includes(displayImageIndex) ? displayImageIndex : activeSlots[0];
+      const orderedSlots = [displaySlot, ...activeSlots.filter((idx) => idx !== displaySlot)];
+      const uploadPromises = orderedSlots.map(async (idx) => {
         const file = imageFiles[idx];
         const customName = imageNames[idx].trim();
         const color = imageColors[idx].trim();
@@ -691,6 +702,11 @@ export default function AdminProductsPage() {
     }
   };
 
+  const activeSlotIndices = [0, 1, 2, 3, 4].filter((idx) => imageFiles[idx] || imagePreviews[idx]);
+  const effectiveDisplayIndex = activeSlotIndices.includes(displayImageIndex)
+    ? displayImageIndex
+    : activeSlotIndices[0] ?? 0;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6">
@@ -816,7 +832,7 @@ export default function AdminProductsPage() {
                 <div>
                   <h3 className="font-title-sm text-[16px] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    First image is the primary thumbnail. Filenames are customizable and automatically name-spaced to the Product ID.
+                    Check "Display Image" under a photo to make it the primary thumbnail shown across the storefront. Filenames are customizable and automatically name-spaced to the Product ID.
                     Tag each photo with the color shown so the storefront color filter and swatches work correctly.
                   </p>
                 </div>
@@ -893,6 +909,24 @@ export default function AdminProductsPage() {
                               className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-mono text-[10px] text-on-surface"
                             />
                           </div>
+                        )}
+
+                        {(hasImage || preview) && (
+                          <label
+                            htmlFor={`display-image-${index}`}
+                            className="flex items-center gap-1.5 mt-1 cursor-pointer select-none"
+                          >
+                            <input
+                              id={`display-image-${index}`}
+                              type="checkbox"
+                              checked={effectiveDisplayIndex === index}
+                              onChange={() => chooseDisplayImage(index)}
+                              className="rounded border-outline w-3.5 h-3.5 text-primary focus:ring-primary cursor-pointer"
+                            />
+                            <span className={`font-body-sm text-[10px] ${effectiveDisplayIndex === index ? 'text-primary font-semibold' : 'text-on-surface-variant/80'}`}>
+                              Display Image
+                            </span>
+                          </label>
                         )}
                       </div>
                     );
