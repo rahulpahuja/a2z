@@ -12,16 +12,6 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 
 const categories = [
   {
-    name: "Sarees",
-    alt: "Close up of a vibrantly colored, heavily embroidered traditional Indian Saree fabric. The texture is rich and detailed, shot in a minimalist studio setting with soft lighting. The colors are striking, emphasizing 'Vibrant Elegance' against a clean background.",
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCARzYXzIj1gZdv7GRsnxvuTyixKKXCZ_GEY49nyWHN1Uv9IilC_7Jrgh6iVjWrUqX5AybzfSuMxZUWN0H6Jzp2QKZMv3pZRho6B_aDvSKGIQFvw7bBPQpDSq2V6qcR7DLJJgD0mDnTRHYwYtdG0S2ZldpmZeRk-gF_cAnTqFxzWDeAdun_atiPw3WFeQDlfuuAjfUY2lGQZEBCdYa4Iz5-tOHGNFfqVk0iCLawpByG7_M73zL9nmVjUg",
-  },
-  {
-    name: "Lehengas",
-    alt: "High-quality close up of a luxurious, contemporary Lehenga skirt fabric. Detailed intricate beadwork and embroidery are visible. The setting is clean and well-lit, reflecting a premium corporate fashion aesthetic with a traditional twist.",
-    src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDDDzpacbowO2gjVeSFFi69EnBvyZ0dzME6SzKDu6U_BdGiY-x6uOEaNDjQlN-ltucgmMV3bxyxv11deaux-7qKkZoDF-1lUqRuGUPvBmFj9mACx8aZeeGBMAQ-4s-dNwuBP8MPCEoIpv3UyvxC0vVZHFCTBv9VsOkzE-fGED2qDJ1GQMntCK-j8W4jnN34-65IefDTfrqoI0kDqkWvh88mk2_QMt0YPKX-SyfAwoylWPX9j9B2VcSN9A",
-  },
-  {
     name: "Kurtis",
     alt: "Elegant close up of a beautifully patterned Kurti top material. The fabric shows delicate traditional Indian motifs. Shot with bright, soft studio lighting in a minimalist environment, conveying a sense of sophisticated cultural heritage.",
     src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCSewrfsaNP6cnMWzsJNh0wyJHzQghJ6Qc8DVbNPEoVUmGVxpiyQnsamY6K0_FXe5nYWB2iJSYUD0e9dPCl3AKcSrF5pHPVFvPTAsAfbZy3m5HEzVbiF1FUyIBVgCHIgpNwSVq87fkZNHkY9R4cxh7ueH2nYTM2IE9n5Yy08u8fNQyVdn2UEHx3cgBb0g_iF4g27W4s3LIeOuPqv111KsNj5xjZPZyhBftD9krUxtT3tIaL3n4-Je3ptA",

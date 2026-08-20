@@ -5,8 +5,6 @@ const PATH = 'settings/topNav';
 
 export const DEFAULT_TOP_NAV_LINKS = [
   { id: 'nav_new_arrivals', label: 'New Arrivals', type: 'all' },
-  { id: 'nav_saree', label: 'Sarees', type: 'category', category: 'Saree' },
-  { id: 'nav_lehenga', label: 'Lehengas', type: 'category', category: 'Lehenga' },
   { id: 'nav_kurti', label: 'Kurtis', type: 'category', category: 'Kurti' },
 ];
 
