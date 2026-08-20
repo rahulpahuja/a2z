@@ -5,9 +5,7 @@ const ROOT = 'categories';
 
 const DEFAULT_CATEGORIES = [
   { id: 'cat_anarkali', title: 'Anarkali', createdAt: 0 },
-  { id: 'cat_saree', title: 'Saree', createdAt: 0 },
   { id: 'cat_coord', title: 'Coord Set', createdAt: 0 },
-  { id: 'cat_lehenga', title: 'Lehenga', createdAt: 0 },
   { id: 'cat_kurti', title: 'Kurti', createdAt: 0 },
   { id: 'cat_dress', title: 'Dress', createdAt: 0 },
   { id: 'cat_gown', title: 'Gown', createdAt: 0 },
