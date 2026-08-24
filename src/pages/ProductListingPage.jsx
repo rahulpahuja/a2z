@@ -12,7 +12,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
-import { getColorName } from '../utils/productColors.js';
+import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import './ProductListingPage.css';
 
 const COLORS = [
@@ -657,7 +657,7 @@ export default function ProductListingPage() {
               <div className={`grid ${mobileViewMode === 'grid' ? 'grid-cols-2 gap-3' : 'grid-cols-1 gap-6'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 sm:gap-6 custom-product-grid`}>
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
-                  const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+                  const isAvailable = isProductAvailable(product);
                   const handleBuyNow = () => {
                     addItem({
                       id: product.id,
@@ -771,7 +771,7 @@ export default function ProductListingPage() {
                             )}
                           </div>
                         )}
-                    {(!product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock)) ? (
+                    {isProductAvailable(product) ? (
                       <div className="mt-4 flex flex-col gap-2">
                         <button
                           onClick={handleBuyNow}

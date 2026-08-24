@@ -22,14 +22,9 @@ function getLocalProducts() {
         hsnCode: '6204',
         sku: `A2Z-${p.id.toUpperCase().replace(/[^A-Z0-9]/g, '')}`,
         colors: [
-          { name: 'Rani Pink', stock: 8, outOfStock: false },
-          { name: 'Emerald Green', stock: 6, outOfStock: false },
-          { name: 'Dusty Rose', stock: 4, outOfStock: false },
-        ],
-        sizes: [
-          { size: 'S', stock: 5 },
-          { size: 'M', stock: 10 },
-          { size: 'L', stock: 15 }
+          { name: 'Rani Pink', outOfStock: false, sizes: [{ size: 'S', stock: 2 }, { size: 'M', stock: 3 }, { size: 'L', stock: 3 }] },
+          { name: 'Emerald Green', outOfStock: false, sizes: [{ size: 'S', stock: 2 }, { size: 'M', stock: 2 }, { size: 'L', stock: 2 }] },
+          { name: 'Dusty Rose', outOfStock: false, sizes: [{ size: 'S', stock: 1 }, { size: 'M', stock: 2 }, { size: 'L', stock: 1 }] },
         ],
         createdAtMs: Date.now() - idx * 60000,
       }));
@@ -79,9 +74,10 @@ export function subscribeToAdminProducts(callback) {
 
 // product: { title, description, hashtags: string[], categoryId, categoryTitle,
 //            price: number, hsnCode,
-//            colors: [{ name, hex, stock: number|null, outOfStock: bool }],
-//            sizes: [{ size, stock }] }
-// colors[].stock === null means stock isn't tracked for that color (always available).
+//            colors: [{ name, hex, outOfStock: bool, sizes: [{ size, stock: number|null }] }] }
+// Each color owns its own sizes — colors[].sizes[].stock is the joint
+// (color, size) inventory count. stock === null means that size isn't
+// stock-tracked for that color (always available). See utils/productColors.js.
 export function createAdminProduct(product) {
   const productId = product.id || `prod_${Date.now()}`;
   if (!isFirebaseEnabled) {
@@ -245,15 +241,30 @@ export function updateProductOutOfStock(productId, outOfStock) {
   return set(ref(db, `${ROOT}/${productId}/outOfStock`), outOfStock);
 }
 
-// Colors with stock: null aren't tracked and are left untouched — only
-// colors the admin has given an explicit stock count get decremented.
-function reduceColorStock(colors, colorName, quantity) {
+// Reduces stock for one (color, size) pair. Sizes with stock: null aren't
+// tracked and are left untouched — only a size the admin has given an
+// explicit stock count gets decremented.
+function reduceColorStock(colors, colorName, sizeName, quantity) {
   if (!colors || !colorName) return colors;
   return colors.map((c) => {
-    if (typeof c === 'string') return c;
-    if (c.name !== colorName || c.stock === null || c.stock === undefined) return c;
-    return { ...c, stock: Math.max(0, c.stock - quantity) };
+    if (typeof c === 'string' || c.name !== colorName || !Array.isArray(c.sizes)) return c;
+    return {
+      ...c,
+      sizes: c.sizes.map((s) => {
+        if (s.size !== sizeName || s.stock === null || s.stock === undefined) return s;
+        return { ...s, stock: Math.max(0, s.stock - quantity) };
+      }),
+    };
   });
+}
+
+// Reverses a prior reduceProductStock call — used when a local bill is
+// cancelled or edited (the original line items' stock must be given back
+// before the new/updated line items are deducted). Delegates to
+// reduceProductStock with the quantity negated rather than duplicating the
+// per-size/per-color traversal.
+export function restockProductStock(productId, size, quantity, color) {
+  return reduceProductStock(productId, size, -quantity, color);
 }
 
 export function reduceProductStock(productId, size, quantity, color) {
@@ -261,15 +272,7 @@ export function reduceProductStock(productId, size, quantity, color) {
     const products = getLocalProducts();
     const product = products.find((p) => p.id === productId);
     if (product) {
-      if (product.sizes) {
-        product.sizes = product.sizes.map((s) => {
-          if (s.size === size) {
-            return { ...s, stock: Math.max(0, s.stock - quantity) };
-          }
-          return s;
-        });
-      }
-      product.colors = reduceColorStock(product.colors, color, quantity);
+      product.colors = reduceColorStock(product.colors, color, size, quantity);
       setLocalProducts(products);
       notifyLocalListeners();
     }
@@ -280,20 +283,8 @@ export function reduceProductStock(productId, size, quantity, color) {
   return get(productRef).then((snapshot) => {
     if (snapshot.exists()) {
       const product = snapshot.val();
-      const updates = {};
-      if (product.sizes) {
-        updates[`${ROOT}/${productId}/sizes`] = product.sizes.map((s) => {
-          if (s.size === size) {
-            return { ...s, stock: Math.max(0, s.stock - quantity) };
-          }
-          return s;
-        });
-      }
       if (product.colors) {
-        updates[`${ROOT}/${productId}/colors`] = reduceColorStock(product.colors, color, quantity);
-      }
-      if (Object.keys(updates).length > 0) {
-        return update(ref(db), updates);
+        return set(ref(db, `${ROOT}/${productId}/colors`), reduceColorStock(product.colors, color, size, quantity));
       }
     }
   });
@@ -307,7 +298,7 @@ export function updateProductColorOutOfStock(productId, colorName, outOfStock) {
     (colors ?? []).map((c) => {
       const name = typeof c === 'string' ? c : c.name;
       if (name !== colorName) return c;
-      const base = typeof c === 'string' ? { name: c, hex: null, stock: null } : c;
+      const base = typeof c === 'string' ? { name: c, hex: null, sizes: [] } : c;
       return { ...base, outOfStock };
     });
 

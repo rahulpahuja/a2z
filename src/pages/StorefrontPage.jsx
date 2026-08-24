@@ -9,6 +9,7 @@ import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
+import { isProductAvailable } from '../utils/productColors.js';
 
 const categories = [
   {
@@ -195,7 +196,7 @@ export default function StorefrontPage() {
     desc: product.description,
     price: formatCurrency(product.price),
     priceValue: product.price,
-    inStock: !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock),
+    inStock: isProductAvailable(product),
   }));
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);

@@ -6,6 +6,7 @@ import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { subscribeToAdminProducts } from '../../services/adminProducts.js';
 import { subscribeToOrders } from '../../services/orders.js';
+import { isProductAvailable, getSizeStockSummary } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
 import {
   getOrdersToday,
@@ -300,7 +301,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col gap-4">
               {productMatches.map((product) => {
                 const stat = statsForProduct(product.id);
-                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+                const isAvailable = isProductAvailable(product);
                 return (
                   <div key={product.id} className="flex gap-4 border border-outline-variant/30 rounded-lg p-4">
                     <ProductImage src={product.images?.[0] || product.image} alt={product.name || product.title} className="w-16 h-20 object-cover rounded-md shrink-0" />
@@ -317,18 +318,21 @@ export default function AdminDashboardPage() {
                         </Link>
                       </div>
 
-                      {product.sizes && product.sizes.length > 0 && (
-                        <div className="mt-3 p-3 bg-surface-container rounded-lg border border-outline-variant/25">
-                          <p className="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1 font-semibold">Live Stock Breakdown</p>
-                          <div className="flex flex-wrap gap-2">
-                            {product.sizes.map((s) => (
-                              <span key={s.size} className="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant/20 font-mono text-[11px] text-on-surface">
-                                Size {s.size}: <strong className={s.stock > 0 ? "text-primary" : "text-error"}>{s.stock} left</strong>
-                              </span>
-                            ))}
+                      {(() => {
+                        const sizeSummary = getSizeStockSummary(product);
+                        return sizeSummary.length > 0 && (
+                          <div className="mt-3 p-3 bg-surface-container rounded-lg border border-outline-variant/25">
+                            <p className="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1 font-semibold">Live Stock Breakdown</p>
+                            <div className="flex flex-wrap gap-2">
+                              {sizeSummary.map((s) => (
+                                <span key={s.size} className="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant/20 font-mono text-[11px] text-on-surface">
+                                  Size {s.size}: <strong className={s.stock === null || s.stock > 0 ? "text-primary" : "text-error"}>{s.stock === null ? 'Unlimited' : `${s.stock} left`}</strong>
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       <div className="grid grid-cols-3 gap-4 mt-3 font-body-sm text-body-sm border-t border-outline-variant/20 pt-3">
                         <div>

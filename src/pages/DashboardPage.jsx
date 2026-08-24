@@ -6,6 +6,7 @@ import { subscribeToAdminProducts } from '../services/adminProducts.js';
 import { MOCK_ORDERS } from '../data/mockOrders.js';
 import { formatCurrency } from '../context/CartContext.jsx';
 import { searchProducts } from '../utils/productSearch.js';
+import { getProductTotalStock } from '../utils/productColors.js';
 import './DashboardPage.css';
 
 const NAV_ITEMS = [
@@ -100,8 +101,8 @@ export default function DashboardPage() {
     const pendingShipments = allOrders.filter((o) => o.status === 'Processing').length;
 
     const lowStockCount = products.filter((p) => {
-      const totalStock = (p.sizes || []).reduce((sum, s) => sum + (s.stock || 0), 0);
-      return totalStock <= LOW_STOCK_THRESHOLD;
+      const totalStock = getProductTotalStock(p);
+      return totalStock !== null && totalStock <= LOW_STOCK_THRESHOLD;
     }).length;
 
     // Rolling last 7 days, oldest to newest, revenue excluding cancelled.
