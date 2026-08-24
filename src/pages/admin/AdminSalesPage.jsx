@@ -20,15 +20,18 @@ export default function AdminSalesPage() {
   const dailyChartRef = useRef(null);
   const monthlyChartRef = useRef(null);
   const quarterlyChartRef = useRef(null);
+  const yearlyChartRef = useRef(null);
 
   // Active chart instances
   const dailyChartInst = useRef(null);
   const monthlyChartInst = useRef(null);
   const quarterlyChartInst = useRef(null);
+  const yearlyChartInst = useRef(null);
 
   // Drill-down state
-  const [drillDownType, setDrillDownType] = useState('all'); // 'all', 'daily', 'monthly', 'quarterly'
+  const [drillDownType, setDrillDownType] = useState('all'); // 'all', 'daily', 'monthly', 'quarterly', 'yearly'
   const [drillDownLabel, setDrillDownLabel] = useState('');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null); // For detail view modal
 
@@ -310,7 +313,15 @@ export default function AdminSalesPage() {
     }));
   }, [allOrders]);
 
-  // 2. Monthly Sales Aggr (For year 2026)
+  // Years that have at least one order, plus the current year — powers the
+  // year picker for the monthly/quarterly charts and the yearly chart below.
+  const availableYears = useMemo(() => {
+    const years = new Set([new Date().getFullYear()]);
+    allOrders.forEach((order) => years.add(new Date(order.placedAt).getFullYear()));
+    return Array.from(years).sort((a, b) => b - a);
+  }, [allOrders]);
+
+  // 2. Monthly Sales Aggr (for the selected year)
   const monthlyData = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const data = {};
@@ -320,7 +331,7 @@ export default function AdminSalesPage() {
 
     allOrders.forEach((order) => {
       const date = new Date(order.placedAt);
-      if (date.getFullYear() === 2026) {
+      if (date.getFullYear() === selectedYear) {
         const monthLabel = months[date.getMonth()];
         if (order.status !== 'Cancelled') data[monthLabel].revenue += order.total;
         data[monthLabel].orders.push(order);
@@ -332,9 +343,9 @@ export default function AdminSalesPage() {
       revenue: data[m].revenue,
       orders: data[m].orders,
     }));
-  }, [allOrders]);
+  }, [allOrders, selectedYear]);
 
-  // 3. Quarterly Sales Aggr (For year 2026)
+  // 3. Quarterly Sales Aggr (for the selected year)
   const quarterlyData = useMemo(() => {
     const quarters = ['Q1 (Jan-Mar)', 'Q2 (Apr-Jun)', 'Q3 (Jul-Sep)', 'Q4 (Oct-Dec)'];
     const data = {
@@ -346,7 +357,7 @@ export default function AdminSalesPage() {
 
     allOrders.forEach((order) => {
       const date = new Date(order.placedAt);
-      if (date.getFullYear() === 2026) {
+      if (date.getFullYear() === selectedYear) {
         const month = date.getMonth();
         let qKey = 'Q1 (Jan-Mar)';
         if (month >= 3 && month <= 5) qKey = 'Q2 (Apr-Jun)';
@@ -363,7 +374,28 @@ export default function AdminSalesPage() {
       revenue: data[q].revenue,
       orders: data[q].orders,
     }));
-  }, [allOrders]);
+  }, [allOrders, selectedYear]);
+
+  // 4. Yearly Sales Aggr (every year that has an order)
+  const yearlyData = useMemo(() => {
+    const data = {};
+    availableYears.forEach((y) => {
+      data[y] = { revenue: 0, orders: [] };
+    });
+
+    allOrders.forEach((order) => {
+      const year = new Date(order.placedAt).getFullYear();
+      if (data[year] === undefined) return;
+      if (order.status !== 'Cancelled') data[year].revenue += order.total;
+      data[year].orders.push(order);
+    });
+
+    return [...availableYears].sort((a, b) => a - b).map((y) => ({
+      label: String(y),
+      revenue: data[y].revenue,
+      orders: data[y].orders,
+    }));
+  }, [allOrders, availableYears]);
 
   // Handle chart click to drill-down
   const handleDrillDown = (type, label) => {
@@ -386,12 +418,12 @@ export default function AdminSalesPage() {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       list = allOrders.filter((order) => {
         const date = new Date(order.placedAt);
-        return date.getFullYear() === 2026 && months[date.getMonth()] === drillDownLabel;
+        return date.getFullYear() === selectedYear && months[date.getMonth()] === drillDownLabel;
       });
     } else if (drillDownType === 'quarterly') {
       list = allOrders.filter((order) => {
         const date = new Date(order.placedAt);
-        if (date.getFullYear() !== 2026) return false;
+        if (date.getFullYear() !== selectedYear) return false;
         const month = date.getMonth();
         let qLabel = 'Q1 (Jan-Mar)';
         if (month >= 3 && month <= 5) qLabel = 'Q2 (Apr-Jun)';
@@ -399,6 +431,8 @@ export default function AdminSalesPage() {
         else if (month >= 9 && month <= 11) qLabel = 'Q4 (Oct-Dec)';
         return qLabel === drillDownLabel;
       });
+    } else if (drillDownType === 'yearly') {
+      list = allOrders.filter((order) => String(new Date(order.placedAt).getFullYear()) === drillDownLabel);
     }
 
     if (searchQuery.trim()) {
@@ -412,7 +446,7 @@ export default function AdminSalesPage() {
     }
 
     return list;
-  }, [allOrders, drillDownType, drillDownLabel, searchQuery]);
+  }, [allOrders, drillDownType, drillDownLabel, searchQuery, selectedYear]);
 
   // Render Charts
   useEffect(() => {
@@ -597,13 +631,68 @@ export default function AdminSalesPage() {
       });
     }
 
+    // 4. Yearly Chart (Bar Chart)
+    destroyChart(yearlyChartInst);
+    if (yearlyChartRef.current) {
+      const ctx = yearlyChartRef.current.getContext('2d');
+      yearlyChartInst.current = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: yearlyData.map((d) => d.label),
+          datasets: [
+            {
+              label: 'Revenue',
+              data: yearlyData.map((d) => d.revenue),
+              backgroundColor: brandRose,
+              borderRadius: 4,
+              hoverBackgroundColor: brandPink,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `Revenue: ${formatCurrency(ctx.parsed.y)}`,
+              },
+            },
+          },
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const idx = elements[0].index;
+              const bar = yearlyData[idx];
+              handleDrillDown('yearly', bar.label, bar.orders);
+            }
+          },
+          scales: {
+            y: {
+              grid: { color: chartGridColor, drawBorder: false },
+              ticks: {
+                font: { family: 'Montserrat', size: 10 },
+                color: '#564149',
+                callback: (val) => `₹${val / 1000}k`,
+              },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { family: 'Montserrat', size: 10 }, color: '#564149' },
+            },
+          },
+        },
+      });
+    }
+
     // Clean up instances on unmount
     return () => {
       destroyChart(dailyChartInst);
       destroyChart(monthlyChartInst);
       destroyChart(quarterlyChartInst);
+      destroyChart(yearlyChartInst);
     };
-  }, [loading, dailyData, monthlyData, quarterlyData]);
+  }, [loading, dailyData, monthlyData, quarterlyData, yearlyData]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -649,7 +738,23 @@ export default function AdminSalesPage() {
         </section>
 
         {/* Charts Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex justify-end">
+          <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+            Year for monthly/quarterly charts
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1.5 font-body-sm text-body-sm text-on-surface"
+            >
+              {availableYears.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <section className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
           {/* Daily line chart */}
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
             <div className="flex justify-between items-center mb-4">
@@ -674,7 +779,7 @@ export default function AdminSalesPage() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Monthly Sales breakdown</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue by Calendar Month (2026)</p>
+                <p className="text-[11px] text-on-surface-variant/75">Revenue by Calendar Month ({selectedYear})</p>
               </div>
               <span className="text-[10px] bg-secondary/10 text-secondary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
@@ -693,7 +798,7 @@ export default function AdminSalesPage() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Quarterly Sales Distribution</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue percentage share (2026)</p>
+                <p className="text-[11px] text-on-surface-variant/75">Revenue percentage share ({selectedYear})</p>
               </div>
               <span className="text-[10px] bg-tertiary/10 text-tertiary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
@@ -705,6 +810,25 @@ export default function AdminSalesPage() {
               </div>
             )}
             <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on segments to drill down to quarterly logs.</p>
+          </div>
+
+          {/* Yearly bar chart */}
+          <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Yearly Sales</h3>
+                <p className="text-[11px] text-on-surface-variant/75">Revenue by Year</p>
+              </div>
+              <span className="text-[10px] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
+            </div>
+            {loading ? (
+              <div className="flex-1 flex items-center justify-center text-on-surface-variant">Loading chart...</div>
+            ) : (
+              <div className="flex-1 relative">
+                <canvas ref={yearlyChartRef}></canvas>
+              </div>
+            )}
+            <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on bars to drill down to yearly logs.</p>
           </div>
         </section>
 

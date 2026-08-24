@@ -12,7 +12,7 @@ import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
-import { normalizeColors, isColorOutOfStock } from '../utils/productColors.js';
+import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -115,18 +115,19 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (product) {
-      if (product.sizes && product.sizes.length > 0) {
-        const firstAvailable = product.sizes.find((s) => s.stock > 0) || product.sizes[0];
-        setSelectedSize(firstAvailable.size);
-      } else {
-        setSelectedSize('M');
-      }
-      const normalizedColors = normalizeColors(product.colors);
+      const normalizedColors = normalizeColors(product.colors, product.sizes);
       const initialColorObj = normalizedColors.length > 0
         ? (normalizedColors.find((c) => !isColorOutOfStock(c)) || normalizedColors[0])
         : null;
       const initialColor = initialColorObj ? initialColorObj.name : 'Pink';
       setSelectedColor(initialColor);
+      if (initialColorObj && initialColorObj.sizes.length > 0) {
+        const firstAvailable =
+          initialColorObj.sizes.find((s) => s.stock === null || s.stock > 0) || initialColorObj.sizes[0];
+        setSelectedSize(firstAvailable.size);
+      } else {
+        setSelectedSize('M');
+      }
       const matchIndex = (product.imageColors ?? []).findIndex(
         (c) => c && c.toLowerCase() === initialColor.toLowerCase()
       );
@@ -154,15 +155,19 @@ export default function ProductDetailPage() {
   const mainMedia = media[selectedThumbnail] ?? media[0];
   const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
 
-  const availableSizes = product.sizes ?? SIZES.map((size) => ({ size, stock: 100 }));
-  const availableColors = product.colors && product.colors.length > 0 ? normalizeColors(product.colors) : COLORS;
+  const availableColors =
+    product.colors && product.colors.length > 0
+      ? normalizeColors(product.colors, product.sizes)
+      : COLORS.map((c) => ({ ...c, outOfStock: false, sizes: SIZES.map((size) => ({ size, stock: null })) }));
+  const sizeNames = getAllSizeNames(product.colors, product.sizes);
+  const availableSizes = sizeNames.length > 0 ? sizeNames.map((size) => ({ size })) : SIZES.map((size) => ({ size }));
 
   const isProductOutOfStock = Boolean(product.outOfStock);
   const selectedColorObj = availableColors.find((c) => c.name === selectedColor) ?? null;
   const isSelectedColorOutOfStock = selectedColorObj ? isColorOutOfStock(selectedColorObj) : false;
-  const sizeStock = product.sizes?.find((s) => s.size === selectedSize)?.stock ?? 999;
-  const colorStock = selectedColorObj?.stock ?? Infinity;
-  const selectedSizeStock = isProductOutOfStock || isSelectedColorOutOfStock ? 0 : Math.min(sizeStock, colorStock);
+  const selectedSizeStockRaw = selectedColorObj ? getColorSizeStock(selectedColorObj, selectedSize) : null;
+  const selectedSizeStock =
+    isProductOutOfStock || isSelectedColorOutOfStock ? 0 : selectedSizeStockRaw === null ? 999 : selectedSizeStockRaw;
 
   const decrementQuantity = () => setQuantity((q) => Math.max(1, q - 1));
   const incrementQuantity = () => setQuantity((q) => Math.min(selectedSizeStock, q + 1));
@@ -172,6 +177,16 @@ export default function ProductDetailPage() {
 
   const handleSelectColor = (colorName) => {
     setSelectedColor(colorName);
+    const colorObj = availableColors.find((c) => c.name === colorName);
+    if (colorObj && colorObj.sizes.length > 0) {
+      const stillAvailable = colorObj.sizes.some(
+        (s) => s.size === selectedSize && (s.stock === null || s.stock > 0)
+      );
+      if (!stillAvailable) {
+        const firstAvailable = colorObj.sizes.find((s) => s.stock === null || s.stock > 0) || colorObj.sizes[0];
+        setSelectedSize(firstAvailable.size);
+      }
+    }
     const matchIndex = (product.imageColors ?? []).findIndex(
       (c) => c && c.toLowerCase() === colorName.toLowerCase()
     );
@@ -371,7 +386,8 @@ export default function ProductDetailPage() {
               <div className="flex gap-2 flex-wrap">
                 {availableSizes.map((s) => {
                   const isSelected = selectedSize === s.size;
-                  const isOutOfStock = isProductOutOfStock || s.stock === 0;
+                  const stockForSize = selectedColorObj ? getColorSizeStock(selectedColorObj, s.size) : null;
+                  const isOutOfStock = isProductOutOfStock || stockForSize === 0;
                   return (
                     <button
                       key={s.size}

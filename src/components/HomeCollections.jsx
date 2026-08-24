@@ -6,6 +6,7 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import ProductCardImage from './ProductCardImage.jsx';
 import ProductImage from './ProductImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
+import { isProductAvailable } from '../utils/productColors.js';
 
 function CollectionRow({ collection, products }) {
   const scrollRef = useRef(null);
@@ -49,7 +50,7 @@ function CollectionRow({ collection, products }) {
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
           {collectionProducts.map((product) => {
-            const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+            const isAvailable = isProductAvailable(product);
             return (
             <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
               <Link

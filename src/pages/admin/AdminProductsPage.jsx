@@ -10,8 +10,17 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
-import { getColorName, normalizeColors, isColorOutOfStock } from '../../utils/productColors.js';
+import {
+  getColorName,
+  normalizeColors,
+  isColorOutOfStock,
+  getColorTotalStock,
+  getSizeStockSummary,
+  getProductTotalStock,
+  getAllSizeNames,
+} from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
+import './AdminProductsPage.css';
 
 const uploadImageToExternalServer = async (file, customName) => {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
@@ -64,9 +73,11 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [sizes, setSizes] = useState([]); // [{ size, stock }]
+  const [sizes, setSizes] = useState([]); // string[] — the set of sizes this product comes in
   const [customSize, setCustomSize] = useState('');
-  const [colorStocks, setColorStocks] = useState({}); // { [colorName]: { stock: '' | number, outOfStock: bool } }
+  // { [colorName]: { outOfStock: bool, stockBySize: { [size]: '' | number } } } — the
+  // joint (color, size) stock, keyed by color so each color owns its own per-size quantities.
+  const [colorSizeStocks, setColorSizeStocks] = useState({});
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
   const [productId, setProductId] = useState('');
@@ -90,13 +101,18 @@ export default function AdminProductsPage() {
   const [collectionFilter, setCollectionFilter] = useState('All');
 
 
-  // Rehydrates the per-color stock/out-of-stock editor from a saved product's
-  // colors, tolerating the old plain-string shape (no stock recorded yet).
-  const colorStocksFromProduct = (product) => {
+  // Rehydrates the per-color, per-size stock editor from a saved product's
+  // colors, tolerating both the old plain-string colors shape and the older
+  // unlinked { colors, sizes } shape (migrated via normalizeColors).
+  const colorSizeStocksFromProduct = (product) => {
     const next = {};
-    normalizeColors(product.colors).forEach((c) => {
+    normalizeColors(product.colors, product.sizes).forEach((c) => {
       if (!c.name) return;
-      next[c.name] = { stock: c.stock === null ? '' : c.stock, outOfStock: c.outOfStock };
+      const stockBySize = {};
+      c.sizes.forEach((s) => {
+        stockBySize[s.size] = s.stock === null ? '' : s.stock;
+      });
+      next[c.name] = { outOfStock: c.outOfStock, stockBySize };
     });
     return next;
   };
@@ -115,8 +131,8 @@ export default function AdminProductsPage() {
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
     });
-    setSizes(product.sizes ?? []);
-    setColorStocks(colorStocksFromProduct(product));
+    setSizes(getAllSizeNames(product.colors, product.sizes));
+    setColorSizeStocks(colorSizeStocksFromProduct(product));
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -157,8 +173,8 @@ export default function AdminProductsPage() {
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
     });
-    setSizes(product.sizes ?? []);
-    setColorStocks(colorStocksFromProduct(product));
+    setSizes(getAllSizeNames(product.colors, product.sizes));
+    setColorSizeStocks(colorSizeStocksFromProduct(product));
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -475,35 +491,37 @@ export default function AdminProductsPage() {
   };
 
   const addSize = (size) => {
-    if (!size.trim() || sizes.some((s) => s.size === size)) return;
-    setSizes((prev) => [...prev, { size, stock: 0 }]);
+    if (!size.trim() || sizes.includes(size)) return;
+    setSizes((prev) => [...prev, size]);
     setCustomSize('');
   };
 
-  const updateSizeStock = (size, stock) => {
-    setSizes((prev) => prev.map((s) => (s.size === size ? { ...s, stock: Math.max(0, Number(stock) || 0) } : s)));
-  };
-
-  const removeSize = (size) => setSizes((prev) => prev.filter((s) => s.size !== size));
+  const removeSize = (size) => setSizes((prev) => prev.filter((s) => s !== size));
 
   // The colors a product ships in are driven by the color tagged on each
   // uploaded image (imageColors). This mirrors that set so the "Colors &
-  // Stock" section can offer a stock qty + out-of-stock toggle per color
-  // without asking the admin to re-type color names a second time.
+  // Stock" section can offer a per-size stock qty + out-of-stock toggle per
+  // color without asking the admin to re-type color names a second time.
   const derivedColorNames = useMemo(
     () => [...new Set(imageColors.map((c) => c.trim()).filter(Boolean))],
     [imageColors]
   );
 
-  const updateColorStock = (name, stock) => {
-    setColorStocks((prev) => ({
+  const updateColorSizeStock = (colorName, size, stock) => {
+    setColorSizeStocks((prev) => ({
       ...prev,
-      [name]: { ...prev[name], stock: stock === '' ? '' : Math.max(0, Number(stock) || 0) },
+      [colorName]: {
+        ...prev[colorName],
+        stockBySize: {
+          ...prev[colorName]?.stockBySize,
+          [size]: stock === '' ? '' : Math.max(0, Number(stock) || 0),
+        },
+      },
     }));
   };
 
   const toggleColorOutOfStock = (name) => {
-    setColorStocks((prev) => ({
+    setColorSizeStocks((prev) => ({
       ...prev,
       [name]: { ...prev[name], outOfStock: !prev[name]?.outOfStock },
     }));
@@ -513,7 +531,7 @@ export default function AdminProductsPage() {
     setForm(EMPTY_FORM);
     setSizes([]);
     setCustomSize('');
-    setColorStocks({});
+    setColorSizeStocks({});
     imagePreviews.forEach((preview) => {
       if (preview && preview.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
@@ -599,11 +617,15 @@ export default function AdminProductsPage() {
       const uploadedColors = uploadedFiles.map((f) => f.color);
       const derivedColorNamesAtSubmit = [...new Set(uploadedColors.filter(Boolean))];
       const colorsPayload = derivedColorNamesAtSubmit.map((name) => {
-        const entry = colorStocks[name];
+        const entry = colorSizeStocks[name];
         return {
           name,
-          stock: !entry || entry.stock === '' || entry.stock === undefined ? null : Number(entry.stock),
+          hex: null,
           outOfStock: Boolean(entry?.outOfStock),
+          sizes: sizes.map((size) => {
+            const raw = entry?.stockBySize?.[size];
+            return { size, stock: raw === '' || raw === undefined ? null : Number(raw) };
+          }),
         };
       });
 
@@ -624,7 +646,6 @@ export default function AdminProductsPage() {
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
         colors: colorsPayload,
-        sizes,
         image: uploadedUrls[0],
         images: uploadedUrls,
         imageColors: uploadedColors,
@@ -1005,10 +1026,10 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* Sizes + stock */}
+              {/* Sizes */}
               <div>
                 <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
-                  Sizes &amp; Stock
+                  Sizes
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {quickSizeOptions.map((size) => (
@@ -1016,7 +1037,7 @@ export default function AdminProductsPage() {
                       key={size}
                       type="button"
                       onClick={() => addSize(size)}
-                      disabled={sizes.some((s) => s.size === size)}
+                      disabled={sizes.includes(size)}
                       className="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-label-caps text-label-caps hover:border-primary hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {usesInchSizes ? `${size}"` : size}
@@ -1039,35 +1060,27 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
                 {sizes.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    {sizes.map((s) => (
-                      <div key={s.size} className="flex items-center gap-3 border border-outline-variant/30 rounded-lg px-4 py-2">
-                        <span className="font-body-sm text-body-sm text-on-surface w-24">{s.size}</span>
-                        <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor={`stock-${s.size}`}>
-                          Stock
-                        </label>
-                        <input
-                          id={`stock-${s.size}`}
-                          type="number"
-                          min="0"
-                          value={s.stock}
-                          onChange={(e) => updateSizeStock(s.size, e.target.value)}
-                          className="w-24 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-1 font-body-sm text-body-sm text-on-surface transition-colors"
-                        />
+                  <div className="admin-products-sizes__chips">
+                    {sizes.map((size) => (
+                      <span key={size} className="admin-products-sizes__chip">
+                        {usesInchSizes ? `${size}"` : size}
                         <button
                           type="button"
-                          onClick={() => removeSize(s.size)}
-                          className="ml-auto text-error font-label-caps text-label-caps hover:underline"
+                          onClick={() => removeSize(size)}
+                          className="admin-products-sizes__chip-remove"
+                          aria-label={`Remove size ${size}`}
                         >
-                          Remove
+                          ×
                         </button>
-                      </div>
+                      </span>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Colors + per-color stock */}
+              {/* Colors, each with its own per-size stock — this is the
+                  color↔size↔quantity linkage: every color owns its own sizes,
+                  and every size owns its own quantity. */}
               <div>
                 <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
                   Colors &amp; Stock
@@ -1076,32 +1089,52 @@ export default function AdminProductsPage() {
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     Tag a color on at least one image above to manage its stock here.
                   </p>
+                ) : sizes.length === 0 ? (
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    Add at least one size above to enter stock per color.
+                  </p>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="admin-products-colors__list">
                     {derivedColorNames.map((name) => {
-                      const entry = colorStocks[name] ?? { stock: '', outOfStock: false };
+                      const entry = colorSizeStocks[name] ?? { outOfStock: false, stockBySize: {} };
                       return (
-                        <div key={name} className="flex items-center gap-3 border border-outline-variant/30 rounded-lg px-4 py-2">
-                          <span className="font-body-sm text-body-sm text-on-surface w-32 truncate">{name}</span>
-                          <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor={`color-stock-${name}`}>
-                            Stock
-                          </label>
-                          <input
-                            id={`color-stock-${name}`}
-                            type="number"
-                            min="0"
-                            placeholder="Unlimited"
-                            value={entry.stock}
-                            onChange={(e) => updateColorStock(name, e.target.value)}
-                            className="w-28 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-1 font-body-sm text-body-sm text-on-surface transition-colors"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => toggleColorOutOfStock(name)}
-                            className={`ml-auto font-label-caps text-label-caps hover:underline ${entry.outOfStock ? 'text-primary' : 'text-error'}`}
-                          >
-                            {entry.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
-                          </button>
+                        <div key={name} className="admin-products-colors__card">
+                          <div className="admin-products-colors__card-header">
+                            <span className="admin-products-colors__name">{name}</span>
+                            <button
+                              type="button"
+                              onClick={() => toggleColorOutOfStock(name)}
+                              className={`admin-products-colors__oos-toggle${
+                                entry.outOfStock ? ' admin-products-colors__oos-toggle--active' : ''
+                              }`}
+                            >
+                              {entry.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
+                            </button>
+                          </div>
+                          <div className="admin-products-colors__size-rows">
+                            {sizes.map((size) => (
+                              <div key={size} className="admin-products-colors__size-row">
+                                <span className="admin-products-colors__size-label">
+                                  {usesInchSizes ? `${size}"` : size}
+                                </span>
+                                <label
+                                  className="admin-products-colors__size-stock-label"
+                                  htmlFor={`stock-${name}-${size}`}
+                                >
+                                  Stock
+                                </label>
+                                <input
+                                  id={`stock-${name}-${size}`}
+                                  type="number"
+                                  min="0"
+                                  placeholder="Unlimited"
+                                  value={entry.stockBySize?.[size] ?? ''}
+                                  onChange={(e) => updateColorSizeStock(name, size, e.target.value)}
+                                  className="admin-products-colors__size-stock-input"
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       );
                     })}
@@ -1290,7 +1323,7 @@ export default function AdminProductsPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {paginatedProducts.map((product) => {
-                const totalStock = (product.sizes ?? []).reduce((sum, s) => sum + (s.stock ?? 0), 0);
+                const totalStock = getProductTotalStock(product);
                 const isOutOfStock = Boolean(product.outOfStock) || totalStock === 0;
                 const isSelected = selectedProductIds.includes(product.id);
                 return (
@@ -1389,8 +1422,9 @@ export default function AdminProductsPage() {
                       {(product.colors ?? []).length > 0 ? (
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="font-body-sm text-body-sm text-on-surface-variant">Colors:</span>
-                          {normalizeColors(product.colors).map((c) => {
+                          {normalizeColors(product.colors, product.sizes).map((c) => {
                             const colorOut = isColorOutOfStock(c);
+                            const colorTotal = getColorTotalStock(c);
                             return (
                               <span
                                 key={c.name}
@@ -1398,7 +1432,7 @@ export default function AdminProductsPage() {
                                   colorOut ? 'border-error/40 text-error' : 'border-outline-variant/40 text-on-surface-variant'
                                 }`}
                               >
-                                {c.name}{c.stock !== null ? ` (${c.stock})` : ''}
+                                {c.name}{colorTotal !== null ? ` (${colorTotal})` : ''}
                                 <button
                                   type="button"
                                   onClick={() => handleToggleColorOutOfStock(product, c.name, colorOut)}
@@ -1414,7 +1448,7 @@ export default function AdminProductsPage() {
                         <p className="font-body-sm text-body-sm text-on-surface-variant">Colors: —</p>
                       )}
                       <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Sizes: {(product.sizes ?? []).map((s) => `${s.size} (${s.stock})`).join(', ') || '—'} · Total stock: <span className={isOutOfStock ? "text-error font-semibold" : ""}>{totalStock}</span>
+                        Sizes: {getSizeStockSummary(product).map((s) => `${s.size} (${s.stock === null ? '∞' : s.stock})`).join(', ') || '—'} · Total stock: <span className={isOutOfStock ? "text-error font-semibold" : ""}>{totalStock === null ? '∞' : totalStock}</span>
                       </p>
                       {product.hashtags?.length > 0 && (
                         <p className="font-body-sm text-body-sm text-secondary">{product.hashtags.join(' ')}</p>

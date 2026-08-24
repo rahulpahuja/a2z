@@ -1,0 +1,463 @@
+.billing-page {
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.billing-header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-outline-variant);
+  padding: 1.5rem 2rem;
+}
+
+.billing-header__title {
+  font-family: var(--font-title-sm);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.billing-header__subtitle {
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  margin-top: 0.25rem;
+}
+
+.billing-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.billing-section {
+  background-color: var(--color-surface-container-low);
+  border: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+}
+
+.billing-section__title {
+  font-family: var(--font-title-sm);
+  font-size: var(--text-title-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-bottom: 1rem;
+}
+
+.billing-section__hint {
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+/* Today's summary */
+.billing-summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.billing-summary-card {
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid color-mix(in srgb, var(--color-outline-variant) 40%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+}
+
+.billing-summary-card__label {
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.billing-summary-card__value {
+  font-family: var(--font-title-sm);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-top: 0.375rem;
+}
+
+.billing-summary-card__link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.billing-summary-card__link:hover {
+  text-decoration: underline;
+}
+
+/* Barcode scan */
+.billing-scan {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.billing-scan__icon {
+  color: var(--color-primary);
+}
+
+.billing-scan__input {
+  flex: 1;
+  background-color: var(--color-surface-container-lowest);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body-lg);
+  font-size: var(--text-body-lg);
+  color: var(--color-on-surface);
+}
+
+.billing-scan__input:focus {
+  outline: none;
+  border-style: solid;
+}
+
+/* Form grid */
+.billing-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.billing-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.billing-field--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.billing-field__label--normal-case {
+  text-transform: none;
+}
+
+.billing-inline-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.billing-field__label {
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.billing-field__input,
+.billing-field__select {
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 0.625rem 0.875rem;
+  font-family: var(--font-body-lg);
+  font-size: var(--text-body-lg);
+  color: var(--color-on-surface);
+  transition: border-color 150ms ease;
+}
+
+.billing-field__input:focus,
+.billing-field__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.billing-field__checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--color-primary);
+}
+
+/* Item picker */
+.billing-item-picker {
+  border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 40%, transparent);
+  padding-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.billing-item-picker__row {
+  display: grid;
+  grid-template-columns: 2fr 1.3fr 1fr 0.8fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+@media (max-width: 900px) {
+  .billing-item-picker__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.billing-add-btn {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-lg);
+  transition: opacity 150ms ease;
+  white-space: nowrap;
+}
+
+.billing-add-btn:hover {
+  opacity: 0.9;
+}
+
+.billing-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-virtual-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 40%, transparent);
+  padding-top: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .billing-virtual-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Line items table */
+.billing-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+}
+
+.billing-items-table th {
+  text-align: left;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.billing-items-table td {
+  padding: 0.625rem 0.75rem;
+  color: var(--color-on-surface);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+}
+
+.billing-items-table__badge {
+  display: inline-block;
+  font-family: var(--font-label-caps);
+  font-size: 10px;
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-tertiary);
+  background-color: color-mix(in srgb, var(--color-tertiary) 15%, transparent);
+  border-radius: var(--radius-full);
+  padding: 0.125rem 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.billing-items-table__remove {
+  color: var(--color-error);
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  text-transform: uppercase;
+}
+
+.billing-items-table__remove:hover {
+  text-decoration: underline;
+}
+
+/* Totals */
+.billing-totals {
+  margin-left: auto;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.billing-totals__row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.billing-totals__row--total {
+  font-family: var(--font-title-sm);
+  font-size: var(--text-title-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  border-top: 1px solid var(--color-outline-variant);
+  padding-top: 0.5rem;
+}
+
+.billing-form-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.billing-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius-lg);
+  transition: opacity 150ms ease;
+}
+
+.billing-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.billing-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-btn-ghost {
+  background-color: transparent;
+  color: var(--color-on-surface-variant);
+  border: 1px solid var(--color-outline-variant);
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.billing-btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Bills list */
+.billing-bills-filter {
+  margin-bottom: 1rem;
+}
+
+.billing-bills-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+}
+
+.billing-bills-table th {
+  text-align: left;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.billing-bills-table td {
+  padding: 0.75rem;
+  color: var(--color-on-surface);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+  vertical-align: top;
+}
+
+.billing-status-badge {
+  display: inline-block;
+  font-family: var(--font-label-caps);
+  font-size: 10px;
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  padding: 0.1875rem 0.625rem;
+}
+
+.billing-status-badge--completed {
+  color: var(--color-secondary);
+  background-color: color-mix(in srgb, var(--color-secondary) 15%, transparent);
+}
+
+.billing-status-badge--cancelled {
+  color: var(--color-error);
+  background-color: var(--color-error-container);
+}
+
+.billing-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.billing-link-btn {
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.billing-link-btn:hover {
+  text-decoration: underline;
+}
+
+.billing-link-btn--danger {
+  color: var(--color-error);
+}
+
+.billing-link-btn:disabled {
+  color: var(--color-outline);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.billing-empty {
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  padding: 1rem 0;
+}
+
+.billing-editing-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+}

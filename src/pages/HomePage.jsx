@@ -10,6 +10,7 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import { getHighResUrl } from '../utils/image.js';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import { subscribeToCarousel } from '../services/carousel.js';
+import { isProductAvailable } from '../utils/productColors.js';
 import { subscribeToCategoryBubbles, DEFAULT_CATEGORY_BUBBLES } from '../services/categoryBubbles.js';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
@@ -355,7 +356,7 @@ export default function HomePage() {
             >
               {productsRow1.map((product) => {
                 const isFavorited = !!favorites[product.id];
-                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+                const isAvailable = isProductAvailable(product);
                 return (
                   <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
@@ -461,7 +462,7 @@ export default function HomePage() {
             >
               {productsRow2.map((product) => {
                 const isFavorited = !!favorites[product.id];
-                const isAvailable = !product.outOfStock && (product.sizes?.some((s) => s.stock > 0) ?? product.inStock);
+                const isAvailable = isProductAvailable(product);
                 return (
                   <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
