@@ -8,7 +8,7 @@ import { generateReceiptPdf } from '../../utils/generateReceipt.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
 import { getStoreSettingsOnce } from '../../services/storeSettings.js';
-import { createForwardShipment, trackShipment, cancelShipment, buildDeliveryAddress } from '../../services/shipprime.js';
+import { createForwardShipment, trackShipment, cancelShipment, buildDeliveryAddress, extractShipmentCost } from '../../services/shipprime.js';
 import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
 import './AdminSalesPage.css';
 
@@ -176,6 +176,7 @@ export default function AdminSalesPage() {
           awb: result.awb,
           courier: result.courier,
           labelUrl: result.labelUrl,
+          cost: extractShipmentCost(result),
           createdAt: new Date().toISOString(),
         },
       };

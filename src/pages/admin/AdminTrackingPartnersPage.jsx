@@ -1,7 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { subscribeToTrackingPartners, saveTrackingPartners } from '../../services/trackingPartners.js';
+import { subscribeToOrders } from '../../services/orders.js';
+import { formatCurrency } from '../../context/CartContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import './AdminTrackingPartnersPage.css';
+
+const currentMonthValue = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
 
 export default function AdminTrackingPartnersPage() {
   const { showToast } = useToast();
@@ -9,6 +16,8 @@ export default function AdminTrackingPartnersPage() {
   const [newPartner, setNewPartner] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [spendMonth, setSpendMonth] = useState(currentMonthValue);
 
   useEffect(() => {
     const unsubscribe = subscribeToTrackingPartners((data, error) => {
@@ -21,6 +30,30 @@ export default function AdminTrackingPartnersPage() {
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToOrders((rows) => setOrders(rows));
+    return unsubscribe;
+  }, []);
+
+  // Spend tracked from our own shipment records — ShipPrime has no public
+  // billing API we could find, so this sums whatever cost their
+  // forward-create response happened to return (see extractShipmentCost in
+  // services/shipprime.js), not a live wallet balance from ShipPrime itself.
+  const shipmentStats = useMemo(() => {
+    const [year, month] = spendMonth.split('-').map(Number);
+    const shipped = orders.filter((o) => {
+      if (!o.shipment?.awb) return false;
+      const d = new Date(o.shipment.createdAt || o.placedAt);
+      return d.getFullYear() === year && d.getMonth() === month - 1;
+    });
+    const withCost = shipped.filter((o) => typeof o.shipment.cost === 'number');
+    return {
+      count: shipped.length,
+      totalCost: withCost.reduce((sum, o) => sum + o.shipment.cost, 0),
+      missingCostCount: shipped.length - withCost.length,
+    };
+  }, [orders, spendMonth]);
 
   const handleAddPartner = async (e) => {
     e.preventDefault();
@@ -79,8 +112,53 @@ export default function AdminTrackingPartnersPage() {
         </p>
       </header>
 
-      <main className="admin-main-container grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+      <main className="admin-main-container flex flex-col gap-8">
+        {/* ShipPrime Spend */}
+        <section className="admin-card flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="admin-card-title">ShipPrime Spend</h2>
+              <p className="admin-card-subtitle">
+                Tracked from our own shipment records, not a live ShipPrime balance — ShipPrime has no public billing
+                API, so this sums whatever cost their response returned per shipment.
+              </p>
+            </div>
+            <div className="form-group admin-form-group--tight">
+              <label className="form-label" htmlFor="spend-month">
+                Month
+              </label>
+              <input
+                id="spend-month"
+                type="month"
+                value={spendMonth}
+                onChange={(e) => setSpendMonth(e.target.value)}
+                className="form-input"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+              <p className="admin-card-subtitle">Shipments</p>
+              <p className="font-title-sm text-title-sm text-on-surface mt-1">{shipmentStats.count}</p>
+            </div>
+            <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+              <p className="admin-card-subtitle">Recorded Spend</p>
+              <p className="font-title-sm text-title-sm text-on-surface mt-1">{formatCurrency(shipmentStats.totalCost)}</p>
+            </div>
+            <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+              <p className="admin-card-subtitle">Missing Cost Data</p>
+              <p className="font-title-sm text-title-sm text-on-surface mt-1">{shipmentStats.missingCostCount}</p>
+            </div>
+          </div>
+          {shipmentStats.missingCostCount > 0 && (
+            <p className="text-[11px] text-on-surface-variant">
+              {shipmentStats.missingCostCount} shipment{shipmentStats.missingCostCount === 1 ? '' : 's'} this month had
+              no cost figure in ShipPrime's response — check the ShipPrime dashboard directly for the true total.
+            </p>
+          )}
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Add Partner Form */}
         <section className="admin-card h-fit flex flex-col gap-5">
           <div>
@@ -155,6 +233,7 @@ export default function AdminTrackingPartnersPage() {
             </div>
           )}
         </section>
+        </div>
       </main>
     </div>
   );

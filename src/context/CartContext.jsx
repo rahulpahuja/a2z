@@ -3,7 +3,7 @@ import { recordPurchase } from '../services/productStats.js';
 import { createFirebaseOrder, updateFirebaseOrder } from '../services/orders.js';
 import { reduceProductStock } from '../services/adminProducts.js';
 import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
-import { createForwardShipment, buildDeliveryAddress } from '../services/shipprime.js';
+import { createForwardShipment, buildDeliveryAddress, extractShipmentCost } from '../services/shipprime.js';
 import { INDIAN_STATES_AND_UT } from '../data/indiaData.js';
 
 const CartContext = createContext(null);
@@ -54,6 +54,7 @@ async function autoCreateShipment(order) {
         awb: result.awb,
         courier: result.courier,
         labelUrl: result.labelUrl,
+        cost: extractShipmentCost(result),
         createdAt: new Date().toISOString(),
       },
     });

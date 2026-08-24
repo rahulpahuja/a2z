@@ -8,8 +8,15 @@ compatibility_date = "2024-01-01"
 #RAZORPAY_KEY_ID = "rzp_test_TFk94wiS7UoIb0"
 RAZORPAY_KEY_ID = "rzp_live_TFqdNz2HJEn8dW"
 
-# RAZORPAY_KEY_SECRET must NOT be set in this file (it's committed to git).
-# For local development, put it in `.dev.vars` (gitignored):
+# RAZORPAY_KEY_SECRET and APP_SHARED_KEY must NOT be set in this file (it's
+# committed to git).
+# For local development, put them in `.dev.vars` (gitignored):
 #   RAZORPAY_KEY_SECRET=your_secret_here
-# For production, set it with:
+#   APP_SHARED_KEY=some_random_string
+# For production, set them with:
 #   wrangler secret put RAZORPAY_KEY_SECRET
+#   wrangler secret put APP_SHARED_KEY
+#
+# APP_SHARED_KEY gates the admin-only /fees-report endpoint (checked against
+# the x-app-key request header) — /create-order and /verify-payment stay
+# open, since customer checkout calls them without being logged in.
