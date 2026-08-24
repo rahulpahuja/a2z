@@ -78,6 +78,8 @@ export default function AdminProductsPage() {
   // { [colorName]: { outOfStock: bool, stockBySize: { [size]: '' | number } } } — the
   // joint (color, size) stock, keyed by color so each color owns its own per-size quantities.
   const [colorSizeStocks, setColorSizeStocks] = useState({});
+  const [editingColorName, setEditingColorName] = useState(null);
+  const [colorRenameValue, setColorRenameValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
   const [productId, setProductId] = useState('');
@@ -133,6 +135,8 @@ export default function AdminProductsPage() {
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
+    setEditingColorName(null);
+    setColorRenameValue('');
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -175,6 +179,8 @@ export default function AdminProductsPage() {
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
+    setEditingColorName(null);
+    setColorRenameValue('');
     setImageFiles([null, null, null, null, null]);
 
     const initialPreviews = ['', '', '', '', ''];
@@ -527,11 +533,61 @@ export default function AdminProductsPage() {
     }));
   };
 
+  // Colors are derived from the color tagged on each image (see
+  // derivedColorNames above), so renaming/removing one here has to retag the
+  // underlying images too, or the old name would just reappear on re-render.
+  const startRenameColor = (name) => {
+    setEditingColorName(name);
+    setColorRenameValue(name);
+  };
+
+  const cancelRenameColor = () => {
+    setEditingColorName(null);
+    setColorRenameValue('');
+  };
+
+  const saveRenameColor = (oldName) => {
+    const newName = colorRenameValue.trim();
+    if (!newName || newName === oldName) {
+      cancelRenameColor();
+      return;
+    }
+    if (derivedColorNames.includes(newName)) {
+      showToast(`"${newName}" is already used by another color on this product.`);
+      return;
+    }
+    setImageColors((prev) => prev.map((c) => (c === oldName ? newName : c)));
+    setColorSizeStocks((prev) => {
+      const next = { ...prev };
+      next[newName] = next[oldName] ?? { outOfStock: false, stockBySize: {} };
+      delete next[oldName];
+      return next;
+    });
+    cancelRenameColor();
+  };
+
+  const deleteColor = (name) => {
+    if (
+      !window.confirm(`Remove color "${name}"? Any images tagged with this color will need a new color tag before you can save.`)
+    ) {
+      return;
+    }
+    setImageColors((prev) => prev.map((c) => (c === name ? '' : c)));
+    setColorSizeStocks((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+    if (editingColorName === name) cancelRenameColor();
+  };
+
   const resetForm = () => {
     setForm(EMPTY_FORM);
     setSizes([]);
     setCustomSize('');
     setColorSizeStocks({});
+    setEditingColorName(null);
+    setColorRenameValue('');
     imagePreviews.forEach((preview) => {
       if (preview && preview.startsWith('blob:')) {
         URL.revokeObjectURL(preview);
@@ -1100,16 +1156,67 @@ export default function AdminProductsPage() {
                       return (
                         <div key={name} className="admin-products-colors__card">
                           <div className="admin-products-colors__card-header">
-                            <span className="admin-products-colors__name">{name}</span>
-                            <button
-                              type="button"
-                              onClick={() => toggleColorOutOfStock(name)}
-                              className={`admin-products-colors__oos-toggle${
-                                entry.outOfStock ? ' admin-products-colors__oos-toggle--active' : ''
-                              }`}
-                            >
-                              {entry.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
-                            </button>
+                            {editingColorName === name ? (
+                              <div className="admin-products-colors__rename">
+                                <input
+                                  autoFocus
+                                  value={colorRenameValue}
+                                  onChange={(e) => setColorRenameValue(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      saveRenameColor(name);
+                                    } else if (e.key === 'Escape') {
+                                      cancelRenameColor();
+                                    }
+                                  }}
+                                  className="admin-products-colors__rename-input"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => saveRenameColor(name)}
+                                  className="admin-products-colors__action-btn"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelRenameColor}
+                                  className="admin-products-colors__action-btn"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <span className="admin-products-colors__name">{name}</span>
+                                <div className="admin-products-colors__actions">
+                                  <button
+                                    type="button"
+                                    onClick={() => startRenameColor(name)}
+                                    className="admin-products-colors__action-btn"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => deleteColor(name)}
+                                    className="admin-products-colors__action-btn admin-products-colors__action-btn--danger"
+                                  >
+                                    Delete
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleColorOutOfStock(name)}
+                                    className={`admin-products-colors__oos-toggle${
+                                      entry.outOfStock ? ' admin-products-colors__oos-toggle--active' : ''
+                                    }`}
+                                  >
+                                    {entry.outOfStock ? 'Mark In Stock' : 'Mark Out of Stock'}
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                           <div className="admin-products-colors__size-rows">
                             {sizes.map((size) => (
