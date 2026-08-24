@@ -101,6 +101,10 @@
   margin-bottom: 1.25rem;
 }
 
+.admin-form-group--tight {
+  margin-bottom: 0;
+}
+
 .form-label {
   display: block;
   font-family: var(--font-label-caps);

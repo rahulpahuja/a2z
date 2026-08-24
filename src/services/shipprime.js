@@ -27,6 +27,32 @@ export function buildDeliveryAddress(shippingDetails, stateName) {
   };
 }
 
+// ShipPrime has no public API documentation we could find, so the exact
+// field name their forward-create response uses for the per-shipment charge
+// is unknown. This checks the field names most freight/logistics APIs use;
+// if none match, callers get null and should say "not available" rather
+// than silently show ₹0 — see AdminTrackingPartnersPage's spend panel.
+const COST_FIELD_CANDIDATES = [
+  'freightCharges',
+  'freightCharge',
+  'shippingCharges',
+  'shippingCharge',
+  'totalCharges',
+  'charges',
+  'shippingCost',
+  'cost',
+  'amount',
+];
+
+export function extractShipmentCost(result) {
+  if (!result || typeof result !== 'object') return null;
+  for (const key of COST_FIELD_CANDIDATES) {
+    const value = result[key];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return null;
+}
+
 export async function createForwardShipment({ order, pickupAddress, deliveryAddress }) {
   assertConfigured();
   const res = await fetch(`${API_BASE}/forward/create`, {

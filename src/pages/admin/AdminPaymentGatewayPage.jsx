@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import { isFirebaseEnabled } from '../../firebase.js';
 import { subscribeToPaymentGateways, savePaymentGateway, deletePaymentGateway } from '../../services/paymentGateway.js';
+import { getRazorpayFeesReport } from '../../services/razorpay.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import './AdminPaymentGatewayPage.css';
+
+const currentMonthValue = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+};
+
+const fmtINR = (value) => `₹${Number(value ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 
 export default function AdminPaymentGatewayPage() {
   const { showToast } = useToast();
@@ -12,9 +20,36 @@ export default function AdminPaymentGatewayPage() {
   const [apiSecret, setApiSecret] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const [feesMonth, setFeesMonth] = useState(currentMonthValue);
+  const [feesReport, setFeesReport] = useState(null);
+  const [feesLoading, setFeesLoading] = useState(false);
+  const [feesError, setFeesError] = useState(null);
+
+  const fetchFeesReport = async (monthValue) => {
+    const [year, month] = monthValue.split('-').map(Number);
+    const from = new Date(year, month - 1, 1);
+    const to = new Date(year, month, 0, 23, 59, 59, 999);
+    setFeesLoading(true);
+    setFeesError(null);
+    try {
+      const report = await getRazorpayFeesReport(from, to);
+      setFeesReport(report);
+    } catch (err) {
+      setFeesError(err.message || 'Could not load Razorpay fees report.');
+      setFeesReport(null);
+    } finally {
+      setFeesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeesReport(feesMonth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feesMonth]);
 
   useEffect(() => {
     if (!isFirebaseEnabled) {
@@ -179,8 +214,55 @@ export default function AdminPaymentGatewayPage() {
           </div>
         )}
 
+        {/* Razorpay Fees */}
+        <section className="admin-card flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="admin-card-title">Razorpay Fees</h2>
+              <p className="admin-card-subtitle">
+                Razorpay has no separate bill to pay — its 2% + GST fee is deducted automatically from each
+                settlement. This is what it has actually taken for the selected month.
+              </p>
+            </div>
+            <div className="form-group admin-form-group--tight">
+              <label className="form-label" htmlFor="fees-month">
+                Month
+              </label>
+              <input
+                id="fees-month"
+                type="month"
+                value={feesMonth}
+                onChange={(e) => setFeesMonth(e.target.value)}
+                className="form-input"
+              />
+            </div>
+          </div>
+          {feesError ? (
+            <p className="text-[12px] text-error">{feesError}</p>
+          ) : feesLoading ? (
+            <p className="text-[12px] text-on-surface-variant">Loading…</p>
+          ) : feesReport ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+                <p className="admin-card-subtitle">Payments</p>
+                <p className="font-title-sm text-title-sm text-on-surface mt-1">{feesReport.count}</p>
+              </div>
+              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+                <p className="admin-card-subtitle">Total Collected</p>
+                <p className="font-title-sm text-title-sm text-on-surface mt-1">{fmtINR(feesReport.totalAmount)}</p>
+              </div>
+              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
+                <p className="admin-card-subtitle">Fees + Tax Taken</p>
+                <p className="font-title-sm text-title-sm text-on-surface mt-1">
+                  {fmtINR(feesReport.totalFees + feesReport.totalTax)}
+                </p>
+              </div>
+            </div>
+          ) : null}
+        </section>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Add / Edit Gateway Form */}
           <section className="admin-card h-fit flex flex-col gap-5">
             <div>

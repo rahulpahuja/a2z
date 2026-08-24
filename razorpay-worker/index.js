@@ -113,6 +113,81 @@ async function createOrder(request, env, corsHeaders) {
   );
 }
 
+function checkAppKey(request, env) {
+  return Boolean(env.APP_SHARED_KEY) && request.headers.get("x-app-key") === env.APP_SHARED_KEY;
+}
+
+// Razorpay's standard payment-gateway fee (2% + GST) is deducted per
+// transaction at settlement — there is no separate "bill" to pay. This sums
+// what Razorpay has actually taken in fees/tax over a date range, paginating
+// through their Payments API (max 100 results per page).
+async function getFeesReport(request, env, corsHeaders) {
+  const url = new URL(request.url);
+  const fromParam = url.searchParams.get("from");
+  const toParam = url.searchParams.get("to");
+  if (!fromParam || !toParam) {
+    return new Response(JSON.stringify({ error: "from and to (ISO dates) query params are required." }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const from = Math.floor(new Date(fromParam).getTime() / 1000);
+  const to = Math.floor(new Date(toParam).getTime() / 1000);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) {
+    return new Response(JSON.stringify({ error: "from/to must be valid dates." }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const auth = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
+  let skip = 0;
+  let count = 0;
+  let totalAmountPaise = 0;
+  let totalFeesPaise = 0;
+  let totalTaxPaise = 0;
+  const PAGE_SIZE = 100;
+  const MAX_PAGES = 50; // hard cap so a misconfigured range can't loop forever
+
+  for (let page = 0; page < MAX_PAGES; page += 1) {
+    const res = await fetch(
+      `https://api.razorpay.com/v1/payments?from=${from}&to=${to}&count=${PAGE_SIZE}&skip=${skip}`,
+      { headers: { Authorization: `Basic ${auth}` } }
+    );
+    const data = await res.json();
+    if (!res.ok) {
+      return new Response(
+        JSON.stringify({ error: data?.error?.description || "Razorpay fees lookup failed." }),
+        { status: res.status === 401 ? 401 : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const items = data.items || [];
+    for (const payment of items) {
+      if (payment.status !== "captured" && payment.status !== "refunded") continue;
+      count += 1;
+      totalAmountPaise += payment.amount || 0;
+      totalFeesPaise += payment.fee || 0;
+      totalTaxPaise += payment.tax || 0;
+    }
+
+    if (items.length < PAGE_SIZE) break;
+    skip += PAGE_SIZE;
+  }
+
+  return new Response(
+    JSON.stringify({
+      currency: "INR",
+      count,
+      totalAmount: totalAmountPaise / 100,
+      totalFees: totalFeesPaise / 100,
+      totalTax: totalTaxPaise / 100,
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
+
 async function hmacSha256Hex(secret, message) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
@@ -173,8 +248,8 @@ export default {
   async fetch(request, env) {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, x-app-key",
     };
 
     if (request.method === "OPTIONS") {
@@ -211,6 +286,29 @@ export default {
         return await verifyPayment(request, env, corsHeaders);
       } catch (err) {
         return new Response(JSON.stringify({ success: false, error: err.message }), {
+          status: err.status || 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    if (request.method === "GET" && url.pathname === "/fees-report") {
+      if (!checkAppKey(request, env)) {
+        return new Response(JSON.stringify({ error: "Unauthorized." }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+        return new Response(JSON.stringify({ error: "Razorpay credentials are not configured on the server." }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      try {
+        return await getFeesReport(request, env, corsHeaders);
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
           status: err.status || 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

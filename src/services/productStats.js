@@ -4,6 +4,35 @@ import { db, isFirebaseEnabled } from '../firebase.js';
 const ROOT = 'productStats';
 const VIEWED_KEY_PREFIX = 'a2z_viewed_';
 
+// Firebase Realtime Database keys can't contain . # $ [ ] / — referrer
+// hostnames and UTM values need sanitizing before use as a key.
+function sanitizeStatsKey(raw) {
+  return String(raw).replace(/[.#$[\]/]/g, '_');
+}
+
+// Where did this view come from? Prefers ?utm_source= when present (an
+// admin-controlled label from a marketing link), falling back to the
+// referring page's hostname, or 'direct' for a same-site navigation or no
+// referrer at all (typed URL, bookmark, most app/social in-app browsers).
+function getReferrerLabel() {
+  try {
+    const utmSource = new URLSearchParams(window.location.search).get('utm_source');
+    if (utmSource) return sanitizeStatsKey(utmSource.trim().toLowerCase());
+    if (!document.referrer) return 'direct';
+    const refHost = new URL(document.referrer).hostname.replace(/^www\./, '');
+    if (refHost === window.location.hostname) return 'direct';
+    return sanitizeStatsKey(refHost);
+  } catch {
+    return 'direct';
+  }
+}
+
+function todayKey() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 function getLocalStats() {
   try {
     const data = localStorage.getItem(ROOT);
@@ -43,13 +72,21 @@ function notifyTopProductsListeners() {
 }
 
 export function recordView(productId) {
+  const day = todayKey();
+  const referrer = getReferrerLabel();
+
   if (!isFirebaseEnabled) {
     const sessionKey = `${VIEWED_KEY_PREFIX}${productId}`;
     if (sessionStorage.getItem(sessionKey)) return;
     sessionStorage.setItem(sessionKey, '1');
     const stats = getLocalStats();
-    const prodStat = stats[productId] || { views: 0, purchases: 0 };
+    const prodStat = stats[productId] || { views: 0, purchases: 0, daily: {} };
     prodStat.views = (prodStat.views || 0) + 1;
+    prodStat.daily = prodStat.daily || {};
+    const dayStat = prodStat.daily[day] || { views: 0, referrers: {} };
+    dayStat.views += 1;
+    dayStat.referrers[referrer] = (dayStat.referrers[referrer] || 0) + 1;
+    prodStat.daily[day] = dayStat;
     stats[productId] = prodStat;
     setLocalStats(stats);
     notifyStatsListeners(productId);
@@ -61,6 +98,26 @@ export function recordView(productId) {
   update(ref(db, `${ROOT}/${productId}`), { views: increment(1) }).catch(() => {
     sessionStorage.removeItem(sessionKey);
   });
+  update(ref(db, `${ROOT}/${productId}/daily/${day}`), {
+    views: increment(1),
+    [`referrers/${referrer}`]: increment(1),
+  }).catch(() => {});
+}
+
+// Full productStats tree, incl. each product's { daily: { 'YYYY-MM-DD': {
+// views, referrers } } } breakdown — used by the Analytics page to build
+// a monthly per-product + sitewide referrer report client-side (same
+// load-then-aggregate pattern AdminSalesPage uses for orders).
+export function subscribeToAllProductStats(callback) {
+  if (!isFirebaseEnabled) {
+    callback(getLocalStats());
+    return () => {};
+  }
+  return onValue(
+    ref(db, ROOT),
+    (snapshot) => callback(snapshot.val() || {}),
+    () => callback({})
+  );
 }
 
 export function recordPurchase(productId, quantity = 1) {

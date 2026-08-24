@@ -1,5 +1,6 @@
 const API_BASE = import.meta.env.VITE_RAZORPAY_API_URL;
 const KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+const APP_KEY = import.meta.env.VITE_RAZORPAY_APP_KEY;
 
 // Razorpay key IDs are prefixed `rzp_test_` in test mode and `rzp_live_` in
 // live mode — use that to flag test-mode payment IDs when storing orders.
@@ -39,6 +40,27 @@ export async function verifyRazorpayPayment({ razorpay_order_id, razorpay_paymen
     return { success: false, error: data.error || 'Signature verification failed.' };
   }
   return data;
+}
+
+// Razorpay's standard fees (2% + GST) are auto-deducted per transaction —
+// there's no separate bill to pay, just what they've taken. `from`/`to` are
+// Date objects or ISO strings for the reporting window.
+export async function getRazorpayFeesReport(from, to) {
+  if (!API_BASE || !APP_KEY) {
+    throw new Error('Razorpay fee reporting is not configured. Set VITE_RAZORPAY_API_URL and VITE_RAZORPAY_APP_KEY in .env.');
+  }
+  const params = new URLSearchParams({
+    from: new Date(from).toISOString(),
+    to: new Date(to).toISOString(),
+  });
+  const res = await fetch(`${API_BASE}/fees-report?${params}`, {
+    headers: { 'x-app-key': APP_KEY },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Could not load Razorpay fees report.');
+  }
+  return data; // { currency, count, totalAmount, totalFees, totalTax }
 }
 
 export function openRazorpayCheckout({ order, name, description, prefill, onSuccess, onFailure, onDismiss }) {

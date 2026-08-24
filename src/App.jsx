@@ -42,6 +42,7 @@ import AdminUsageBillingPage from './pages/admin/AdminUsageBillingPage.jsx'
 import AdminProductVideosPage from './pages/admin/AdminProductVideosPage.jsx'
 import AdminSalesPage from './pages/admin/AdminSalesPage.jsx'
 import AdminLocalBillingPage from './pages/admin/AdminLocalBillingPage.jsx'
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage.jsx'
 import AdminCollectionsPage from './pages/admin/AdminCollectionsPage.jsx'
 import AdminBillTemplatePage from './pages/admin/AdminBillTemplatePage.jsx'
 import AdminReferrerDetailsPage from './pages/admin/AdminReferrerDetailsPage.jsx'
@@ -99,6 +100,7 @@ const ADMIN_ROUTES = [
   { path: '/super/product-videos', Component: AdminProductVideosPage },
   { path: '/super/sales', Component: AdminSalesPage },
   { path: '/super/local-billing', Component: AdminLocalBillingPage },
+  { path: '/super/analytics', Component: AdminAnalyticsPage },
   { path: '/super/collections', Component: AdminCollectionsPage },
   { path: '/super/bill-template', Component: AdminBillTemplatePage },
   { path: '/super/referrers', Component: AdminReferrerDetailsPage },

@@ -11,6 +11,18 @@
         "purchases": {
           ".validate": "newData.isNumber() && newData.val() >= 0"
         },
+        "daily": {
+          "$day": {
+            "views": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "referrers": {
+              "$referrer": {
+                ".validate": "newData.isNumber() && newData.val() >= 0"
+              }
+            }
+          }
+        },
         "$other": {
           ".validate": false
         }

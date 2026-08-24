@@ -3,14 +3,7 @@ import { db, isFirebaseEnabled } from '../firebase.js';
 
 const PATH = 'settings/tracking_partners';
 
-export const DEFAULT_TRACKING_PARTNERS = [
-  'DHL',
-  'FedEx',
-  'BlueDart',
-  'Delhivery',
-  'DTDC',
-  'India Post'
-];
+export const DEFAULT_TRACKING_PARTNERS = ['ShipPrime'];
 
 function getLocalTrackingPartners() {
   try {
