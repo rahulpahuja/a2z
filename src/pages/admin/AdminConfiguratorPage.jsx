@@ -1336,6 +1336,72 @@ export default function AdminConfiguratorPage() {
                           <option value={6}>6 items in a row</option>
                         </select>
                       </div>
+
+                      <div className="form-group">
+                        <label className="form-label" htmlFor="add-to-cart-style">Add to Cart Style</label>
+                        <select
+                          id="add-to-cart-style"
+                          value={form.addToCartStyle || 'icon'}
+                          onChange={(e) => handleChange('addToCartStyle', e.target.value)}
+                          className="form-select text-[12px] py-2 px-3"
+                        >
+                          <option value="icon">Bag Icon (Default, Larger Image)</option>
+                          <option value="button">Buttons</option>
+                        </select>
+                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                          Bag Icon replaces the "Add to Cart" button with a small icon over the image and enlarges the photo. Switch to Buttons to bring back the full-width Add to Cart button.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="admin-card flex flex-col gap-5">
+                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
+                      Filter Placement
+                    </h3>
+                    <p className="text-[11px] text-on-surface-variant/60 -mt-2">
+                      Choose whether each filter appears as a quick dropdown next to "Sort by" (sticky on mobile while scrolling) or inside the left filter sidebar.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="form-group">
+                        <label className="form-label" htmlFor="gender-filter-placement">Gender Filter</label>
+                        <select
+                          id="gender-filter-placement"
+                          value={form.genderFilterPlacement || 'top'}
+                          onChange={(e) => handleChange('genderFilterPlacement', e.target.value)}
+                          className="form-select text-[12px] py-2 px-3"
+                        >
+                          <option value="top">Top (Default, near Sort By)</option>
+                          <option value="left">Left Sidebar</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label" htmlFor="color-filter-placement">Color Filter</label>
+                        <select
+                          id="color-filter-placement"
+                          value={form.colorFilterPlacement || 'top'}
+                          onChange={(e) => handleChange('colorFilterPlacement', e.target.value)}
+                          className="form-select text-[12px] py-2 px-3"
+                        >
+                          <option value="top">Top (Default, near Sort By)</option>
+                          <option value="left">Left Sidebar</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label" htmlFor="size-filter-placement">Size Filter</label>
+                        <select
+                          id="size-filter-placement"
+                          value={form.sizeFilterPlacement || 'top'}
+                          onChange={(e) => handleChange('sizeFilterPlacement', e.target.value)}
+                          className="form-select text-[12px] py-2 px-3"
+                        >
+                          <option value="top">Top (Default, near Sort By)</option>
+                          <option value="left">Left Sidebar</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 
