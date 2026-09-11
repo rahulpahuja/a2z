@@ -109,6 +109,27 @@ export function deleteCollection(id) {
   return remove(ref(db, `${ROOT}/${id}`));
 }
 
+// Persists an explicit admin-chosen order (e.g. typing "3" into a position
+// field) by re-numbering every collection in `orderedCollections` 0..n-1.
+export function setCollectionOrder(orderedCollections) {
+  if (!isFirebaseEnabled) {
+    const collections = getLocalCollections();
+    orderedCollections.forEach((c, idx) => {
+      const match = collections.find((row) => row.id === c.id);
+      if (match) match.order = idx;
+    });
+    setLocalCollections(collections);
+    notifyLocalListeners();
+    return Promise.resolve();
+  }
+
+  const updates = {};
+  orderedCollections.forEach((c, idx) => {
+    updates[`${ROOT}/${c.id}/order`] = idx;
+  });
+  return update(ref(db), updates);
+}
+
 // Swaps the `order` value of two collections so admin-controlled up/down
 // reordering sticks across reloads instead of resetting to createdAt order.
 export function reorderCollections(collectionA, collectionB) {
