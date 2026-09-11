@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 
-function ShotSlide({ shot, product, active, muted, onToggleMute }) {
+function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
   const videoRef = useRef(null);
   const navigate = useNavigate();
 
@@ -22,7 +22,11 @@ function ShotSlide({ shot, product, active, muted, onToggleMute }) {
     <section className="relative w-full h-full snap-start snap-always shrink-0 bg-black flex items-center justify-center overflow-hidden">
       <video
         ref={videoRef}
-        src={shot.videoUrl}
+        // Only the active slide and its immediate neighbors get a real src —
+        // every shot mounting a video at once was what made the feed so slow
+        // to load, since the browser tried to fetch every clip immediately.
+        src={isNear ? shot.videoUrl : undefined}
+        preload={active ? 'auto' : isNear ? 'metadata' : 'none'}
         className="w-full h-full object-contain"
         loop
         playsInline
@@ -127,6 +131,7 @@ export default function ShotsPage() {
               shot={shot}
               product={productsById.get(shot.productId)}
               active={index === activeIndex}
+              isNear={Math.abs(index - activeIndex) <= 1}
               muted={muted}
               onToggleMute={() => setMuted((m) => !m)}
             />

@@ -40,6 +40,24 @@ function enlargeAspectRatio(aspect, factor = 1.15) {
   return `${w}/${(h * factor).toFixed(2)}`;
 }
 
+// Phones get a taller product image — the text block below it is already
+// tightened for mobile (see the card's className), and that saved vertical
+// space is handed to the photo instead.
+function useIsMobileViewport(breakpointPx = 640) {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < breakpointPx
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mql = window.matchMedia(`(max-width: ${breakpointPx - 1}px)`);
+    const handleChange = (e) => setIsMobile(e.matches);
+    handleChange(mql);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, [breakpointPx]);
+  return isMobile;
+}
+
 const FILTER_SELECT_CLASS = 'appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors';
 
 const BADGE_STYLES = {
@@ -56,8 +74,10 @@ export default function ProductListingPage() {
   const genderFilterOnTop = theme?.genderFilterPlacement !== 'left';
   const colorFilterOnTop = theme?.colorFilterPlacement !== 'left';
   const sizeFilterOnTop = theme?.sizeFilterPlacement !== 'left';
-  const listingImgAspect = useIconAddToCart
-    ? enlargeAspectRatio(theme?.listingImgAspect || '3/4')
+  const isMobileViewport = useIsMobileViewport();
+  const listingImgEnlargeFactor = (useIconAddToCart ? 1.15 : 1) * (isMobileViewport ? 1.15 : 1);
+  const listingImgAspect = listingImgEnlargeFactor !== 1
+    ? enlargeAspectRatio(theme?.listingImgAspect || '3/4', listingImgEnlargeFactor)
     : 'var(--custom-listing-img-aspect, 3/4)';
 
   const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
@@ -324,7 +344,7 @@ export default function ProductListingPage() {
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
+          <Link to="/" className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim truncate">A2Z Collection</Link>
         </div>
         <nav className="hidden md:flex items-center gap-8 [@media(orientation:landscape)_and_(max-height:500px)]:!hidden">
           {navLinks.map((link) => (
@@ -901,20 +921,20 @@ export default function ProductListingPage() {
                           </button>
                         )}
                       </Link>
-                      <div className="p-4 flex flex-col flex-grow">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
+                      <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
+                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold block">
                           {product.category || product.categoryTitle}
                         </span>
                         <Link to={`/products/${product.id}`}>
                           <h2
-                            className="text-on-surface mb-1 line-clamp-1 font-semibold"
+                            className="text-on-surface mb-0.5 sm:mb-1 line-clamp-1 font-semibold"
                             style={{ fontSize: 'var(--custom-font-title-size, 14px)' }}
                           >
                             {product.name || product.title}
                           </h2>
                         </Link>
                         <p
-                          className="text-on-surface-variant mb-3 line-clamp-1"
+                          className="text-on-surface-variant mb-1 sm:mb-3 line-clamp-1"
                           style={{ fontSize: 'var(--custom-font-desc-size, 12px)' }}
                         >
                           {product.description}
@@ -948,10 +968,10 @@ export default function ProductListingPage() {
                           </div>
                         )}
                     {isProductAvailable(product) ? (
-                      <div className="mt-4 flex flex-col gap-2">
+                      <div className="mt-2 sm:mt-4 flex flex-col gap-1.5 sm:gap-2">
                         <button
                           onClick={handleBuyNow}
-                          className="w-full py-3 rounded-xl bg-primary text-white font-label-caps text-label-caps uppercase hover:opacity-90 transition-opacity focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
+                          className="w-full py-2 sm:py-3 rounded-xl bg-primary text-white font-label-caps text-label-caps uppercase hover:opacity-90 transition-opacity focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
                         >
                           Buy Now
                         </button>
@@ -968,14 +988,14 @@ export default function ProductListingPage() {
                                 size: null,
                               })
                             }
-                            className="w-full py-3 rounded-xl border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
+                            className="w-full py-2 sm:py-3 rounded-xl border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
                           >
                             Add to Cart
                           </button>
                         )}
                       </div>
                     ) : (
-                      <button disabled className="mt-4 w-full py-3 rounded-xl border-2 border-primary text-primary font-label-caps text-label-caps uppercase opacity-60 cursor-not-allowed focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none">
+                      <button disabled className="mt-2 sm:mt-4 w-full py-2 sm:py-3 rounded-xl border-2 border-primary text-primary font-label-caps text-label-caps uppercase opacity-60 cursor-not-allowed focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none">
                         Out of Stock
                       </button>
                     )}

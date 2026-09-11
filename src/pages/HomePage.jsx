@@ -223,7 +223,11 @@ export default function HomePage() {
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {heroSlides.map((slide, index) => (
-              <div key={slide.id || index} className="w-full h-full flex-shrink-0 relative overflow-hidden">
+              <Link
+                to={slide.link || '/products'}
+                key={slide.id || index}
+                className="w-full h-full flex-shrink-0 relative overflow-hidden block"
+              >
                 {/* Blurred, scaled copy fills the frame so the sharp image below never needs to crop */}
                 <div
                   aria-hidden="true"
@@ -244,15 +248,12 @@ export default function HomePage() {
                     </h1>
                   )}
                   {!slide.hideCta && (
-                    <Link
-                      to={slide.link}
-                      className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 [@media(orientation:landscape)_and_(max-height:500px)]:!px-5 [@media(orientation:landscape)_and_(max-height:500px)]:!py-2 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg"
-                    >
+                    <span className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 [@media(orientation:landscape)_and_(max-height:500px)]:!px-5 [@media(orientation:landscape)_and_(max-height:500px)]:!py-2 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg">
                       {slide.cta}
-                    </Link>
+                    </span>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
