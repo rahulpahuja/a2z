@@ -35,6 +35,12 @@ export default {
         object.writeHttpMetadata(headers);
         headers.set("etag", object.httpEtag);
         headers.set("Access-Control-Allow-Origin", "*"); // Allow browser rendering CORS
+        // Filenames are reused on edit (not content-hashed), so cache for a
+        // day rather than forever — repeat visits within that window skip
+        // the network entirely, and an edited image still shows up same-day.
+        if (!headers.has("Cache-Control")) {
+          headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+        }
 
         return new Response(object.body, {
           headers,
@@ -86,7 +92,10 @@ export default {
 
           // Upload to R2 securely
           await env.BUCKET.put(uniqueFileName, fileData, {
-            httpMetadata: { contentType },
+            httpMetadata: {
+              contentType,
+              cacheControl: "public, max-age=86400, stale-while-revalidate=604800",
+            },
           });
 
           // Construct public URL dynamically using request origin for local testing,
