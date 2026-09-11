@@ -173,9 +173,13 @@ export default function HomePage() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileNavOpen(true)}
-              className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+              className="inline-flex md:hidden items-center justify-center [@media(orientation:landscape)_and_(max-height:500px)]:!inline-flex text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
             >
-              <span className="material-symbols-outlined text-[26px]">menu</span>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             </button>
             <Link
               to="/"
