@@ -34,6 +34,14 @@ const SIZES = [
   { id: 'xxl', label: 'XXL', disabled: true },
 ];
 
+function enlargeAspectRatio(aspect, factor = 1.15) {
+  const [w, h] = String(aspect).split('/').map(Number);
+  if (!w || !h) return aspect;
+  return `${w}/${(h * factor).toFixed(2)}`;
+}
+
+const FILTER_SELECT_CLASS = 'appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors';
+
 const BADGE_STYLES = {
   Handcrafted: 'bg-secondary-container text-on-secondary-container',
   'New Arrival': 'bg-tertiary text-on-tertiary',
@@ -44,6 +52,13 @@ const BADGE_STYLES = {
 export default function ProductListingPage() {
   const { theme } = useStorefrontTheme();
   const itemsPerPage = theme?.itemsPerPage ? Math.max(50, Number(theme.itemsPerPage)) : 400;
+  const useIconAddToCart = theme?.addToCartStyle === 'icon';
+  const genderFilterOnTop = theme?.genderFilterPlacement !== 'left';
+  const colorFilterOnTop = theme?.colorFilterPlacement !== 'left';
+  const sizeFilterOnTop = theme?.sizeFilterPlacement !== 'left';
+  const listingImgAspect = useIconAddToCart
+    ? enlargeAspectRatio(theme?.listingImgAspect || '3/4')
+    : 'var(--custom-listing-img-aspect, 3/4)';
 
   const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
   const { addItem } = useCart();
@@ -90,6 +105,8 @@ export default function ProductListingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState({});
+  const toggleSection = (key) => setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   const [mobileViewMode, setMobileViewMode] = useState('grid'); // 'list' | 'grid' — mobile-only layout toggle
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
@@ -126,9 +143,75 @@ export default function ProductListingPage() {
     setSearchParams(next);
   };
 
+  const applyGenderFilter = (genderOption) => {
+    setSelectedGender(genderOption);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('category');
+      next.delete('subcategory');
+      return next;
+    });
+  };
+
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  // Compact quick-filter <select>s rendered next to Sort By when a filter's
+  // admin-configured placement is "top" instead of the left sidebar.
+  const renderGenderQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`gender-${idSuffix}`}>
+      <select
+        id={`gender-filter-${idSuffix}`}
+        aria-label="Gender"
+        className={FILTER_SELECT_CLASS}
+        value={selectedGender}
+        onChange={(e) => applyGenderFilter(e.target.value)}
+      >
+        <option value="All">All Genders</option>
+        <option value="Male">Male / Men</option>
+        <option value="Female">Female / Women</option>
+        <option value="Unisex">Unisex</option>
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
+
+  const renderColorQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`color-${idSuffix}`}>
+      <select
+        id={`color-filter-${idSuffix}`}
+        aria-label="Color"
+        className={FILTER_SELECT_CLASS}
+        value={selectedColor || ''}
+        onChange={(e) => setSelectedColor(e.target.value || null)}
+      >
+        <option value="">All Colors</option>
+        {COLORS.map((color) => (
+          <option key={color.id} value={color.id}>{color.label}</option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
+
+  const renderSizeQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`size-${idSuffix}`}>
+      <select
+        id={`size-filter-${idSuffix}`}
+        aria-label="Size"
+        className={FILTER_SELECT_CLASS}
+        value={selectedSize || ''}
+        onChange={(e) => setSelectedSize(e.target.value || null)}
+      >
+        <option value="">All Sizes</option>
+        {SIZES.map((size) => (
+          <option key={size.id} value={size.id} disabled={size.disabled}>{size.label}</option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
 
   const selectedColorLabel = COLORS.find((c) => c.id === selectedColor)?.label ?? null;
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
@@ -283,7 +366,10 @@ export default function ProductListingPage() {
             </span>
           </div>
         </div>
-        <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden mt-4 md:mt-0 items-center gap-3">
+        <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden flex-wrap mt-4 md:mt-0 items-center gap-3">
+          {genderFilterOnTop && renderGenderQuickFilter('desktop')}
+          {colorFilterOnTop && renderColorQuickFilter('desktop')}
+          {sizeFilterOnTop && renderSizeQuickFilter('desktop')}
           <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
           <div className="relative">
             <select
@@ -303,12 +389,12 @@ export default function ProductListingPage() {
       </div>
 
       {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3">
+      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3 overflow-x-auto">
         <button
           type="button"
           onClick={() => setMobileFiltersOpen((open) => !open)}
           aria-expanded={mobileFiltersOpen}
-          className="flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
         >
           <span className="material-symbols-outlined text-sm">tune</span>
           Filters
@@ -317,12 +403,15 @@ export default function ProductListingPage() {
           type="button"
           onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
           aria-pressed={mobileViewMode === 'grid'}
-          className="flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
         >
           <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
           {mobileViewMode === 'grid' ? 'List' : 'Grid'}
         </button>
-        <div className="relative ml-auto">
+        {genderFilterOnTop && renderGenderQuickFilter('mobile')}
+        {colorFilterOnTop && renderColorQuickFilter('mobile')}
+        {sizeFilterOnTop && renderSizeQuickFilter('mobile')}
+        <div className="relative ml-auto shrink-0">
           <select
             className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
             id="sort-by-mobile"
@@ -353,16 +442,24 @@ export default function ProductListingPage() {
         }>
           {/* Category Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
-            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+            <h3
+              className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+              onClick={() => toggleSection('category')}
+            >
               Category
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                {collapsedSections.category ? 'add' : 'remove'}
+              </span>
             </h3>
-            <div className="space-y-3">
+            <div className={collapsedSections.category ? 'hidden' : 'space-y-3'}>
               {CATEGORY_OPTIONS.map((category) => (
                 <label key={category} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={category === 'All' ? activeCategory === 'All' : activeCategoryList.length === 1 && activeCategoryList[0] === category}
-                    onChange={() => setActiveCategory(category)}
+                    onChange={() => {
+                      setActiveCategory(category);
+                      setMobileFiltersOpen(false);
+                    }}
                     className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                     type="radio"
                     name="category"
@@ -373,41 +470,59 @@ export default function ProductListingPage() {
             </div>
           </div>
 
-          {/* Gender Filter on Left Side */}
-          <div className="space-y-4 border-b border-surface-variant pb-6">
-            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
-              Gender
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
-            </h3>
-            <div className="space-y-3">
-              {['All', 'Male', 'Female', 'Unisex'].map((genderOption) => (
-                <label key={genderOption} className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    checked={selectedGender === genderOption}
-                    onChange={() => setSelectedGender(genderOption)}
-                    className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
-                    type="radio"
-                    name="gender"
-                  />
-                  <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">
-                    {genderOption === 'Male' ? 'Male / Men' : genderOption === 'Female' ? 'Female / Women' : genderOption}
-                  </span>
-                </label>
-              ))}
+          {/* Gender Filter on Left Side (only when placement is set to "left") */}
+          {!genderFilterOnTop && (
+            <div className="space-y-4 border-b border-surface-variant pb-6">
+              <h3
+                className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+                onClick={() => toggleSection('gender')}
+              >
+                Gender
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                  {collapsedSections.gender ? 'add' : 'remove'}
+                </span>
+              </h3>
+              <div className={collapsedSections.gender ? 'hidden' : 'space-y-3'}>
+                {['All', 'Male', 'Female', 'Unisex'].map((genderOption) => (
+                  <label key={genderOption} className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      checked={selectedGender === genderOption}
+                      onChange={() => {
+                        applyGenderFilter(genderOption);
+                        setMobileFiltersOpen(false);
+                      }}
+                      className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
+                      type="radio"
+                      name="gender"
+                    />
+                    <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary transition-colors">
+                      {genderOption === 'Male' ? 'Male / Men' : genderOption === 'Female' ? 'Female / Women' : genderOption}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {subcategoryOptions.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
-              <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+              <h3
+                className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+                onClick={() => toggleSection('subcategory')}
+              >
                 Subcategory
-                <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                  {collapsedSections.subcategory ? 'add' : 'remove'}
+                </span>
               </h3>
-              <div className="space-y-3">
+              <div className={collapsedSections.subcategory ? 'hidden' : 'space-y-3'}>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={activeSubcategory === 'All'}
-                    onChange={() => setActiveSubcategory('All')}
+                    onChange={() => {
+                      setActiveSubcategory('All');
+                      setMobileFiltersOpen(false);
+                    }}
                     className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                     type="radio"
                     name="subcategory"
@@ -418,7 +533,10 @@ export default function ProductListingPage() {
                   <label key={subcategory} className="flex items-center gap-3 cursor-pointer group">
                     <input
                       checked={activeSubcategory === subcategory}
-                      onChange={() => setActiveSubcategory(subcategory)}
+                      onChange={() => {
+                        setActiveSubcategory(subcategory);
+                        setMobileFiltersOpen(false);
+                      }}
                       className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                       type="radio"
                       name="subcategory"
@@ -432,15 +550,23 @@ export default function ProductListingPage() {
 
           {publishedCollections.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
-              <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+              <h3
+                className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+                onClick={() => toggleSection('collection')}
+              >
                 Collection
-                <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+                <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                  {collapsedSections.collection ? 'add' : 'remove'}
+                </span>
               </h3>
-              <div className="space-y-3">
+              <div className={collapsedSections.collection ? 'hidden' : 'space-y-3'}>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={!selectedCollectionId}
-                    onChange={() => setSelectedCollectionId(null)}
+                    onChange={() => {
+                      setSelectedCollectionId(null);
+                      setMobileFiltersOpen(false);
+                    }}
                     className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                     type="radio"
                     name="collection"
@@ -451,7 +577,10 @@ export default function ProductListingPage() {
                   <label key={collection.id} className="flex items-center gap-3 cursor-pointer group">
                     <input
                       checked={selectedCollectionId === collection.id}
-                      onChange={() => setSelectedCollectionId(collection.id)}
+                      onChange={() => {
+                        setSelectedCollectionId(collection.id);
+                        setMobileFiltersOpen(false);
+                      }}
                       className="filter-checkbox rounded border-outline w-5 h-5 text-primary focus:ring-primary transition-colors"
                       type="radio"
                       name="collection"
@@ -465,11 +594,16 @@ export default function ProductListingPage() {
 
           {/* Dual-Bound Price Range Filter */}
           <div className="space-y-4 border-b border-surface-variant pb-6">
-            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+            <h3
+              className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+              onClick={() => toggleSection('price')}
+            >
               Price Range
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                {collapsedSections.price ? 'add' : 'remove'}
+              </span>
             </h3>
-            <div className="pt-1 space-y-4">
+            <div className={collapsedSections.price ? 'hidden' : 'pt-1 space-y-4'}>
               <div className="flex items-center justify-between text-xs font-semibold text-primary">
                 <span>Min: ₹{minPrice.toLocaleString('en-IN')}</span>
                 <span>Max: ₹{maxPrice.toLocaleString('en-IN')}</span>
@@ -528,19 +662,28 @@ export default function ProductListingPage() {
             </div>
           </div>
 
+          {!colorFilterOnTop && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
-            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+            <h3
+              className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+              onClick={() => toggleSection('color')}
+            >
               Color
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                {collapsedSections.color ? 'add' : 'remove'}
+              </span>
             </h3>
-            <div className="flex flex-wrap gap-3">
+            <div className={collapsedSections.color ? 'hidden' : 'flex flex-wrap gap-3'}>
               {COLORS.map((color) => {
                 const isSelected = selectedColor === color.id;
                 return (
                   <button
                     key={color.id}
                     aria-label={color.label}
-                    onClick={() => setSelectedColor(color.id)}
+                    onClick={() => {
+                      setSelectedColor(color.id);
+                      setMobileFiltersOpen(false);
+                    }}
                     className={`w-8 h-8 rounded-full ${color.className} border ${color.id === 'white' ? 'border-outline' : 'border-outline/20'} ring-2 ${isSelected ? 'ring-primary' : 'ring-transparent'} focus:ring-primary transition-all hover:scale-110 relative`}
                   >
                     {isSelected && (
@@ -551,20 +694,31 @@ export default function ProductListingPage() {
               })}
             </div>
           </div>
+          )}
 
+          {!sizeFilterOnTop && (
           <div className="space-y-4 pb-6">
-            <h3 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer">
+            <h3
+              className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
+              onClick={() => toggleSection('size')}
+            >
               Size
-              <span className="material-symbols-outlined text-on-surface-variant text-sm">remove</span>
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                {collapsedSections.size ? 'add' : 'remove'}
+              </span>
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className={collapsedSections.size ? 'hidden' : 'flex flex-wrap gap-2'}>
               {SIZES.map((size) => {
                 const isSelected = selectedSize === size.id;
                 return (
                   <button
                     key={size.id}
                     disabled={size.disabled}
-                    onClick={() => !size.disabled && setSelectedSize(size.id)}
+                    onClick={() => {
+                      if (size.disabled) return;
+                      setSelectedSize(size.id);
+                      setMobileFiltersOpen(false);
+                    }}
                     className={
                       isSelected
                         ? 'px-4 py-2 rounded-[32px] bg-tertiary text-on-tertiary border-transparent font-label-caps text-label-caps transition-colors'
@@ -577,6 +731,7 @@ export default function ProductListingPage() {
               })}
             </div>
           </div>
+          )}
 
           <button
             className="w-full py-3 rounded-xl border border-primary text-primary font-label-caps text-label-caps uppercase tracking-widest hover:bg-primary/5 transition-colors"
@@ -588,6 +743,7 @@ export default function ProductListingPage() {
               setSelectedColor(null);
               setSelectedSize(null);
               setSelectedCollectionId(null);
+              setMobileFiltersOpen(false);
             }}
           >
             Clear Filters
@@ -690,7 +846,7 @@ export default function ProductListingPage() {
                         to={`/products/${product.id}`}
                         className="relative w-full overflow-hidden product-card-img-wrapper bg-surface-container block"
                         style={{
-                          aspectRatio: 'var(--custom-listing-img-aspect, 3/4)',
+                          aspectRatio: listingImgAspect,
                         }}
                       >
                         <ProductCardImage
@@ -724,6 +880,26 @@ export default function ProductListingPage() {
                             {isFavorited ? 'favorite' : 'favorite_border'}
                           </span>
                         </button>
+                        {useIconAddToCart && isAvailable && (
+                          <button
+                            aria-label="Add to Cart"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              addItem({
+                                id: product.id,
+                                title: product.name || product.title,
+                                price: product.price,
+                                image: product.image,
+                                alt: product.alt,
+                                color: null,
+                                size: null,
+                              });
+                            }}
+                            className="absolute top-16 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
+                          </button>
+                        )}
                       </Link>
                       <div className="p-4 flex flex-col flex-grow">
                         <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
@@ -779,22 +955,24 @@ export default function ProductListingPage() {
                         >
                           Buy Now
                         </button>
-                        <button
-                          onClick={() =>
-                            addItem({
-                              id: product.id,
-                              title: product.name || product.title,
-                              price: product.price,
-                              image: product.image,
-                              alt: product.alt,
-                              color: null,
-                              size: null,
-                            })
-                          }
-                          className="w-full py-3 rounded-xl border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
-                        >
-                          Add to Cart
-                        </button>
+                        {!useIconAddToCart && (
+                          <button
+                            onClick={() =>
+                              addItem({
+                                id: product.id,
+                                title: product.name || product.title,
+                                price: product.price,
+                                image: product.image,
+                                alt: product.alt,
+                                color: null,
+                                size: null,
+                              })
+                            }
+                            className="w-full py-3 rounded-xl border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps uppercase hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none"
+                          >
+                            Add to Cart
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <button disabled className="mt-4 w-full py-3 rounded-xl border-2 border-primary text-primary font-label-caps text-label-caps uppercase opacity-60 cursor-not-allowed focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none">
