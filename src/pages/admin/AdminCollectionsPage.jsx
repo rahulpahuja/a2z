@@ -5,6 +5,7 @@ import {
   updateCollection,
   deleteCollection,
   reorderCollections,
+  setCollectionOrder,
 } from '../../services/collections.js';
 import { useProducts } from '../../context/ProductsContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -237,6 +238,17 @@ export default function AdminCollectionsPage() {
     await reorderCollections(collections[index], collections[targetIndex]);
   };
 
+  const handleSetPosition = async (collectionId, rawPosition) => {
+    const currentIndex = collections.findIndex((c) => c.id === collectionId);
+    if (currentIndex === -1) return;
+    const newIndex = Math.min(Math.max(Math.round(rawPosition) - 1, 0), collections.length - 1);
+    if (Number.isNaN(newIndex) || newIndex === currentIndex) return;
+    const reordered = [...collections];
+    const [moved] = reordered.splice(currentIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+    await setCollectionOrder(reordered);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -312,6 +324,20 @@ export default function AdminCollectionsPage() {
                     </div>
 
                     <div className="flex items-center gap-2 mt-auto pt-2 border-t border-outline-variant/20">
+                      <input
+                        key={`${collection.id}-pos-${idx}`}
+                        type="number"
+                        min={1}
+                        max={collections.length}
+                        defaultValue={idx + 1}
+                        aria-label="Position"
+                        title="Set exact position"
+                        onBlur={(e) => handleSetPosition(collection.id, Number(e.target.value))}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') e.currentTarget.blur();
+                        }}
+                        className="w-11 h-8 rounded-lg border border-outline-variant/40 text-center text-[12px] text-on-surface focus:border-primary focus:ring-0"
+                      />
                       <button
                         type="button"
                         onClick={() => handleMove(idx, -1)}
