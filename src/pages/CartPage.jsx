@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
+import { logViewCart } from '../services/analytics.js';
+import { formatCouponBadge } from '../utils/coupons.js';
 
 function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove }) {
   return (
@@ -63,11 +66,28 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
 }
 
 export default function CartPage() {
-  const { items: cartItems, updateQuantity, removeItem, taxRatePercent } = useCart();
+  const {
+    items: cartItems,
+    updateQuantity,
+    removeItem,
+    totals,
+    taxRatePercent,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+  } = useCart();
+  const { user } = useAuth();
   const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    logViewCart(cartItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
@@ -90,9 +110,27 @@ export default function CartPage() {
     updateQuantity(id, Math.max(1, Number(value) || 1));
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * (taxRatePercent / 100);
-  const grandTotal = subtotal + tax;
+  const { subtotal, discount, tax, grandTotal } = totals;
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim();
+    if (!code) return;
+    setApplyingCoupon(true);
+    setCouponError('');
+    try {
+      await applyCoupon(code, { customerId: user?.uid ?? null, user });
+      setCouponCode('');
+    } catch (err) {
+      setCouponError(err.message || 'Could not apply this coupon.');
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    setCouponError('');
+  };
 
   return (
     <>
@@ -103,7 +141,7 @@ export default function CartPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -174,6 +212,47 @@ export default function CartPage() {
               <h2 className="font-headline-md-mobile md:font-headline-md text-headline-md-mobile md:text-headline-md text-on-surface mb-gutter">
                 Order Summary
               </h2>
+              <div className="mb-gutter flex flex-col gap-2">
+                <label className="font-label-caps text-label-caps text-on-surface-variant" htmlFor="coupon">
+                  Coupon Code
+                </label>
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between gap-2 bg-secondary/10 border border-secondary/30 rounded-DEFAULT px-4 py-2">
+                    <div>
+                      <p className="font-label-caps text-label-caps text-secondary">{appliedCoupon.code}</p>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">{formatCouponBadge(appliedCoupon)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="font-label-caps text-label-caps text-error hover:opacity-80 uppercase"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-grow bg-transparent border-b border-outline focus:border-primary focus:ring-0 font-body-sm text-body-sm text-on-surface py-2 transition-colors"
+                      id="coupon"
+                      placeholder="Enter code"
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      disabled={applyingCoupon}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={applyingCoupon || !couponCode.trim()}
+                      className="text-secondary hover:text-primary transition-colors font-label-caps text-label-caps border border-secondary hover:border-primary px-4 py-2 rounded-DEFAULT uppercase disabled:opacity-50"
+                    >
+                      {applyingCoupon ? 'Applying…' : 'Apply'}
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="font-body-sm text-body-sm text-error">{couponError}</p>}
+              </div>
               <div className="flex flex-col gap-[16px] mb-gutter border-b border-surface-variant pb-gutter">
                 <div className="flex justify-between items-center">
                   <span className="font-body-lg text-body-lg text-on-surface-variant">Subtotal</span>
@@ -181,6 +260,14 @@ export default function CartPage() {
                     {formatCurrency(subtotal)}
                   </span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="font-body-lg text-body-lg text-secondary">Coupon Discount</span>
+                    <span className="font-price-display text-price-display text-secondary">
+                      -{formatCurrency(discount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="font-body-lg text-body-lg text-on-surface-variant">Shipping</span>
                   <span className="font-body-lg text-body-lg text-secondary font-semibold">Free</span>
@@ -197,24 +284,6 @@ export default function CartPage() {
                 <span className="font-price-display text-price-display text-primary text-[24px]">
                   {formatCurrency(grandTotal)}
                 </span>
-              </div>
-              <div className="mb-gutter flex flex-col gap-2">
-                <label className="font-label-caps text-label-caps text-on-surface-variant" htmlFor="coupon">
-                  Coupon Code
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    className="flex-grow bg-transparent border-b border-outline focus:border-primary focus:ring-0 font-body-sm text-body-sm text-on-surface py-2 transition-colors"
-                    id="coupon"
-                    placeholder="Enter code"
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                  />
-                  <button className="text-secondary hover:text-primary transition-colors font-label-caps text-label-caps border border-secondary hover:border-primary px-4 py-2 rounded-DEFAULT uppercase">
-                    Apply
-                  </button>
-                </div>
               </div>
               <button
                 onClick={() => navigate('/checkout/shipping')}

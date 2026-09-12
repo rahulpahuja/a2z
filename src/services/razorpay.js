@@ -63,6 +63,28 @@ export async function getRazorpayFeesReport(from, to) {
   return data; // { currency, count, totalAmount, totalFees, totalTax }
 }
 
+// Loaded on demand (only when the payment page is reached) instead of as a
+// blocking <script> tag in index.html, which used to delay every page load
+// site-wide for a dependency only the checkout flow needs.
+let scriptPromise = null;
+export function loadRazorpayScript() {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (window.Razorpay) return Promise.resolve();
+  if (!scriptPromise) {
+    scriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve();
+      script.onerror = () => {
+        scriptPromise = null;
+        reject(new Error('Could not load the Razorpay checkout script.'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+  return scriptPromise;
+}
+
 export function openRazorpayCheckout({ order, name, description, prefill, onSuccess, onFailure, onDismiss }) {
   if (typeof window.Razorpay === 'undefined') {
     throw new Error('Razorpay checkout script failed to load. Check your connection and try again.');

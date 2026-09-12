@@ -13,6 +13,7 @@ import {
   verifyOtp as msg91VerifyOtp,
   resetOtpSession as resetMsg91OtpSession,
 } from '../services/msg91Otp.js';
+import { logLogin } from '../services/analytics.js';
 
 const AuthContext = createContext(null);
 
@@ -161,6 +162,7 @@ export function AuthProvider({ children }) {
       setUser(msg91SessionToUser(session));
       resetMsg91OtpSession();
       pendingIdentifierRef.current = null;
+      logLogin('phone_otp');
       return;
     }
 
@@ -169,6 +171,7 @@ export function AuthProvider({ children }) {
     }
     await confirmationRef.current.confirm(code);
     confirmationRef.current = null;
+    logLogin('phone_otp');
   };
 
   const retryOtp = async (channel = null) => {

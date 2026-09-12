@@ -8,6 +8,7 @@ import { sanitizeShippingForm, isValidGstNumber } from '../utils/security.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import AuthModal from '../components/AuthModal.jsx';
+import { logBeginCheckout, logAddShippingInfo } from '../services/analytics.js';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
@@ -33,7 +34,7 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange, err
 }
 
 export default function CheckoutShippingPage() {
-  const { items: cartItems, setShippingDetails, taxRatePercent } = useCart();
+  const { items: cartItems, setShippingDetails, taxRatePercent, totals, appliedCoupon } = useCart();
   const { user } = useAuth();
   const { profile, saveAddress } = useProfile();
   const navigate = useNavigate();
@@ -58,6 +59,11 @@ export default function CheckoutShippingPage() {
   useEffect(() => {
     const unsubscribe = subscribeToReferrers((rows) => setReferrers(rows));
     return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    logBeginCheckout(cartItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -96,9 +102,7 @@ export default function CheckoutShippingPage() {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * (taxRatePercent / 100);
-  const grandTotal = subtotal + tax;
+  const { subtotal, discount, tax, grandTotal } = totals;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -136,6 +140,7 @@ export default function CheckoutShippingPage() {
       saveAddress({ ...sanitized, id: selectedAddressId || undefined, label: existingLabel || 'Home' });
     }
 
+    logAddShippingInfo(cartItems);
     navigate('/checkout/payment');
   };
 
@@ -419,6 +424,12 @@ export default function CheckoutShippingPage() {
                   <span>Subtotal</span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-secondary">
+                    <span>Coupon ({appliedCoupon.code})</span>
+                    <span>-{formatCurrency(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-on-surface-variant">
                   <span>Shipping</span>
                   <span>Free</span>

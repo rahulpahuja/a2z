@@ -7,6 +7,7 @@ import VideoPlayer from '../components/VideoPlayer.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
+import { logViewItem } from '../services/analytics.js';
 import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
@@ -56,7 +57,7 @@ function TopNav() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -138,6 +139,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!product) return undefined;
     recordView(product.id);
+    logViewItem(product);
     const unsubscribe = subscribeToProductStats(product.id, (stats) => setViewCount(stats.views));
     return unsubscribe;
   }, [product?.id]);
@@ -196,6 +198,8 @@ export default function ProductDetailPage() {
   const cartLine = () => ({
     id: `${product.id}-${selectedColor}-${selectedSize}`,
     productId: product.id,
+    categoryId: product.categoryId,
+    subcategoryId: product.subcategoryId,
     title: product.name || product.title,
     color: selectedColor,
     size: selectedSize,

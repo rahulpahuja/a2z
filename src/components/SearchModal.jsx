@@ -4,6 +4,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 import ProductCardImage from './ProductCardImage.jsx';
 import { createProductSearchIndex } from '../utils/productSearch.js';
+import { logSearch, logSelectItem } from '../services/analytics.js';
 
 export default function SearchModal({ open, onClose }) {
   const { products } = useProducts();
@@ -42,6 +43,11 @@ export default function SearchModal({ open, onClose }) {
     if (!needle) return [];
     return index.search(needle, { limit: 8 }).map((r) => r.item);
   }, [index, debouncedQuery]);
+
+  useEffect(() => {
+    const needle = debouncedQuery.trim();
+    if (needle) logSearch(needle);
+  }, [debouncedQuery]);
 
   if (!open) return null;
 
@@ -88,7 +94,10 @@ export default function SearchModal({ open, onClose }) {
             <Link
               key={product.id}
               to={`/products/${product.id}`}
-              onClick={onClose}
+              onClick={() => {
+                logSelectItem(product, 'Search Results');
+                onClose();
+              }}
               className="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container transition-colors"
             >
               <div className="relative w-14 h-16 rounded-md overflow-hidden bg-surface-variant shrink-0">

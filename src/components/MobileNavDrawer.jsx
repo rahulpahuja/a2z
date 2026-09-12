@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { logSelectContent, logShare } from '../services/analytics.js';
 
 const DEFAULT_FALLBACK_LINKS = [
   { label: 'New Arrivals', to: '/products?filter=new-arrivals' },
@@ -9,6 +10,10 @@ const DEFAULT_FALLBACK_LINKS = [
 ];
 
 export default function MobileNavDrawer({ open, onClose, links = [] }) {
+  useEffect(() => {
+    if (open) logSelectContent('menu', 'hamburger_open');
+  }, [open]);
+
   // Lock body scroll when drawer is open
   useEffect(() => {
     if (open) {
@@ -52,9 +57,14 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '+919644444661';
   const cleanPhone = whatsappNumber.replace(/[^0-9]/g, '');
 
+  const handleNavClick = (label) => {
+    logSelectContent('nav_link', label);
+    onClose();
+  };
+
   return (
     <div
-      className={`fixed inset-0 z-[300] md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!block transition-all duration-300 ${
+      className={`fixed inset-0 z-[300] transition-all duration-300 ${
         open ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
       }`}
       aria-hidden={!open}
@@ -106,7 +116,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               {/* Guaranteed Prominent New Arrivals Link */}
               <Link
                 to={categoryLinks.newArrivals.to || '/products?filter=new-arrivals'}
-                onClick={onClose}
+                onClick={() => handleNavClick('New Arrivals')}
                 className="flex items-center justify-between px-3.5 py-3 rounded-xl bg-primary/10 text-primary font-bold font-title-sm text-title-sm hover:bg-primary/15 transition-all shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
@@ -121,7 +131,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               {/* All Products Link */}
               <Link
                 to="/products"
-                onClick={onClose}
+                onClick={() => handleNavClick('All Products')}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
@@ -143,7 +153,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 <Link
                   key={link.id || link.label}
                   to={link.to}
-                  onClick={onClose}
+                  onClick={() => handleNavClick(link.label)}
                   className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors font-body-md text-body-md"
                 >
                   <span className="truncate">{link.label}</span>
@@ -161,7 +171,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
             <nav className="flex flex-col gap-1">
               <Link
                 to="/shots"
-                onClick={onClose}
+                onClick={() => handleNavClick('A2Z Shots')}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
@@ -172,7 +182,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/orders/tracking"
-                onClick={onClose}
+                onClick={() => handleNavClick('Track Your Order')}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
@@ -183,7 +193,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/orders"
-                onClick={onClose}
+                onClick={() => handleNavClick('My Orders')}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
@@ -194,7 +204,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/cart"
-                onClick={onClose}
+                onClick={() => handleNavClick('Cart')}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
@@ -214,7 +224,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
             <nav className="flex flex-col gap-1">
               <Link
                 to="/a2z-stores"
-                onClick={onClose}
+                onClick={() => handleNavClick('Store Location')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">location_on</span>
@@ -222,7 +232,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/contact-us"
-                onClick={onClose}
+                onClick={() => handleNavClick('Contact Us')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">support_agent</span>
@@ -230,7 +240,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/about-us"
-                onClick={onClose}
+                onClick={() => handleNavClick('About A2Z')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">info</span>
@@ -238,7 +248,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               </Link>
               <Link
                 to="/size-chart"
-                onClick={onClose}
+                onClick={() => handleNavClick('Size Guide')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
                 <span className="material-symbols-outlined text-[18px]">straighten</span>
@@ -255,6 +265,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               href={`https://wa.me/${cleanPhone}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => logShare('whatsapp', 'menu_footer')}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-label-caps text-[11px] uppercase tracking-wider transition-colors shadow-sm"
             >
               <span className="material-symbols-outlined text-[16px]">chat</span>
@@ -264,6 +275,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
           {cleanPhone && (
             <a
               href={`tel:+${cleanPhone}`}
+              onClick={() => logShare('call', 'menu_footer')}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-outline hover:border-primary text-on-surface hover:text-primary font-label-caps text-[11px] uppercase tracking-wider transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">call</span>

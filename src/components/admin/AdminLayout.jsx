@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
   { to: '/super/analytics', label: 'Analytics', icon: 'insights' },
   { to: '/super/local-billing', label: 'Local Billing', icon: 'point_of_sale' },
   { to: '/super/collections', label: 'Collections', icon: 'collections_bookmark' },
+  { to: '/super/coupons', label: 'Coupons', icon: 'sell' },
   { to: '/super/categories', label: 'Categories', icon: 'category' },
   { to: '/super/products', label: 'Products', icon: 'inventory_2' },
   { to: '/super/trash', label: 'Trash', icon: 'delete' },
