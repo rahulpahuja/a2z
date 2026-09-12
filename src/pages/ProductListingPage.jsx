@@ -151,6 +151,15 @@ export default function ProductListingPage() {
     setVisibleCount(50);
   }, [activeCategory, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColor, selectedSize, selectedCollectionId, sortBy]);
 
+  // Instant, not smooth: an animated scroll gets fought/cancelled by the
+  // browser's scroll anchoring while the product grid's content swaps out
+  // underneath it, since that's a large, page-wide layout change happening
+  // at the same time.
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
   const setActiveCategory = (category) => {
     const next = {};
     if (category !== 'All') next.category = category;
@@ -1041,7 +1050,7 @@ export default function ProductListingPage() {
             <button
               className="w-10 h-10 rounded-full flex items-center justify-center border border-outline text-on-surface-variant hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={() => goToPage(Math.max(1, currentPage - 1))}
             >
               <span className="material-symbols-outlined text-sm">chevron_left</span>
             </button>
@@ -1051,7 +1060,7 @@ export default function ProductListingPage() {
               ) : (
                 <button
                   key={page}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => goToPage(page)}
                   className={
                     currentPage === page
                       ? 'w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-body-sm text-body-sm transition-colors'
@@ -1065,7 +1074,7 @@ export default function ProductListingPage() {
             <button
               className="w-10 h-10 rounded-full flex items-center justify-center border border-outline text-on-surface hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
             >
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>
