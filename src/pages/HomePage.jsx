@@ -240,7 +240,6 @@ export default function HomePage() {
                   data-alt={slide.alt}
                   style={{ backgroundImage: `url('${slide.image}')` }}
                 ></div>
-                <div className="absolute inset-0 bg-black/25"></div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                   {!slide.hideTitle && (
                     <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg [@media(orientation:landscape)_and_(max-height:500px)]:!font-display-lg-mobile [@media(orientation:landscape)_and_(max-height:500px)]:!text-display-lg-mobile text-on-tertiary playfair mb-3 md:mb-6 [@media(orientation:landscape)_and_(max-height:500px)]:!mb-2 max-w-3xl drop-shadow-lg px-2 break-words text-center">

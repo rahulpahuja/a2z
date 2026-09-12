@@ -3,4 +3,4 @@ Disallow: /__trap__
 Disallow: /super/
 Disallow: /dashboard
 
-Sitemap: https://thea2zcollection.in/sitemap.xml
+Sitemap: https://www.thea2zcollection.com/sitemap.xml
