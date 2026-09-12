@@ -30,10 +30,21 @@ if (isFirebaseEnabled) {
 
 export const db = isFirebaseEnabled ? getDatabase(firebaseApp) : null;
 
+// Headless/automated browsers (Puppeteer, Playwright, Selenium — what
+// Netlify's post-deploy Lighthouse checks and preview screenshots run under)
+// set navigator.webdriver and/or a "Headless" UA token. A real visitor never
+// does. Skipping analytics for these keeps every automated post-deploy check
+// from showing up in GA4 as a fake user session.
+function isAutomatedBrowser() {
+  if (typeof navigator === 'undefined') return false;
+  if (navigator.webdriver) return true;
+  return /HeadlessChrome|Lighthouse|Puppeteer|Playwright/i.test(navigator.userAgent || '');
+}
+
 // getAnalytics() requires an async support check (it fails in browsers without
 // cookie/IndexedDB support, and can't run at all outside a browser), so it's
 // exposed as a promise rather than a plain export like `auth`/`db` above.
 export const analyticsPromise =
-  isFirebaseEnabled && firebaseConfig.measurementId
+  isFirebaseEnabled && firebaseConfig.measurementId && !isAutomatedBrowser()
     ? isAnalyticsSupported().then((supported) => (supported ? getAnalytics(firebaseApp) : null))
     : Promise.resolve(null);
