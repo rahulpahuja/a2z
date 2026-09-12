@@ -3,6 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
 
+const SHOTS_TUTORIAL_KEY = 'a2z_shots_tutorial_seen';
+
+function hasSeenShotsTutorial() {
+  try {
+    return Boolean(localStorage.getItem(SHOTS_TUTORIAL_KEY));
+  } catch {
+    return false;
+  }
+}
+
+function markShotsTutorialSeen() {
+  try {
+    localStorage.setItem(SHOTS_TUTORIAL_KEY, '1');
+  } catch {
+    // ignore storage failures (e.g. private mode)
+  }
+}
+
 function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
   const videoRef = useRef(null);
   const navigate = useNavigate();
@@ -64,9 +82,36 @@ function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
 export default function ShotsPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [muted, setMuted] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(() => !hasSeenShotsTutorial());
   const containerRef = useRef(null);
   const { products } = useProducts();
   const navigate = useNavigate();
+
+  const dismissTutorial = () => {
+    setShowTutorial(false);
+    markShotsTutorialSeen();
+  };
+
+  // Dismiss the instant the visitor actually scrolls the reel — a direct
+  // native scroll event, rather than the derived `activeIndex` state, since
+  // the IntersectionObserver driving that also fires while it's still
+  // settling right after mount, which dismissed this before it was ever seen.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !showTutorial) return undefined;
+    const handleScroll = () => dismissTutorial();
+    container.addEventListener('scroll', handleScroll, { once: true, passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTutorial]);
+
+  // Otherwise auto-dismiss after a few seconds so it never lingers over the video.
+  useEffect(() => {
+    if (!showTutorial) return undefined;
+    const timeout = setTimeout(dismissTutorial, 3500);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTutorial]);
 
   // Auto-populated from every product that has a video uploaded (via Product
   // Videos) — no separate admin curation step, so newly uploaded product
@@ -115,6 +160,15 @@ export default function ShotsPage() {
       >
         <span className="material-symbols-outlined">close</span>
       </button>
+
+      {showTutorial && shots.length > 0 && (
+        // pointer-events-none: purely a visual hint, so a real swipe reaches
+        // the scroll container underneath instead of being absorbed here.
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/50 backdrop-blur-sm pointer-events-none">
+          <span className="material-symbols-outlined text-white text-6xl animate-bounce">swipe_up</span>
+          <p className="font-label-caps text-label-caps text-white uppercase tracking-widest">Swipe up for more</p>
+        </div>
+      )}
 
       {shots.length === 0 ? (
         <div className="w-full h-full flex items-center justify-center">
