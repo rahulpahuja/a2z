@@ -16,7 +16,7 @@ import path from 'node:path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.join(__dirname, '..');
 const OUTPUT_PATH = path.join(REPO_ROOT, 'public', 'sitemap.xml');
-const SITE_URL = 'https://thea2zcollection.in';
+const SITE_URL = 'https://www.thea2zcollection.com';
 
 // Every real, indexable page that isn't a product detail page — kept in
 // sync manually with src/App.jsx's ROUTES. Deliberately excludes anything
