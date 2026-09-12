@@ -61,7 +61,7 @@ export default function MyOrdersPage() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileNavOpen(true)}
-              className="md:hidden text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+              className="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
             >
               <span className="material-symbols-outlined">menu</span>
             </button>
@@ -89,7 +89,7 @@ export default function MyOrdersPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>

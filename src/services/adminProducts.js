@@ -1,4 +1,4 @@
-import { onValue, ref, remove, serverTimestamp, set, get, update } from 'firebase/database';
+import { onValue, ref, remove, runTransaction, serverTimestamp, set, get, update } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { PRODUCTS } from '../data/products.js';
 
@@ -288,6 +288,74 @@ export function reduceProductStock(productId, size, quantity, color) {
       }
     }
   });
+}
+
+// Applies a stock delta to one (color, size) pair and reports whether it was
+// applied: a negative delta (reserving stock for an order) is rejected
+// in-place — without mutating anything — once it would take that size below
+// zero; a positive delta (releasing a reservation) always succeeds. Shared
+// by both the atomic Firebase transaction and the local/no-Firebase
+// simulation below so the two can never disagree on when stock runs out.
+function applyColorSizeDelta(colors, colorName, sizeName, delta) {
+  let insufficient = false;
+  const updated = colors.map((c) => {
+    const name = typeof c === 'string' ? c : c.name;
+    if (name !== colorName || typeof c === 'string' || !Array.isArray(c.sizes)) return c;
+    return {
+      ...c,
+      sizes: c.sizes.map((s) => {
+        if (s.size !== sizeName || s.stock === null || s.stock === undefined) return s;
+        const next = s.stock + delta;
+        if (next < 0) {
+          insufficient = true;
+          return s;
+        }
+        return { ...s, stock: next };
+      }),
+    };
+  });
+  return insufficient ? undefined : updated;
+}
+
+// Atomically reserves (negative delta) or releases (positive delta) stock
+// for one order line. A size whose stock isn't tracked (stock === null) is
+// treated as always available, matching the rest of the app. Returns
+// whether the delta was applied — callers reserving stock for an order must
+// check this and roll back any lines already reserved if it comes back
+// false, since the order can't be fulfilled.
+function applyStockDelta(productId, color, size, delta) {
+  if (!isFirebaseEnabled) {
+    const products = getLocalProducts();
+    const product = products.find((p) => p.id === productId);
+    if (!product?.colors) return Promise.resolve(true);
+    const result = applyColorSizeDelta(product.colors, color, size, delta);
+    if (result === undefined) return Promise.resolve(false);
+    product.colors = result;
+    setLocalProducts(products);
+    notifyLocalListeners();
+    return Promise.resolve(true);
+  }
+
+  const colorsRef = ref(db, `${ROOT}/${productId}/colors`);
+  return runTransaction(colorsRef, (colors) => {
+    if (!colors) return colors; // nothing tracked for this product — allow without changes
+    return applyColorSizeDelta(colors, color, size, delta);
+  }).then((result) => result.committed);
+}
+
+// Reserves `quantity` units of one (color, size) pair for an order about to
+// be placed. Returns false (without changing anything) if there isn't
+// enough stock — the caller must then release any other lines it already
+// reserved for the same order rather than leave them dangling.
+export function reserveProductStock(productId, color, size, quantity) {
+  return applyStockDelta(productId, color, size, -quantity);
+}
+
+// Gives back a reservation made by reserveProductStock — used when an order
+// fails after stock was reserved (coupon limit reached, order-write failed)
+// so the customer can retry without the stock staying locked away.
+export function releaseProductStock(productId, color, size, quantity) {
+  return applyStockDelta(productId, color, size, quantity).then(() => {});
 }
 
 // Sets an explicit "stock out" override for one color on a product,

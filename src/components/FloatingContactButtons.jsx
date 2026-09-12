@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext.jsx';
 import { WHATSAPP_NUMBER, INSTAGRAM_HANDLE } from '../config/store.js';
 import { buildWhatsAppLink } from '../utils/whatsapp.js';
+import { logShare, logSelectContent } from '../services/analytics.js';
 
 function WhatsAppIcon() {
   return (
@@ -34,6 +35,7 @@ export default function FloatingContactButtons() {
       showToast('WhatsApp number is not configured yet.');
       return;
     }
+    logShare('whatsapp', 'floating_button');
     window.open(buildWhatsAppLink(WHATSAPP_NUMBER), '_blank', 'noopener,noreferrer');
   };
 
@@ -42,6 +44,7 @@ export default function FloatingContactButtons() {
       showToast('Instagram link is not configured yet.');
       return;
     }
+    logShare('instagram', 'floating_button');
     window.open(`https://instagram.com/${INSTAGRAM_HANDLE}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -50,7 +53,10 @@ export default function FloatingContactButtons() {
       <button
         type="button"
         aria-label="Watch Shots"
-        onClick={() => navigate('/shots')}
+        onClick={() => {
+          logSelectContent('floating_button', 'shots');
+          navigate('/shots');
+        }}
         className="w-14 h-14 rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
       >
         <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>

@@ -59,6 +59,20 @@
         ".write": true
       }
     },
+    "coupons": {
+      ".read": true,
+      "$code": {
+        ".write": true,
+        "usageCount": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "customerUsage": {
+          "$customerId": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          }
+        }
+      }
+    },
     "referrers": {
       ".read": "auth != null",
       ".write": "auth != null"

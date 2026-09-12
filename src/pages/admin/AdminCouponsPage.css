@@ -1,0 +1,114 @@
+/* Custom styles specific to AdminCouponsPage — common.css supplies the
+   page/card/form/button/table/badge primitives this builds on. */
+
+.coupon-error-text {
+  font-size: 11px;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+}
+
+.coupon-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.coupon-badge-preview {
+  font-family: var(--font-title-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb, 172, 36, 113), 0.08);
+  border: 1px dashed var(--color-primary);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.coupon-toggle-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.coupon-toggle-btn {
+  flex: 1;
+  border: 1px solid var(--color-outline-variant);
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-on-surface-variant);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.coupon-toggle-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.coupon-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 13px;
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.coupon-target-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.coupon-target-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 13px;
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.coupon-row-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.coupon-link-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.coupon-link-btn:hover {
+  opacity: 0.8;
+}
+
+.coupon-link-btn--danger {
+  color: var(--color-error);
+}
+
+/* Additional status-badge color variants beyond the primary/secondary/error
+   trio common.css ships with — coupons have more derived states (scheduled,
+   expired, draft, usage-limit-reached) than those three cover. */
+.status-badge-tertiary {
+  background-color: rgba(122, 86, 66, 0.15);
+  color: var(--color-tertiary);
+}
+
+.status-badge-neutral {
+  background-color: rgba(86, 65, 73, 0.12);
+  color: var(--color-on-surface-variant);
+}

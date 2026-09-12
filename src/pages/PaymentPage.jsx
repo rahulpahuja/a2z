@@ -1,19 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, isTestMode } from '../services/razorpay.js';
+import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, loadRazorpayScript, isTestMode } from '../services/razorpay.js';
 import { isValidAmount } from '../utils/security.js';
+import { logAddPaymentInfo } from '../services/analytics.js';
 
 export default function PaymentPage() {
-  const { items: cartItems, placeOrder, taxRatePercent } = useCart();
+  const { items: cartItems, placeOrder, taxRatePercent, totals, appliedCoupon } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * (taxRatePercent / 100);
-  const total = subtotal + tax;
+  const { subtotal, discount, tax, grandTotal: total } = totals;
+
+  // Start fetching the checkout script as soon as this page mounts, so it's
+  // normally already loaded by the time the customer clicks "Place Order".
+  useEffect(() => {
+    loadRazorpayScript().catch(() => {});
+  }, []);
 
   const handlePlaceOrder = async () => {
     if (!isValidAmount(total)) {
@@ -22,7 +29,9 @@ export default function PaymentPage() {
     }
 
     setIsProcessing(true);
+    logAddPaymentInfo(cartItems);
     try {
+      await loadRazorpayScript();
       const order = await createRazorpayOrder(total, `receipt_${Date.now()}`);
       openRazorpayCheckout({
         order,
@@ -35,12 +44,24 @@ export default function PaymentPage() {
               showToast('Payment verification failed. Please contact support before retrying.');
               return;
             }
-            placeOrder({
-              paymentMethod: 'Razorpay',
-              paymentId: isTestMode ? `test_${response.razorpay_payment_id}` : response.razorpay_payment_id,
-              placedAt: new Date().toISOString(),
-            });
-            navigate('/orders/tracking', { state: { justPlaced: true } });
+            try {
+              await placeOrder({
+                paymentMethod: 'Razorpay',
+                paymentId: isTestMode ? `test_${response.razorpay_payment_id}` : response.razorpay_payment_id,
+                placedAt: new Date().toISOString(),
+                customerId: user?.uid ?? null,
+                user,
+              });
+              navigate('/orders/tracking', { state: { justPlaced: true } });
+            } catch (orderErr) {
+              // Payment was already captured by Razorpay at this point, so this
+              // is a genuine edge case (e.g. a cart item going out of stock in
+              // the seconds it took to pay) rather than a cancelled checkout —
+              // point the customer at support instead of silently losing it.
+              showToast(
+                `${orderErr.message || 'Could not place your order.'} Your payment was captured — contact support to resolve this.`
+              );
+            }
           } catch (err) {
             showToast(err.message || 'Could not verify payment.');
           } finally {
@@ -148,6 +169,12 @@ export default function PaymentPage() {
                   <span>Subtotal</span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-secondary">
+                    <span>Coupon ({appliedCoupon.code})</span>
+                    <span>-{formatCurrency(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-on-surface-variant">
                   <span>Shipping</span>
                   <span>Free</span>

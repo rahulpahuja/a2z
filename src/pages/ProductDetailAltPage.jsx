@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
+import { logViewItem } from '../services/analytics.js';
 import { getHighResUrl } from '../utils/image.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
@@ -120,6 +121,7 @@ export default function ProductDetailAltPage() {
 
   useEffect(() => {
     recordView(PRODUCT.id);
+    logViewItem(PRODUCT);
     return subscribeToProductStats(PRODUCT.id, (stats) => setViewCount(stats.views));
   }, []);
 
@@ -161,7 +163,7 @@ export default function ProductDetailAltPage() {
               type="button"
               aria-label="Open menu"
               onClick={() => setMobileNavOpen(true)}
-              className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+              className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
             >
               <span className="material-symbols-outlined">menu</span>
             </button>

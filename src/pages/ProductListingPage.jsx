@@ -13,6 +13,7 @@ import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
+import { logViewItemList, logSelectItem } from '../services/analytics.js';
 import './ProductListingPage.css';
 
 const COLORS = [
@@ -302,6 +303,12 @@ export default function ProductListingPage() {
     return paginatedProducts.slice(0, visibleCount);
   }, [paginatedProducts, visibleCount]);
 
+  useEffect(() => {
+    const listName = activeFilter === 'new-arrivals' ? 'New Arrivals' : activeCategory === 'All' ? 'All Products' : activeCategory;
+    logViewItemList(lazyLoadedProducts, listName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory, activeSubcategory, selectedGender, sortBy, selectedCollectionId]);
+
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
   const PAGES = useMemo(() => {
     const list = [];
@@ -340,7 +347,7 @@ export default function ProductListingPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -841,6 +848,8 @@ export default function ProductListingPage() {
                       price: product.price,
                       image: product.image,
                       alt: product.alt,
+                      categoryId: product.categoryId,
+                      subcategoryId: product.subcategoryId,
                       color: null,
                       size: null,
                     });
@@ -864,6 +873,7 @@ export default function ProductListingPage() {
                     >
                       <Link
                         to={`/products/${product.id}`}
+                        onClick={() => logSelectItem(product, 'Product Listing')}
                         className="relative w-full overflow-hidden product-card-img-wrapper bg-surface-container block"
                         style={{
                           aspectRatio: listingImgAspect,
@@ -911,6 +921,8 @@ export default function ProductListingPage() {
                                 price: product.price,
                                 image: product.image,
                                 alt: product.alt,
+                                categoryId: product.categoryId,
+                                subcategoryId: product.subcategoryId,
                                 color: null,
                                 size: null,
                               });
@@ -925,7 +937,7 @@ export default function ProductListingPage() {
                         <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold block">
                           {product.category || product.categoryTitle}
                         </span>
-                        <Link to={`/products/${product.id}`}>
+                        <Link to={`/products/${product.id}`} onClick={() => logSelectItem(product, 'Product Listing')}>
                           <h2
                             className="text-on-surface mb-0.5 sm:mb-1 line-clamp-1 font-semibold"
                             style={{ fontSize: 'var(--custom-font-title-size, 14px)' }}
@@ -984,6 +996,8 @@ export default function ProductListingPage() {
                                 price: product.price,
                                 image: product.image,
                                 alt: product.alt,
+                                categoryId: product.categoryId,
+                                subcategoryId: product.subcategoryId,
                                 color: null,
                                 size: null,
                               })

@@ -1,5 +1,6 @@
 import { ref, set, get, child, onValue } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
+import { orderBelongsToUser } from '../utils/orderMatch.js';
 
 const ROOT = 'orders';
 
@@ -52,6 +53,26 @@ export function subscribeToOrders(callback) {
 
 export function updateFirebaseOrder(order) {
   return createFirebaseOrder(order);
+}
+
+// "First order only" coupons need to know whether this customer has ever
+// successfully completed one before — reuses the same phone/email/name/
+// customerId matching MyOrdersPage already relies on for "my orders" so the
+// two notions of "belongs to this customer" can't drift apart.
+export function hasPriorOrders(user) {
+  if (!user) return Promise.resolve(false);
+  if (!isFirebaseEnabled) {
+    const localOrders = JSON.parse(localStorage.getItem(ROOT) || '[]');
+    return Promise.resolve(localOrders.some((o) => o.status !== 'Cancelled' && orderBelongsToUser(o, user)));
+  }
+  return get(ref(db, ROOT)).then((snapshot) => {
+    let found = false;
+    snapshot.forEach((child) => {
+      const order = child.val();
+      if (order.status !== 'Cancelled' && orderBelongsToUser(order, user)) found = true;
+    });
+    return found;
+  });
 }
 
 export function subscribeToOrder(id, callback) {
