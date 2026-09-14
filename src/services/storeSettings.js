@@ -36,7 +36,7 @@ export const DEFAULT_STORE_SETTINGS = {
   homeProductsPerRow: 8,
   // Whether the circular "shop by category" bubbles row (Shots, Bags, Best
   // Sellers, Coords, New Arrivals, Tops, Trousers) shows on the home page.
-  showCategoryBubbles: true,
+  showCategoryBubbles: false,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.
