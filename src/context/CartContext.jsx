@@ -35,6 +35,21 @@ function generateOrderId() {
   return `ORD-${Date.now().toString(36).toUpperCase()}${rand}`;
 }
 
+// Runs a side effect that happens after an order is already written, without
+// ever letting it escape. By that point the customer has paid and their order
+// exists, so a failure updating stats, analytics or shipping is cosmetic —
+// surfacing it would tell them the order failed when it did not. Catches both
+// a synchronous throw (`ref()` rejects an id containing . # $ [ ]) and a
+// rejected promise, so neither can reach the caller or go unhandled.
+function fireAndForget(label, fn) {
+  const report = (err) => console.error(`${label} failed after the order was placed:`, err);
+  try {
+    Promise.resolve(fn()).catch(report);
+  } catch (err) {
+    report(err);
+  }
+}
+
 // Fire-and-forget: books a ShipPrime forward shipment for a freshly placed
 // order and persists the result onto it. Never throws — a shipping failure
 // (bad address, ShipPrime down, not configured) must not affect checkout,
@@ -230,7 +245,7 @@ export function CartProvider({ children }) {
       throw err;
     }
 
-    autoCreateShipment(order);
+    fireAndForget('Shipment booking', () => autoCreateShipment(order));
 
     try {
       localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
@@ -240,8 +255,8 @@ export function CartProvider({ children }) {
     setLastOrder(order);
     setItems([]);
     setAppliedCoupon(null);
-    items.forEach((line) => recordPurchase(line.id, line.quantity));
-    logPurchase(order);
+    fireAndForget('Purchase stats', () => Promise.all(items.map((line) => recordPurchase(line.id, line.quantity))));
+    fireAndForget('Purchase analytics', () => logPurchase(order));
     return order;
   };
 
