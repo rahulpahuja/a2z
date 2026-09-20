@@ -131,9 +131,34 @@ export function deleteCoupon(code) {
 // `.info/serverTimeOffset` is a documented client SDK feature that reports
 // the clock skew between this device and the Firebase server — applying it
 // gives an authoritative "now" without trusting the browser's own clock.
+// It must be read with a listener, not `get()`: `.info` is a client-side
+// virtual namespace rather than stored data, and `get()` forwards the
+// literal path to the server, which rejects it with "Invalid token in
+// path". The node also stays empty — and so never fires — until the
+// connection handshake lands, so fall back to the local clock rather than
+// stall a checkout whose payment has already been captured.
+const SERVER_TIME_FALLBACK_MS = 3000;
+
 export function getServerNow() {
   if (!isFirebaseEnabled) return Promise.resolve(new Date());
-  return get(ref(db, '.info/serverTimeOffset')).then((snapshot) => new Date(Date.now() + (snapshot.val() || 0)));
+  return new Promise((resolve) => {
+    let settled = false;
+    let unsubscribe;
+    const finish = (offset) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      unsubscribe?.();
+      resolve(new Date(Date.now() + offset));
+    };
+    const timer = setTimeout(() => finish(0), SERVER_TIME_FALLBACK_MS);
+    unsubscribe = onValue(
+      ref(db, '.info/serverTimeOffset'),
+      (snapshot) => finish(snapshot.val() || 0),
+      () => finish(0),
+      { onlyOnce: true }
+    );
+  });
 }
 
 // Atomically consumes one use of a coupon: increments usageCount and the
