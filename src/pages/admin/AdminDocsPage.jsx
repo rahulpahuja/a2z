@@ -36,6 +36,7 @@ const RTDB_PATHS = [
   { path: 'categories/*', access: 'Read & write: signed-in users only.', note: 'Used by the Categories admin page.' },
   { path: 'settings/*', access: 'Read & write: signed-in users only.', note: 'Store Settings + Bill Template.' },
   { path: 'fileMetadata/*', access: 'Read & write: signed-in users only.', note: 'Logs R2 storage keys, urls, MIME types, and sizes for all uploads.' },
+  { path: 'checkoutFailures/*', access: 'Read: signed-in users only. Write: public.', note: 'A checkout that failed after Razorpay captured the payment — keyed by payment id, reconcile against the Razorpay dashboard. No admin UI; read it in the Firebase console.' },
 ];
 
 function Section({ id, title, children }) {
