@@ -85,6 +85,10 @@
       ".read": "auth != null",
       ".write": true
     },
+    "checkoutFailures": {
+      ".read": "auth != null",
+      ".write": true
+    },
     ".read": false,
     ".write": false
   }

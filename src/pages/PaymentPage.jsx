@@ -6,6 +6,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, loadRazorpayScript, isTestMode } from '../services/razorpay.js';
 import { isValidAmount } from '../utils/security.js';
 import { logAddPaymentInfo } from '../services/analytics.js';
+import { logCheckoutFailure } from '../services/checkoutLog.js';
 
 export default function PaymentPage() {
   const { items: cartItems, placeOrder, taxRatePercent, totals, appliedCoupon } = useCart();
@@ -41,6 +42,12 @@ export default function PaymentPage() {
           try {
             const verification = await verifyRazorpayPayment(response);
             if (!verification.success) {
+              logCheckoutFailure({
+                stage: 'verify-payment',
+                error: new Error(verification.error || 'Signature verification failed.'),
+                paymentId: response.razorpay_payment_id,
+                amount: total,
+              });
               showToast('Payment verification failed. Please contact support before retrying.');
               return;
             }
@@ -57,12 +64,25 @@ export default function PaymentPage() {
               // Payment was already captured by Razorpay at this point, so this
               // is a genuine edge case (e.g. a cart item going out of stock in
               // the seconds it took to pay) rather than a cancelled checkout —
-              // point the customer at support instead of silently losing it.
+              // point the customer at support instead of silently losing it,
+              // and leave a record support can reconcile against Razorpay.
+              logCheckoutFailure({
+                stage: 'place-order',
+                error: orderErr,
+                paymentId: response.razorpay_payment_id,
+                amount: total,
+              });
               showToast(
                 `${orderErr.message || 'Could not place your order.'} Your payment was captured — contact support to resolve this.`
               );
             }
           } catch (err) {
+            logCheckoutFailure({
+              stage: 'verify-payment',
+              error: err,
+              paymentId: response.razorpay_payment_id,
+              amount: total,
+            });
             showToast(err.message || 'Could not verify payment.');
           } finally {
             setIsProcessing(false);
@@ -78,6 +98,10 @@ export default function PaymentPage() {
         },
       });
     } catch (err) {
+      // Nothing was charged here, but a failure to even open checkout means
+      // nobody can pay at all (misconfigured worker, Razorpay unreachable) —
+      // worth recording, unlike a routine declined card in onFailure.
+      logCheckoutFailure({ stage: 'start-payment', error: err, amount: total });
       showToast(err.message || 'Could not start payment.');
       setIsProcessing(false);
     }
