@@ -8,12 +8,12 @@ import { sanitizeShippingForm, isValidGstNumber } from '../utils/security.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import AuthModal from '../components/AuthModal.jsx';
-import { logBeginCheckout, logAddShippingInfo } from '../services/analytics.js';
+import { logAnalyticsEvent, logBeginCheckout, logAddShippingInfo } from '../services/analytics.js';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
 
-function TextField({ id, label, placeholder, type = 'text', value, onChange, error }) {
+function TextField({ id, label, placeholder, type = 'text', value, onChange, error, ...inputProps }) {
   return (
     <div>
       <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={id}>
@@ -27,6 +27,7 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange, err
         type={type}
         value={value}
         onChange={onChange}
+        {...inputProps}
       />
       {error && <p className="text-error text-xs mt-1 font-body-sm">{error}</p>}
     </div>
@@ -35,7 +36,7 @@ function TextField({ id, label, placeholder, type = 'text', value, onChange, err
 
 export default function CheckoutShippingPage() {
   const { items: cartItems, setShippingDetails, taxRatePercent, totals, appliedCoupon } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { profile, saveAddress } = useProfile();
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -61,10 +62,19 @@ export default function CheckoutShippingPage() {
     return unsubscribe;
   }, []);
 
+  // begin_checkout counts people who can actually fill in the form, not everyone who lands on the
+  // sign-in wall; the wall gets its own event so the funnel shows where the drop-off really is.
+  const checkoutStartedRef = useRef(false);
   useEffect(() => {
+    if (authLoading || !user || checkoutStartedRef.current) return;
+    checkoutStartedRef.current = true;
     logBeginCheckout(cartItems);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!authLoading && !user) logAnalyticsEvent('checkout_sign_in_wall');
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (prefilledRef.current) return;
@@ -129,6 +139,8 @@ export default function CheckoutShippingPage() {
 
     if (Object.keys(errorsMap).length > 0) {
       setErrors(errorsMap);
+      Object.keys(errorsMap).forEach((field) => logAnalyticsEvent('shipping_form_error', { field }));
+      document.getElementById(['zip', 'phone', 'gstNumber'].find((field) => errorsMap[field]))?.focus();
       return;
     }
 
@@ -143,6 +155,10 @@ export default function CheckoutShippingPage() {
     logAddShippingInfo(cartItems);
     navigate('/checkout/payment');
   };
+
+  // Firebase restores a returning customer's session asynchronously; until then `user` is null,
+  // which must not flash the sign-in wall at someone who is already signed in.
+  if (authLoading) return null;
 
   if (!user) {
     return (
@@ -236,6 +252,8 @@ export default function CheckoutShippingPage() {
                   placeholder="Enter your first name"
                   value={form.firstName}
                   onChange={handleChange}
+                  autoComplete="given-name"
+                  required
                 />
                 <TextField
                   id="lastName"
@@ -243,6 +261,8 @@ export default function CheckoutShippingPage() {
                   placeholder="Enter your last name"
                   value={form.lastName}
                   onChange={handleChange}
+                  autoComplete="family-name"
+                  required
                 />
               </div>
               <TextField
@@ -251,6 +271,8 @@ export default function CheckoutShippingPage() {
                 placeholder="Street address or P.O. Box"
                 value={form.address}
                 onChange={handleChange}
+                autoComplete="address-line1"
+                required
               />
               <TextField
                 id="apartment"
@@ -258,6 +280,7 @@ export default function CheckoutShippingPage() {
                 placeholder="Apartment, suite, unit, building, floor, etc."
                 value={form.apartment}
                 onChange={handleChange}
+                autoComplete="address-line2"
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <div className="md:col-span-1">
@@ -270,6 +293,8 @@ export default function CheckoutShippingPage() {
                     name="state"
                     value={form.state}
                     onChange={handleChange}
+                    autoComplete="address-level1"
+                    required
                   >
                     <option disabled value="">
                       Select State
@@ -291,6 +316,8 @@ export default function CheckoutShippingPage() {
                     name="city"
                     value={form.city}
                     onChange={handleChange}
+                    autoComplete="address-level2"
+                    required
                     disabled={!form.state}
                   >
                     <option disabled value="">
@@ -312,6 +339,8 @@ export default function CheckoutShippingPage() {
                     value={form.zip}
                     onChange={handleChange}
                     error={errors.zip}
+                    autoComplete="postal-code"
+                    inputMode="numeric"
                   />
                 </div>
               </div>
@@ -323,6 +352,8 @@ export default function CheckoutShippingPage() {
                 value={form.phone}
                 onChange={handleChange}
                 error={errors.phone}
+                autoComplete="tel-national"
+                inputMode="numeric"
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextField

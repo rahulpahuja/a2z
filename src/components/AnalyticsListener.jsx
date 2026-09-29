@@ -4,6 +4,7 @@ import { logPageView } from '../services/analytics.js';
 import { useProducts } from '../context/ProductsContext.jsx';
 
 const SITE_NAME = 'A2Z Collection';
+const ADMIN_PATH = /^\/(super|dashboard)(\/|$)/;
 
 // Kept in sync with src/App.jsx's route lists — without this, every page
 // reported the same static document.title to GA4, making every page_view
@@ -84,6 +85,7 @@ export default function AnalyticsListener() {
   // (a live product-stock update, say), which would otherwise send a
   // duplicate page_view unconnected to any real page change.
   useEffect(() => {
+    if (ADMIN_PATH.test(pathname)) return; // the owner working in the admin is not a visitor
     const pageName = resolvePageName(pathname, products);
     logPageView(pathname + search, `${pageName} – ${SITE_NAME}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
