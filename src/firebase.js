@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
-import { getAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
+import { initializeAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -41,10 +41,22 @@ function isAutomatedBrowser() {
   return /HeadlessChrome|Lighthouse|Puppeteer|Playwright/i.test(navigator.userAgent || '');
 }
 
+// Only the real storefront reports. localhost, Netlify previews and staging hosts were
+// showing up in GA4 as visitors and skewing bounce, duration and page-view counts.
+const PRODUCTION_HOST = /(^|\.)thea2zcollection\.(com|in)$/i;
+
+function isProductionHost() {
+  return typeof location !== 'undefined' && PRODUCTION_HOST.test(location.hostname);
+}
+
 // getAnalytics() requires an async support check (it fails in browsers without
 // cookie/IndexedDB support, and can't run at all outside a browser), so it's
 // exposed as a promise rather than a plain export like `auth`/`db` above.
+// AnalyticsListener sends the page_view for every route, including the first one, so the
+// SDK's own on-load page_view would count each visit's landing page twice.
+const ANALYTICS_SETTINGS = { config: { send_page_view: false } };
+
 export const analyticsPromise =
-  isFirebaseEnabled && firebaseConfig.measurementId && !isAutomatedBrowser()
-    ? isAnalyticsSupported().then((supported) => (supported ? getAnalytics(firebaseApp) : null))
+  isFirebaseEnabled && firebaseConfig.measurementId && !isAutomatedBrowser() && isProductionHost()
+    ? isAnalyticsSupported().then((supported) => (supported ? initializeAnalytics(firebaseApp, ANALYTICS_SETTINGS) : null))
     : Promise.resolve(null);
