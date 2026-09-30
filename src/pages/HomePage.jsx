@@ -98,6 +98,11 @@ function readBannerHintSeen() {
   }
 }
 
+const GENDER_CARDS = [
+  { label: 'Men', gender: 'Male' },
+  { label: 'Women', gender: 'Female' },
+];
+
 export default function HomePage() {
   const { products } = useProducts();
   const { theme } = useStorefrontTheme();
@@ -320,6 +325,21 @@ export default function HomePage() {
           >
             <span className="material-symbols-outlined text-sm md:text-base">chevron_right</span>
           </button>
+        </section>
+
+        {/* Shop by gender */}
+        <section className="grid grid-cols-2 gap-3 sm:gap-6 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full pt-6 md:pt-10">
+          {GENDER_CARDS.map(({ label, gender }) => (
+            <Link
+              key={gender}
+              to={`/products?gender=${gender}`}
+              className="group flex items-center justify-center h-24 sm:h-36 rounded-xl bg-surface-container-low border border-tertiary-container/30 hover:border-primary hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+            >
+              <span className="playfair text-headline-md md:text-headline-lg text-on-surface group-hover:text-primary transition-colors">
+                {label}
+              </span>
+            </Link>
+          ))}
         </section>
 
         {/* Category Badges */}
