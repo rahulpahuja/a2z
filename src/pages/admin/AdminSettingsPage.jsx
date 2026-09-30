@@ -20,6 +20,20 @@ const FIELDS = [
   { key: 'facebookUrl', label: 'Facebook Page URL', placeholder: 'https://www.facebook.com/yourpage' },
 ];
 
+function SettingToggle({ checked, onChange, label }) {
+  return (
+    <label className="flex items-center gap-3 mt-5 cursor-pointer w-fit">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary"
+      />
+      <span className="font-body-sm text-body-sm text-on-surface">{label}</span>
+    </label>
+  );
+}
+
 export default function AdminSettingsPage() {
   const { showToast } = useToast();
   const [settings, setSettings] = useState(DEFAULT_STORE_SETTINGS);
@@ -161,17 +175,16 @@ export default function AdminSettingsPage() {
               />
             </div>
 
-            <label className="flex items-center gap-3 mt-5 cursor-pointer w-fit">
-              <input
-                type="checkbox"
-                checked={settings.showCategoryBubbles ?? true}
-                onChange={(event) => setSettings((prev) => ({ ...prev, showCategoryBubbles: event.target.checked }))}
-                className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary"
-              />
-              <span className="font-body-sm text-body-sm text-on-surface">
-                Show the category row (Shots, Bags, Best Sellers, Coords, New Arrivals, Tops, Trousers) on the home page
-              </span>
-            </label>
+            <SettingToggle
+              checked={settings.showCategoryBubbles ?? true}
+              onChange={(showCategoryBubbles) => setSettings((prev) => ({ ...prev, showCategoryBubbles }))}
+              label="Show the category row (Shots, Bags, Best Sellers, Coords, New Arrivals, Tops, Trousers) on the home page"
+            />
+            <SettingToggle
+              checked={settings.showBannerHint ?? true}
+              onChange={(showBannerHint) => setSettings((prev) => ({ ...prev, showBannerHint }))}
+              label="Show a &quot;Tap to shop&quot; hint on the home page banner to first-time visitors"
+            />
           </div>
 
           {/* Refund Policy Provision for Super User */}

@@ -87,6 +87,17 @@ function VideoCard({ src, poster, title, description }) {
   );
 }
 
+const BANNER_HINT_KEY = 'a2z_banner_hint_seen';
+const BANNER_HINT_MS = 6000;
+
+function readBannerHintSeen() {
+  try {
+    return localStorage.getItem(BANNER_HINT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function HomePage() {
   const { products } = useProducts();
   const { theme } = useStorefrontTheme();
@@ -102,6 +113,8 @@ export default function HomePage() {
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const [homeProductsPerRow, setHomeProductsPerRow] = useState(DEFAULT_STORE_SETTINGS.homeProductsPerRow);
   const [showCategoryBubbles, setShowCategoryBubbles] = useState(DEFAULT_STORE_SETTINGS.showCategoryBubbles);
+  const [showBannerHint, setShowBannerHint] = useState(DEFAULT_STORE_SETTINGS.showBannerHint);
+  const [bannerHintSeen, setBannerHintSeen] = useState(readBannerHintSeen);
 
   const productsRow1 = products.slice(0, homeProductsPerRow);
   const productsRow2 = products.slice(homeProductsPerRow, homeProductsPerRow + 20);
@@ -121,9 +134,26 @@ export default function HomePage() {
     const unsub = subscribeToStoreSettings((data) => {
       setHomeProductsPerRow(data.homeProductsPerRow || DEFAULT_STORE_SETTINGS.homeProductsPerRow);
       setShowCategoryBubbles(data.showCategoryBubbles ?? DEFAULT_STORE_SETTINGS.showCategoryBubbles);
+      setShowBannerHint(data.showBannerHint ?? DEFAULT_STORE_SETTINGS.showBannerHint);
     });
     return unsub;
   }, []);
+
+  const bannerHintVisible = showBannerHint && !bannerHintSeen && heroSlides.length > 0;
+  const dismissBannerHint = () => {
+    setBannerHintSeen(true);
+    try {
+      localStorage.setItem(BANNER_HINT_KEY, '1');
+    } catch {
+      // Storage blocked (private mode): hint just won't persist across visits.
+    }
+  };
+
+  useEffect(() => {
+    if (!bannerHintVisible) return undefined;
+    const timer = setTimeout(dismissBannerHint, BANNER_HINT_MS);
+    return () => clearTimeout(timer);
+  }, [bannerHintVisible]);
 
   useEffect(() => {
     const unsub = subscribeToCarousel((slides) => {
@@ -217,7 +247,7 @@ export default function HomePage() {
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="w-full max-w-full overflow-x-clip">
         {/* Hero Carousel */}
-        <section className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
+        <section onClick={dismissBannerHint} className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
           <div
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -255,6 +285,12 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
+
+          {bannerHintVisible && (
+            <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-pulse bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-sm rounded-full px-4 py-2 font-label-caps text-[11px] uppercase tracking-widest shadow-lg whitespace-nowrap">
+              Tap to shop the collection →
+            </span>
+          )}
 
           {/* Dots Indicator */}
           <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
