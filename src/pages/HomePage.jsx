@@ -217,7 +217,7 @@ export default function HomePage() {
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="w-full max-w-full overflow-x-clip">
         {/* Hero Carousel */}
-        <section className="relative w-full max-w-full h-[52vh] min-h-[360px] sm:h-[65vh] sm:min-h-[460px] md:h-[70vh] md:min-h-[500px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
+        <section className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
           <div
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
