@@ -1,6 +1,7 @@
 import AIStudioPage from '../pages/AIStudioPage.jsx';
 import AdminImageConverterPage from '../pages/admin/AdminImageConverterPage.jsx';
 import AdminWatermarkPage from '../pages/admin/AdminWatermarkPage.jsx';
+import AdminImageEditorPage from '../pages/admin/AdminImageEditorPage.jsx';
 import AdminUploadTestPage from '../pages/admin/AdminUploadTestPage.jsx';
 
 // Single source of truth for which tools live inside the Image Studio pane.
@@ -27,6 +28,13 @@ export const IMAGE_STUDIO_TOOLS = [
     icon: 'auto_fix',
     description: 'Remove existing watermarks or add your own text/logo watermark.',
     Component: AdminWatermarkPage,
+  },
+  {
+    id: 'image-editor',
+    label: 'Image Editor',
+    icon: 'crop',
+    description: 'Crop, rotate, flip, and adjust an image, then download it.',
+    Component: AdminImageEditorPage,
   },
   {
     id: 'upload-test',

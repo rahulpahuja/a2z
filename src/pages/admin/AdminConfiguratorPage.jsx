@@ -1356,10 +1356,26 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
-                      Filter Placement
-                    </h3>
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
+                        Filter Placement
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            genderFilterPlacement: 'top',
+                            colorFilterPlacement: 'top',
+                            sizeFilterPlacement: 'top',
+                          }))
+                        }
+                        className="text-[11px] font-label-caps text-label-caps uppercase px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
+                      >
+                        Move All Filters to Top
+                      </button>
+                    </div>
                     <p className="text-[11px] text-on-surface-variant/60 -mt-2">
                       Choose whether each filter appears as a quick dropdown next to "Sort by" (sticky on mobile while scrolling) or inside the left filter sidebar.
                     </p>

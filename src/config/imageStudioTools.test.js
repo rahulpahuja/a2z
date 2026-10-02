@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { IMAGE_STUDIO_TOOLS, DEFAULT_IMAGE_STUDIO_TOOL_ID, getImageStudioTool } from './imageStudioTools.js';
 
 describe('imageStudioTools config', () => {
-  it('lists the four image tools moved out of the standalone admin nav', () => {
+  it('lists the five image tools moved out of the standalone admin nav', () => {
     const ids = IMAGE_STUDIO_TOOLS.map((tool) => tool.id);
-    expect(ids).toEqual(['ai-studio', 'image-converter', 'watermark-studio', 'upload-test']);
+    expect(ids).toEqual(['ai-studio', 'image-converter', 'watermark-studio', 'image-editor', 'upload-test']);
   });
 
   it('gives every tool a unique id, a label, an icon, and a component', () => {
