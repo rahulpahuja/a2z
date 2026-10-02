@@ -14,6 +14,7 @@ import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
+import DiscountCountdown from '../components/DiscountCountdown.jsx';
 import { logViewItemList, logSelectItem } from '../services/analytics.js';
 import './ProductListingPage.css';
 
@@ -126,6 +127,11 @@ export default function ProductListingPage() {
     }
   }, [maxCatalogPrice]);
 
+  // Bumped by an expiring discount countdown to force a re-render — the
+  // price/badge below are computed fresh each render from the real clock,
+  // so this is the only nudge needed to revert a product's price the
+  // instant its discount lapses, without a page reload.
+  const [, forceDiscountRecheck] = useState(0);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [collections, setCollections] = useState([]);
@@ -986,6 +992,11 @@ export default function ProductListingPage() {
                               </span>
                               <span className="font-body-sm text-[11px] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
                             </div>
+                            <DiscountCountdown
+                              product={product}
+                              className="text-[10px] text-error font-medium mt-0.5"
+                              onExpire={() => forceDiscountRecheck((n) => n + 1)}
+                            />
                           </div>
                         ) : (
                           <div className="mt-auto flex items-center justify-between">

@@ -19,6 +19,16 @@ function isPositiveFinite(value) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0;
 }
 
+// The instant a dated (UNTIL_DATE) discount's end date lapses — end of day,
+// local time — or null when there's no valid end date to parse. Shared by
+// isDiscountActive and getDiscountCountdownMs so the two can never disagree
+// on when a discount actually ends.
+function getDiscountEndTime(product) {
+  if (!product?.discountEndDate) return null;
+  const end = new Date(`${product.discountEndDate}T23:59:59.999`);
+  return Number.isNaN(end.getTime()) ? null : end;
+}
+
 // True when `product`'s configured discount is currently in effect: a
 // positive discount value, and — for a dated discount — not yet past its end
 // date. `now` is injectable so callers and tests don't depend on wall-clock
@@ -29,10 +39,26 @@ export function isDiscountActive(product, now = new Date()) {
   const value = Number(product?.discountValue);
   if (!isPositiveFinite(value)) return false;
   if (product?.discountDurationType !== DISCOUNT_DURATIONS.UNTIL_DATE) return true;
-  if (!product.discountEndDate) return false;
-  const end = new Date(`${product.discountEndDate}T23:59:59.999`);
-  if (Number.isNaN(end.getTime())) return false;
+  const end = getDiscountEndTime(product);
+  if (!end) return false;
   return now.getTime() <= end.getTime();
+}
+
+const COUNTDOWN_WINDOW_MS = 60 * 60 * 1000;
+
+// Milliseconds remaining until a dated discount expires, but only once it's
+// worth showing a countdown for: the discount must be active, dated (a
+// FOREVER discount never shows one), and inside its final hour. Returns null
+// otherwise — including once it's actually expired, at which point the
+// price has simply reverted (see getDiscountedPrice) and there's nothing
+// left to count down.
+export function getDiscountCountdownMs(product, now = new Date()) {
+  if (!isDiscountActive(product, now)) return null;
+  if (product?.discountDurationType !== DISCOUNT_DURATIONS.UNTIL_DATE) return null;
+  const end = getDiscountEndTime(product);
+  if (!end) return null;
+  const msRemaining = end.getTime() - now.getTime();
+  return msRemaining > 0 && msRemaining <= COUNTDOWN_WINDOW_MS ? msRemaining : null;
 }
 
 // The product's price after any currently-active discount is applied.
