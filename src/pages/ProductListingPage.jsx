@@ -91,7 +91,23 @@ export default function ProductListingPage() {
   const subcategoryFilterOnTop = theme?.subcategoryFilterPlacement !== 'left';
   const collectionFilterOnTop = theme?.collectionFilterPlacement !== 'left';
   const priceFilterOnTop = theme?.priceFilterPlacement !== 'left';
+  // Whether the left sidebar has anything in it at all — when every filter
+  // is placed "top" (the default), the sidebar would otherwise still
+  // reserve its full width for nothing, starving the product grid.
+  const anyFilterOnLeft =
+    !categoryFilterOnTop ||
+    !subcategoryFilterOnTop ||
+    !genderFilterOnTop ||
+    !collectionFilterOnTop ||
+    !priceFilterOnTop ||
+    !colorFilterOnTop ||
+    !sizeFilterOnTop;
   const isMobileViewport = useIsMobileViewport();
+  // On mobile, every filter — "top" or "left" — lives in the single Filters
+  // drawer instead of being spread across a horizontal scroll strip, so the
+  // drawer (and the button that opens it) is worth showing whenever there's
+  // any filter at all, not just the ones placed "left".
+  const showFilterSidebar = anyFilterOnLeft || isMobileViewport;
   const listingImgEnlargeFactor = (useIconAddToCart ? 1.15 : 1) * (isMobileViewport ? 1.15 : 1);
   const listingImgAspect = listingImgEnlargeFactor !== 1
     ? enlargeAspectRatio(theme?.listingImgAspect || '3/4', listingImgEnlargeFactor)
@@ -216,6 +232,17 @@ export default function ProductListingPage() {
     } else {
       setSortBy(value);
     }
+  };
+
+  const clearAllFilters = () => {
+    setSearchParams({});
+    setSelectedGender('All');
+    setMinPrice(minCatalogPrice);
+    setMaxPrice(maxCatalogPrice || 50000);
+    setSelectedColor(null);
+    setSelectedSize(null);
+    setSelectedCollectionId(null);
+    setMobileFiltersOpen(false);
   };
 
   const toggleFavorite = (id) => {
@@ -539,11 +566,19 @@ export default function ProductListingPage() {
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
           </div>
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          >
+            Clear Filters
+          </button>
         </div>
       </div>
 
       {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
       <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3 overflow-x-auto">
+        {showFilterSidebar && (
         <button
           type="button"
           onClick={() => setMobileFiltersOpen((open) => !open)}
@@ -553,6 +588,7 @@ export default function ProductListingPage() {
           <span className="material-symbols-outlined text-sm">tune</span>
           Filters
         </button>
+        )}
         <button
           type="button"
           onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
@@ -562,13 +598,6 @@ export default function ProductListingPage() {
           <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
           {mobileViewMode === 'grid' ? 'List' : 'Grid'}
         </button>
-        {categoryFilterOnTop && renderCategoryQuickFilter('mobile')}
-        {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('mobile')}
-        {genderFilterOnTop && renderGenderQuickFilter('mobile')}
-        {collectionFilterOnTop && publishedCollections.length > 0 && renderCollectionQuickFilter('mobile')}
-        {priceFilterOnTop && renderPriceQuickFilter('mobile')}
-        {colorFilterOnTop && renderColorQuickFilter('mobile')}
-        {sizeFilterOnTop && renderSizeQuickFilter('mobile')}
         <div className="relative ml-auto shrink-0">
           <select
             className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
@@ -588,6 +617,13 @@ export default function ProductListingPage() {
           </select>
           <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
         </div>
+        <button
+          type="button"
+          onClick={clearAllFilters}
+          className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+        >
+          Clear Filters
+        </button>
       </div>
 
       <main
@@ -598,13 +634,14 @@ export default function ProductListingPage() {
           background: 'var(--custom-backdrop-bg, inherit)',
         }}
       >
+        {showFilterSidebar && (
         <aside className={
           mobileFiltersOpen
             ? 'block md:block [@media(orientation:landscape)_and_(max-height:500px)]:!block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
             : 'hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
         }>
           {/* Category Filter on Left Side (only when placement is set to "left") */}
-          {!categoryFilterOnTop && (
+          {(!categoryFilterOnTop || isMobileViewport) && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -636,7 +673,7 @@ export default function ProductListingPage() {
           )}
 
           {/* Gender Filter on Left Side (only when placement is set to "left") */}
-          {!genderFilterOnTop && (
+          {(!genderFilterOnTop || isMobileViewport) && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
               <h3
                 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -669,7 +706,7 @@ export default function ProductListingPage() {
             </div>
           )}
 
-          {!subcategoryFilterOnTop && subcategoryOptions.length > 0 && (
+          {(!subcategoryFilterOnTop || isMobileViewport) && subcategoryOptions.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
               <h3
                 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -713,7 +750,7 @@ export default function ProductListingPage() {
             </div>
           )}
 
-          {!collectionFilterOnTop && publishedCollections.length > 0 && (
+          {(!collectionFilterOnTop || isMobileViewport) && publishedCollections.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
               <h3
                 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -758,7 +795,7 @@ export default function ProductListingPage() {
           )}
 
           {/* Dual-Bound Price Range Filter on Left Side (only when placement is set to "left") */}
-          {!priceFilterOnTop && (
+          {(!priceFilterOnTop || isMobileViewport) && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -829,7 +866,7 @@ export default function ProductListingPage() {
           </div>
           )}
 
-          {!colorFilterOnTop && (
+          {(!colorFilterOnTop || isMobileViewport) && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -863,7 +900,7 @@ export default function ProductListingPage() {
           </div>
           )}
 
-          {!sizeFilterOnTop && (
+          {(!sizeFilterOnTop || isMobileViewport) && (
           <div className="space-y-4 pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -899,23 +936,8 @@ export default function ProductListingPage() {
             </div>
           </div>
           )}
-
-          <button
-            className="w-full py-3 rounded-xl border border-primary text-primary font-label-caps text-label-caps uppercase tracking-widest hover:bg-primary/5 transition-colors"
-            onClick={() => {
-              setSearchParams({});
-              setSelectedGender('All');
-              setMinPrice(minCatalogPrice);
-              setMaxPrice(maxCatalogPrice || 50000);
-              setSelectedColor(null);
-              setSelectedSize(null);
-              setSelectedCollectionId(null);
-              setMobileFiltersOpen(false);
-            }}
-          >
-            Clear Filters
-          </button>
         </aside>
+        )}
 
         <div className="flex-grow">
           <div className="flex flex-wrap gap-2 mb-6 items-center">
