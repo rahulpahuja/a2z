@@ -389,6 +389,38 @@ export default function AdminProductsPage() {
     });
   };
 
+  // Downloads an image box's current photo (existing R2 upload or a
+  // freshly-chosen local file) to the admin's machine. Fetches it as a blob
+  // first — a plain <a download> is silently ignored by the browser for a
+  // cross-origin URL like an R2 asset — and falls back to opening it in a
+  // new tab if the fetch itself fails (e.g. no CORS on the bucket), so the
+  // admin can still save it manually.
+  const downloadImage = async (url, suggestedName) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const extension = suggestedName.includes('.')
+        ? ''
+        : blob.type === 'image/webp' ? '.webp'
+        : blob.type === 'image/png' ? '.png'
+        : blob.type === 'image/jpeg' ? '.jpg'
+        : '';
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${suggestedName}${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Image download failed', err);
+      showToast('Could not download this image directly — opening it in a new tab instead.');
+      window.open(url, '_blank', 'noopener');
+    }
+  };
+
   const clearImageSlot = (index) => {
     setImageFiles((prev) => {
       const copy = [...prev];
@@ -972,15 +1004,35 @@ export default function AdminProductsPage() {
                       <div key={index} className="flex flex-col gap-2 p-3 border border-outline-variant/40 rounded-lg bg-surface-container-lowest relative">
                         <div className="flex justify-between items-center">
                           <span className="font-label-caps text-[10px] text-on-surface-variant">Image Box {index + 1} {index < 3 && <span className="text-error font-bold">*</span>}</span>
-                          {hasImage && (
-                            <button
-                              type="button"
-                              onClick={() => clearImageSlot(index)}
-                              className="text-error font-body-sm text-[10px] hover:underline"
-                            >
-                              Clear
-                            </button>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {preview && (
+                              <button
+                                type="button"
+                                onClick={() => document.getElementById(`image-file-input-${index}`).click()}
+                                className="text-primary font-body-sm text-[10px] hover:underline"
+                              >
+                                Replace
+                              </button>
+                            )}
+                            {preview && (
+                              <button
+                                type="button"
+                                onClick={() => downloadImage(preview, fileName || `image-box-${index + 1}`)}
+                                className="text-on-surface-variant font-body-sm text-[10px] hover:underline"
+                              >
+                                Download
+                              </button>
+                            )}
+                            {hasImage && (
+                              <button
+                                type="button"
+                                onClick={() => clearImageSlot(index)}
+                                className="text-error font-body-sm text-[10px] hover:underline"
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
                         </div>
 
                         {preview ? (
