@@ -14,6 +14,7 @@ import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
+import { getPriceBreakdown } from '../utils/discount.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -148,6 +149,7 @@ export default function ProductDetailPage() {
     return <ProductNotFound />;
   }
 
+  const { originalPrice, discountedPrice, hasDiscount } = getPriceBreakdown(product);
   const images = product.images && product.images.length > 1 ? product.images : [product.image];
   const videos = product.videos ?? [];
   const media = [
@@ -203,7 +205,7 @@ export default function ProductDetailPage() {
     title: product.name || product.title,
     color: selectedColor,
     size: selectedSize,
-    price: product.price,
+    price: discountedPrice,
     image: images[0],
     alt: product.alt,
   });
@@ -414,9 +416,9 @@ export default function ProductDetailPage() {
 
             {/* Price */}
             <div className="flex items-center gap-4">
-              <span className="font-price-display text-price-display text-primary">{formatCurrency(product.price)}</span>
-              {product.originalPrice && (
-                <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
+              <span className="font-price-display text-price-display text-primary">{formatCurrency(discountedPrice)}</span>
+              {hasDiscount && (
+                <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
               )}
             </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
+import { getDiscountedPrice } from '../utils/discount.js';
 import ProductCardImage from './ProductCardImage.jsx';
 import { createProductSearchIndex } from '../utils/productSearch.js';
 import { logSearch, logSelectItem } from '../services/analytics.js';
@@ -112,7 +113,7 @@ export default function SearchModal({ open, onClose }) {
                   {product.title || product.name}
                 </p>
                 <p className="font-body-sm text-body-sm text-on-surface-variant truncate">
-                  {(product.categoryTitle || product.category) ?? ''} · {formatCurrency(product.price)}
+                  {(product.categoryTitle || product.category) ?? ''} · {formatCurrency(getDiscountedPrice(product))}
                 </p>
               </div>
             </Link>

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
+import { getDiscountedPrice } from '../utils/discount.js';
 import { subscribeToTopProducts } from '../services/productStats.js';
 import ProductCardImage from './ProductCardImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
@@ -112,7 +113,7 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
                 </div>
                 <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
                   <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
-                  <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(product.price)}</p>
+                  <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(getDiscountedPrice(product))}</p>
                 </div>
               </Link>
             </div>

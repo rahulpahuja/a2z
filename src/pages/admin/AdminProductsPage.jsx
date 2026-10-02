@@ -10,6 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
+import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, validateDiscountInput } from '../../utils/discount.js';
 import {
   getColorName,
   normalizeColors,
@@ -63,6 +64,10 @@ const EMPTY_FORM = {
   price: '',
   hsnCode: '',
   gender: 'Unisex',
+  discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+  discountValue: '',
+  discountDurationType: DISCOUNT_DURATIONS.FOREVER,
+  discountEndDate: '',
 };
 
 export default function AdminProductsPage() {
@@ -132,6 +137,10 @@ export default function AdminProductsPage() {
       hsnCode: product.hsnCode || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
+      discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
+      discountValue: product.discountValue ?? '',
+      discountDurationType: product.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
+      discountEndDate: product.discountEndDate || '',
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
@@ -176,6 +185,10 @@ export default function AdminProductsPage() {
       hsnCode: product.hsnCode || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
+      discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
+      discountValue: product.discountValue ?? '',
+      discountDurationType: product.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
+      discountEndDate: product.discountEndDate || '',
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
@@ -615,6 +628,12 @@ export default function AdminProductsPage() {
       return;
     }
 
+    const discountError = validateDiscountInput(form);
+    if (discountError) {
+      showToast(discountError);
+      return;
+    }
+
     const activeSlots = [0, 1, 2, 3, 4].filter(
       (idx) => imageFiles[idx] || imagePreviews[idx]
     );
@@ -701,6 +720,10 @@ export default function AdminProductsPage() {
         subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
+        discountUnit: form.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
+        discountValue: form.discountValue === '' ? null : Number(form.discountValue),
+        discountDurationType: form.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
+        discountEndDate: form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE ? form.discountEndDate : null,
         colors: colorsPayload,
         image: uploadedUrls[0],
         images: uploadedUrls,
@@ -1080,6 +1103,67 @@ export default function AdminProductsPage() {
                     className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                   />
                 </div>
+              </div>
+
+              {/* Discount */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-value">
+                    Discount
+                  </label>
+                  <input
+                    id="p-discount-value"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.discountValue}
+                    onChange={updateField('discountValue')}
+                    placeholder="No discount"
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-unit">
+                    Discount Unit
+                  </label>
+                  <select
+                    id="p-discount-unit"
+                    value={form.discountUnit}
+                    onChange={updateField('discountUnit')}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                  >
+                    <option value={DISCOUNT_UNITS.PERCENTAGE}>Percentage (%)</option>
+                    <option value={DISCOUNT_UNITS.FIXED}>Flat amount (₹)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-duration">
+                    Discount Duration
+                  </label>
+                  <select
+                    id="p-discount-duration"
+                    value={form.discountDurationType}
+                    onChange={updateField('discountDurationType')}
+                    className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                  >
+                    <option value={DISCOUNT_DURATIONS.FOREVER}>Forever</option>
+                    <option value={DISCOUNT_DURATIONS.UNTIL_DATE}>Until a certain date</option>
+                  </select>
+                </div>
+                {form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE && (
+                  <div>
+                    <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-end-date">
+                      Discount Ends On
+                    </label>
+                    <input
+                      id="p-discount-end-date"
+                      type="date"
+                      value={form.discountEndDate}
+                      onChange={updateField('discountEndDate')}
+                      className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Sizes */}
