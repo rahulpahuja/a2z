@@ -97,6 +97,19 @@ function withLinkFields(slide) {
   };
 }
 
+// Every listing-page filter that can be placed "top" (near Sort By) or
+// "left" (sidebar) — drives both the per-filter dropdowns and the "Move All
+// Filters to Top" shortcut, so a new filter only needs adding here.
+const FILTER_PLACEMENT_FIELDS = [
+  { key: 'categoryFilterPlacement', label: 'Category Filter' },
+  { key: 'subcategoryFilterPlacement', label: 'Subcategory Filter' },
+  { key: 'genderFilterPlacement', label: 'Gender Filter' },
+  { key: 'collectionFilterPlacement', label: 'Collection Filter' },
+  { key: 'priceFilterPlacement', label: 'Price Filter' },
+  { key: 'colorFilterPlacement', label: 'Color Filter' },
+  { key: 'sizeFilterPlacement', label: 'Size Filter' },
+];
+
 const SURFACES = [
   { key: 'hero', label: 'Hero Carousel', icon: 'view_carousel' },
   { key: 'categoryBubbles', label: 'Category Bubbles', icon: 'category' },
@@ -1366,9 +1379,7 @@ export default function AdminConfiguratorPage() {
                         onClick={() =>
                           setForm((prev) => ({
                             ...prev,
-                            genderFilterPlacement: 'top',
-                            colorFilterPlacement: 'top',
-                            sizeFilterPlacement: 'top',
+                            ...Object.fromEntries(FILTER_PLACEMENT_FIELDS.map(({ key }) => [key, 'top'])),
                           }))
                         }
                         className="text-[11px] font-label-caps text-label-caps uppercase px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
@@ -1380,44 +1391,20 @@ export default function AdminConfiguratorPage() {
                       Choose whether each filter appears as a quick dropdown next to "Sort by" (sticky on mobile while scrolling) or inside the left filter sidebar.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="form-group">
-                        <label className="form-label" htmlFor="gender-filter-placement">Gender Filter</label>
-                        <select
-                          id="gender-filter-placement"
-                          value={form.genderFilterPlacement || 'top'}
-                          onChange={(e) => handleChange('genderFilterPlacement', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
-                        >
-                          <option value="top">Top (Default, near Sort By)</option>
-                          <option value="left">Left Sidebar</option>
-                        </select>
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label" htmlFor="color-filter-placement">Color Filter</label>
-                        <select
-                          id="color-filter-placement"
-                          value={form.colorFilterPlacement || 'top'}
-                          onChange={(e) => handleChange('colorFilterPlacement', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
-                        >
-                          <option value="top">Top (Default, near Sort By)</option>
-                          <option value="left">Left Sidebar</option>
-                        </select>
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label" htmlFor="size-filter-placement">Size Filter</label>
-                        <select
-                          id="size-filter-placement"
-                          value={form.sizeFilterPlacement || 'top'}
-                          onChange={(e) => handleChange('sizeFilterPlacement', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
-                        >
-                          <option value="top">Top (Default, near Sort By)</option>
-                          <option value="left">Left Sidebar</option>
-                        </select>
-                      </div>
+                      {FILTER_PLACEMENT_FIELDS.map(({ key, label }) => (
+                        <div className="form-group" key={key}>
+                          <label className="form-label" htmlFor={`${key}-placement`}>{label}</label>
+                          <select
+                            id={`${key}-placement`}
+                            value={form[key] || 'top'}
+                            onChange={(e) => handleChange(key, e.target.value)}
+                            className="form-select text-[12px] py-2 px-3"
+                          >
+                            <option value="top">Top (Default, near Sort By)</option>
+                            <option value="left">Left Sidebar</option>
+                          </select>
+                        </div>
+                      ))}
                     </div>
                   </div>
 

@@ -87,6 +87,10 @@ export default function ProductListingPage() {
   const genderFilterOnTop = theme?.genderFilterPlacement !== 'left';
   const colorFilterOnTop = theme?.colorFilterPlacement !== 'left';
   const sizeFilterOnTop = theme?.sizeFilterPlacement !== 'left';
+  const categoryFilterOnTop = theme?.categoryFilterPlacement !== 'left';
+  const subcategoryFilterOnTop = theme?.subcategoryFilterPlacement !== 'left';
+  const collectionFilterOnTop = theme?.collectionFilterPlacement !== 'left';
+  const priceFilterOnTop = theme?.priceFilterPlacement !== 'left';
   const isMobileViewport = useIsMobileViewport();
   const listingImgEnlargeFactor = (useIconAddToCart ? 1.15 : 1) * (isMobileViewport ? 1.15 : 1);
   const listingImgAspect = listingImgEnlargeFactor !== 1
@@ -200,6 +204,20 @@ export default function ProductListingPage() {
     });
   };
 
+  // The "Sort by" dropdown also offers the gender filter as a shortcut — its
+  // value is namespaced ("gender-Male") so it can't collide with a sortBy
+  // value, and a selected gender takes priority over sortBy in the <select>
+  // since only one option can show as selected at a time.
+  const GENDER_SORT_PREFIX = 'gender-';
+  const sortSelectValue = selectedGender !== 'All' ? `${GENDER_SORT_PREFIX}${selectedGender}` : sortBy;
+  const handleSortSelectChange = (value) => {
+    if (value.startsWith(GENDER_SORT_PREFIX)) {
+      applyGenderFilter(value.slice(GENDER_SORT_PREFIX.length));
+    } else {
+      setSortBy(value);
+    }
+  };
+
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -280,6 +298,84 @@ export default function ProductListingPage() {
     const titles = [...new Set(relevant.map((s) => s.title))];
     return titles;
   }, [SUBCATEGORIES, activeCategoryList]);
+
+  const renderCategoryQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`category-${idSuffix}`}>
+      <select
+        id={`category-filter-${idSuffix}`}
+        aria-label="Category"
+        className={FILTER_SELECT_CLASS}
+        value={activeCategoryList.length === 1 ? activeCategoryList[0] : 'All'}
+        onChange={(e) => setActiveCategory(e.target.value)}
+      >
+        {categoryOptions.map((category) => (
+          <option key={category} value={category}>{category === 'All' ? 'All Categories' : category}</option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
+
+  const renderSubcategoryQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`subcategory-${idSuffix}`}>
+      <select
+        id={`subcategory-filter-${idSuffix}`}
+        aria-label="Subcategory"
+        className={FILTER_SELECT_CLASS}
+        value={activeSubcategory}
+        onChange={(e) => setActiveSubcategory(e.target.value)}
+      >
+        <option value="All">All Subcategories</option>
+        {subcategoryOptions.map((subcategory) => (
+          <option key={subcategory} value={subcategory}>{subcategory}</option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
+
+  const renderCollectionQuickFilter = (idSuffix) => (
+    <div className="relative shrink-0" key={`collection-${idSuffix}`}>
+      <select
+        id={`collection-filter-${idSuffix}`}
+        aria-label="Collection"
+        className={FILTER_SELECT_CLASS}
+        value={selectedCollectionId || ''}
+        onChange={(e) => setSelectedCollectionId(e.target.value || null)}
+      >
+        <option value="">All Collections</option>
+        {publishedCollections.map((collection) => (
+          <option key={collection.id} value={collection.id}>{collection.name}</option>
+        ))}
+      </select>
+      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+    </div>
+  );
+
+  const renderPriceQuickFilter = (idSuffix) => (
+    <div className="flex items-center gap-1.5 shrink-0" key={`price-${idSuffix}`}>
+      <input
+        type="number"
+        min={0}
+        max={maxPrice}
+        value={minPrice}
+        onChange={(e) => setMinPrice(Math.max(0, Math.min(Number(e.target.value) || 0, maxPrice)))}
+        aria-label="Minimum price"
+        placeholder="Min ₹"
+        className="w-[72px] bg-transparent border border-outline rounded-lg py-2 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+      />
+      <span className="text-on-surface-variant text-xs">–</span>
+      <input
+        type="number"
+        min={minPrice}
+        value={maxPrice}
+        onChange={(e) => setMaxPrice(Math.max(minPrice, Number(e.target.value) || 0))}
+        aria-label="Maximum price"
+        placeholder="Max ₹"
+        className="w-[72px] bg-transparent border border-outline rounded-lg py-2 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+      />
+    </div>
+  );
 
   const filteredProducts = useMemo(() => {
     let base = activeCategoryList.length === 0
@@ -416,7 +512,11 @@ export default function ProductListingPage() {
           </div>
         </div>
         <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden flex-wrap mt-4 md:mt-0 items-center gap-3">
+          {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
+          {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('desktop')}
           {genderFilterOnTop && renderGenderQuickFilter('desktop')}
+          {collectionFilterOnTop && publishedCollections.length > 0 && renderCollectionQuickFilter('desktop')}
+          {priceFilterOnTop && renderPriceQuickFilter('desktop')}
           {colorFilterOnTop && renderColorQuickFilter('desktop')}
           {sizeFilterOnTop && renderSizeQuickFilter('desktop')}
           <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
@@ -424,13 +524,18 @@ export default function ProductListingPage() {
             <select
               className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
               id="sort-by"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              value={sortSelectValue}
+              onChange={(e) => handleSortSelectChange(e.target.value)}
             >
               <option value="newest">Newest</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
               <option value="popular">Popularity</option>
+              <optgroup label="Gender">
+                <option value={`${GENDER_SORT_PREFIX}Male`}>Male / Men</option>
+                <option value={`${GENDER_SORT_PREFIX}Female`}>Female / Women</option>
+                <option value={`${GENDER_SORT_PREFIX}Unisex`}>Unisex</option>
+              </optgroup>
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
           </div>
@@ -457,20 +562,29 @@ export default function ProductListingPage() {
           <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
           {mobileViewMode === 'grid' ? 'List' : 'Grid'}
         </button>
+        {categoryFilterOnTop && renderCategoryQuickFilter('mobile')}
+        {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('mobile')}
         {genderFilterOnTop && renderGenderQuickFilter('mobile')}
+        {collectionFilterOnTop && publishedCollections.length > 0 && renderCollectionQuickFilter('mobile')}
+        {priceFilterOnTop && renderPriceQuickFilter('mobile')}
         {colorFilterOnTop && renderColorQuickFilter('mobile')}
         {sizeFilterOnTop && renderSizeQuickFilter('mobile')}
         <div className="relative ml-auto shrink-0">
           <select
             className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
             id="sort-by-mobile"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            value={sortSelectValue}
+            onChange={(e) => handleSortSelectChange(e.target.value)}
           >
             <option value="newest">Newest</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
             <option value="popular">Popularity</option>
+            <optgroup label="Gender">
+              <option value={`${GENDER_SORT_PREFIX}Male`}>Male / Men</option>
+              <option value={`${GENDER_SORT_PREFIX}Female`}>Female / Women</option>
+              <option value={`${GENDER_SORT_PREFIX}Unisex`}>Unisex</option>
+            </optgroup>
           </select>
           <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
         </div>
@@ -489,7 +603,8 @@ export default function ProductListingPage() {
             ? 'block md:block [@media(orientation:landscape)_and_(max-height:500px)]:!block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
             : 'hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
         }>
-          {/* Category Filter */}
+          {/* Category Filter on Left Side (only when placement is set to "left") */}
+          {!categoryFilterOnTop && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -518,6 +633,7 @@ export default function ProductListingPage() {
               ))}
             </div>
           </div>
+          )}
 
           {/* Gender Filter on Left Side (only when placement is set to "left") */}
           {!genderFilterOnTop && (
@@ -553,7 +669,7 @@ export default function ProductListingPage() {
             </div>
           )}
 
-          {subcategoryOptions.length > 0 && (
+          {!subcategoryFilterOnTop && subcategoryOptions.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
               <h3
                 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -597,7 +713,7 @@ export default function ProductListingPage() {
             </div>
           )}
 
-          {publishedCollections.length > 0 && (
+          {!collectionFilterOnTop && publishedCollections.length > 0 && (
             <div className="space-y-4 border-b border-surface-variant pb-6">
               <h3
                 className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -641,7 +757,8 @@ export default function ProductListingPage() {
             </div>
           )}
 
-          {/* Dual-Bound Price Range Filter */}
+          {/* Dual-Bound Price Range Filter on Left Side (only when placement is set to "left") */}
+          {!priceFilterOnTop && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
             <h3
               className="font-title-sm text-title-sm text-on-surface flex justify-between items-center cursor-pointer"
@@ -710,6 +827,7 @@ export default function ProductListingPage() {
               </div>
             </div>
           </div>
+          )}
 
           {!colorFilterOnTop && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
