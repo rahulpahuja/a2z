@@ -51,28 +51,48 @@ export function getDiscountedPrice(product, now = new Date()) {
   return Math.max(0, Math.round(price - (price * percent) / 100));
 }
 
+// A short "10% OFF" / "₹100 OFF" label for an active admin-configured
+// discount, or null when there isn't one (including an expired/legacy one —
+// there's no unit to label a legacy originalPrice markdown with).
+export function getDiscountLabel(product, now = new Date()) {
+  if (!isDiscountActive(product, now)) return null;
+  const value = Math.max(0, Number(product.discountValue) || 0);
+  if (product.discountUnit === DISCOUNT_UNITS.FIXED) {
+    return `₹${Math.round(value)} OFF`;
+  }
+  const percent = Math.min(100, value);
+  const percentLabel = Number.isInteger(percent) ? percent : percent.toFixed(1);
+  return `${percentLabel}% OFF`;
+}
+
 // Everything a price display needs in one call: the price to strike
-// through, the price to actually show/charge, and whether there's a
-// discount worth rendering at all.
+// through, the price to actually show/charge, whether there's a discount
+// worth rendering at all, and a ready-to-show label for it.
 //
 // Falls back to the legacy static `product.originalPrice` (used by the
 // seed catalog in data/products.js, predating per-product discounts) when
 // no admin-configured discount is active, so that existing "X% off" demo
-// pricing keeps rendering unchanged.
+// pricing keeps rendering unchanged — that fallback has no discountLabel,
+// since there's no unit/value to label it with.
 export function getPriceBreakdown(product, now = new Date()) {
   const price = Number(product?.price) || 0;
 
   if (isDiscountActive(product, now)) {
     const discountedPrice = getDiscountedPrice(product, now);
-    return { originalPrice: price, discountedPrice, hasDiscount: discountedPrice < price };
+    return {
+      originalPrice: price,
+      discountedPrice,
+      hasDiscount: discountedPrice < price,
+      discountLabel: getDiscountLabel(product, now),
+    };
   }
 
   const legacyOriginal = Number(product?.originalPrice) || 0;
   if (legacyOriginal > price) {
-    return { originalPrice: legacyOriginal, discountedPrice: price, hasDiscount: true };
+    return { originalPrice: legacyOriginal, discountedPrice: price, hasDiscount: true, discountLabel: null };
   }
 
-  return { originalPrice: price, discountedPrice: price, hasDiscount: false };
+  return { originalPrice: price, discountedPrice: price, hasDiscount: false, discountLabel: null };
 }
 
 // Validates the admin-entered discount fields before a product is saved.
