@@ -6,26 +6,34 @@
 //
 // Product discount fields (all optional — a product with none of these set
 // simply has no discount):
-//   discountUnit:        'PERCENTAGE' | 'FIXED'   (FIXED = a flat rupee amount off)
-//   discountValue:       number                   (percentage points, or rupees for FIXED)
-//   discountDurationType: 'FOREVER' | 'UNTIL_DATE' (defaults to FOREVER)
-//   discountEndDate:     'YYYY-MM-DD' | null       (required, and only meaningful, for UNTIL_DATE)
+//   discountUnit:         'PERCENTAGE' | 'FIXED'    (FIXED = a flat rupee amount off)
+//   discountValue:        number                    (percentage points, or rupees for FIXED)
+//   discountDurationType: 'FOREVER' | 'UNTIL_DATE'   (defaults to FOREVER)
+//   discountEndDate:      'YYYY-MM-DD' | null        (required, and only meaningful, for UNTIL_DATE)
+//   discountEndTimeMode:  'END_OF_DAY' | 'CUSTOM_TIME' (meaningful only for UNTIL_DATE; defaults to END_OF_DAY)
+//   discountEndTime:      'HH:MM' | 'HH:MM:SS' | null (required, and only meaningful, when discountEndTimeMode is CUSTOM_TIME)
 
 export const DISCOUNT_UNITS = { PERCENTAGE: 'PERCENTAGE', FIXED: 'FIXED' };
 
 export const DISCOUNT_DURATIONS = { FOREVER: 'FOREVER', UNTIL_DATE: 'UNTIL_DATE' };
 
+export const DISCOUNT_END_TIME_MODES = { END_OF_DAY: 'END_OF_DAY', CUSTOM_TIME: 'CUSTOM_TIME' };
+
 function isPositiveFinite(value) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0;
 }
 
-// The instant a dated (UNTIL_DATE) discount's end date lapses — end of day,
-// local time — or null when there's no valid end date to parse. Shared by
-// isDiscountActive and getDiscountCountdownMs so the two can never disagree
-// on when a discount actually ends.
+// The instant a dated (UNTIL_DATE) discount lapses, or null when there's no
+// valid end date to parse. Defaults to end of day (23:59:59.999, local
+// time); when discountEndTimeMode is CUSTOM_TIME and a discountEndTime is
+// set, that exact clock time is used instead. Shared by isDiscountActive and
+// getDiscountCountdownMs so the two can never disagree on when a discount
+// actually ends.
 function getDiscountEndTime(product) {
   if (!product?.discountEndDate) return null;
-  const end = new Date(`${product.discountEndDate}T23:59:59.999`);
+  const useCustomTime = product.discountEndTimeMode === DISCOUNT_END_TIME_MODES.CUSTOM_TIME && product.discountEndTime;
+  const timePart = useCustomTime ? product.discountEndTime : '23:59:59.999';
+  const end = new Date(`${product.discountEndDate}T${timePart}`);
   return Number.isNaN(end.getTime()) ? null : end;
 }
 
@@ -124,7 +132,14 @@ export function getPriceBreakdown(product, now = new Date()) {
 // Validates the admin-entered discount fields before a product is saved.
 // Returns an error message to show the admin, or null when the fields are
 // valid — including when they're all empty, since a discount is optional.
-export function validateDiscountInput({ discountUnit, discountValue, discountDurationType, discountEndDate }) {
+export function validateDiscountInput({
+  discountUnit,
+  discountValue,
+  discountDurationType,
+  discountEndDate,
+  discountEndTimeMode,
+  discountEndTime,
+}) {
   const trimmed = String(discountValue ?? '').trim();
   if (!trimmed) return null;
 
@@ -135,8 +150,13 @@ export function validateDiscountInput({ discountUnit, discountValue, discountDur
   if (discountUnit === DISCOUNT_UNITS.PERCENTAGE && value > 100) {
     return 'Percentage discount cannot exceed 100%.';
   }
-  if (discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE && !discountEndDate) {
-    return 'Pick an end date for the discount, or set its duration to Forever.';
+  if (discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE) {
+    if (!discountEndDate) {
+      return 'Pick an end date for the discount, or set its duration to Forever.';
+    }
+    if (discountEndTimeMode === DISCOUNT_END_TIME_MODES.CUSTOM_TIME && !discountEndTime) {
+      return 'Pick an end time for the discount, or set it to end at the full day instead.';
+    }
   }
   return null;
 }
