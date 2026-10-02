@@ -13,6 +13,7 @@ import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
+import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
 import { logViewItemList, logSelectItem } from '../services/analytics.js';
 import './ProductListingPage.css';
 
@@ -34,6 +35,16 @@ const SIZES = [
   { id: 'xl', label: 'XL', disabled: false },
   { id: 'xxl', label: 'XXL', disabled: true },
 ];
+
+function productMatchesGender(productGender, selectedGender) {
+  if (selectedGender === 'All') return true;
+  const g = (productGender || 'Unisex').toString().trim().toLowerCase();
+  const sel = selectedGender.toLowerCase();
+  if (sel === 'male' || sel === 'men') return g === 'male' || g === 'men' || g === 'unisex';
+  if (sel === 'female' || sel === 'women') return g === 'female' || g === 'women' || g === 'unisex';
+  if (sel === 'unisex') return g === 'unisex';
+  return g === sel;
+}
 
 function enlargeAspectRatio(aspect, factor = 1.15) {
   const [w, h] = String(aspect).split('/').map(Number);
@@ -247,6 +258,15 @@ export default function ProductListingPage() {
   const selectedSizeLabel = SIZES.find((s) => s.id === selectedSize)?.label ?? null;
   const selectedCollection = publishedCollections.find((c) => c.id === selectedCollectionId) ?? null;
 
+  const categoryOptions = useMemo(() => {
+    if (selectedGender === 'All') return CATEGORY_OPTIONS;
+    const titlesWithGenderMatch = new Set(
+      CATALOG.filter((p) => productMatchesGender(p.gender, selectedGender))
+        .map((p) => p.category || p.categoryTitle)
+    );
+    return CATEGORY_OPTIONS.filter((c) => c === 'All' || titlesWithGenderMatch.has(c));
+  }, [CATEGORY_OPTIONS, CATALOG, selectedGender]);
+
   const subcategoryOptions = useMemo(() => {
     const relevant = activeCategoryList.length === 0
       ? SUBCATEGORIES
@@ -265,24 +285,11 @@ export default function ProductListingPage() {
     }
 
     if (selectedGender !== 'All') {
-      base = base.filter((p) => {
-        const g = (p.gender || 'Unisex').toString().trim().toLowerCase();
-        const sel = selectedGender.toLowerCase();
-        if (sel === 'male' || sel === 'men') {
-          return g === 'male' || g === 'men' || g === 'unisex';
-        }
-        if (sel === 'female' || sel === 'women') {
-          return g === 'female' || g === 'women' || g === 'unisex';
-        }
-        if (sel === 'unisex') {
-          return g === 'unisex';
-        }
-        return g === sel;
-      });
+      base = base.filter((p) => productMatchesGender(p.gender, selectedGender));
     }
 
     base = base.filter((p) => {
-      const price = Number(p.price) || 0;
+      const price = getDiscountedPrice(p);
       return price >= minPrice && price <= maxPrice;
     });
 
@@ -295,8 +302,8 @@ export default function ProductListingPage() {
       const idSet = new Set(selectedCollection.productIds ?? []);
       base = base.filter((p) => idSet.has(p.id));
     }
-    if (sortBy === 'price-asc') return [...base].sort((a, b) => a.price - b.price);
-    if (sortBy === 'price-desc') return [...base].sort((a, b) => b.price - a.price);
+    if (sortBy === 'price-asc') return [...base].sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
+    if (sortBy === 'price-desc') return [...base].sort((a, b) => getDiscountedPrice(b) - getDiscountedPrice(a));
     if (sortBy === 'popular') return [...base].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     return base;
   }, [CATALOG, activeCategoryList, activeSubcategory, selectedGender, minPrice, maxPrice, selectedColorLabel, selectedCollection, sortBy]);
@@ -488,7 +495,7 @@ export default function ProductListingPage() {
               </span>
             </h3>
             <div className={collapsedSections.category ? 'hidden' : 'space-y-3'}>
-              {CATEGORY_OPTIONS.map((category) => (
+              {categoryOptions.map((category) => (
                 <label key={category} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={category === 'All' ? activeCategory === 'All' : activeCategoryList.length === 1 && activeCategoryList[0] === category}
@@ -850,11 +857,12 @@ export default function ProductListingPage() {
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
                   const isAvailable = isProductAvailable(product);
+                  const { originalPrice, discountedPrice, hasDiscount } = getPriceBreakdown(product);
                   const handleBuyNow = () => {
                     addItem({
                       id: product.id,
                       title: product.name || product.title,
-                      price: product.price,
+                      price: discountedPrice,
                       image: product.image,
                       alt: product.alt,
                       categoryId: product.categoryId,
@@ -927,7 +935,7 @@ export default function ProductListingPage() {
                               addItem({
                                 id: product.id,
                                 title: product.name || product.title,
-                                price: product.price,
+                                price: discountedPrice,
                                 image: product.image,
                                 alt: product.alt,
                                 categoryId: product.categoryId,
@@ -960,16 +968,16 @@ export default function ProductListingPage() {
                         >
                           {product.description}
                         </p>
-                        {product.originalPrice ? (
+                        {hasDiscount ? (
                           <div className="mt-auto flex flex-col justify-between">
                             <div className="flex items-baseline gap-2">
                               <span
                                 className="text-error font-bold"
                                 style={{ fontSize: 'var(--custom-font-price-size, 14px)' }}
                               >
-                                {formatCurrency(product.price)}
+                                {formatCurrency(discountedPrice)}
                               </span>
-                              <span className="font-body-sm text-[11px] text-on-surface-variant line-through">{formatCurrency(product.originalPrice)}</span>
+                              <span className="font-body-sm text-[11px] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
                             </div>
                           </div>
                         ) : (
@@ -978,7 +986,7 @@ export default function ProductListingPage() {
                               className="text-on-surface font-bold"
                               style={{ fontSize: 'var(--custom-font-price-size, 14px)' }}
                             >
-                              {formatCurrency(product.price)}
+                              {formatCurrency(discountedPrice)}
                             </div>
                             {product.rating && (
                               <div className="flex items-center gap-1 text-tertiary">
@@ -1002,7 +1010,7 @@ export default function ProductListingPage() {
                               addItem({
                                 id: product.id,
                                 title: product.name || product.title,
-                                price: product.price,
+                                price: discountedPrice,
                                 image: product.image,
                                 alt: product.alt,
                                 categoryId: product.categoryId,

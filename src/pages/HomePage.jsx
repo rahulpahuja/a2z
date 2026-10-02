@@ -18,6 +18,7 @@ import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchModal from '../components/SearchModal.jsx';
+import { getDiscountedPrice } from '../utils/discount.js';
 import './HomePage.css';
 
 // Product slices are computed inside the component using the useProducts hook
@@ -466,7 +467,7 @@ export default function HomePage() {
                             </div>
                           )}
                         </div>
-                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(product.price)}</p>
+                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(getDiscountedPrice(product))}</p>
                       </div>
                     </Link>
                   </div>
@@ -572,7 +573,7 @@ export default function HomePage() {
                             </div>
                           )}
                         </div>
-                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(product.price)}</p>
+                        <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(getDiscountedPrice(product))}</p>
                       </div>
                     </Link>
                   </div>
