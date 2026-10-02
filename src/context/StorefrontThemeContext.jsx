@@ -39,10 +39,14 @@ export const DEFAULT_THEME = {
   // Product card actions
   addToCartStyle: 'icon',  // 'icon' (default: bag icon over the image, larger photo) | 'button' (Buy Now + Add to Cart buttons)
 
-  // Where the Gender / Color / Size filters appear on the listing page
+  // Where each listing-page filter appears
   genderFilterPlacement: 'top',  // 'top' (default: next to Sort By, sticky on mobile) | 'left' (sidebar)
   colorFilterPlacement: 'top',
   sizeFilterPlacement: 'top',
+  categoryFilterPlacement: 'top',
+  subcategoryFilterPlacement: 'top',
+  collectionFilterPlacement: 'top',
+  priceFilterPlacement: 'top',
 
   // Product image hover auto-slide (ms)
   productHoverSlideDelayMs: 1000,
