@@ -15,6 +15,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
 import { getPriceBreakdown } from '../utils/discount.js';
+import DiscountCountdown from '../components/DiscountCountdown.jsx';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -114,6 +115,10 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
   const [viewCount, setViewCount] = useState(null);
+  // Bumped when the discount countdown expires, to force the price below
+  // (computed fresh each render from the real clock) to re-evaluate and
+  // revert without a page reload.
+  const [, forceDiscountRecheck] = useState(0);
 
   useEffect(() => {
     if (product) {
@@ -415,16 +420,23 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Price */}
-            <div className="flex items-center gap-4">
-              <span className="font-price-display text-price-display text-primary">{formatCurrency(discountedPrice)}</span>
-              {hasDiscount && (
-                <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
-              )}
-              {discountLabel && (
-                <span className="px-2.5 py-1 rounded-full bg-error text-on-error font-label-caps text-label-caps">
-                  {discountLabel}
-                </span>
-              )}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-4">
+                <span className="font-price-display text-price-display text-primary">{formatCurrency(discountedPrice)}</span>
+                {hasDiscount && (
+                  <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
+                )}
+                {discountLabel && (
+                  <span className="px-2.5 py-1 rounded-full bg-error text-on-error font-label-caps text-label-caps">
+                    {discountLabel}
+                  </span>
+                )}
+              </div>
+              <DiscountCountdown
+                product={product}
+                className="text-body-sm text-error font-semibold"
+                onExpire={() => forceDiscountRecheck((n) => n + 1)}
+              />
             </div>
 
             {/* Color */}

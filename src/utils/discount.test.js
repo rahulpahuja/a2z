@@ -5,6 +5,7 @@ import {
   isDiscountActive,
   getDiscountedPrice,
   getDiscountLabel,
+  getDiscountCountdownMs,
   getPriceBreakdown,
   validateDiscountInput,
 } from './discount.js';
@@ -206,6 +207,54 @@ describe('getDiscountLabel', () => {
       discountEndDate: '2020-01-01',
     };
     expect(getDiscountLabel(product, NOW)).toBeNull();
+  });
+});
+
+describe('getDiscountCountdownMs', () => {
+  // Built the same way getDiscountEndTime parses discountEndDate
+  // ('${date}T23:59:59.999', local time) so the diffs below are exact
+  // regardless of the machine's timezone.
+  const END_OF_DAY = new Date('2026-06-15T23:59:59.999');
+  const datedProduct = (overrides = {}) => ({
+    price: 1000,
+    discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+    discountValue: 10,
+    discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+    discountEndDate: '2026-06-15',
+    ...overrides,
+  });
+
+  it('is null for a FOREVER discount, however close "now" is to any date', () => {
+    const product = { price: 1000, discountUnit: DISCOUNT_UNITS.PERCENTAGE, discountValue: 10 };
+    expect(getDiscountCountdownMs(product, END_OF_DAY)).toBeNull();
+  });
+
+  it('is null when there is no active discount at all', () => {
+    expect(getDiscountCountdownMs({ price: 1000 }, END_OF_DAY)).toBeNull();
+  });
+
+  it('is null when more than an hour remains', () => {
+    const now = new Date(END_OF_DAY.getTime() - 60 * 60 * 1000 - 1);
+    expect(getDiscountCountdownMs(datedProduct(), now)).toBeNull();
+  });
+
+  it('returns the exact ms remaining at the one-hour boundary', () => {
+    const now = new Date(END_OF_DAY.getTime() - 60 * 60 * 1000);
+    expect(getDiscountCountdownMs(datedProduct(), now)).toBe(60 * 60 * 1000);
+  });
+
+  it('counts down inside the final hour', () => {
+    const now = new Date(END_OF_DAY.getTime() - 5 * 60 * 1000);
+    expect(getDiscountCountdownMs(datedProduct(), now)).toBe(5 * 60 * 1000);
+  });
+
+  it('is null once the end instant has passed (discount simply expired)', () => {
+    const now = new Date(END_OF_DAY.getTime() + 1);
+    expect(getDiscountCountdownMs(datedProduct(), now)).toBeNull();
+  });
+
+  it('is null at the exact end instant', () => {
+    expect(getDiscountCountdownMs(datedProduct(), END_OF_DAY)).toBeNull();
   });
 });
 
