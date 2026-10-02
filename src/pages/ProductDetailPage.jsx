@@ -149,7 +149,7 @@ export default function ProductDetailPage() {
     return <ProductNotFound />;
   }
 
-  const { originalPrice, discountedPrice, hasDiscount } = getPriceBreakdown(product);
+  const { originalPrice, discountedPrice, hasDiscount, discountLabel } = getPriceBreakdown(product);
   const images = product.images && product.images.length > 1 ? product.images : [product.image];
   const videos = product.videos ?? [];
   const media = [
@@ -419,6 +419,11 @@ export default function ProductDetailPage() {
               <span className="font-price-display text-price-display text-primary">{formatCurrency(discountedPrice)}</span>
               {hasDiscount && (
                 <span className="font-body-lg text-body-lg text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
+              )}
+              {discountLabel && (
+                <span className="px-2.5 py-1 rounded-full bg-error text-on-error font-label-caps text-label-caps">
+                  {discountLabel}
+                </span>
               )}
             </div>
 

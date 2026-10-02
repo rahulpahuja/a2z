@@ -857,7 +857,7 @@ export default function ProductListingPage() {
                 {group.items.map((product) => {
                   const isFavorited = !!favorites[product.id];
                   const isAvailable = isProductAvailable(product);
-                  const { originalPrice, discountedPrice, hasDiscount } = getPriceBreakdown(product);
+                  const { originalPrice, discountedPrice, hasDiscount, discountLabel } = getPriceBreakdown(product);
                   const handleBuyNow = () => {
                     addItem({
                       id: product.id,
@@ -908,11 +908,18 @@ export default function ProductListingPage() {
                             </span>
                           </div>
                         )}
-                        {product.badge && (
+                        {(product.badge || discountLabel) && (
                           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-                            <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
-                              {product.badge}
-                            </span>
+                            {discountLabel && (
+                              <span className="px-3 py-1 rounded-[32px] bg-error text-on-error font-label-caps text-label-caps shadow-sm">
+                                {discountLabel}
+                              </span>
+                            )}
+                            {product.badge && (
+                              <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
+                                {product.badge}
+                              </span>
+                            )}
                           </div>
                         )}
                         <button

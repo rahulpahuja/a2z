@@ -4,6 +4,7 @@ import {
   DISCOUNT_DURATIONS,
   isDiscountActive,
   getDiscountedPrice,
+  getDiscountLabel,
   getPriceBreakdown,
   validateDiscountInput,
 } from './discount.js';
@@ -124,15 +125,17 @@ describe('getPriceBreakdown', () => {
       originalPrice: 1000,
       discountedPrice: 1000,
       hasDiscount: false,
+      discountLabel: null,
     });
   });
 
-  it('reports the active admin-configured discount', () => {
+  it('reports the active admin-configured discount, with its label', () => {
     const product = { price: 1000, discountUnit: DISCOUNT_UNITS.PERCENTAGE, discountValue: 20 };
     expect(getPriceBreakdown(product, NOW)).toEqual({
       originalPrice: 1000,
       discountedPrice: 800,
       hasDiscount: true,
+      discountLabel: '20% OFF',
     });
   });
 
@@ -141,6 +144,7 @@ describe('getPriceBreakdown', () => {
       originalPrice: 1000,
       discountedPrice: 800,
       hasDiscount: true,
+      discountLabel: null,
     });
   });
 
@@ -150,6 +154,7 @@ describe('getPriceBreakdown', () => {
       originalPrice: 1000,
       discountedPrice: 700,
       hasDiscount: true,
+      discountLabel: '₹300 OFF',
     });
   });
 
@@ -158,7 +163,49 @@ describe('getPriceBreakdown', () => {
       originalPrice: 1000,
       discountedPrice: 1000,
       hasDiscount: false,
+      discountLabel: null,
     });
+  });
+});
+
+describe('getDiscountLabel', () => {
+  it('is null when there is no active discount', () => {
+    expect(getDiscountLabel({ price: 1000 }, NOW)).toBeNull();
+  });
+
+  it('labels a whole-number percentage discount', () => {
+    expect(
+      getDiscountLabel({ price: 1000, discountUnit: DISCOUNT_UNITS.PERCENTAGE, discountValue: 10 }, NOW)
+    ).toBe('10% OFF');
+  });
+
+  it('labels a fractional percentage discount', () => {
+    expect(
+      getDiscountLabel({ price: 1000, discountUnit: DISCOUNT_UNITS.PERCENTAGE, discountValue: 12.5 }, NOW)
+    ).toBe('12.5% OFF');
+  });
+
+  it('clamps a percentage label at 100%', () => {
+    expect(
+      getDiscountLabel({ price: 1000, discountUnit: DISCOUNT_UNITS.PERCENTAGE, discountValue: 250 }, NOW)
+    ).toBe('100% OFF');
+  });
+
+  it('labels a FIXED (rupee) discount', () => {
+    expect(getDiscountLabel({ price: 1000, discountUnit: DISCOUNT_UNITS.FIXED, discountValue: 100 }, NOW)).toBe(
+      '₹100 OFF'
+    );
+  });
+
+  it('is null once the dated discount has expired', () => {
+    const product = {
+      price: 1000,
+      discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+      discountValue: 10,
+      discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+      discountEndDate: '2020-01-01',
+    };
+    expect(getDiscountLabel(product, NOW)).toBeNull();
   });
 });
 
