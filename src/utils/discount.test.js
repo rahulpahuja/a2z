@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   DISCOUNT_UNITS,
   DISCOUNT_DURATIONS,
+  DISCOUNT_END_TIME_MODES,
   isDiscountActive,
   getDiscountedPrice,
   getDiscountLabel,
@@ -71,6 +72,45 @@ describe('isDiscountActive', () => {
         NOW
       )
     ).toBe(false);
+  });
+
+  describe('with a CUSTOM_TIME end time', () => {
+    const customTimeProduct = (overrides = {}) => ({
+      price: 1000,
+      discountValue: 10,
+      discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+      discountEndDate: '2026-06-15',
+      discountEndTimeMode: DISCOUNT_END_TIME_MODES.CUSTOM_TIME,
+      discountEndTime: '18:30:00',
+      ...overrides,
+    });
+
+    it('is active right up to the custom end time', () => {
+      const now = new Date('2026-06-15T18:30:00');
+      expect(isDiscountActive(customTimeProduct(), now)).toBe(true);
+    });
+
+    it('is expired a moment after the custom end time', () => {
+      const now = new Date('2026-06-15T18:30:01');
+      expect(isDiscountActive(customTimeProduct(), now)).toBe(false);
+    });
+
+    it('is expired later the same day, well past the custom end time', () => {
+      const now = new Date('2026-06-15T20:00:00');
+      expect(isDiscountActive(customTimeProduct(), now)).toBe(false);
+    });
+
+    it('falls back to end-of-day when discountEndTimeMode is END_OF_DAY despite a stray discountEndTime', () => {
+      const product = customTimeProduct({ discountEndTimeMode: DISCOUNT_END_TIME_MODES.END_OF_DAY });
+      const now = new Date('2026-06-15T20:00:00'); // after 18:30, but before end of day
+      expect(isDiscountActive(product, now)).toBe(true);
+    });
+
+    it('falls back to end-of-day when discountEndTime is missing even though mode is CUSTOM_TIME', () => {
+      const product = customTimeProduct({ discountEndTime: '' });
+      const now = new Date('2026-06-15T20:00:00');
+      expect(isDiscountActive(product, now)).toBe(true);
+    });
   });
 });
 
@@ -311,6 +351,42 @@ describe('validateDiscountInput', () => {
         discountUnit: DISCOUNT_UNITS.PERCENTAGE,
         discountValue: '10',
         discountDurationType: DISCOUNT_DURATIONS.FOREVER,
+      })
+    ).toBeNull();
+  });
+
+  it('defaults to END_OF_DAY and does not require an end time when the mode is unset', () => {
+    expect(
+      validateDiscountInput({
+        discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+        discountValue: '10',
+        discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+        discountEndDate: '2026-12-31',
+      })
+    ).toBeNull();
+  });
+
+  it('requires an end time when discountEndTimeMode is CUSTOM_TIME', () => {
+    expect(
+      validateDiscountInput({
+        discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+        discountValue: '10',
+        discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+        discountEndDate: '2026-12-31',
+        discountEndTimeMode: DISCOUNT_END_TIME_MODES.CUSTOM_TIME,
+      })
+    ).toMatch(/end time/);
+  });
+
+  it('is valid with an end time when discountEndTimeMode is CUSTOM_TIME', () => {
+    expect(
+      validateDiscountInput({
+        discountUnit: DISCOUNT_UNITS.PERCENTAGE,
+        discountValue: '10',
+        discountDurationType: DISCOUNT_DURATIONS.UNTIL_DATE,
+        discountEndDate: '2026-12-31',
+        discountEndTimeMode: DISCOUNT_END_TIME_MODES.CUSTOM_TIME,
+        discountEndTime: '18:30:00',
       })
     ).toBeNull();
   });

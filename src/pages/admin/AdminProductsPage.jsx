@@ -10,7 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
-import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, validateDiscountInput } from '../../utils/discount.js';
+import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, DISCOUNT_END_TIME_MODES, validateDiscountInput } from '../../utils/discount.js';
 import {
   getColorName,
   normalizeColors,
@@ -68,6 +68,8 @@ const EMPTY_FORM = {
   discountValue: '',
   discountDurationType: DISCOUNT_DURATIONS.FOREVER,
   discountEndDate: '',
+  discountEndTimeMode: DISCOUNT_END_TIME_MODES.END_OF_DAY,
+  discountEndTime: '',
 };
 
 export default function AdminProductsPage() {
@@ -141,6 +143,8 @@ export default function AdminProductsPage() {
       discountValue: product.discountValue ?? '',
       discountDurationType: product.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
       discountEndDate: product.discountEndDate || '',
+      discountEndTimeMode: product.discountEndTimeMode || DISCOUNT_END_TIME_MODES.END_OF_DAY,
+      discountEndTime: product.discountEndTime || '',
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
@@ -189,6 +193,8 @@ export default function AdminProductsPage() {
       discountValue: product.discountValue ?? '',
       discountDurationType: product.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
       discountEndDate: product.discountEndDate || '',
+      discountEndTimeMode: product.discountEndTimeMode || DISCOUNT_END_TIME_MODES.END_OF_DAY,
+      discountEndTime: product.discountEndTime || '',
     });
     setSizes(getAllSizeNames(product.colors, product.sizes));
     setColorSizeStocks(colorSizeStocksFromProduct(product));
@@ -724,6 +730,12 @@ export default function AdminProductsPage() {
         discountValue: form.discountValue === '' ? null : Number(form.discountValue),
         discountDurationType: form.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
         discountEndDate: form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE ? form.discountEndDate : null,
+        discountEndTimeMode: form.discountEndTimeMode || DISCOUNT_END_TIME_MODES.END_OF_DAY,
+        discountEndTime:
+          form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE &&
+          form.discountEndTimeMode === DISCOUNT_END_TIME_MODES.CUSTOM_TIME
+            ? form.discountEndTime
+            : null,
         colors: colorsPayload,
         image: uploadedUrls[0],
         images: uploadedUrls,
@@ -1164,6 +1176,38 @@ export default function AdminProductsPage() {
                     />
                   </div>
                 )}
+                {form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE && (
+                  <div>
+                    <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-end-time-mode">
+                      Ends At
+                    </label>
+                    <select
+                      id="p-discount-end-time-mode"
+                      value={form.discountEndTimeMode}
+                      onChange={updateField('discountEndTimeMode')}
+                      className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                    >
+                      <option value={DISCOUNT_END_TIME_MODES.END_OF_DAY}>Full day</option>
+                      <option value={DISCOUNT_END_TIME_MODES.CUSTOM_TIME}>Certain time</option>
+                    </select>
+                  </div>
+                )}
+                {form.discountDurationType === DISCOUNT_DURATIONS.UNTIL_DATE &&
+                  form.discountEndTimeMode === DISCOUNT_END_TIME_MODES.CUSTOM_TIME && (
+                    <div>
+                      <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-discount-end-time">
+                        Discount End Time
+                      </label>
+                      <input
+                        id="p-discount-end-time"
+                        type="time"
+                        step="1"
+                        value={form.discountEndTime}
+                        onChange={updateField('discountEndTime')}
+                        className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                      />
+                    </div>
+                  )}
               </div>
 
               {/* Sizes */}
