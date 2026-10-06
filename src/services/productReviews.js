@@ -1,4 +1,4 @@
-import { onValue, push, ref, remove, runTransaction, serverTimestamp } from 'firebase/database';
+import { onValue, push, ref, remove, runTransaction, serverTimestamp, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { createLocalStore } from './localStore.js';
 
@@ -62,12 +62,15 @@ export function createProductReview(productId, input) {
     localStore.write(productId, [...existing, { id, ...review, helpful: 0, createdAtMs }]);
     return Promise.resolve(id);
   }
-  return push(ref(db, `${ROOT}/${productId}`), {
+  // Create the key first and write with set(). Returning push() directly and awaiting it
+  // recurses inside the Firebase SDK's thenable and throws "Maximum call stack size exceeded".
+  const reviewRef = push(ref(db, `${ROOT}/${productId}`));
+  return set(reviewRef, {
     ...review,
     helpful: 0,
     createdAt: serverTimestamp(),
     createdAtMs,
-  });
+  }).then(() => reviewRef.key);
 }
 
 // Each browser may vote once per review. The vote is remembered locally so the
