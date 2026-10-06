@@ -160,12 +160,12 @@ export default function PaymentPage() {
             </div>
 
             <div className="mt-6 p-5 bg-primary/10 rounded-xl border border-primary/20 flex items-center gap-3 shadow-sm">
-              <span className="material-symbols-outlined text-primary text-[24px]">verified_user</span>
+              <span className="material-symbols-outlined text-primary text-[1.5rem]">verified_user</span>
               <div>
-                <h3 className="font-semibold text-on-surface text-[14px]">
+                <h3 className="font-semibold text-on-surface text-[0.875rem]">
                   Secure Checkout via Razorpay
                 </h3>
-                <p className="text-[11px] text-on-surface-variant mt-0.5">
+                <p className="text-[0.6875rem] text-on-surface-variant mt-0.5">
                   You'll be redirected to Razorpay's secure payment window to complete your purchase.
                 </p>
               </div>

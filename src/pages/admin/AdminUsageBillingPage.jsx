@@ -9,20 +9,20 @@ const usd = (value) => (typeof value === 'number' ? `$${value.toFixed(2)}` : '�
 function StatCard({ title, icon, data }) {
   return (
     <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/30 flex flex-col gap-3">
-      <h3 className="font-title-sm text-[14px] text-on-surface font-semibold flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary text-[18px]">{icon}</span>
+      <h3 className="font-title-sm text-[0.875rem] text-on-surface font-semibold flex items-center gap-2">
+        <span className="material-symbols-outlined text-primary text-[1.125rem]">{icon}</span>
         {title}
       </h3>
       {data?.error ? (
-        <p className="font-body-sm text-[12px] text-error">{data.error}</p>
+        <p className="font-body-sm text-[0.75rem] text-error">{data.error}</p>
       ) : data?.status === 'pending' ? (
-        <p className="font-body-sm text-[12px] text-on-surface-variant italic">{data.note || 'Not yet integrated.'}</p>
+        <p className="font-body-sm text-[0.75rem] text-on-surface-variant italic">{data.note || 'Not yet integrated.'}</p>
       ) : (
         <dl className="flex flex-col gap-1.5">
           {Object.entries(data ?? {})
             .filter(([key]) => key !== 'note' && key !== 'ops_by_action')
             .map(([key, value]) => (
-              <div key={key} className="flex justify-between gap-3 text-[12px]">
+              <div key={key} className="flex justify-between gap-3 text-[0.75rem]">
                 <dt className="text-on-surface-variant capitalize">{key.replace(/_/g, ' ')}</dt>
                 <dd className="text-on-surface font-mono text-right">
                   {typeof value === 'number' && /cost|price/.test(key)
@@ -33,7 +33,7 @@ function StatCard({ title, icon, data }) {
                 </dd>
               </div>
             ))}
-          {data?.note && <p className="text-[10px] text-on-surface-variant/60 mt-1">{data.note}</p>}
+          {data?.note && <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">{data.note}</p>}
         </dl>
       )}
     </div>
@@ -89,7 +89,7 @@ export default function AdminUsageBillingPage() {
         <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Usage & Billing</h1>
         <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
           Live usage/estimated cost across R2, MSG91, Firebase, Netlify, and ShipPrime — served by the{' '}
-          <code className="font-mono text-[12px]">usage-billing-worker</code>.
+          <code className="font-mono text-[0.75rem]">usage-billing-worker</code>.
         </p>
       </header>
 
@@ -97,18 +97,18 @@ export default function AdminUsageBillingPage() {
         {!apiUrl && (
           <section className="bg-error/10 border border-error/30 rounded-xl p-6">
             <p className="font-body-md text-body-md text-error">
-              <code className="font-mono text-[12px]">VITE_USAGE_BILLING_API_URL</code> isn't set. Deploy{' '}
-              <code className="font-mono text-[12px]">usage-billing-worker</code> (fill in real values in its{' '}
-              <code className="font-mono text-[12px]">wrangler.toml</code> and secrets, then <code className="font-mono text-[12px]">wrangler deploy</code>),
-              then add its URL to <code className="font-mono text-[12px]">.env</code> as{' '}
-              <code className="font-mono text-[12px]">VITE_USAGE_BILLING_API_URL</code>.
+              <code className="font-mono text-[0.75rem]">VITE_USAGE_BILLING_API_URL</code> isn't set. Deploy{' '}
+              <code className="font-mono text-[0.75rem]">usage-billing-worker</code> (fill in real values in its{' '}
+              <code className="font-mono text-[0.75rem]">wrangler.toml</code> and secrets, then <code className="font-mono text-[0.75rem]">wrangler deploy</code>),
+              then add its URL to <code className="font-mono text-[0.75rem]">.env</code> as{' '}
+              <code className="font-mono text-[0.75rem]">VITE_USAGE_BILLING_API_URL</code>.
             </p>
           </section>
         )}
 
         <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30">
           <h2 className="font-title-sm text-title-sm text-on-surface mb-4">Access</h2>
-          <p className="font-body-sm text-[12px] text-on-surface-variant mb-4">
+          <p className="font-body-sm text-[0.75rem] text-on-surface-variant mb-4">
             The shared key is never bundled into the site's public code — it's only kept in this browser tab's session
             storage, sent straight to the worker as an auth header.
           </p>
@@ -134,12 +134,12 @@ export default function AdminUsageBillingPage() {
               {loading ? 'Loading…' : 'Fetch Report'}
             </button>
           </form>
-          {error && <p className="font-body-sm text-[12px] text-error mt-3">{error}</p>}
+          {error && <p className="font-body-sm text-[0.75rem] text-error mt-3">{error}</p>}
         </section>
 
         {report && (
           <section className="flex flex-col gap-4">
-            <p className="font-body-sm text-[11px] text-on-surface-variant">
+            <p className="font-body-sm text-[0.6875rem] text-on-surface-variant">
               Generated {new Date(report.generated_at).toLocaleString('en-IN')} · Period{' '}
               {new Date(report.period.start).toLocaleDateString('en-IN')} –{' '}
               {new Date(report.period.end).toLocaleDateString('en-IN')}

@@ -109,7 +109,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
           {/* Main Primary Links */}
           <div>
-            <span className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
               Discover
             </span>
             <nav className="flex flex-col gap-1">
@@ -120,10 +120,10 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-3 rounded-xl bg-primary/10 text-primary font-bold font-title-sm text-title-sm hover:bg-primary/15 transition-all shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-primary">sparkles</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-primary">sparkles</span>
                   <span>New Arrivals</span>
                 </div>
-                <span className="bg-primary text-on-primary font-label-caps text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider">
+                <span className="bg-primary text-on-primary font-label-caps text-[0.625rem] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider">
                   NEW
                 </span>
               </Link>
@@ -135,17 +135,17 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant">grid_view</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-on-surface-variant">grid_view</span>
                   <span>All Products</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant/60">chevron_right</span>
+                <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/60">chevron_right</span>
               </Link>
             </nav>
           </div>
 
           {/* Categories Section */}
           <div>
-            <span className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
               Categories
             </span>
             <nav className="flex flex-col gap-1">
@@ -157,7 +157,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                   className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high hover:text-primary transition-colors font-body-md text-body-md"
                 >
                   <span className="truncate">{link.label}</span>
-                  <span className="material-symbols-outlined text-[18px] text-on-surface-variant/50">chevron_right</span>
+                  <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/50">chevron_right</span>
                 </Link>
               ))}
             </nav>
@@ -165,7 +165,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
           {/* Highlights & Experience */}
           <div>
-            <span className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
               Experience
             </span>
             <nav className="flex flex-col gap-1">
@@ -175,10 +175,10 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-secondary">smart_display</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-secondary">smart_display</span>
                   <span>A2Z Shots (Video Reels)</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant/60">chevron_right</span>
+                <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/60">chevron_right</span>
               </Link>
               <Link
                 to="/orders/tracking"
@@ -186,10 +186,10 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant">local_shipping</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-on-surface-variant">local_shipping</span>
                   <span>Track Your Order</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant/60">chevron_right</span>
+                <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/60">chevron_right</span>
               </Link>
               <Link
                 to="/orders"
@@ -197,10 +197,10 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant">receipt_long</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-on-surface-variant">receipt_long</span>
                   <span>My Orders</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant/60">chevron_right</span>
+                <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/60">chevron_right</span>
               </Link>
               <Link
                 to="/cart"
@@ -208,17 +208,17 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant">shopping_bag</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-on-surface-variant">shopping_bag</span>
                   <span>Cart</span>
                 </div>
-                <span className="material-symbols-outlined text-[18px] text-on-surface-variant/60">chevron_right</span>
+                <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant/60">chevron_right</span>
               </Link>
             </nav>
           </div>
 
           {/* Quick Help & Store Details */}
           <div>
-            <span className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
               About &amp; Support
             </span>
             <nav className="flex flex-col gap-1">
@@ -227,7 +227,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 onClick={() => handleNavClick('Store Location')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">location_on</span>
+                <span className="material-symbols-outlined text-[1.125rem]">location_on</span>
                 <span>Store Location</span>
               </Link>
               <Link
@@ -235,7 +235,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 onClick={() => handleNavClick('Contact Us')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">support_agent</span>
+                <span className="material-symbols-outlined text-[1.125rem]">support_agent</span>
                 <span>Contact Us</span>
               </Link>
               <Link
@@ -243,7 +243,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 onClick={() => handleNavClick('About A2Z')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">info</span>
+                <span className="material-symbols-outlined text-[1.125rem]">info</span>
                 <span>About A2Z</span>
               </Link>
               <Link
@@ -251,7 +251,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
                 onClick={() => handleNavClick('Size Guide')}
                 className="flex items-center gap-2.5 px-3.5 py-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm font-body-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">straighten</span>
+                <span className="material-symbols-outlined text-[1.125rem]">straighten</span>
                 <span>Size Guide</span>
               </Link>
             </nav>
@@ -266,9 +266,9 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => logShare('whatsapp', 'menu_footer')}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-label-caps text-[11px] uppercase tracking-wider transition-colors shadow-sm"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-label-caps text-[0.6875rem] uppercase tracking-wider transition-colors shadow-sm"
             >
-              <span className="material-symbols-outlined text-[16px]">chat</span>
+              <span className="material-symbols-outlined text-[1rem]">chat</span>
               WhatsApp
             </a>
           )}
@@ -276,9 +276,9 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
             <a
               href={`tel:+${cleanPhone}`}
               onClick={() => logShare('call', 'menu_footer')}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-outline hover:border-primary text-on-surface hover:text-primary font-label-caps text-[11px] uppercase tracking-wider transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-outline hover:border-primary text-on-surface hover:text-primary font-label-caps text-[0.6875rem] uppercase tracking-wider transition-colors"
             >
-              <span className="material-symbols-outlined text-[16px]">call</span>
+              <span className="material-symbols-outlined text-[1rem]">call</span>
               Call Us
             </a>
           )}

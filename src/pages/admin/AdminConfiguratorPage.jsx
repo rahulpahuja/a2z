@@ -708,13 +708,13 @@ export default function AdminConfiguratorPage() {
               key={s.key}
               type="button"
               onClick={() => setActiveSurface(s.key)}
-              className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg transition-all text-center font-label-caps text-[10px] uppercase ${
+              className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg transition-all text-center font-label-caps text-[0.625rem] uppercase ${
                 activeSurface === s.key
                   ? 'bg-surface shadow text-primary font-bold'
                   : 'text-on-surface-variant hover:text-on-surface font-medium'
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">{s.icon}</span>
+              <span className="material-symbols-outlined text-[1rem]">{s.icon}</span>
               {s.label}
             </button>
           ))}
@@ -729,16 +729,16 @@ export default function AdminConfiguratorPage() {
 
               {activeSurface === 'hero' && (
                 <div className="admin-card flex flex-col gap-5">
-                  <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[20px]">view_carousel</span>
+                  <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[1.25rem]">view_carousel</span>
                     Homepage Hero Carousel
                   </h3>
-                  <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                  <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                     Recommended: 1920x1080px (16:9) or 1920x800px widescreen images. Animated GIFs upload as-is, preserving the animation.
                   </p>
 
                   {heroLoading ? (
-                    <p className="text-[12px] text-on-surface-variant">Loading…</p>
+                    <p className="text-[0.75rem] text-on-surface-variant">Loading…</p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {heroSlides.map((slide, idx) => {
@@ -746,11 +746,11 @@ export default function AdminConfiguratorPage() {
                         return (
                           <div key={slide.id || idx} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 flex flex-col gap-3">
                             <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
-                              <h4 className="font-title-sm text-[12px] text-primary font-bold uppercase tracking-wider">Slide {idx + 1}</h4>
+                              <h4 className="font-title-sm text-[0.75rem] text-primary font-bold uppercase tracking-wider">Slide {idx + 1}</h4>
                               <button
                                 type="button"
                                 onClick={() => setHeroPreviewIdx(idx)}
-                                className={`text-[10px] uppercase font-label-caps px-2 py-1 rounded transition-colors ${
+                                className={`text-[0.625rem] uppercase font-label-caps px-2 py-1 rounded transition-colors ${
                                   heroPreviewIdx === idx ? 'bg-primary text-on-primary' : 'text-primary bg-primary/5 border border-primary/25'
                                 }`}
                               >
@@ -772,7 +772,7 @@ export default function AdminConfiguratorPage() {
                                   />
                                 ) : (
                                   <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant/40 bg-surface-container-high">
-                                    <span className="material-symbols-outlined text-[24px]">image</span>
+                                    <span className="material-symbols-outlined text-[1.5rem]">image</span>
                                   </div>
                                 )}
                                 {isUploading && (
@@ -786,7 +786,7 @@ export default function AdminConfiguratorPage() {
                                   <button
                                     type="button"
                                     onClick={handleHeroCancelUpload}
-                                    className="border border-error text-error font-label-caps text-[10px] px-3 py-2 rounded hover:bg-error/10 uppercase transition-colors"
+                                    className="border border-error text-error font-label-caps text-[0.625rem] px-3 py-2 rounded hover:bg-error/10 uppercase transition-colors"
                                   >
                                     Cancel Upload
                                   </button>
@@ -795,7 +795,7 @@ export default function AdminConfiguratorPage() {
                                     type="button"
                                     onClick={() => document.getElementById(`hero-upload-${idx}`).click()}
                                     disabled={uploadingSlideIdx !== null}
-                                    className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-2 rounded hover:opacity-90 uppercase transition-opacity border border-outline-variant/20 disabled:opacity-50"
+                                    className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-2 rounded hover:opacity-90 uppercase transition-opacity border border-outline-variant/20 disabled:opacity-50"
                                   >
                                     {slide.image ? 'Replace Image' : 'Upload Image'}
                                   </button>
@@ -811,31 +811,31 @@ export default function AdminConfiguratorPage() {
                             </div>
 
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`hero-title-${idx}`}>Headline / Title</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`hero-title-${idx}`}>Headline / Title</label>
                               <input
                                 id={`hero-title-${idx}`}
                                 type="text"
                                 value={slide.title}
                                 onChange={(e) => handleHeroFieldChange(idx, 'title', e.target.value)}
                                 placeholder="e.g. The Festive Collection"
-                                className="form-input text-[12px] py-2 px-3"
+                                className="form-input text-[0.75rem] py-2 px-3"
                               />
                             </div>
 
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`hero-alt-${idx}`}>Image Alt Description</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`hero-alt-${idx}`}>Image Alt Description</label>
                               <input
                                 id={`hero-alt-${idx}`}
                                 type="text"
                                 value={slide.alt}
                                 onChange={(e) => handleHeroFieldChange(idx, 'alt', e.target.value)}
                                 placeholder="Describe what is shown…"
-                                className="form-input text-[12px] py-2 px-3"
+                                className="form-input text-[0.75rem] py-2 px-3"
                               />
                             </div>
 
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                              <label className="flex items-center gap-2 text-[11px] text-on-surface-variant cursor-pointer">
+                              <label className="flex items-center gap-2 text-[0.6875rem] text-on-surface-variant cursor-pointer">
                                 <input
                                   type="checkbox"
                                   checked={!!slide.hideTitle}
@@ -844,7 +844,7 @@ export default function AdminConfiguratorPage() {
                                 />
                                 Hide headline
                               </label>
-                              <label className="flex items-center gap-2 text-[11px] text-on-surface-variant cursor-pointer">
+                              <label className="flex items-center gap-2 text-[0.6875rem] text-on-surface-variant cursor-pointer">
                                 <input
                                   type="checkbox"
                                   checked={!!slide.hideCta}
@@ -857,26 +857,26 @@ export default function AdminConfiguratorPage() {
 
                             {!slide.hideCta && (
                               <div className="form-group">
-                                <label className="form-label text-[11px]" htmlFor={`hero-cta-${idx}`}>Button CTA Label</label>
+                                <label className="form-label text-[0.6875rem]" htmlFor={`hero-cta-${idx}`}>Button CTA Label</label>
                                 <input
                                   id={`hero-cta-${idx}`}
                                   type="text"
                                   value={slide.cta}
                                   onChange={(e) => handleHeroFieldChange(idx, 'cta', e.target.value)}
                                   placeholder="e.g. Shop Now"
-                                  className="form-input text-[12px] py-2 px-3"
+                                  className="form-input text-[0.75rem] py-2 px-3"
                                 />
                               </div>
                             )}
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div className="form-group">
-                                <label className="form-label text-[11px]" htmlFor={`hero-link-type-${idx}`}>Where should this slide land?</label>
+                                <label className="form-label text-[0.6875rem]" htmlFor={`hero-link-type-${idx}`}>Where should this slide land?</label>
                                 <select
                                   id={`hero-link-type-${idx}`}
                                   value={slide.linkType || 'products'}
                                   onChange={(e) => handleHeroLinkFieldChange(idx, 'linkType', e.target.value)}
-                                  className="form-select text-[12px] py-2 px-3"
+                                  className="form-select text-[0.75rem] py-2 px-3"
                                 >
                                   <option value="home">Home Page</option>
                                   <option value="products">All Products</option>
@@ -888,12 +888,12 @@ export default function AdminConfiguratorPage() {
 
                               {slide.linkType === 'category' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`hero-link-cat-${idx}`}>Category</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`hero-link-cat-${idx}`}>Category</label>
                                   <select
                                     id={`hero-link-cat-${idx}`}
                                     value={slide.linkCategory || ''}
                                     onChange={(e) => handleHeroLinkFieldChange(idx, 'linkCategory', e.target.value)}
-                                    className="form-select text-[12px] py-2 px-3"
+                                    className="form-select text-[0.75rem] py-2 px-3"
                                   >
                                     <option value="">-- Choose Category --</option>
                                     {categories.filter((c) => c !== 'All').map((c) => (
@@ -905,12 +905,12 @@ export default function AdminConfiguratorPage() {
 
                               {slide.linkType === 'product' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`hero-link-prod-${idx}`}>Product</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`hero-link-prod-${idx}`}>Product</label>
                                   <select
                                     id={`hero-link-prod-${idx}`}
                                     value={slide.linkProductId || ''}
                                     onChange={(e) => handleHeroLinkFieldChange(idx, 'linkProductId', e.target.value)}
-                                    className="form-select text-[12px] py-2 px-3"
+                                    className="form-select text-[0.75rem] py-2 px-3"
                                   >
                                     <option value="">-- Choose Product --</option>
                                     {products.map((p) => (
@@ -922,14 +922,14 @@ export default function AdminConfiguratorPage() {
 
                               {slide.linkType === 'custom' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`hero-link-custom-${idx}`}>Custom Path</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`hero-link-custom-${idx}`}>Custom Path</label>
                                   <input
                                     id={`hero-link-custom-${idx}`}
                                     type="text"
                                     value={slide.linkCustom || ''}
                                     onChange={(e) => handleHeroLinkFieldChange(idx, 'linkCustom', e.target.value)}
                                     placeholder="e.g. /about-us"
-                                    className="form-input text-[12px] py-2 px-3"
+                                    className="form-input text-[0.75rem] py-2 px-3"
                                   />
                                 </div>
                               )}
@@ -941,10 +941,10 @@ export default function AdminConfiguratorPage() {
                   )}
 
                   <div className="flex gap-3 justify-start pt-2 border-t border-outline-variant/20">
-                    <button type="button" onClick={handleHeroReset} disabled={heroSaving} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+                    <button type="button" onClick={handleHeroReset} disabled={heroSaving} className="btn btn-secondary py-2.5 px-5 text-[0.6875rem]">
                       Reset Defaults
                     </button>
-                    <button type="button" onClick={handleHeroSave} disabled={heroSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
+                    <button type="button" onClick={handleHeroSave} disabled={heroSaving} className="btn btn-primary py-2.5 px-5 text-[0.6875rem]">
                       {heroSaving ? 'Saving…' : 'Save Hero Carousel'}
                     </button>
                   </div>
@@ -953,16 +953,16 @@ export default function AdminConfiguratorPage() {
 
               {activeSurface === 'categoryBubbles' && (
                 <div className="admin-card flex flex-col gap-5">
-                  <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[20px]">category</span>
+                  <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[1.25rem]">category</span>
                     Homepage Category Bubbles
                   </h3>
-                  <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                  <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                     The circular "shop by category" row under the hero carousel. Square images work best (they're cropped into a circle).
                   </p>
 
                   {bubblesLoading ? (
-                    <p className="text-[12px] text-on-surface-variant">Loading…</p>
+                    <p className="text-[0.75rem] text-on-surface-variant">Loading…</p>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {categoryBubbles.map((bubble, idx) => {
@@ -970,7 +970,7 @@ export default function AdminConfiguratorPage() {
                         return (
                           <div key={bubble.id || idx} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 flex flex-col gap-3">
                             <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
-                              <h4 className="font-title-sm text-[12px] text-primary font-bold uppercase tracking-wider">
+                              <h4 className="font-title-sm text-[0.75rem] text-primary font-bold uppercase tracking-wider">
                                 {bubble.name || `Bubble ${idx + 1}`}
                               </h4>
                               <div className="flex items-center gap-1">
@@ -981,7 +981,7 @@ export default function AdminConfiguratorPage() {
                                   className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                                   aria-label="Move earlier"
                                 >
-                                  <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                  <span className="material-symbols-outlined text-[1rem]">arrow_upward</span>
                                 </button>
                                 <button
                                   type="button"
@@ -990,7 +990,7 @@ export default function AdminConfiguratorPage() {
                                   className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                                   aria-label="Move later"
                                 >
-                                  <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+                                  <span className="material-symbols-outlined text-[1rem]">arrow_downward</span>
                                 </button>
                                 <button
                                   type="button"
@@ -998,7 +998,7 @@ export default function AdminConfiguratorPage() {
                                   className="w-7 h-7 rounded border border-error/40 flex items-center justify-center text-error hover:bg-error/10 transition-colors"
                                   aria-label="Remove bubble"
                                 >
-                                  <span className="material-symbols-outlined text-[16px]">delete</span>
+                                  <span className="material-symbols-outlined text-[1rem]">delete</span>
                                 </button>
                               </div>
                             </div>
@@ -1017,7 +1017,7 @@ export default function AdminConfiguratorPage() {
                                   />
                                 ) : (
                                   <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant/40 bg-surface-container-high">
-                                    <span className="material-symbols-outlined text-[24px]">image</span>
+                                    <span className="material-symbols-outlined text-[1.5rem]">image</span>
                                   </div>
                                 )}
                                 {isUploading && (
@@ -1031,7 +1031,7 @@ export default function AdminConfiguratorPage() {
                                   <button
                                     type="button"
                                     onClick={handleBubbleCancelUpload}
-                                    className="border border-error text-error font-label-caps text-[10px] px-3 py-2 rounded hover:bg-error/10 uppercase transition-colors"
+                                    className="border border-error text-error font-label-caps text-[0.625rem] px-3 py-2 rounded hover:bg-error/10 uppercase transition-colors"
                                   >
                                     Cancel Upload
                                   </button>
@@ -1040,7 +1040,7 @@ export default function AdminConfiguratorPage() {
                                     type="button"
                                     onClick={() => document.getElementById(`bubble-upload-${idx}`).click()}
                                     disabled={uploadingBubbleIdx !== null}
-                                    className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-2 rounded hover:opacity-90 uppercase transition-opacity border border-outline-variant/20 disabled:opacity-50"
+                                    className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-2 rounded hover:opacity-90 uppercase transition-opacity border border-outline-variant/20 disabled:opacity-50"
                                   >
                                     {bubble.image ? 'Replace Image' : 'Upload Image'}
                                   </button>
@@ -1056,37 +1056,37 @@ export default function AdminConfiguratorPage() {
                             </div>
 
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`bubble-name-${idx}`}>Name</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`bubble-name-${idx}`}>Name</label>
                               <input
                                 id={`bubble-name-${idx}`}
                                 type="text"
                                 value={bubble.name}
                                 onChange={(e) => handleBubbleFieldChange(idx, 'name', e.target.value)}
                                 placeholder="e.g. Bags"
-                                className="form-input text-[12px] py-2 px-3"
+                                className="form-input text-[0.75rem] py-2 px-3"
                               />
                             </div>
 
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`bubble-alt-${idx}`}>Image Alt Description</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`bubble-alt-${idx}`}>Image Alt Description</label>
                               <input
                                 id={`bubble-alt-${idx}`}
                                 type="text"
                                 value={bubble.alt}
                                 onChange={(e) => handleBubbleFieldChange(idx, 'alt', e.target.value)}
                                 placeholder="Describe what is shown…"
-                                className="form-input text-[12px] py-2 px-3"
+                                className="form-input text-[0.75rem] py-2 px-3"
                               />
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div className="form-group">
-                                <label className="form-label text-[11px]" htmlFor={`bubble-link-type-${idx}`}>Where should this land?</label>
+                                <label className="form-label text-[0.6875rem]" htmlFor={`bubble-link-type-${idx}`}>Where should this land?</label>
                                 <select
                                   id={`bubble-link-type-${idx}`}
                                   value={bubble.linkType || 'products'}
                                   onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkType', e.target.value)}
-                                  className="form-select text-[12px] py-2 px-3"
+                                  className="form-select text-[0.75rem] py-2 px-3"
                                 >
                                   <option value="home">Home Page</option>
                                   <option value="products">All Products</option>
@@ -1098,12 +1098,12 @@ export default function AdminConfiguratorPage() {
 
                               {bubble.linkType === 'category' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-cat-${idx}`}>Category</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`bubble-link-cat-${idx}`}>Category</label>
                                   <select
                                     id={`bubble-link-cat-${idx}`}
                                     value={bubble.linkCategory || ''}
                                     onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkCategory', e.target.value)}
-                                    className="form-select text-[12px] py-2 px-3"
+                                    className="form-select text-[0.75rem] py-2 px-3"
                                   >
                                     <option value="">-- Choose Category --</option>
                                     {categories.filter((c) => c !== 'All').map((c) => (
@@ -1115,12 +1115,12 @@ export default function AdminConfiguratorPage() {
 
                               {bubble.linkType === 'product' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-prod-${idx}`}>Product</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`bubble-link-prod-${idx}`}>Product</label>
                                   <select
                                     id={`bubble-link-prod-${idx}`}
                                     value={bubble.linkProductId || ''}
                                     onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkProductId', e.target.value)}
-                                    className="form-select text-[12px] py-2 px-3"
+                                    className="form-select text-[0.75rem] py-2 px-3"
                                   >
                                     <option value="">-- Choose Product --</option>
                                     {products.map((p) => (
@@ -1132,14 +1132,14 @@ export default function AdminConfiguratorPage() {
 
                               {bubble.linkType === 'custom' && (
                                 <div className="form-group">
-                                  <label className="form-label text-[11px]" htmlFor={`bubble-link-custom-${idx}`}>Custom Path</label>
+                                  <label className="form-label text-[0.6875rem]" htmlFor={`bubble-link-custom-${idx}`}>Custom Path</label>
                                   <input
                                     id={`bubble-link-custom-${idx}`}
                                     type="text"
                                     value={bubble.linkCustom || ''}
                                     onChange={(e) => handleBubbleLinkFieldChange(idx, 'linkCustom', e.target.value)}
                                     placeholder="e.g. /about-us"
-                                    className="form-input text-[12px] py-2 px-3"
+                                    className="form-input text-[0.75rem] py-2 px-3"
                                   />
                                 </div>
                               )}
@@ -1151,13 +1151,13 @@ export default function AdminConfiguratorPage() {
                   )}
 
                   <div className="flex gap-3 justify-start pt-2 border-t border-outline-variant/20 flex-wrap">
-                    <button type="button" onClick={handleAddBubble} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+                    <button type="button" onClick={handleAddBubble} className="btn btn-secondary py-2.5 px-5 text-[0.6875rem]">
                       + Add Bubble
                     </button>
-                    <button type="button" onClick={handleBubblesReset} disabled={bubblesSaving} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+                    <button type="button" onClick={handleBubblesReset} disabled={bubblesSaving} className="btn btn-secondary py-2.5 px-5 text-[0.6875rem]">
                       Reset Defaults
                     </button>
-                    <button type="button" onClick={handleBubblesSave} disabled={bubblesSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
+                    <button type="button" onClick={handleBubblesSave} disabled={bubblesSaving} className="btn btn-primary py-2.5 px-5 text-[0.6875rem]">
                       {bubblesSaving ? 'Saving…' : 'Save Category Bubbles'}
                     </button>
                   </div>
@@ -1166,20 +1166,20 @@ export default function AdminConfiguratorPage() {
 
               {activeSurface === 'topnav' && (
                 <div className="admin-card flex flex-col gap-5">
-                  <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[20px]">menu</span>
+                  <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[1.25rem]">menu</span>
                     Top Navigation Bar
                   </h3>
-                  <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                  <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                     Choose which links appear in the header and mobile menu, built only from categories that already exist.
                   </p>
 
                   {topNavLoading ? (
-                    <p className="text-[12px] text-on-surface-variant">Loading…</p>
+                    <p className="text-[0.75rem] text-on-surface-variant">Loading…</p>
                   ) : (
                     <>
                       {topNavLinks.length === 0 ? (
-                        <p className="text-[12px] text-on-surface-variant">No nav links yet — add one below.</p>
+                        <p className="text-[0.75rem] text-on-surface-variant">No nav links yet — add one below.</p>
                       ) : (
                         <ul className="divide-y divide-outline-variant/20">
                           {topNavLinks.map((link, idx) => (
@@ -1192,7 +1192,7 @@ export default function AdminConfiguratorPage() {
                                   aria-label="Move up"
                                   className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                                 >
-                                  <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
+                                  <span className="material-symbols-outlined text-[0.875rem]">arrow_upward</span>
                                 </button>
                                 <button
                                   type="button"
@@ -1201,21 +1201,21 @@ export default function AdminConfiguratorPage() {
                                   aria-label="Move down"
                                   className="w-7 h-7 rounded border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                                 >
-                                  <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
+                                  <span className="material-symbols-outlined text-[0.875rem]">arrow_downward</span>
                                 </button>
                               </div>
                               <input
                                 value={link.label}
                                 onChange={(e) => handleNavLinkLabelChange(link.id, e.target.value)}
-                                className="form-input text-[12px] py-2 px-3 flex-1"
+                                className="form-input text-[0.75rem] py-2 px-3 flex-1"
                               />
-                              <span className="text-[10px] text-on-surface-variant/70 font-mono shrink-0 whitespace-nowrap">
+                              <span className="text-[0.625rem] text-on-surface-variant/70 font-mono shrink-0 whitespace-nowrap">
                                 {link.type === 'all' ? 'All Products' : (link.categories?.length ? link.categories.join(', ') : link.category)}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleRemoveNavLink(link.id)}
-                                className="text-error font-label-caps text-[10px] hover:underline shrink-0"
+                                className="text-error font-label-caps text-[0.625rem] hover:underline shrink-0"
                               >
                                 Remove
                               </button>
@@ -1226,8 +1226,8 @@ export default function AdminConfiguratorPage() {
 
                       <div className="flex flex-col sm:flex-row gap-3 sm:items-end pt-4 border-t border-outline-variant/20">
                         <div className="form-group">
-                          <label className="form-label text-[11px]">Link Type</label>
-                          <select value={newLinkType} onChange={(e) => setNewLinkType(e.target.value)} className="form-select text-[12px] py-2 px-3">
+                          <label className="form-label text-[0.6875rem]">Link Type</label>
+                          <select value={newLinkType} onChange={(e) => setNewLinkType(e.target.value)} className="form-select text-[0.75rem] py-2 px-3">
                             <option value="category">Existing Category</option>
                             <option value="all">All Products (New Arrivals)</option>
                           </select>
@@ -1235,10 +1235,10 @@ export default function AdminConfiguratorPage() {
 
                         {newLinkType === 'category' && (
                           <div className="form-group flex-1">
-                            <label className="form-label text-[11px]">Categories</label>
+                            <label className="form-label text-[0.6875rem]">Categories</label>
                             <div className="flex flex-wrap gap-x-4 gap-y-2 border border-outline-variant/40 rounded-lg px-3 py-2.5">
                               {categoryRows.map((c) => (
-                                <label key={c.id} className="flex items-center gap-1.5 text-[12px] text-on-surface cursor-pointer">
+                                <label key={c.id} className="flex items-center gap-1.5 text-[0.75rem] text-on-surface cursor-pointer">
                                   <input
                                     type="checkbox"
                                     checked={newLinkCategoryIds.includes(c.id)}
@@ -1253,12 +1253,12 @@ export default function AdminConfiguratorPage() {
                         )}
 
                         <div className="form-group flex-1">
-                          <label className="form-label text-[11px]">Label (optional override)</label>
+                          <label className="form-label text-[0.6875rem]">Label (optional override)</label>
                           <input
                             value={newLinkLabel}
                             onChange={(e) => setNewLinkLabel(e.target.value)}
                             placeholder="e.g. Sarees"
-                            className="form-input text-[12px] py-2 px-3"
+                            className="form-input text-[0.75rem] py-2 px-3"
                           />
                         </div>
 
@@ -1266,14 +1266,14 @@ export default function AdminConfiguratorPage() {
                           type="button"
                           onClick={handleAddNavLink}
                           disabled={newLinkType === 'category' && newLinkCategoryIds.length === 0}
-                          className="bg-primary-container text-on-primary-container font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity disabled:opacity-50 shrink-0"
+                          className="bg-primary-container text-on-primary-container font-label-caps text-[0.6875rem] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity disabled:opacity-50 shrink-0"
                         >
                           Add Link
                         </button>
                       </div>
 
                       <div className="flex gap-3 justify-start pt-2">
-                        <button type="button" onClick={handleSaveNavLinks} disabled={navSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
+                        <button type="button" onClick={handleSaveNavLinks} disabled={navSaving} className="btn btn-primary py-2.5 px-5 text-[0.6875rem]">
                           {navSaving ? 'Saving…' : 'Save Navigation'}
                         </button>
                       </div>
@@ -1285,8 +1285,8 @@ export default function AdminConfiguratorPage() {
               {activeSurface === 'listing' && (
                 <>
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">aspect_ratio</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">aspect_ratio</span>
                       Image &amp; Grid Sizing
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1296,7 +1296,7 @@ export default function AdminConfiguratorPage() {
                           id="listing-aspect"
                           value={form.listingImgAspect}
                           onChange={(e) => handleChange('listingImgAspect', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="3/4">Portrait (3:4 - Recommended)</option>
                           <option value="1/1">Square (1:1)</option>
@@ -1311,13 +1311,13 @@ export default function AdminConfiguratorPage() {
                           id="listing-img-size"
                           value={form.listingImgSize || '100%'}
                           onChange={(e) => handleChange('listingImgSize', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="80%">Small (80%)</option>
                           <option value="90%">Medium (90%)</option>
                           <option value="100%">Full Width (Default)</option>
                         </select>
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           Shrinks the whole product card within its grid cell. To make cards bigger, reduce grid columns instead.
                         </p>
                       </div>
@@ -1331,9 +1331,9 @@ export default function AdminConfiguratorPage() {
                           value={form.itemsPerPage || 400}
                           onChange={(e) => handleChange('itemsPerPage', Math.max(50, Number(e.target.value)))}
                           required
-                          className="form-input text-[12px] py-2 px-3"
+                          className="form-input text-[0.75rem] py-2 px-3"
                         />
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">Must be at least 50.</p>
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">Must be at least 50.</p>
                       </div>
 
                       <div className="form-group">
@@ -1342,7 +1342,7 @@ export default function AdminConfiguratorPage() {
                           id="grid-cols"
                           value={form.gridCols || 4}
                           onChange={(e) => handleChange('gridCols', Number(e.target.value))}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value={4}>4 items in a row (Default)</option>
                           <option value={5}>5 items in a row</option>
@@ -1356,12 +1356,12 @@ export default function AdminConfiguratorPage() {
                           id="add-to-cart-style"
                           value={form.addToCartStyle || 'icon'}
                           onChange={(e) => handleChange('addToCartStyle', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="icon">Bag Icon (Default, Larger Image)</option>
                           <option value="button">Buttons</option>
                         </select>
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           Bag Icon replaces the "Add to Cart" button with a small icon over the image and enlarges the photo. Switch to Buttons to bring back the full-width Add to Cart button.
                         </p>
                       </div>
@@ -1370,8 +1370,8 @@ export default function AdminConfiguratorPage() {
 
                   <div className="admin-card flex flex-col gap-5">
                     <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
+                      <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-[1.25rem]">tune</span>
                         Filter Placement
                       </h3>
                       <button
@@ -1382,12 +1382,12 @@ export default function AdminConfiguratorPage() {
                             ...Object.fromEntries(FILTER_PLACEMENT_FIELDS.map(({ key }) => [key, 'top'])),
                           }))
                         }
-                        className="text-[11px] font-label-caps text-label-caps uppercase px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
+                        className="text-[0.6875rem] font-label-caps text-label-caps uppercase px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
                       >
                         Move All Filters to Top
                       </button>
                     </div>
-                    <p className="text-[11px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.6875rem] text-on-surface-variant/60 -mt-2">
                       Choose whether each filter appears as a quick dropdown next to "Sort by" (sticky on mobile while scrolling) or inside the left filter sidebar.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1398,7 +1398,7 @@ export default function AdminConfiguratorPage() {
                             id={`${key}-placement`}
                             value={form[key] || 'top'}
                             onChange={(e) => handleChange(key, e.target.value)}
-                            className="form-select text-[12px] py-2 px-3"
+                            className="form-select text-[0.75rem] py-2 px-3"
                           >
                             <option value="top">Top (Default, near Sort By)</option>
                             <option value="left">Left Sidebar</option>
@@ -1409,8 +1409,8 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">format_size</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">format_size</span>
                       Card Typography
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1420,7 +1420,7 @@ export default function AdminConfiguratorPage() {
                           id="title-size-list"
                           value={form.titleSizeListing}
                           onChange={(e) => handleChange('titleSizeListing', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="12px">Compact (12px)</option>
                           <option value="14px">Regular (14px - Default)</option>
@@ -1435,7 +1435,7 @@ export default function AdminConfiguratorPage() {
                           id="desc-size-list"
                           value={form.descSizeListing}
                           onChange={(e) => handleChange('descSizeListing', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="10px">Extra Small (10px)</option>
                           <option value="11px">Small (11px)</option>
@@ -1450,7 +1450,7 @@ export default function AdminConfiguratorPage() {
                           id="price-size-list"
                           value={form.priceSizeListing}
                           onChange={(e) => handleChange('priceSizeListing', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="12px">Regular (12px)</option>
                           <option value="14px">Semibold (14px - Default)</option>
@@ -1461,11 +1461,11 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">border_outer</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">border_outer</span>
                       Card Border
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                       Also styles the Product Detail Page main image border — the two stay in sync.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1475,7 +1475,7 @@ export default function AdminConfiguratorPage() {
                           id="border-radius"
                           value={form.borderRadius}
                           onChange={(e) => handleChange('borderRadius', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="0px">Sharp Corner (0px)</option>
                           <option value="8px">Rounded Soft (8px)</option>
@@ -1491,7 +1491,7 @@ export default function AdminConfiguratorPage() {
                           id="border-width"
                           value={form.borderWidth}
                           onChange={(e) => handleChange('borderWidth', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="0px">None (0px)</option>
                           <option value="1px">Thin (1px - Default)</option>
@@ -1514,7 +1514,7 @@ export default function AdminConfiguratorPage() {
                             value={form.borderColor}
                             onChange={(e) => handleChange('borderColor', e.target.value)}
                             placeholder="#DCAE96"
-                            className="form-input text-[12px] py-1.5 px-3 flex-1"
+                            className="form-input text-[0.75rem] py-1.5 px-3 flex-1"
                           />
                         </div>
                       </div>
@@ -1526,8 +1526,8 @@ export default function AdminConfiguratorPage() {
               {activeSurface === 'detail' && (
                 <>
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">aspect_ratio</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">aspect_ratio</span>
                       Image Dimensions
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1537,7 +1537,7 @@ export default function AdminConfiguratorPage() {
                           id="detail-aspect"
                           value={form.detailImgAspect}
                           onChange={(e) => handleChange('detailImgAspect', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="3/4">Portrait (3:4)</option>
                           <option value="1/1">Square (1:1 - Recommended)</option>
@@ -1553,7 +1553,7 @@ export default function AdminConfiguratorPage() {
                           id="gallery-thumb-w"
                           value={form.galleryThumbW}
                           onChange={(e) => handleChange('galleryThumbW', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="56px">56px</option>
                           <option value="64px">64px (Default)</option>
@@ -1568,7 +1568,7 @@ export default function AdminConfiguratorPage() {
                           id="gallery-thumb-h"
                           value={form.galleryThumbH}
                           onChange={(e) => handleChange('galleryThumbH', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="70px">70px</option>
                           <option value="80px">80px (Default)</option>
@@ -1580,8 +1580,8 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">format_size</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">format_size</span>
                       Detail Typography
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1591,7 +1591,7 @@ export default function AdminConfiguratorPage() {
                           id="title-size-detail"
                           value={form.titleSizeDetail}
                           onChange={(e) => handleChange('titleSizeDetail', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="20px">Small (20px)</option>
                           <option value="24px">Medium (24px)</option>
@@ -1607,7 +1607,7 @@ export default function AdminConfiguratorPage() {
                           id="desc-size-detail"
                           value={form.descSizeDetail}
                           onChange={(e) => handleChange('descSizeDetail', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="13px">Small (13px)</option>
                           <option value="14px">Medium (14px)</option>
@@ -1620,11 +1620,11 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">border_outer</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">border_outer</span>
                       Image Border
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                       Radius, width &amp; color are shared with the Listing Page card border — edit here or there, both update.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1634,7 +1634,7 @@ export default function AdminConfiguratorPage() {
                           id="border-radius-detail"
                           value={form.borderRadius}
                           onChange={(e) => handleChange('borderRadius', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="0px">Sharp Corner (0px)</option>
                           <option value="8px">Rounded Soft (8px)</option>
@@ -1650,7 +1650,7 @@ export default function AdminConfiguratorPage() {
                           id="border-radius-sm"
                           value={form.borderRadiusSm}
                           onChange={(e) => handleChange('borderRadiusSm', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="0px">Sharp Corner (0px)</option>
                           <option value="4px">Extra Small (4px)</option>
@@ -1666,7 +1666,7 @@ export default function AdminConfiguratorPage() {
                           id="border-width-detail"
                           value={form.borderWidth}
                           onChange={(e) => handleChange('borderWidth', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="0px">None (0px)</option>
                           <option value="1px">Thin (1px - Default)</option>
@@ -1689,7 +1689,7 @@ export default function AdminConfiguratorPage() {
                             value={form.borderColor}
                             onChange={(e) => handleChange('borderColor', e.target.value)}
                             placeholder="#DCAE96"
-                            className="form-input text-[12px] py-1.5 px-3 flex-1"
+                            className="form-input text-[0.75rem] py-1.5 px-3 flex-1"
                           />
                         </div>
                       </div>
@@ -1701,11 +1701,11 @@ export default function AdminConfiguratorPage() {
               {activeSurface === 'global' && (
                 <>
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">hourglass_empty</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">hourglass_empty</span>
                       Loading Placeholder
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                       Shown on product and listing pages while products load, instead of a "Product not found" or empty message.
                     </p>
                     <div className="form-group">
@@ -1714,7 +1714,7 @@ export default function AdminConfiguratorPage() {
                         id="loading-placeholder"
                         value={form.loadingPlaceholder || 'shimmer'}
                         onChange={(e) => handleChange('loadingPlaceholder', e.target.value)}
-                        className="form-select text-[12px] py-2 px-3"
+                        className="form-select text-[0.75rem] py-2 px-3"
                       >
                         <option value="shimmer">Shimmer (animated placeholder, default)</option>
                         <option value="none">None (blank while loading)</option>
@@ -1723,11 +1723,11 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">palette</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">palette</span>
                       Backgrounds &amp; Backdrop Filters
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                       These settings apply site-wide, across every storefront page.
                     </p>
 
@@ -1738,7 +1738,7 @@ export default function AdminConfiguratorPage() {
                           id="theme-mode"
                           value={form.themeMode || 'light'}
                           onChange={(e) => handleChange('themeMode', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="light">Light Theme (Classic)</option>
                           <option value="dark">Dark Theme (Modern Sleek)</option>
@@ -1760,7 +1760,7 @@ export default function AdminConfiguratorPage() {
                             value={form.storeBgColor}
                             onChange={(e) => handleChange('storeBgColor', e.target.value)}
                             placeholder="#ffffff"
-                            className="form-input text-[12px] py-1.5 px-3 flex-1"
+                            className="form-input text-[0.75rem] py-1.5 px-3 flex-1"
                           />
                         </div>
                       </div>
@@ -1771,7 +1771,7 @@ export default function AdminConfiguratorPage() {
                           id="backdrop-filter"
                           value={form.backdropFilter}
                           onChange={(e) => handleChange('backdropFilter', e.target.value)}
-                          className="form-select text-[12px] py-2 px-3"
+                          className="form-select text-[0.75rem] py-2 px-3"
                         >
                           <option value="none">None (No blur)</option>
                           <option value="blur(4px)">Subtle blur (4px)</option>
@@ -1788,9 +1788,9 @@ export default function AdminConfiguratorPage() {
                           value={form.backdropBg}
                           onChange={(e) => handleChange('backdropBg', e.target.value)}
                           placeholder="e.g. rgba(255,255,255,0.85) or linear-gradient(180deg, #fff, #f5f5f5)"
-                          className="form-input text-[12px] py-2 px-3"
+                          className="form-input text-[0.75rem] py-2 px-3"
                         />
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           Accepts CSS transparency overlays (RGBA) or gradients applied behind galleries, detail layouts, or listings.
                         </p>
                       </div>
@@ -1810,12 +1810,12 @@ export default function AdminConfiguratorPage() {
                               value={form.primaryColor || '#ac2471'}
                               onChange={(e) => handleChange('primaryColor', e.target.value)}
                               placeholder="#ac2471"
-                              className="form-input text-[12px] py-1.5 px-3 flex-1"
+                              className="form-input text-[0.75rem] py-1.5 px-3 flex-1"
                             />
                           </div>
 
                           <div className="flex flex-wrap gap-2 items-center">
-                            <span className="text-[10px] text-on-surface-variant font-mono mr-1">Presets:</span>
+                            <span className="text-[0.625rem] text-on-surface-variant font-mono mr-1">Presets:</span>
                             {[
                               { label: 'Royal Pink', hex: '#ac2471' },
                               { label: 'Luxury Gold', hex: '#c5a880' },
@@ -1828,7 +1828,7 @@ export default function AdminConfiguratorPage() {
                                 key={preset.hex}
                                 type="button"
                                 onClick={() => handleChange('primaryColor', preset.hex)}
-                                className="px-2 py-1 rounded text-[10px] border border-outline-variant/30 hover:border-primary transition-all flex items-center gap-1.5"
+                                className="px-2 py-1 rounded text-[0.625rem] border border-outline-variant/30 hover:border-primary transition-all flex items-center gap-1.5"
                                 style={{ backgroundColor: `${preset.hex}15`, color: preset.hex }}
                               >
                                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.hex }} />
@@ -1837,7 +1837,7 @@ export default function AdminConfiguratorPage() {
                             ))}
                           </div>
                         </div>
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           Sets the primary accent color applied site-wide to buttons, highlights, badges, star ratings, and links.
                         </p>
                       </div>
@@ -1845,11 +1845,11 @@ export default function AdminConfiguratorPage() {
                   </div>
 
                   <div className="admin-card flex flex-col gap-5">
-                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-[20px]">animation</span>
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">animation</span>
                       Product Image Hover Auto-Slide
                     </h3>
-                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
                       Applies wherever product images appear: gallery, homepage rows, and product detail.
                     </p>
 
@@ -1863,9 +1863,9 @@ export default function AdminConfiguratorPage() {
                           step="100"
                           value={form.productHoverSlideDelayMs ?? 1000}
                           onChange={(e) => handleChange('productHoverSlideDelayMs', Math.max(0, Number(e.target.value)))}
-                          className="form-input text-[12px] py-2 px-3"
+                          className="form-input text-[0.75rem] py-2 px-3"
                         />
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           How long a shopper must hover before it starts auto-sliding through other images.
                         </p>
                       </div>
@@ -1879,9 +1879,9 @@ export default function AdminConfiguratorPage() {
                           step="100"
                           value={form.productHoverSlideIntervalMs ?? 1800}
                           onChange={(e) => handleChange('productHoverSlideIntervalMs', Math.max(700, Number(e.target.value)))}
-                          className="form-input text-[12px] py-2 px-3"
+                          className="form-input text-[0.75rem] py-2 px-3"
                         />
-                        <p className="text-[10px] text-on-surface-variant/60 mt-1">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
                           Minimum 700ms — the slide transition itself takes that long.
                         </p>
                       </div>
@@ -1892,22 +1892,22 @@ export default function AdminConfiguratorPage() {
 
               {activeSurface === 'videos' && (
                 <div className="admin-card flex flex-col gap-5">
-                  <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[20px]">movie</span>
+                  <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[1.25rem]">movie</span>
                     Stories in Motion (Video Lookbooks)
                   </h3>
 
                   <div className="space-y-6">
                     {(form.lookbookVideos || []).map((video, idx) => (
                       <div key={video.id || idx} className="p-4 rounded-xl border border-outline-variant/30 bg-surface-container-low/50 flex flex-col gap-3">
-                        <h4 className="text-[12px] font-bold text-primary flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-[16px]">play_circle</span>
+                        <h4 className="text-[0.75rem] font-bold text-primary flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-[1rem]">play_circle</span>
                           Video Slot {idx + 1}
                         </h4>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="form-group">
-                            <label className="form-label text-[11px]" htmlFor={`video-title-${idx}`}>Video Title</label>
+                            <label className="form-label text-[0.6875rem]" htmlFor={`video-title-${idx}`}>Video Title</label>
                             <input
                               id={`video-title-${idx}`}
                               type="text"
@@ -1918,12 +1918,12 @@ export default function AdminConfiguratorPage() {
                                 handleChange('lookbookVideos', updated);
                               }}
                               placeholder="e.g. Vibrant Rani Pink Lookbook"
-                              className="form-input text-[11px] py-1.5 px-3"
+                              className="form-input text-[0.6875rem] py-1.5 px-3"
                             />
                           </div>
 
                           <div className="form-group">
-                            <label className="form-label text-[11px]" htmlFor={`video-desc-${idx}`}>Description</label>
+                            <label className="form-label text-[0.6875rem]" htmlFor={`video-desc-${idx}`}>Description</label>
                             <input
                               id={`video-desc-${idx}`}
                               type="text"
@@ -1934,14 +1934,14 @@ export default function AdminConfiguratorPage() {
                                 handleChange('lookbookVideos', updated);
                               }}
                               placeholder="e.g. Witness the detailed gold zari embroidery..."
-                              className="form-input text-[11px] py-1.5 px-3"
+                              className="form-input text-[0.6875rem] py-1.5 px-3"
                             />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-outline-variant/10">
                           <div className="form-group">
-                            <label className="form-label text-[11px]">Video Source Mode</label>
+                            <label className="form-label text-[0.6875rem]">Video Source Mode</label>
                             <select
                               value={video.sourceMode || (video.src?.startsWith('blob:') || video.src?.startsWith('data:') ? 'upload' : 'url')}
                               onChange={(e) => {
@@ -1950,7 +1950,7 @@ export default function AdminConfiguratorPage() {
                                 updated[idx] = { ...updated[idx], sourceMode: mode, selectedProductId: '' };
                                 handleChange('lookbookVideos', updated);
                               }}
-                              className="form-select text-[11px] py-1.5 px-2"
+                              className="form-select text-[0.6875rem] py-1.5 px-2"
                             >
                               <option value="url">Paste Custom Video URL</option>
                               <option value="preset">Select Mixkit Luxury Preset</option>
@@ -1961,7 +1961,7 @@ export default function AdminConfiguratorPage() {
 
                           {(video.sourceMode === 'url' || (!video.sourceMode && !video.src?.startsWith('blob:'))) && (
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`video-url-${idx}`}>Video URL Link</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`video-url-${idx}`}>Video URL Link</label>
                               <input
                                 id={`video-url-${idx}`}
                                 type="text"
@@ -1972,14 +1972,14 @@ export default function AdminConfiguratorPage() {
                                   handleChange('lookbookVideos', updated);
                                 }}
                                 placeholder="https://..."
-                                className="form-input text-[11px] py-1.5 px-3"
+                                className="form-input text-[0.6875rem] py-1.5 px-3"
                               />
                             </div>
                           )}
 
                           {video.sourceMode === 'preset' && (
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`video-preset-${idx}`}>Choose Preset Video</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`video-preset-${idx}`}>Choose Preset Video</label>
                               <select
                                 id={`video-preset-${idx}`}
                                 value={video.src || ''}
@@ -1988,7 +1988,7 @@ export default function AdminConfiguratorPage() {
                                   updated[idx] = { ...updated[idx], src: e.target.value };
                                   handleChange('lookbookVideos', updated);
                                 }}
-                                className="form-select text-[11px] py-1.5 px-2"
+                                className="form-select text-[0.6875rem] py-1.5 px-2"
                               >
                                 <option value="">-- Choose Preset --</option>
                                 <option value="https://vjs.zencdn.net/v/oceans.mp4">Preset 1: Oceans Waves</option>
@@ -2001,7 +2001,7 @@ export default function AdminConfiguratorPage() {
 
                           {video.sourceMode === 'upload' && (
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`video-file-${idx}`}>Upload MP4 / WebM</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`video-file-${idx}`}>Upload MP4 / WebM</label>
                               <input
                                 id={`video-file-${idx}`}
                                 type="file"
@@ -2016,10 +2016,10 @@ export default function AdminConfiguratorPage() {
                                     showToast(`Video Slot ${idx + 1} loaded locally! Preview on the right.`);
                                   }
                                 }}
-                                className="form-input text-[11px] py-1 px-2 text-[10px]"
+                                className="form-input text-[0.6875rem] py-1 px-2 text-[0.625rem]"
                               />
                               {video.originalName && (
-                                <span className="text-[9px] text-on-surface-variant/70 mt-1 block truncate">
+                                <span className="text-[0.5625rem] text-on-surface-variant/70 mt-1 block truncate">
                                   Loaded: {video.originalName}
                                 </span>
                               )}
@@ -2028,7 +2028,7 @@ export default function AdminConfiguratorPage() {
 
                           {video.sourceMode === 'product' && (
                             <div className="form-group">
-                              <label className="form-label text-[11px]" htmlFor={`video-product-${idx}`}>Select Product</label>
+                              <label className="form-label text-[0.6875rem]" htmlFor={`video-product-${idx}`}>Select Product</label>
                               <select
                                 id={`video-product-${idx}`}
                                 value={video.selectedProductId || ''}
@@ -2044,7 +2044,7 @@ export default function AdminConfiguratorPage() {
                                   };
                                   handleChange('lookbookVideos', updated);
                                 }}
-                                className="form-select text-[11px] py-1.5 px-2"
+                                className="form-select text-[0.6875rem] py-1.5 px-2"
                               >
                                 <option value="">-- Choose Product --</option>
                                 {products.map((p) => {
@@ -2061,7 +2061,7 @@ export default function AdminConfiguratorPage() {
 
                           {video.sourceMode === 'product' && video.selectedProductId && (
                             <div className="col-span-2 pt-2 border-t border-outline-variant/10 mt-1">
-                              <label className="form-label text-[10px] mb-1 font-semibold block text-primary">
+                              <label className="form-label text-[0.625rem] mb-1 font-semibold block text-primary">
                                 Attach Product Video Clip (Select one to preview &amp; bind)
                               </label>
                               <div className="flex gap-3 overflow-x-auto py-1.5">
@@ -2083,9 +2083,9 @@ export default function AdminConfiguratorPage() {
                                       <video src={vidSrc} className="w-full h-full object-cover" muted playsInline />
                                       <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
                                         {isActive ? (
-                                          <span className="material-symbols-outlined text-white text-[16px] fill-icon">check_circle</span>
+                                          <span className="material-symbols-outlined text-white text-[1rem] fill-icon">check_circle</span>
                                         ) : (
-                                          <span className="material-symbols-outlined text-white text-[16px] opacity-0 hover:opacity-100">play_circle</span>
+                                          <span className="material-symbols-outlined text-white text-[1rem] opacity-0 hover:opacity-100">play_circle</span>
                                         )}
                                       </div>
                                     </div>
@@ -2123,7 +2123,7 @@ export default function AdminConfiguratorPage() {
               >
                 {form.backdropFilter !== 'none' && (
                   <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-20">
-                    <span className="text-[10px] font-mono tracking-widest text-outline uppercase">
+                    <span className="text-[0.625rem] font-mono tracking-widest text-outline uppercase">
                       Backdrop Filter Active ({form.backdropFilter})
                     </span>
                   </div>
@@ -2138,7 +2138,7 @@ export default function AdminConfiguratorPage() {
                             key={i}
                             type="button"
                             onClick={() => setHeroPreviewIdx(i)}
-                            className={`w-8 h-8 rounded-full text-[11px] font-bold flex items-center justify-center transition-colors ${
+                            className={`w-8 h-8 rounded-full text-[0.6875rem] font-bold flex items-center justify-center transition-colors ${
                               heroPreviewIdx === i ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:text-primary'
                             }`}
                           >
@@ -2155,7 +2155,7 @@ export default function AdminConfiguratorPage() {
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-on-surface-variant/40">
-                            <span className="material-symbols-outlined text-[32px]">image</span>
+                            <span className="material-symbols-outlined text-[2rem]">image</span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-black/25" />
@@ -2169,7 +2169,7 @@ export default function AdminConfiguratorPage() {
                             </h1>
                           )}
                           {!heroSlides[heroPreviewIdx]?.hideCta && (
-                            <span className="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-caps text-[10px] uppercase tracking-widest shadow-md">
+                            <span className="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-caps text-[0.625rem] uppercase tracking-widest shadow-md">
                               {heroSlides[heroPreviewIdx]?.cta || 'Shop Now'}
                             </span>
                           )}
@@ -2187,11 +2187,11 @@ export default function AdminConfiguratorPage() {
                               <img src={bubble.image} alt={bubble.alt} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
-                                <span className="material-symbols-outlined text-[20px]">image</span>
+                                <span className="material-symbols-outlined text-[1.25rem]">image</span>
                               </div>
                             )}
                           </div>
-                          <span className="text-[10px] text-center opacity-80">{bubble.name || `Bubble ${idx + 1}`}</span>
+                          <span className="text-[0.625rem] text-center opacity-80">{bubble.name || `Bubble ${idx + 1}`}</span>
                         </div>
                       ))}
                     </div>
@@ -2199,18 +2199,18 @@ export default function AdminConfiguratorPage() {
 
                   {activeSurface === 'topnav' && (
                     <div className="flex flex-col gap-3 w-full max-w-[420px] mx-auto">
-                      <span className="text-[9px] uppercase tracking-wider opacity-70 text-center block">Header Navigation Preview</span>
+                      <span className="text-[0.5625rem] uppercase tracking-wider opacity-70 text-center block">Header Navigation Preview</span>
                       <div
                         className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 p-4 rounded-xl border border-outline-variant/30"
                         style={{ backgroundColor: surfaceCardBg }}
                       >
                         {topNavLinks.length === 0 ? (
-                          <span className="text-[11px] text-on-surface-variant/60">No links added yet</span>
+                          <span className="text-[0.6875rem] text-on-surface-variant/60">No links added yet</span>
                         ) : (
                           topNavLinks.map((link) => (
                             <span
                               key={link.id}
-                              className="font-label-caps text-[10px] uppercase tracking-wider"
+                              className="font-label-caps text-[0.625rem] uppercase tracking-wider"
                               style={{ color: form.primaryColor || '#ac2471' }}
                             >
                               {link.label}
@@ -2245,11 +2245,11 @@ export default function AdminConfiguratorPage() {
                             className="preview-aspect-box w-full"
                             style={{ aspectRatio: form.listingImgAspect, borderRadius: '0px', borderWidth: '0px', minHeight: '40px' }}
                           >
-                            <span className="material-symbols-outlined text-outline-variant text-[14px]">image</span>
+                            <span className="material-symbols-outlined text-outline-variant text-[0.875rem]">image</span>
                           </div>
                           {form.gridCols <= 4 ? (
                             <div className="p-2 flex flex-col gap-0.5" style={{ backgroundColor: surfaceCardBg }}>
-                              <span className="text-[7px] uppercase tracking-wider font-bold leading-none" style={{ color: form.primaryColor || '#ac2471' }}>
+                              <span className="text-[0.4375rem] uppercase tracking-wider font-bold leading-none" style={{ color: form.primaryColor || '#ac2471' }}>
                                 Category
                               </span>
                               <h4 className="font-bold text-on-surface line-clamp-1 leading-none" style={{ fontSize: `calc(${form.titleSizeListing} * 0.75)` }}>
@@ -2261,7 +2261,7 @@ export default function AdminConfiguratorPage() {
                             </div>
                           ) : (
                             <div className="p-1 flex flex-col bg-surface-container-lowest text-center">
-                              <span className="font-bold text-on-surface text-[8px] leading-none">Item {i + 1}</span>
+                              <span className="font-bold text-on-surface text-[0.5rem] leading-none">Item {i + 1}</span>
                             </div>
                           )}
                         </div>
@@ -2297,7 +2297,7 @@ export default function AdminConfiguratorPage() {
                               boxShadow: i === 0 ? `0 0 0 2px ${(form.primaryColor || '#ac2471')}30` : 'none',
                             }}
                           >
-                            <span className="material-symbols-outlined text-outline-variant text-[16px]">image</span>
+                            <span className="material-symbols-outlined text-outline-variant text-[1rem]">image</span>
                           </div>
                         ))}
                       </div>
@@ -2313,7 +2313,7 @@ export default function AdminConfiguratorPage() {
                         <h2 className="font-bold leading-tight" style={{ fontSize: form.titleSizeDetail }}>
                           Detail Title Text
                         </h2>
-                        <p className="leading-relaxed text-[13px] opacity-90" style={{ fontSize: form.descSizeDetail }}>
+                        <p className="leading-relaxed text-[0.8125rem] opacity-90" style={{ fontSize: form.descSizeDetail }}>
                           This text block displays how long product description paragraphs adjust in size to ensure optimal legibility and screen aesthetics.
                         </p>
                       </div>
@@ -2328,11 +2328,11 @@ export default function AdminConfiguratorPage() {
                             className="w-full h-12 rounded-lg border border-outline-variant/40"
                             style={{ backgroundColor: form.themeMode === 'dark' ? '#121212' : form.themeMode === 'midnight' ? '#030712' : form.storeBgColor }}
                           />
-                          <span className="text-[9px] uppercase tracking-wider opacity-70">Background</span>
+                          <span className="text-[0.5625rem] uppercase tracking-wider opacity-70">Background</span>
                         </div>
                         <div className="flex-1 flex flex-col items-center gap-1.5">
                           <div className="w-full h-12 rounded-lg border border-outline-variant/40" style={{ backgroundColor: form.primaryColor || '#ac2471' }} />
-                          <span className="text-[9px] uppercase tracking-wider opacity-70">Primary Accent</span>
+                          <span className="text-[0.5625rem] uppercase tracking-wider opacity-70">Primary Accent</span>
                         </div>
                       </div>
 
@@ -2346,19 +2346,19 @@ export default function AdminConfiguratorPage() {
                           borderStyle: 'solid',
                         }}
                       >
-                        <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: form.primaryColor || '#ac2471' }}>
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wide" style={{ color: form.primaryColor || '#ac2471' }}>
                           Sample Button / Badge
                         </span>
                         <button
                           type="button"
-                          className="text-[11px] font-bold py-1.5 px-3 rounded-md self-start"
+                          className="text-[0.6875rem] font-bold py-1.5 px-3 rounded-md self-start"
                           style={{ backgroundColor: form.primaryColor || '#ac2471', color: '#fff' }}
                         >
                           Add to Cart
                         </button>
                       </div>
 
-                      <div className="text-[10px] text-center opacity-70 font-mono">
+                      <div className="text-[0.625rem] text-center opacity-70 font-mono">
                         Hover {form.productHoverSlideDelayMs ?? 1000}ms → advance every {form.productHoverSlideIntervalMs ?? 1800}ms
                       </div>
                     </div>
@@ -2375,11 +2375,11 @@ export default function AdminConfiguratorPage() {
                             <video src={video.src} className="w-full h-full object-cover" muted loop playsInline autoPlay />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <span className="material-symbols-outlined text-[18px]">movie</span>
+                              <span className="material-symbols-outlined text-[1.125rem]">movie</span>
                             </div>
                           )}
                           <div className="absolute inset-0 bg-black/40 flex items-end p-1.5">
-                            <span className="text-[7px] text-white line-clamp-2 font-bold">{video.title}</span>
+                            <span className="text-[0.4375rem] text-white line-clamp-2 font-bold">{video.title}</span>
                           </div>
                         </div>
                       ))}
@@ -2394,10 +2394,10 @@ export default function AdminConfiguratorPage() {
           {/* Form actions — apply to the whole theme, only shown for theme-driven surfaces */}
           {themeSurfaces.includes(activeSurface) && (
             <div className="flex gap-3 justify-start">
-              <button type="button" onClick={handleReset} disabled={isSaving} className="btn btn-secondary py-2.5 px-5 text-[11px]">
+              <button type="button" onClick={handleReset} disabled={isSaving} className="btn btn-secondary py-2.5 px-5 text-[0.6875rem]">
                 Reset Defaults
               </button>
-              <button type="submit" disabled={isSaving} className="btn btn-primary py-2.5 px-5 text-[11px]">
+              <button type="submit" disabled={isSaving} className="btn btn-primary py-2.5 px-5 text-[0.6875rem]">
                 {isSaving ? 'Saving Configurations…' : 'Save Layout Configurations'}
               </button>
             </div>
@@ -2412,17 +2412,17 @@ export default function AdminConfiguratorPage() {
             className="flex items-center justify-between gap-4 w-full text-left"
           >
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-on-surface-variant">flaky</span>
-              <span className="font-title-sm text-[13px] text-on-surface-variant font-semibold">Developer Diagnostics</span>
+              <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant">flaky</span>
+              <span className="font-title-sm text-[0.8125rem] text-on-surface-variant font-semibold">Developer Diagnostics</span>
               {diagStatus && (
-                <span className={`status-badge px-2 py-1 rounded-lg flex items-center gap-1 text-[10px] ${
+                <span className={`status-badge px-2 py-1 rounded-lg flex items-center gap-1 text-[0.625rem] ${
                   diagStatus === 'passed' ? 'test-badge-passed' : diagStatus === 'failed' ? 'test-badge-failed' : 'test-badge-running'
                 }`}>
                   {diagStatus.toUpperCase()}
                 </span>
               )}
             </div>
-            <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
+            <span className="material-symbols-outlined text-[1.125rem] text-on-surface-variant">
               {diagOpen ? 'expand_less' : 'expand_more'}
             </span>
           </button>
@@ -2433,7 +2433,7 @@ export default function AdminConfiguratorPage() {
                 <p className="admin-card-subtitle">
                   Automated test assertions confirming theme database writes, state bindings, and DOM CSS variable injections.
                 </p>
-                <button onClick={runDiagnostics} disabled={isSaving} className="btn btn-secondary text-[11px] py-2 px-4 shrink-0">
+                <button onClick={runDiagnostics} disabled={isSaving} className="btn btn-secondary text-[0.6875rem] py-2 px-4 shrink-0">
                   Run Layout Assertions
                 </button>
               </div>
@@ -2442,12 +2442,12 @@ export default function AdminConfiguratorPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {diagResults.map((res, i) => (
                     <div key={i} className="test-card-box flex items-start gap-3">
-                      <span className={`material-symbols-outlined shrink-0 text-[18px] ${res.status === 'pass' ? 'text-secondary' : 'text-error'}`}>
+                      <span className={`material-symbols-outlined shrink-0 text-[1.125rem] ${res.status === 'pass' ? 'text-secondary' : 'text-error'}`}>
                         {res.status === 'pass' ? 'check_circle' : 'cancel'}
                       </span>
                       <div className="min-w-0">
-                        <p className="font-bold text-on-surface text-[12px]">{res.name}</p>
-                        <p className="text-[10px] text-on-surface-variant/80 mt-0.5">{res.message}</p>
+                        <p className="font-bold text-on-surface text-[0.75rem]">{res.name}</p>
+                        <p className="text-[0.625rem] text-on-surface-variant/80 mt-0.5">{res.message}</p>
                       </div>
                     </div>
                   ))}

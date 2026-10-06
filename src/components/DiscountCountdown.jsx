@@ -34,7 +34,7 @@ export default function DiscountCountdown({ product, className = '', onExpire })
 
   return (
     <span className={`inline-flex items-center gap-1 ${className}`}>
-      <span className="material-symbols-outlined text-[14px] leading-none">schedule</span>
+      <span className="material-symbols-outlined text-[0.875rem] leading-none">schedule</span>
       Ends in {formatCountdown(msRemaining)}
     </span>
   );

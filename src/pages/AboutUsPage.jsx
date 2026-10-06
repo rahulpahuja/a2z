@@ -89,7 +89,7 @@ export default function AboutUsPage() {
           {VALUES.map((value) => (
             <div key={value.title} className="flex flex-col items-center text-center gap-3 p-6">
               <span className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                <span className="material-symbols-outlined text-[26px]">{value.icon}</span>
+                <span className="material-symbols-outlined text-[1.625rem]">{value.icon}</span>
               </span>
               <h3 className="font-title-sm text-title-sm text-on-surface">{value.title}</h3>
               <p className="font-body-sm text-body-sm text-on-surface-variant">{value.body}</p>

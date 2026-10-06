@@ -193,7 +193,7 @@ export default function AdminAnalyticsPage() {
               <p className="admin-card-subtitle">Where views came from this month.</p>
             </div>
             {report.topReferrers.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-on-surface-variant text-[13px]">
+              <div className="flex-1 flex items-center justify-center text-on-surface-variant text-[0.8125rem]">
                 No referrer data yet.
               </div>
             ) : (

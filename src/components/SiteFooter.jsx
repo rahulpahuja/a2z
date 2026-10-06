@@ -120,8 +120,8 @@ export default function SiteFooter() {
 
       <div className="border-t border-surface-variant py-6 text-center flex flex-col items-center gap-1">
         <p className="font-body-sm text-body-sm text-on-surface-variant">© 2026 A2Z Collection. All rights reserved.</p>
-        <p className="text-[10px] text-on-surface-variant/50 font-mono">v{APP_VERSION} (Build #{APP_BUILD})</p>
-        <p className="text-[10px] text-on-surface-variant/50">
+        <p className="text-[0.625rem] text-on-surface-variant/50 font-mono">v{APP_VERSION} (Build #{APP_BUILD})</p>
+        <p className="text-[0.625rem] text-on-surface-variant/50">
           Powered by{' '}
           <a
             href="https://mobile1x.com/"
@@ -133,7 +133,7 @@ export default function SiteFooter() {
           </a>{' '}
           · Founder Rahul Pahuja · +91-8819091000
         </p>
-        <p className="text-[10px] text-on-surface-variant/50">
+        <p className="text-[0.625rem] text-on-surface-variant/50">
           Developed by{' '}
           <a
             href="https://therahulpahuja.com"

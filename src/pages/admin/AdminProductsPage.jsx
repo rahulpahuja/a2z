@@ -989,7 +989,7 @@ export default function AdminProductsPage() {
               {/* Product Images (5 Slots) */}
               <div className="space-y-4 border border-outline-variant/35 rounded-xl p-5 bg-surface-container-low/40">
                 <div>
-                  <h3 className="font-title-sm text-[16px] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
+                  <h3 className="font-title-sm text-[1rem] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     Check "Display Image" under a photo to make it the primary thumbnail shown across the storefront. Filenames are customizable and automatically name-spaced to the Product ID.
                     Tag each photo with the color shown so the storefront color filter and swatches work correctly.
@@ -1005,13 +1005,13 @@ export default function AdminProductsPage() {
                     return (
                       <div key={index} className="flex flex-col gap-2 p-3 border border-outline-variant/40 rounded-lg bg-surface-container-lowest relative">
                         <div className="flex justify-between items-center">
-                          <span className="font-label-caps text-[10px] text-on-surface-variant">Image Box {index + 1} {index < 3 && <span className="text-error font-bold">*</span>}</span>
+                          <span className="font-label-caps text-[0.625rem] text-on-surface-variant">Image Box {index + 1} {index < 3 && <span className="text-error font-bold">*</span>}</span>
                           <div className="flex items-center gap-2">
                             {preview && (
                               <button
                                 type="button"
                                 onClick={() => document.getElementById(`image-file-input-${index}`).click()}
-                                className="text-primary font-body-sm text-[10px] hover:underline"
+                                className="text-primary font-body-sm text-[0.625rem] hover:underline"
                               >
                                 Replace
                               </button>
@@ -1020,7 +1020,7 @@ export default function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => downloadImage(preview, fileName || `image-box-${index + 1}`)}
-                                className="text-on-surface-variant font-body-sm text-[10px] hover:underline"
+                                className="text-on-surface-variant font-body-sm text-[0.625rem] hover:underline"
                               >
                                 Download
                               </button>
@@ -1029,7 +1029,7 @@ export default function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => clearImageSlot(index)}
-                                className="text-error font-body-sm text-[10px] hover:underline"
+                                className="text-error font-body-sm text-[0.625rem] hover:underline"
                               >
                                 Clear
                               </button>
@@ -1046,8 +1046,8 @@ export default function AdminProductsPage() {
                             onClick={() => document.getElementById(`image-file-input-${index}`).click()}
                             className="w-full aspect-[3/4] rounded-md border-2 border-dashed border-outline-variant/70 hover:border-primary/50 bg-surface-container-low flex flex-col items-center justify-center cursor-pointer transition-colors"
                           >
-                            <span className="material-symbols-outlined text-[24px] text-outline">add_a_photo</span>
-                            <span className="font-body-sm text-[10px] text-on-surface-variant/80 mt-1">Upload</span>
+                            <span className="material-symbols-outlined text-[1.5rem] text-outline">add_a_photo</span>
+                            <span className="font-body-sm text-[0.625rem] text-on-surface-variant/80 mt-1">Upload</span>
                           </div>
                         )}
 
@@ -1061,7 +1061,7 @@ export default function AdminProductsPage() {
 
                         {(hasImage || preview) && (
                           <div className="flex flex-col gap-1 mt-1">
-                            <label className="font-body-sm text-[10px] text-on-surface-variant/80" htmlFor={`color-${index}`}>
+                            <label className="font-body-sm text-[0.625rem] text-on-surface-variant/80" htmlFor={`color-${index}`}>
                               Color <span className="text-error font-bold">*</span>
                             </label>
                             <input
@@ -1070,14 +1070,14 @@ export default function AdminProductsPage() {
                               value={imageColors[index]}
                               onChange={(e) => handleImageColorChange(index, e.target.value)}
                               placeholder="e.g. Rani Pink"
-                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-[11px] text-on-surface"
+                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-[0.6875rem] text-on-surface"
                             />
                           </div>
                         )}
 
                         {hasImage && (
                           <div className="flex flex-col gap-1 mt-1">
-                            <label className="font-body-sm text-[10px] text-on-surface-variant/80" htmlFor={`filename-${index}`}>
+                            <label className="font-body-sm text-[0.625rem] text-on-surface-variant/80" htmlFor={`filename-${index}`}>
                               File Name
                             </label>
                             <input
@@ -1085,7 +1085,7 @@ export default function AdminProductsPage() {
                               type="text"
                               value={fileName}
                               onChange={(e) => handleImageNameChange(index, e.target.value)}
-                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-mono text-[10px] text-on-surface"
+                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-mono text-[0.625rem] text-on-surface"
                             />
                           </div>
                         )}
@@ -1102,7 +1102,7 @@ export default function AdminProductsPage() {
                               onChange={() => chooseDisplayImage(index)}
                               className="rounded border-outline w-3.5 h-3.5 text-primary focus:ring-primary cursor-pointer"
                             />
-                            <span className={`font-body-sm text-[10px] ${effectiveDisplayIndex === index ? 'text-primary font-semibold' : 'text-on-surface-variant/80'}`}>
+                            <span className={`font-body-sm text-[0.625rem] ${effectiveDisplayIndex === index ? 'text-primary font-semibold' : 'text-on-surface-variant/80'}`}>
                               Display Image
                             </span>
                           </label>
@@ -1456,14 +1456,14 @@ export default function AdminProductsPage() {
               <h2 className="font-title-sm text-title-sm text-on-surface">
                 All Products ({products.length})
               </h2>
-              <span className="font-body-sm text-[11px] text-on-surface-variant">Select all on this page</span>
+              <span className="font-body-sm text-[0.6875rem] text-on-surface-variant">Select all on this page</span>
             </div>
             <div className="flex items-center gap-3">
               <Link
                 to="/super/trash"
                 className="flex items-center gap-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
               >
-                <span className="material-symbols-outlined text-[18px]">delete</span>
+                <span className="material-symbols-outlined text-[1.125rem]">delete</span>
                 View Trash
               </Link>
             {selectedProductIds.length > 0 && (
@@ -1474,7 +1474,7 @@ export default function AdminProductsPage() {
                   disabled={saving}
                   className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">content_copy</span>
                   Duplicate Selected ({selectedProductIds.length})
                 </button>
                 <button
@@ -1483,7 +1483,7 @@ export default function AdminProductsPage() {
                   disabled={saving}
                   className="flex items-center gap-2 bg-error/10 hover:bg-error/20 text-error font-label-caps text-label-caps px-4 py-2.5 rounded-lg uppercase tracking-wider transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">delete</span>
                   Move to Trash ({selectedProductIds.length})
                 </button>
               </div>
@@ -1492,7 +1492,7 @@ export default function AdminProductsPage() {
           </div>
 
           <div className="relative mb-4 max-w-sm">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[1.125rem] text-on-surface-variant">
               search
             </span>
             <input
@@ -1503,7 +1503,7 @@ export default function AdminProductsPage() {
               className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg pl-10 pr-4 py-2 font-body-sm text-body-sm text-on-surface transition-colors"
             />
             {titleFilter && (
-              <p className="font-body-sm text-[11px] text-on-surface-variant mt-1">
+              <p className="font-body-sm text-[0.6875rem] text-on-surface-variant mt-1">
                 {filteredProducts.length} of {products.length} products match "{titleFilter.trim()}"
               </p>
             )}
@@ -1511,7 +1511,7 @@ export default function AdminProductsPage() {
 
           <div className="flex flex-wrap items-end gap-4 mb-6">
             <div className="flex flex-col gap-1">
-              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-gender">Gender</label>
+              <label className="font-body-sm text-[0.6875rem] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-gender">Gender</label>
               <select
                 id="filter-gender"
                 value={genderFilter}
@@ -1525,7 +1525,7 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-color">Color</label>
+              <label className="font-body-sm text-[0.6875rem] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-color">Color</label>
               <select
                 id="filter-color"
                 value={colorFilter}
@@ -1540,7 +1540,7 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-min-price">Min Price (₹)</label>
+              <label className="font-body-sm text-[0.6875rem] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-min-price">Min Price (₹)</label>
               <input
                 id="filter-min-price"
                 type="number"
@@ -1553,7 +1553,7 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-max-price">Max Price (₹)</label>
+              <label className="font-body-sm text-[0.6875rem] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-max-price">Max Price (₹)</label>
               <input
                 id="filter-max-price"
                 type="number"
@@ -1567,7 +1567,7 @@ export default function AdminProductsPage() {
 
             {collectionsList.length > 0 && (
               <div className="flex flex-col gap-1">
-                <label className="font-body-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-collection">Collection</label>
+                <label className="font-body-sm text-[0.6875rem] text-on-surface-variant uppercase tracking-wider font-semibold" htmlFor="filter-collection">Collection</label>
                 <select
                   id="filter-collection"
                   value={collectionFilter}
@@ -1639,7 +1639,7 @@ export default function AdminProductsPage() {
                           alt={product.title}
                         />
                         {isOutOfStock && (
-                          <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[9px] font-bold uppercase tracking-wider">
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[0.5625rem] font-bold uppercase tracking-wider">
                             OOS
                           </span>
                         )}
@@ -1651,7 +1651,7 @@ export default function AdminProductsPage() {
                           <h3 className="font-title-sm text-title-sm text-on-surface flex items-center gap-2">
                             {product.title}
                             {isOutOfStock && (
-                              <span className="text-[10px] font-bold bg-error/10 text-error px-2 py-0.5 rounded-full uppercase">
+                              <span className="text-[0.625rem] font-bold bg-error/10 text-error px-2 py-0.5 rounded-full uppercase">
                                 Out of Stock
                               </span>
                             )}
@@ -1660,7 +1660,7 @@ export default function AdminProductsPage() {
                             {product.categoryTitle}
                             {product.subcategoryTitle ? ` / ${product.subcategoryTitle}` : ''} · {formatCurrency(product.price)} · {product.gender || 'Unisex'} · HSN {product.hsnCode} · SKU {product.sku} · {product.images?.length || 1} images
                           </p>
-                          <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
+                          <p className="font-body-sm text-[0.6875rem] text-on-surface-variant/70 font-mono">
                             ID: {product.id}
                           </p>
                         </div>
@@ -1732,7 +1732,7 @@ export default function AdminProductsPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleToggleColorOutOfStock(product, c.name, colorOut)}
-                                  className="font-label-caps text-[10px] uppercase text-primary hover:underline"
+                                  className="font-label-caps text-[0.625rem] uppercase text-primary hover:underline"
                                 >
                                   {colorOut ? 'Mark In Stock' : 'Mark Out'}
                                 </button>

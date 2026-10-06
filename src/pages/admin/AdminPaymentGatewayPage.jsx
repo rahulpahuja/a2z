@@ -203,10 +203,10 @@ export default function AdminPaymentGatewayPage() {
         {/* Firebase Verification Warning */}
         {!isFirebaseEnabled && (
           <div className="alert-banner alert-banner-error">
-            <span className="material-symbols-outlined text-[28px] shrink-0">database_off</span>
+            <span className="material-symbols-outlined text-[1.75rem] shrink-0">database_off</span>
             <div>
-              <p className="font-bold text-[15px]">Firebase Database Integration Required</p>
-              <p className="text-[12px] opacity-90 mt-0.5">
+              <p className="font-bold text-[0.9375rem]">Firebase Database Integration Required</p>
+              <p className="text-[0.75rem] opacity-90 mt-0.5">
                 For security reasons, payment gateway keys can only be managed and saved directly in Firebase Realtime Database. 
                 Please enter your Firebase Credentials in your environment `.env` configuration file to unlock this page.
               </p>
@@ -238,9 +238,9 @@ export default function AdminPaymentGatewayPage() {
             </div>
           </div>
           {feesError ? (
-            <p className="text-[12px] text-error">{feesError}</p>
+            <p className="text-[0.75rem] text-error">{feesError}</p>
           ) : feesLoading ? (
-            <p className="text-[12px] text-on-surface-variant">Loading…</p>
+            <p className="text-[0.75rem] text-on-surface-variant">Loading…</p>
           ) : feesReport ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4">
@@ -328,7 +328,7 @@ export default function AdminPaymentGatewayPage() {
                   disabled={saving || !isFirebaseEnabled}
                   className="form-checkbox"
                 />
-                <label htmlFor="gateway-active" className="font-semibold text-on-surface text-[13px] cursor-pointer">
+                <label htmlFor="gateway-active" className="font-semibold text-on-surface text-[0.8125rem] cursor-pointer">
                   Activate this Payment Gateway
                 </label>
               </div>
@@ -348,7 +348,7 @@ export default function AdminPaymentGatewayPage() {
                   disabled={saving || !isFirebaseEnabled || !name.trim() || !apiKey.trim()}
                   className="btn btn-primary flex-1"
                 >
-                  <span className="material-symbols-outlined text-[18px]">save</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">save</span>
                   {saving ? 'Saving…' : editingId ? 'Save' : 'Add Gateway'}
                 </button>
               </div>
@@ -383,25 +383,25 @@ export default function AdminPaymentGatewayPage() {
                       <div className={`w-10 h-10 rounded-full ${
                         g.isActive ? 'bg-primary/10 text-primary' : 'bg-surface-variant text-on-surface-variant'
                       } flex items-center justify-center shrink-0`}>
-                        <span className="material-symbols-outlined text-[22px]">credit_card</span>
+                        <span className="material-symbols-outlined text-[1.375rem]">credit_card</span>
                       </div>
                       
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-on-surface text-[15px]">{g.name}</span>
+                          <span className="font-bold text-on-surface text-[0.9375rem]">{g.name}</span>
                           {g.isActive && (
                             <span className="status-badge status-badge-primary">
                               Active
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-on-surface-variant flex items-center gap-1.5 font-mono">
-                          <span className="font-sans font-semibold text-[10px] text-outline-variant">KEY:</span>
+                        <p className="text-[0.6875rem] text-on-surface-variant flex items-center gap-1.5 font-mono">
+                          <span className="font-sans font-semibold text-[0.625rem] text-outline-variant">KEY:</span>
                           {maskKey(g.apiKey)}
                         </p>
                         {g.apiSecret && (
-                          <p className="text-[11px] text-on-surface-variant flex items-center gap-1.5 font-mono">
-                            <span className="font-sans font-semibold text-[10px] text-outline-variant">SECRET:</span>
+                          <p className="text-[0.6875rem] text-on-surface-variant flex items-center gap-1.5 font-mono">
+                            <span className="font-sans font-semibold text-[0.625rem] text-outline-variant">SECRET:</span>
                             {maskKey(g.apiSecret)}
                           </p>
                         )}
@@ -426,7 +426,7 @@ export default function AdminPaymentGatewayPage() {
                         className="w-8 h-8 rounded-full hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors"
                         title="Edit config"
                       >
-                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                        <span className="material-symbols-outlined text-[1.125rem]">edit</span>
                       </button>
 
                       <button
@@ -436,7 +436,7 @@ export default function AdminPaymentGatewayPage() {
                         className="w-8 h-8 rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error flex items-center justify-center transition-colors"
                         title="Delete gateway"
                       >
-                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                        <span className="material-symbols-outlined text-[1.125rem]">delete</span>
                       </button>
                     </div>
                   </div>

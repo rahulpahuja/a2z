@@ -8,7 +8,7 @@ function Stars({ rating }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <span
           key={star}
-          className="material-symbols-outlined text-[16px]"
+          className="material-symbols-outlined text-[1rem]"
           style={{ fontVariationSettings: rating >= star ? "'FILL' 1" : "'FILL' 0" }}
         >
           star

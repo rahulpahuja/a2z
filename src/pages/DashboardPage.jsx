@@ -411,7 +411,7 @@ export default function DashboardPage() {
                         <p className="font-body-sm text-body-sm text-on-surface truncate">
                           {product.title || product.name}
                         </p>
-                        <p className="font-body-sm text-[11px] text-on-surface-variant truncate">
+                        <p className="font-body-sm text-[0.6875rem] text-on-surface-variant truncate">
                           {(product.categoryTitle || product.category) ?? ''} · {formatCurrency(product.price)}
                         </p>
                       </Link>
@@ -434,7 +434,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <button className="bg-primary hover:bg-surface-tint text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-[12px] transition-colors flex items-center gap-2 shadow-[0px_4px_10px_rgba(172,36,113,0.2)]">
-              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span className="material-symbols-outlined text-[1.125rem]">add</span>
               NEW PRODUCT
             </button>
           </div>
@@ -455,11 +455,11 @@ export default function DashboardPage() {
                   <span className={`font-label-caps text-label-caps ${kpi.badgeColor} flex items-center gap-1`}>
                     {kpi.badgeIconAfter ? (
                       <>
-                        {kpi.badge} <span className="material-symbols-outlined text-[14px]">{kpi.badgeIcon}</span>
+                        {kpi.badge} <span className="material-symbols-outlined text-[0.875rem]">{kpi.badgeIcon}</span>
                       </>
                     ) : (
                       <>
-                        <span className="material-symbols-outlined text-[14px]">{kpi.badgeIcon}</span> {kpi.badge}
+                        <span className="material-symbols-outlined text-[0.875rem]">{kpi.badgeIcon}</span> {kpi.badge}
                       </>
                     )}
                   </span>
@@ -554,7 +554,7 @@ export default function DashboardPage() {
                               {order.status}
                             </span>
                           </td>
-                          <td className="py-4 px-6 text-right font-price-display text-[16px]">
+                          <td className="py-4 px-6 text-right font-price-display text-[1rem]">
                             {formatCurrency(order.total)}
                           </td>
                         </tr>
