@@ -62,7 +62,7 @@ export const handler = async (event) => {
 
   const verified = await verifyMsg91AccessToken(accessToken);
   // Fail closed: the verified identifier must be present and must be this phone.
-  const verifiedDigits = digitsOnly(verified?.mobile ?? verified?.identifier);
+  const verifiedDigits = digitsOnly(verified?.message);
   if (!verified) return json(401, { error: 'OTP verification failed', reason: 'msg91_rejected' });
   if (verifiedDigits !== phoneDigits) return json(401, { error: 'OTP verification failed', reason: 'msg91_phone_mismatch' });
 
