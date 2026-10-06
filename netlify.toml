@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   # VITE_ADMIN_PHONES isn't a real secret (all VITE_* vars ship in the public
