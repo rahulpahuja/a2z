@@ -57,18 +57,18 @@ export default function FloatingContactButtons() {
           logSelectContent('floating_button', 'shots');
           navigate('/shots');
         }}
-        className="w-14 h-14 rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
+        className="a2z-fab rounded-full bg-inverse-surface text-white flex flex-col items-center justify-center gap-0.5 shadow-lg hover:scale-105 transition-transform"
       >
-        <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span className="material-symbols-outlined a2z-fab-bolt" style={{ fontVariationSettings: "'FILL' 1" }}>
           bolt
         </span>
-        <span className="text-[9px] font-bold uppercase tracking-wide leading-none">Shots</span>
+        <span className="a2z-fab-label font-bold uppercase tracking-wide leading-none">Shots</span>
       </button>
       <button
         type="button"
         aria-label="Chat on WhatsApp"
         onClick={handleWhatsApp}
-        className="w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+        className="a2z-fab rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
       >
         <WhatsAppIcon />
       </button>
@@ -76,7 +76,7 @@ export default function FloatingContactButtons() {
         type="button"
         aria-label="Visit Instagram"
         onClick={handleInstagram}
-        className="w-14 h-14 rounded-full bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+        className="a2z-fab rounded-full bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
       >
         <InstagramIcon />
       </button>

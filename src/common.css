@@ -293,3 +293,36 @@ body.user-signed-in .docked {
   filter: brightness(0.93);
   transition: filter 0.2s ease;
 }
+
+/* Floating Shots / WhatsApp / Instagram buttons: scale with the phone width, capped at the desktop size. */
+.a2z-fab {
+  width: clamp(44px, 12vw, 56px);
+  height: clamp(44px, 12vw, 56px);
+}
+
+.a2z-fab-bolt {
+  font-size: clamp(16px, 4.6vw, 22px);
+}
+
+.a2z-fab-label {
+  font-size: clamp(7px, 2.2vw, 9px);
+}
+
+.a2z-fab svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* Heart and bag on product cards: same scaling, so they stay proportional on small phones. */
+.a2z-card-action {
+  width: clamp(32px, 9vw, 40px);
+  height: clamp(32px, 9vw, 40px);
+}
+
+.a2z-card-action .material-symbols-outlined {
+  font-size: clamp(16px, 4.6vw, 20px);
+}
+
+.a2z-card-action-bag {
+  top: calc(0.75rem + clamp(32px, 9vw, 40px) + 0.5rem);
+}
