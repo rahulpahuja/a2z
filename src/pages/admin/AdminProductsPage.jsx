@@ -7,6 +7,7 @@ import { subscribeToCollections } from '../../services/collections.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
+import ProductContentModal from '../../components/admin/ProductContentModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
@@ -89,6 +90,7 @@ export default function AdminProductsPage() {
   const [colorRenameValue, setColorRenameValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [barcodeProduct, setBarcodeProduct] = useState(null);
+  const [contentProduct, setContentProduct] = useState(null);
   const [productId, setProductId] = useState('');
   const [imageFiles, setImageFiles] = useState([null, null, null, null, null]);
   const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
@@ -1684,6 +1686,13 @@ export default function AdminProductsPage() {
                           >
                             Print Barcode
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => setContentProduct(product)}
+                            className="font-label-caps text-label-caps text-primary hover:underline"
+                          >
+                            FAQs &amp; Reviews
+                          </button>
                           <Link
                             to={`/super/product-videos?productId=${product.id}`}
                             className="font-label-caps text-label-caps text-primary hover:underline"
@@ -1798,6 +1807,7 @@ export default function AdminProductsPage() {
       </main>
 
       {barcodeProduct && <BarcodeModal product={barcodeProduct} onClose={() => setBarcodeProduct(null)} />}
+      {contentProduct && <ProductContentModal product={contentProduct} onClose={() => setContentProduct(null)} />}
     </div>
   );
 }

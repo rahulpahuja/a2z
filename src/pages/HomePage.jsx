@@ -17,7 +17,7 @@ import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/st
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
-import SearchModal from '../components/SearchModal.jsx';
+import SearchBar from '../components/SearchBar.jsx';
 import { getDiscountedPrice } from '../utils/discount.js';
 import './HomePage.css';
 
@@ -115,7 +115,6 @@ export default function HomePage() {
   const [heroSlides, setHeroSlides] = useState([]);
   const [categoryBubbles, setCategoryBubbles] = useState(DEFAULT_CATEGORY_BUBBLES);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const [homeProductsPerRow, setHomeProductsPerRow] = useState(DEFAULT_STORE_SETTINGS.homeProductsPerRow);
   const [showCategoryBubbles, setShowCategoryBubbles] = useState(DEFAULT_STORE_SETTINGS.showCategoryBubbles);
@@ -236,21 +235,13 @@ export default function HomePage() {
             ))}
           </nav>
           <div className="flex items-center space-x-3 md:space-x-6 text-primary dark:text-primary-fixed-dim">
-            <button
-              type="button"
-              aria-label="Search"
-              onClick={() => setSearchOpen(true)}
-              className="hover:opacity-80 transition-opacity duration-200 hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden"
-            >
-              <span className="material-symbols-outlined">search</span>
-            </button>
+            <SearchBar className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden" />
             <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
             <CartIconButton className="hover:opacity-80 transition-opacity duration-200" />
           </div>
         </div>
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <main className="w-full max-w-full overflow-x-clip">
         {/* Hero Carousel */}
         <section onClick={dismissBannerHint} className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
