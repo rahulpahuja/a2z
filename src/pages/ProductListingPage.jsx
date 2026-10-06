@@ -1053,18 +1053,11 @@ export default function ProductListingPage() {
                             </span>
                           </div>
                         )}
-                        {(product.badge || discountLabel) && (
+                        {product.badge && (
                           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-                            {discountLabel && (
-                              <span className="px-3 py-1 rounded-[32px] bg-error text-on-error font-label-caps text-label-caps shadow-sm">
-                                {discountLabel}
-                              </span>
-                            )}
-                            {product.badge && (
-                              <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
-                                {product.badge}
-                              </span>
-                            )}
+                            <span className={`px-3 py-1 rounded-[32px] ${BADGE_STYLES[product.badge] ?? 'bg-tertiary text-on-tertiary'} font-label-caps text-label-caps shadow-sm`}>
+                              {product.badge}
+                            </span>
                           </div>
                         )}
                         <button
@@ -1130,6 +1123,11 @@ export default function ProductListingPage() {
                                 {formatCurrency(discountedPrice)}
                               </span>
                               <span className="font-body-sm text-[0.6875rem] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
+                              {discountLabel && (
+                                <span className="px-2 py-0.5 rounded-[32px] bg-error text-on-error font-label-caps text-[0.625rem] shadow-sm">
+                                  {discountLabel}
+                                </span>
+                              )}
                             </div>
                             <DiscountCountdown
                               product={product}
