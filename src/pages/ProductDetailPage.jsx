@@ -6,6 +6,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import VideoPlayer from '../components/VideoPlayer.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { ProductDetailSkeleton } from '../components/Shimmer.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import { logViewItem } from '../services/analytics.js';
 import ProductImage from '../components/ProductImage.jsx';
@@ -115,7 +116,7 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const { products: allProducts } = useProducts();
+  const { products: allProducts, loading } = useProducts();
   const product = allProducts.find((p) => p.id === id) || null;
 
   const [selectedThumbnail, setSelectedThumbnail] = useState(0);
@@ -177,6 +178,14 @@ export default function ProductDetailPage() {
   }, [product, faqs, reviews]);
 
   if (!product) {
+    if (loading) {
+      return (
+        <>
+          <TopNav />
+          <ProductDetailSkeleton />
+        </>
+      );
+    }
     return <ProductNotFound />;
   }
 

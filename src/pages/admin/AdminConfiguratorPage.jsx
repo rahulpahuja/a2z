@@ -1702,6 +1702,28 @@ export default function AdminConfiguratorPage() {
                 <>
                   <div className="admin-card flex flex-col gap-5">
                     <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[20px]">hourglass_empty</span>
+                      Loading Placeholder
+                    </h3>
+                    <p className="text-[10px] text-on-surface-variant/60 -mt-2">
+                      Shown on product and listing pages while products load, instead of a "Product not found" or empty message.
+                    </p>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="loading-placeholder">Style</label>
+                      <select
+                        id="loading-placeholder"
+                        value={form.loadingPlaceholder || 'shimmer'}
+                        onChange={(e) => handleChange('loadingPlaceholder', e.target.value)}
+                        className="form-select text-[12px] py-2 px-3"
+                      >
+                        <option value="shimmer">Shimmer (animated placeholder, default)</option>
+                        <option value="none">None (blank while loading)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-card flex flex-col gap-5">
+                    <h3 className="font-title-sm text-[15px] text-on-surface font-semibold flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary text-[20px]">palette</span>
                       Backgrounds &amp; Backdrop Filters
                     </h3>
