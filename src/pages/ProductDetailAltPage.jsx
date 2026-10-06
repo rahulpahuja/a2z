@@ -258,16 +258,16 @@ export default function ProductDetailAltPage() {
             {/* Ratings */}
             <div className="flex items-center gap-2 mb-6">
               <div className="flex text-primary">
-                <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
-                <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
-                <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
-                <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
-                <span className="material-symbols-outlined fill-icon text-[20px]">star</span>
+                <span className="material-symbols-outlined fill-icon text-[1.25rem]">star</span>
+                <span className="material-symbols-outlined fill-icon text-[1.25rem]">star</span>
+                <span className="material-symbols-outlined fill-icon text-[1.25rem]">star</span>
+                <span className="material-symbols-outlined fill-icon text-[1.25rem]">star</span>
+                <span className="material-symbols-outlined fill-icon text-[1.25rem]">star</span>
               </div>
               <span className="font-body-sm text-body-sm text-on-surface-variant underline cursor-pointer">42 Reviews</span>
               {viewCount !== null && viewCount > 0 && (
                 <span className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">visibility</span>
+                  <span className="material-symbols-outlined text-[1rem]">visibility</span>
                   {viewCount.toLocaleString('en-IN')} views
                 </span>
               )}
@@ -433,7 +433,7 @@ export default function ProductDetailAltPage() {
                 <div className="rounded-[16px] border border-tertiary/30 bg-surface-container-low overflow-hidden aspect-[3/4] mb-4 relative">
                   <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt={product.alt} src={product.src} />
                   {product.badge && (
-                    <div className="absolute bottom-3 left-3 bg-tertiary-container text-on-tertiary-container font-label-caps text-[10px] px-3 py-1 rounded-full uppercase">
+                    <div className="absolute bottom-3 left-3 bg-tertiary-container text-on-tertiary-container font-label-caps text-[0.625rem] px-3 py-1 rounded-full uppercase">
                       {product.badge}
                     </div>
                   )}

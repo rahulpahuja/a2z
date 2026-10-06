@@ -50,7 +50,7 @@ function Section({ id, title, children }) {
 
 function Code({ children }) {
   return (
-    <code className="bg-surface-container-low border border-outline-variant rounded px-1.5 py-0.5 font-mono text-[13px] text-on-surface">
+    <code className="bg-surface-container-low border border-outline-variant rounded px-1.5 py-0.5 font-mono text-[0.8125rem] text-on-surface">
       {children}
     </code>
   );
@@ -58,7 +58,7 @@ function Code({ children }) {
 
 function Pre({ children }) {
   return (
-    <pre className="bg-surface-container-low border border-outline-variant rounded-lg p-4 overflow-x-auto font-mono text-[13px] text-on-surface whitespace-pre-wrap">
+    <pre className="bg-surface-container-low border border-outline-variant rounded-lg p-4 overflow-x-auto font-mono text-[0.8125rem] text-on-surface whitespace-pre-wrap">
       {children}
     </pre>
   );

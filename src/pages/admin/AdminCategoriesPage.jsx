@@ -314,7 +314,7 @@ export default function AdminCategoriesPage() {
                                   type="button"
                                   onClick={() => handleSubEditSave(sub.id)}
                                   disabled={updatingSub || !editingSubTitle.trim()}
-                                  className="text-primary font-label-caps text-[10px] hover:underline disabled:opacity-50"
+                                  className="text-primary font-label-caps text-[0.625rem] hover:underline disabled:opacity-50"
                                 >
                                   Save
                                 </button>
@@ -322,7 +322,7 @@ export default function AdminCategoriesPage() {
                                   type="button"
                                   onClick={handleSubEditCancel}
                                   disabled={updatingSub}
-                                  className="text-on-surface-variant font-label-caps text-[10px] hover:underline"
+                                  className="text-on-surface-variant font-label-caps text-[0.625rem] hover:underline"
                                 >
                                   Cancel
                                 </button>
@@ -335,14 +335,14 @@ export default function AdminCategoriesPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleSubEditStart(sub)}
-                                  className="text-primary font-label-caps text-[10px] hover:underline"
+                                  className="text-primary font-label-caps text-[0.625rem] hover:underline"
                                 >
                                   Edit
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleSubDelete(sub.id)}
-                                  className="text-error font-label-caps text-[10px] hover:underline"
+                                  className="text-error font-label-caps text-[0.625rem] hover:underline"
                                 >
                                   Delete
                                 </button>
@@ -362,13 +362,13 @@ export default function AdminCategoriesPage() {
         <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30 flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Top Navigation Bar</h2>
-            <p className="font-body-sm text-[12px] text-on-surface-variant">
+            <p className="font-body-sm text-[0.75rem] text-on-surface-variant">
               Choosing which of these categories appear in the header nav now lives in the Layout Configurator.
             </p>
           </div>
           <Link
             to="/super/configurator?surface=topnav"
-            className="bg-primary-container text-on-primary-container font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity shrink-0"
+            className="bg-primary-container text-on-primary-container font-label-caps text-[0.6875rem] px-5 py-2.5 rounded-lg uppercase hover:opacity-90 transition-opacity shrink-0"
           >
             Open in Layout Configurator
           </Link>

@@ -32,7 +32,7 @@ export default function A2ZStoresPage() {
 
         <div className="bg-surface-container-low border border-tertiary-container/30 rounded-xl p-8 flex flex-col items-center gap-3">
           <span className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-[28px]">storefront</span>
+            <span className="material-symbols-outlined text-[1.75rem]">storefront</span>
           </span>
           <p className="font-title-sm text-title-sm text-on-surface">
             We currently have just one home — right here in Indore.
@@ -54,7 +54,7 @@ export default function A2ZStoresPage() {
               onClick={() => setShowMap(true)}
               className="mt-2 inline-flex items-center gap-2 bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-xl uppercase tracking-widest hover:opacity-90 transition-opacity"
             >
-              <span className="material-symbols-outlined text-[18px]">map</span>
+              <span className="material-symbols-outlined text-[1.125rem]">map</span>
               View on Map
             </button>
           ) : (

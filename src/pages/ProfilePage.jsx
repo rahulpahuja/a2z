@@ -27,7 +27,7 @@ const EMPTY_ADDRESS = {
 function Field({ label, ...props }) {
   return (
     <div>
-      <label className="block font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant mb-1.5">
+      <label className="block font-label-caps text-[0.625rem] uppercase tracking-wider text-on-surface-variant mb-1.5">
         {label}
       </label>
       <input className={inputClassName} {...props} />
@@ -64,7 +64,7 @@ function AddressForm({ initial, onCancel, onSave }) {
       <Field label="Apartment, suite, etc. (optional)" name="apartment" value={form.apartment} onChange={handleChange} />
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant mb-1.5">
+          <label className="block font-label-caps text-[0.625rem] uppercase tracking-wider text-on-surface-variant mb-1.5">
             State
           </label>
           <select className={`${inputClassName} appearance-none`} name="state" value={form.state} onChange={handleChange}>
@@ -77,7 +77,7 @@ function AddressForm({ initial, onCancel, onSave }) {
           </select>
         </div>
         <div>
-          <label className="block font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant mb-1.5">
+          <label className="block font-label-caps text-[0.625rem] uppercase tracking-wider text-on-surface-variant mb-1.5">
             City
           </label>
           <select
@@ -214,7 +214,7 @@ export default function ProfilePage() {
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors mb-6"
         >
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span className="material-symbols-outlined text-[1.125rem]">arrow_back</span>
           Back
         </button>
 
@@ -277,23 +277,23 @@ export default function ProfilePage() {
                   <p className="font-body-sm text-body-sm font-semibold text-on-surface">
                     {addr.label || 'Address'} — {addr.firstName} {addr.lastName}
                   </p>
-                  <p className="font-body-sm text-[12px] text-on-surface-variant truncate">
+                  <p className="font-body-sm text-[0.75rem] text-on-surface-variant truncate">
                     {addr.address}{addr.apartment ? `, ${addr.apartment}` : ''}, {addr.city}, {addr.state} {addr.zip}
                   </p>
-                  <p className="font-body-sm text-[12px] text-on-surface-variant">{addr.phone}</p>
+                  <p className="font-body-sm text-[0.75rem] text-on-surface-variant">{addr.phone}</p>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => setEditingAddress(addr)}
-                    className="font-body-sm text-[12px] text-primary hover:underline"
+                    className="font-body-sm text-[0.75rem] text-primary hover:underline"
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => removeAddress(addr.id)}
-                    className="font-body-sm text-[12px] text-error hover:underline"
+                    className="font-body-sm text-[0.75rem] text-error hover:underline"
                   >
                     Delete
                   </button>

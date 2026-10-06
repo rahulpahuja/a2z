@@ -55,12 +55,12 @@ export default function CareersPage() {
               <div key={job.id} className="p-6 bg-surface-container-low border border-tertiary-container/30 rounded-xl">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <h2 className="font-title-sm text-title-sm text-on-surface">{job.title}</h2>
-                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-[10px] uppercase tracking-wider">
+                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-[0.625rem] uppercase tracking-wider">
                     {job.type}
                   </span>
                 </div>
                 <p className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mb-3">
-                  <span className="material-symbols-outlined text-[16px]">location_on</span>
+                  <span className="material-symbols-outlined text-[1rem]">location_on</span>
                   {job.location}
                 </p>
                 {job.description && (

@@ -361,7 +361,7 @@ export default function AdminProductVideosPage() {
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
                             SKU {product.sku} · {product.categoryTitle}
                           </p>
-                          <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono truncate">
+                          <p className="font-body-sm text-[0.6875rem] text-on-surface-variant/70 font-mono truncate">
                             ID: {product.id}
                           </p>
                         </div>
@@ -393,7 +393,7 @@ export default function AdminProductVideosPage() {
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     SKU {selectedProduct.sku} · {selectedProduct.categoryTitle}
                   </p>
-                  <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
+                  <p className="font-body-sm text-[0.6875rem] text-on-surface-variant/70 font-mono">
                     ID: {selectedProduct.id}
                   </p>
                 </div>
@@ -423,14 +423,14 @@ export default function AdminProductVideosPage() {
                 return (
                   <div key={index} className="flex flex-col gap-2 p-3 border border-outline-variant/40 rounded-lg bg-surface-container-lowest">
                     <div className="flex justify-between items-center">
-                      <span className="font-label-caps text-[10px] text-on-surface-variant">
+                      <span className="font-label-caps text-[0.625rem] text-on-surface-variant">
                         Video {index + 1} {index === 0 && <span className="text-error font-bold">*</span>}
                       </span>
                       {hasVideo && !converting && (
                         <button
                           type="button"
                           onClick={() => clearVideoSlot(index)}
-                          className="text-error font-body-sm text-[10px] hover:underline"
+                          className="text-error font-body-sm text-[0.625rem] hover:underline"
                         >
                           Remove
                         </button>
@@ -440,7 +440,7 @@ export default function AdminProductVideosPage() {
                     {converting ? (
                       <div className="w-full aspect-video rounded-md border-2 border-dashed border-primary/40 bg-surface-container-low flex flex-col items-center justify-center gap-2 px-4">
                         <span className="animate-spin inline-block w-6 h-6 border-2 border-t-transparent border-primary rounded-full"></span>
-                        <span className="font-body-sm text-[11px] text-on-surface-variant">
+                        <span className="font-body-sm text-[0.6875rem] text-on-surface-variant">
                           Converting for compatibility… {progressPct}%
                         </span>
                       </div>
@@ -453,8 +453,8 @@ export default function AdminProductVideosPage() {
                         onClick={() => document.getElementById(`video-file-input-${index}`).click()}
                         className="w-full aspect-video rounded-md border-2 border-dashed border-outline-variant/70 hover:border-primary/50 bg-surface-container-low flex flex-col items-center justify-center cursor-pointer transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[28px] text-outline">video_call</span>
-                        <span className="font-body-sm text-[10px] text-on-surface-variant/80 mt-1">Upload video</span>
+                        <span className="material-symbols-outlined text-[1.75rem] text-outline">video_call</span>
+                        <span className="font-body-sm text-[0.625rem] text-on-surface-variant/80 mt-1">Upload video</span>
                       </div>
                     )}
 
@@ -468,7 +468,7 @@ export default function AdminProductVideosPage() {
                     />
 
                     {hasVideo && !converting && (
-                      <p className="font-body-sm text-[10px] text-on-surface-variant/80 font-mono truncate">{fileName}</p>
+                      <p className="font-body-sm text-[0.625rem] text-on-surface-variant/80 font-mono truncate">{fileName}</p>
                     )}
                   </div>
                 );
@@ -482,7 +482,7 @@ export default function AdminProductVideosPage() {
                 </span>
                 {Object.entries(uploadProgress).map(([slotIdx, pct]) => (
                   <div key={slotIdx} className="flex flex-col gap-1.5">
-                    <div className="flex justify-between font-body-sm text-[12px] text-on-surface-variant">
+                    <div className="flex justify-between font-body-sm text-[0.75rem] text-on-surface-variant">
                       <span className="truncate">Video {parseInt(slotIdx) + 1} ({videoNames[slotIdx]})</span>
                       <span className="font-semibold shrink-0 ml-2">{pct}%</span>
                     </div>

@@ -58,7 +58,7 @@ function QuickActions() {
             'flex flex-col gap-2 border border-outline-variant/30 rounded-lg p-4 hover:border-primary hover:bg-surface-container transition-colors';
           const content = (
             <>
-              <span className="material-symbols-outlined text-primary text-[22px]">{action.icon}</span>
+              <span className="material-symbols-outlined text-primary text-[1.375rem]">{action.icon}</span>
               <span className="font-title-sm text-title-sm text-on-surface">{action.label}</span>
               <span className="font-body-sm text-body-sm text-on-surface-variant">{action.desc}</span>
             </>
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
               className="inline-flex items-center gap-1 mt-3 text-primary font-label-caps text-label-caps hover:underline"
             >
               Review {shipmentStats.needsAttention} order{shipmentStats.needsAttention === 1 ? '' : 's'} in Sales Management
-              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[1rem]">arrow_forward</span>
             </Link>
           )}
         </section>
@@ -248,11 +248,11 @@ export default function AdminDashboardPage() {
                   <button
                     type="button"
                     onClick={() => generateReceiptPdf(orderResult)}
-                    className="px-3 py-1 rounded border border-primary text-primary font-label-caps text-[10px] uppercase hover:bg-surface-container transition-colors"
+                    className="px-3 py-1 rounded border border-primary text-primary font-label-caps text-[0.625rem] uppercase hover:bg-surface-container transition-colors"
                   >
                     Download Invoice
                   </button>
-                  <span className={`px-3 py-1 rounded-full font-label-caps text-[10px] uppercase ${STATUS_STYLES[orderResult.status] ?? 'bg-surface-variant text-on-surface-variant'}`}>
+                  <span className={`px-3 py-1 rounded-full font-label-caps text-[0.625rem] uppercase ${STATUS_STYLES[orderResult.status] ?? 'bg-surface-variant text-on-surface-variant'}`}>
                     {orderResult.status}
                   </span>
                 </div>
@@ -322,10 +322,10 @@ export default function AdminDashboardPage() {
                         const sizeSummary = getSizeStockSummary(product);
                         return sizeSummary.length > 0 && (
                           <div className="mt-3 p-3 bg-surface-container rounded-lg border border-outline-variant/25">
-                            <p className="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1 font-semibold">Live Stock Breakdown</p>
+                            <p className="font-label-caps text-[0.625rem] text-on-surface-variant uppercase mb-1 font-semibold">Live Stock Breakdown</p>
                             <div className="flex flex-wrap gap-2">
                               {sizeSummary.map((s) => (
-                                <span key={s.size} className="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant/20 font-mono text-[11px] text-on-surface">
+                                <span key={s.size} className="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant/20 font-mono text-[0.6875rem] text-on-surface">
                                   Size {s.size}: <strong className={s.stock === null || s.stock > 0 ? "text-primary" : "text-error"}>{s.stock === null ? 'Unlimited' : `${s.stock} left`}</strong>
                                 </span>
                               ))}

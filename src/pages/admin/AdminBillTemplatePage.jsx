@@ -150,7 +150,7 @@ export default function AdminBillTemplatePage() {
                     className="text-on-surface-variant hover:text-primary disabled:opacity-30"
                     aria-label={`Move ${col.label} up`}
                   >
-                    <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
+                    <span className="material-symbols-outlined text-[1.25rem]">arrow_upward</span>
                   </button>
                   <button
                     type="button"
@@ -159,7 +159,7 @@ export default function AdminBillTemplatePage() {
                     className="text-on-surface-variant hover:text-primary disabled:opacity-30"
                     aria-label={`Move ${col.label} down`}
                   >
-                    <span className="material-symbols-outlined text-[20px]">arrow_downward</span>
+                    <span className="material-symbols-outlined text-[1.25rem]">arrow_downward</span>
                   </button>
                 </div>
               ))}

@@ -45,7 +45,7 @@ export default function ImageStudioPage() {
                     : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary'
                 }`}
               >
-                <span className="material-symbols-outlined text-[18px]">{tool.icon}</span>
+                <span className="material-symbols-outlined text-[1.125rem]">{tool.icon}</span>
                 {tool.label}
               </button>
             );

@@ -52,7 +52,7 @@ export default function AdminLayout({ children }) {
                     : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
                 }`}
               >
-                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                <span className="material-symbols-outlined text-[1.25rem]">{item.icon}</span>
                 {item.label}
               </Link>
             );
@@ -68,7 +68,7 @@ export default function AdminLayout({ children }) {
             }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-body-sm text-body-sm text-error hover:bg-surface-container-high transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">logout</span>
+            <span className="material-symbols-outlined text-[1.25rem]">logout</span>
             Sign Out
           </button>
         </div>
