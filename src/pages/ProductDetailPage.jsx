@@ -302,14 +302,14 @@ export default function ProductDetailPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="order-first md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+          className="order-1 md:order-none md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
         >
           <span className="material-symbols-outlined text-[1.25rem]">arrow_back</span>
           Back
         </button>
 
         {/* Left: Image Gallery (60% -> 7 columns) */}
-        <section className="md:col-span-7 flex flex-col gap-unit">
+        <section className="order-3 md:order-none md:col-span-7 flex flex-col gap-unit">
           <motion.div
             key={product.id}
             initial={{ opacity: 0, scale: 1.06, y: 18 }}
@@ -398,12 +398,14 @@ export default function ProductDetailPage() {
             </div>
           )}
         </section>
+        {product.description && (
+          <p className="order-4 md:hidden font-body-sm text-body-sm text-on-surface-variant" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
+        )}
 
-        {/* Right: Product Info (40% -> 5 columns) */}
-        {/* On phones the title, price and buy actions come straight after Back, above the photo gallery. */}
-        <section className="order-first md:order-none md:col-span-5 flex flex-col gap-6">
+        {/* Right: Product Info (40% -> 5 columns). On phones it flattens into the grid so each part can be ordered. */}
+        <section className="max-md:contents md:col-span-5 md:flex md:flex-col md:gap-6">
           {/* Title & Description */}
-          <div className="flex flex-col gap-2 border-b border-outline-variant/30 pb-6">
+          <div className="order-2 md:order-none flex flex-col gap-2 border-b border-outline-variant/30 pb-6">
             <div className="flex justify-between items-start">
               <span className="font-label-caps text-label-caps text-secondary uppercase tracking-widest">{product.category}</span>
               <div className="flex items-center gap-3">
@@ -435,7 +437,7 @@ export default function ProductDetailPage() {
               {product.name || product.title}
             </motion.h1>
             {product.description && (
-              <p className="font-body-sm text-body-sm text-on-surface-variant mt-1" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
+              <p className="hidden md:block font-body-sm text-body-sm text-on-surface-variant mt-1" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
             )}
             {viewCount !== null && viewCount > 0 && (
               <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
@@ -454,7 +456,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Selectors */}
-          <div className="flex flex-col gap-6">
+          <div className="order-5 md:order-none flex flex-col gap-6">
             {/* Size */}
             <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center">
@@ -584,7 +586,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 mt-4">
+          <div className="order-5 md:order-none flex flex-col gap-3 mt-4">
             <button
               onClick={handleBuyNow}
               disabled={selectedSizeStock === 0}
@@ -608,7 +610,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Policies (Always Expanded) */}
-          <div className="flex flex-col border-t border-outline-variant/30 mt-4 divide-y divide-outline-variant/30 font-body-sm text-body-sm">
+          <div className="order-5 md:order-none flex flex-col border-t border-outline-variant/30 mt-4 divide-y divide-outline-variant/30 font-body-sm text-body-sm">
             {ACCORDION_ITEMS.map((item) => (
               <div key={item.title} className="py-4 flex flex-col gap-2">
                 <h3 className="font-title-sm text-title-sm text-on-surface">
@@ -620,7 +622,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Social & Wishlist */}
-          <div className="flex items-center justify-between pt-6 border-t border-outline-variant/30">
+          <div className="order-5 md:order-none flex items-center justify-between pt-6 border-t border-outline-variant/30">
             <button className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-body-sm text-body-sm">
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>favorite</span>
               Add to Wishlist
