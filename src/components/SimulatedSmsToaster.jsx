@@ -63,8 +63,8 @@ export default function SimulatedSmsToaster() {
     <div className="fixed bottom-6 right-6 z-[999] max-w-sm w-full bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-700/50 p-4 flex flex-col gap-3 animate-slide-up hover:scale-[1.02] transition-transform duration-200">
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-green-400 text-[20px]">sms</span>
-          <span className="font-sans font-bold text-[11px] tracking-wider uppercase text-slate-300">
+          <span className="material-symbols-outlined text-green-400 text-[1.25rem]">sms</span>
+          <span className="font-sans font-bold text-[0.6875rem] tracking-wider uppercase text-slate-300">
             Simulated SMS Dispatched
           </span>
         </div>
@@ -72,25 +72,25 @@ export default function SimulatedSmsToaster() {
           onClick={() => setActiveSms(null)}
           className="text-slate-400 hover:text-slate-200 transition-colors"
         >
-          <span className="material-symbols-outlined text-[16px]">close</span>
+          <span className="material-symbols-outlined text-[1rem]">close</span>
         </button>
       </div>
 
       <div className="space-y-1 bg-slate-800/80 rounded-xl p-3 border border-slate-700/30">
-        <p className="font-mono text-[10px] text-green-400 font-bold">
+        <p className="font-mono text-[0.625rem] text-green-400 font-bold">
           TO: {activeSms.phone || '+91 XXXXX XXXXX'}
         </p>
-        <p className="font-sans text-[12px] text-slate-100 leading-relaxed leading-normal mt-1">
+        <p className="font-sans text-[0.75rem] text-slate-100 leading-relaxed leading-normal mt-1">
           {activeSms.message}
         </p>
       </div>
 
       <button
         onClick={handleTrackClick}
-        className="w-full flex items-center justify-center gap-1.5 bg-green-500 hover:bg-green-600 text-slate-950 font-bold font-label-caps text-[10px] uppercase py-2 px-3 rounded-lg transition-colors"
+        className="w-full flex items-center justify-center gap-1.5 bg-green-500 hover:bg-green-600 text-slate-950 font-bold font-label-caps text-[0.625rem] uppercase py-2 px-3 rounded-lg transition-colors"
       >
         <span>Open Tracking Link</span>
-        <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+        <span className="material-symbols-outlined text-[0.875rem]">open_in_new</span>
       </button>
     </div>
   );

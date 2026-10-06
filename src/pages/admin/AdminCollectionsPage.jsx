@@ -60,7 +60,7 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
         className="bg-surface border border-outline-variant rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
       >
         <div className="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container shrink-0">
-          <h3 className="font-title-sm text-[16px] text-on-surface font-bold">
+          <h3 className="font-title-sm text-[1rem] text-on-surface font-bold">
             {initial.id ? 'Edit Collection' : 'New Collection'}
           </h3>
           <button type="button" onClick={onClose} className="w-9 h-9 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
@@ -70,7 +70,7 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
 
         <div className="p-6 overflow-y-auto flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
-            <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor="collection-name">
+            <label className="font-label-caps text-[0.625rem] text-on-surface-variant" htmlFor="collection-name">
               Collection Name
             </label>
             <input
@@ -85,7 +85,7 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-label-caps text-[10px] text-on-surface-variant" htmlFor="collection-hero">
+            <label className="font-label-caps text-[0.625rem] text-on-surface-variant" htmlFor="collection-hero">
               Thumbnail / Hero Product
             </label>
             <select
@@ -100,14 +100,14 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
                 <option key={p.id} value={p.id}>{p.name || p.title}</option>
               ))}
             </select>
-            <p className="text-[10px] text-on-surface-variant/60">
+            <p className="text-[0.625rem] text-on-surface-variant/60">
               Must be one of the products picked for this collection — used as its thumbnail on the homepage.
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <label className="font-label-caps text-[10px] text-on-surface-variant">
+              <label className="font-label-caps text-[0.625rem] text-on-surface-variant">
                 Products in this Collection ({form.productIds.length} selected)
               </label>
               <input
@@ -115,12 +115,12 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products…"
-                className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-1.5 text-[11px] text-on-surface transition-colors w-48"
+                className="bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-1.5 text-[0.6875rem] text-on-surface transition-colors w-48"
               />
             </div>
             <div className="border border-outline-variant/30 rounded-xl max-h-72 overflow-y-auto divide-y divide-outline-variant/10">
               {filteredProducts.length === 0 && (
-                <p className="p-4 text-[12px] text-on-surface-variant/70 text-center">No products match your search.</p>
+                <p className="p-4 text-[0.75rem] text-on-surface-variant/70 text-center">No products match your search.</p>
               )}
               {filteredProducts.map((p) => {
                 const checked = form.productIds.includes(p.id);
@@ -143,8 +143,8 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[12px] font-semibold text-on-surface truncate">{p.name || p.title}</p>
-                      <p className="text-[10px] text-on-surface-variant/70 truncate">{p.category || p.categoryTitle}</p>
+                      <p className="text-[0.75rem] font-semibold text-on-surface truncate">{p.name || p.title}</p>
+                      <p className="text-[0.625rem] text-on-surface-variant/70 truncate">{p.category || p.categoryTitle}</p>
                     </div>
                   </label>
                 );
@@ -152,7 +152,7 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-[12px] text-on-surface cursor-pointer">
+          <label className="flex items-center gap-2 text-[0.75rem] text-on-surface cursor-pointer">
             <input
               type="checkbox"
               checked={form.published}
@@ -167,14 +167,14 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
           <button
             type="button"
             onClick={onClose}
-            className="border border-outline text-on-surface font-label-caps text-[11px] px-5 py-2.5 rounded-lg uppercase tracking-widest hover:bg-surface-container-high transition-colors"
+            className="border border-outline text-on-surface font-label-caps text-[0.6875rem] px-5 py-2.5 rounded-lg uppercase tracking-widest hover:bg-surface-container-high transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !form.name.trim() || form.productIds.length === 0}
-            className="bg-primary text-on-primary font-label-caps text-[11px] px-6 py-2.5 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="bg-primary text-on-primary font-label-caps text-[0.6875rem] px-6 py-2.5 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save Collection'}
           </button>
@@ -271,7 +271,7 @@ export default function AdminCollectionsPage() {
           onClick={() => setEditing(EMPTY_FORM)}
           className="bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity shrink-0 flex items-center gap-2"
         >
-          <span className="material-symbols-outlined text-[18px]">add</span>
+          <span className="material-symbols-outlined text-[1.125rem]">add</span>
           New Collection
         </button>
       </header>
@@ -279,7 +279,7 @@ export default function AdminCollectionsPage() {
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-10">
         {collections.length === 0 ? (
           <div className="bg-surface-container-low rounded-xl border border-outline-variant/30 p-12 text-center flex flex-col items-center gap-3">
-            <span className="material-symbols-outlined text-[40px] text-on-surface-variant/40">collections_bookmark</span>
+            <span className="material-symbols-outlined text-[2.5rem] text-on-surface-variant/40">collections_bookmark</span>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
               No collections yet. Create one to feature a curated set of products on the home page.
             </p>
@@ -303,11 +303,11 @@ export default function AdminCollectionsPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
-                        <span className="material-symbols-outlined text-[32px]">image</span>
+                        <span className="material-symbols-outlined text-[2rem]">image</span>
                       </div>
                     )}
                     <span
-                      className={`absolute top-3 right-3 font-label-caps text-[10px] uppercase px-2.5 py-1 rounded-full backdrop-blur ${
+                      className={`absolute top-3 right-3 font-label-caps text-[0.625rem] uppercase px-2.5 py-1 rounded-full backdrop-blur ${
                         collection.published ? 'bg-secondary-container/90 text-on-secondary-container' : 'bg-surface/90 text-on-surface-variant'
                       }`}
                     >
@@ -317,8 +317,8 @@ export default function AdminCollectionsPage() {
 
                   <div className="p-4 flex flex-col gap-3 flex-1">
                     <div>
-                      <h3 className="font-title-sm text-[15px] text-on-surface font-bold truncate">{collection.name}</h3>
-                      <p className="text-[11px] text-on-surface-variant/70 mt-0.5">
+                      <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-bold truncate">{collection.name}</h3>
+                      <p className="text-[0.6875rem] text-on-surface-variant/70 mt-0.5">
                         {validProductCount} product{validProductCount === 1 ? '' : 's'}
                       </p>
                     </div>
@@ -336,7 +336,7 @@ export default function AdminCollectionsPage() {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') e.currentTarget.blur();
                         }}
-                        className="w-11 h-8 rounded-lg border border-outline-variant/40 text-center text-[12px] text-on-surface focus:border-primary focus:ring-0"
+                        className="w-11 h-8 rounded-lg border border-outline-variant/40 text-center text-[0.75rem] text-on-surface focus:border-primary focus:ring-0"
                       />
                       <button
                         type="button"
@@ -345,7 +345,7 @@ export default function AdminCollectionsPage() {
                         aria-label="Move up"
                         className="w-8 h-8 rounded-lg border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                       >
-                        <span className="material-symbols-outlined text-[16px]">arrow_upward</span>
+                        <span className="material-symbols-outlined text-[1rem]">arrow_upward</span>
                       </button>
                       <button
                         type="button"
@@ -354,12 +354,12 @@ export default function AdminCollectionsPage() {
                         aria-label="Move down"
                         className="w-8 h-8 rounded-lg border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors disabled:opacity-30"
                       >
-                        <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+                        <span className="material-symbols-outlined text-[1rem]">arrow_downward</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleTogglePublished(collection)}
-                        className="flex-1 text-center border border-outline-variant/40 rounded-lg py-1.5 text-[10px] font-label-caps uppercase text-on-surface-variant hover:text-primary hover:border-primary transition-colors"
+                        className="flex-1 text-center border border-outline-variant/40 rounded-lg py-1.5 text-[0.625rem] font-label-caps uppercase text-on-surface-variant hover:text-primary hover:border-primary transition-colors"
                       >
                         {collection.published ? 'Unpublish' : 'Publish'}
                       </button>
@@ -369,7 +369,7 @@ export default function AdminCollectionsPage() {
                         aria-label="Edit"
                         className="w-8 h-8 rounded-lg border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                        <span className="material-symbols-outlined text-[1rem]">edit</span>
                       </button>
                       <button
                         type="button"
@@ -377,7 +377,7 @@ export default function AdminCollectionsPage() {
                         aria-label="Delete"
                         className="w-8 h-8 rounded-lg border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-error hover:border-error transition-colors"
                       >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                        <span className="material-symbols-outlined text-[1rem]">delete</span>
                       </button>
                     </div>
                   </div>

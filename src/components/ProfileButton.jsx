@@ -80,7 +80,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
           <div className="absolute right-0 top-full mt-2 w-72 bg-surface rounded-xl shadow-xl border border-outline-variant py-2 z-[295] flex flex-col gap-1 max-h-[85vh] overflow-y-auto">
             {/* Header info */}
             <div className="px-4 py-2 border-b border-outline-variant/60">
-              <p className="font-body-sm text-[12px] text-on-surface-variant font-medium">Logged in as</p>
+              <p className="font-body-sm text-[0.75rem] text-on-surface-variant font-medium">Logged in as</p>
               <p className="font-body-sm text-body-sm text-on-surface font-semibold truncate mt-0.5">
                 {displayName(user, profile)}
               </p>
@@ -88,21 +88,21 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
             
             {/* My Orders Section */}
             <div className="px-4 py-2 flex flex-col gap-2">
-              <h4 className="font-label-caps text-[9px] uppercase tracking-wider text-outline font-bold">My Orders</h4>
+              <h4 className="font-label-caps text-[0.5625rem] uppercase tracking-wider text-outline font-bold">My Orders</h4>
               {userOrders.length === 0 ? (
-                <p className="text-[11px] text-on-surface-variant/70 italic py-1">No orders found.</p>
+                <p className="text-[0.6875rem] text-on-surface-variant/70 italic py-1">No orders found.</p>
               ) : (
                 <div className="flex flex-col gap-2.5 max-h-[40vh] overflow-y-auto pr-1">
                   {userOrders.slice(0, 4).map((order) => (
-                    <div key={order.id} className="p-2 bg-surface-container rounded-lg border border-outline-variant/30 flex flex-col gap-1.5 text-[11px]">
+                    <div key={order.id} className="p-2 bg-surface-container rounded-lg border border-outline-variant/30 flex flex-col gap-1.5 text-[0.6875rem]">
                       <div className="flex justify-between items-center font-mono">
                         <button
                           onClick={() => handleTrackOrder(order)}
-                          className="font-bold text-primary hover:underline text-left text-[11px]"
+                          className="font-bold text-primary hover:underline text-left text-[0.6875rem]"
                         >
                           {order.id}
                         </button>
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                        <span className={`px-1.5 py-0.5 rounded text-[0.5625rem] font-bold uppercase tracking-wider ${
                           order.status === 'Delivered' 
                             ? 'bg-secondary/15 text-secondary' 
                             : order.status === 'Cancelled'
@@ -118,22 +118,22 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                         <div className="flex flex-wrap gap-2 items-center">
                           <button
                             onClick={() => handleTrackOrder(order)}
-                            className="text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-0.5 underline font-medium"
+                            className="text-[0.625rem] text-on-surface-variant hover:text-primary flex items-center gap-0.5 underline font-medium"
                           >
-                            <span className="material-symbols-outlined text-[10px]">location_on</span>
+                            <span className="material-symbols-outlined text-[0.625rem]">location_on</span>
                             Visual Track
                           </button>
                           <a
                             href={getTrackingPortalUrl(order.trackingPartner, order.trackingId)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[10px] text-secondary hover:underline flex items-center gap-0.5 font-semibold"
+                            className="text-[0.625rem] text-secondary hover:underline flex items-center gap-0.5 font-semibold"
                           >
                             <span>Track on {order.trackingPartner} ↗</span>
                           </a>
                         </div>
                       ) : (
-                        <p className="text-[9px] text-on-surface-variant/60 italic">No tracking info yet</p>
+                        <p className="text-[0.5625rem] text-on-surface-variant/60 italic">No tracking info yet</p>
                       )}
                     </div>
                   ))}
@@ -142,7 +142,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
               <Link
                 to="/orders"
                 onClick={() => setMenuOpen(false)}
-                className="text-[11px] text-primary hover:underline font-semibold self-start mt-0.5"
+                className="text-[0.6875rem] text-primary hover:underline font-semibold self-start mt-0.5"
               >
                 View All Orders →
               </Link>
@@ -158,7 +158,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px]">edit</span>
+                <span className="material-symbols-outlined text-[1rem]">edit</span>
                 Edit Profile
               </button>
               <button
@@ -171,7 +171,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2 font-body-sm text-body-sm text-error hover:bg-surface-container transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px]">logout</span>
+                <span className="material-symbols-outlined text-[1rem]">logout</span>
                 Sign Out
               </button>
             </div>

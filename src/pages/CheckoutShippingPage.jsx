@@ -233,7 +233,7 @@ export default function CheckoutShippingPage() {
                     key={addr.id}
                     type="button"
                     onClick={() => applySavedAddress(addr)}
-                    className={`px-4 py-2 rounded-full border font-label-caps text-[11px] uppercase tracking-wider transition-colors ${
+                    className={`px-4 py-2 rounded-full border font-label-caps text-[0.6875rem] uppercase tracking-wider transition-colors ${
                       selectedAddressId === addr.id
                         ? 'bg-primary text-on-primary border-primary'
                         : 'border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
@@ -433,7 +433,7 @@ export default function CheckoutShippingPage() {
                         <h3 className="font-title-sm text-title-sm text-on-surface line-clamp-2 mb-1">{item.title}</h3>
                         {item.size ? (
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="inline-block bg-tertiary text-on-tertiary font-label-caps text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">
+                            <span className="inline-block bg-tertiary text-on-tertiary font-label-caps text-[0.625rem] px-2 py-1 rounded-full uppercase tracking-wider">
                               {item.size}
                             </span>
                             <span className="font-body-sm text-body-sm text-on-surface-variant">Qty: {item.quantity}</span>

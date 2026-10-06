@@ -77,8 +77,8 @@ function VideoCard({ src, poster, title, description }) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-6">
         <h3 className="font-title-sm text-title-sm text-white playfair mb-1">{title}</h3>
         <p className="font-body-sm text-body-sm text-white/80 line-clamp-2">{description}</p>
-        <div className="mt-3 flex items-center gap-1.5 font-label-caps text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-primary)' }}>
-          <span className="material-symbols-outlined text-[16px] animate-pulse">
+        <div className="mt-3 flex items-center gap-1.5 font-label-caps text-[0.6875rem] uppercase tracking-wider" style={{ color: 'var(--color-primary)' }}>
+          <span className="material-symbols-outlined text-[1rem] animate-pulse">
             {isPaused ? 'play_arrow' : 'pause'}
           </span>
           <span>{isPaused ? 'Tap to play' : 'Playing Lookbook'}</span>
@@ -198,7 +198,7 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[11px] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words [@media(orientation:landscape)_and_(max-height:500px)]:!py-1">
+      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[0.6875rem] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words [@media(orientation:landscape)_and_(max-height:500px)]:!py-1">
         Enjoy Free Shipping on Orders Above ₹2,500
       </div>
       <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-0 md:top-[32px] z-50 flat no shadows border-b border-surface-variant w-full max-w-full">
@@ -274,7 +274,7 @@ export default function HomePage() {
                     </h1>
                   )}
                   {!slide.hideCta && (
-                    <span className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 [@media(orientation:landscape)_and_(max-height:500px)]:!px-5 [@media(orientation:landscape)_and_(max-height:500px)]:!py-2 rounded-xl font-label-caps text-[11px] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg">
+                    <span className="bg-primary text-on-primary px-6 py-3 sm:px-8 sm:py-4 [@media(orientation:landscape)_and_(max-height:500px)]:!px-5 [@media(orientation:landscape)_and_(max-height:500px)]:!py-2 rounded-xl font-label-caps text-[0.6875rem] sm:text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-colors shadow-lg">
                       {slide.cta}
                     </span>
                   )}
@@ -284,7 +284,7 @@ export default function HomePage() {
           </div>
 
           {bannerHintVisible && (
-            <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-pulse bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-sm rounded-full px-4 py-2 font-label-caps text-[11px] uppercase tracking-widest shadow-lg whitespace-nowrap">
+            <span className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-pulse bg-inverse-surface/80 text-inverse-on-surface backdrop-blur-sm rounded-full px-4 py-2 font-label-caps text-[0.6875rem] uppercase tracking-widest shadow-lg whitespace-nowrap">
               Tap to shop the collection →
             </span>
           )}
@@ -343,7 +343,7 @@ export default function HomePage() {
               className="flex flex-col items-center gap-2.5 sm:gap-4 min-w-[90px] sm:min-w-[120px] carousel-item"
             >
               <div className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300 bg-inverse-surface flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-[30px] sm:text-[40px]">smart_display</span>
+                <span className="material-symbols-outlined text-white text-[1.875rem] sm:text-[2.5rem]">smart_display</span>
               </div>
               <span className="font-title-sm text-xs sm:text-title-sm text-on-surface text-center">Shots</span>
             </Link>
@@ -381,10 +381,10 @@ export default function HomePage() {
             </h2>
             <Link
               to="/products"
-              className="font-label-caps text-[11px] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
+              className="font-label-caps text-[0.6875rem] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
             >
               View All
-              <span className="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[1rem] md:text-[1.125rem]">arrow_forward</span>
             </Link>
           </div>
           {productsRow1.length === 0 ? (
@@ -429,7 +429,7 @@ export default function HomePage() {
                           </div>
                         )}
                         {product.badge && (
-                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[10px] md:text-label-caps uppercase">{product.badge}</div>
+                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[0.625rem] md:text-label-caps uppercase">{product.badge}</div>
                         )}
                         <button
                           type="button"
@@ -440,20 +440,20 @@ export default function HomePage() {
                           }}
                           className={`absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                         >
-                          <span className="material-symbols-outlined text-[18px] md:text-[20px]" data-weight={isFavorited ? 'fill' : undefined}>
+                          <span className="material-symbols-outlined text-[1.125rem] md:text-[1.25rem]" data-weight={isFavorited ? 'fill' : undefined}>
                             {isFavorited ? 'favorite' : 'favorite_border'}
                           </span>
                         </button>
                       </div>
                       <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block truncate">
+                        <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider font-semibold block truncate">
                           {product.category || product.categoryTitle}
                         </span>
                         <div className="flex justify-between items-start gap-1">
                           <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
                           {product.rating && (
                             <div className="flex items-center text-secondary gap-0.5 shrink-0">
-                              <span className="material-symbols-outlined text-[15px] fill-icon">star</span>
+                              <span className="material-symbols-outlined text-[0.9375rem] fill-icon">star</span>
                               <span className="font-body-sm text-xs md:text-body-sm">{product.rating}</span>
                             </div>
                           )}
@@ -487,10 +487,10 @@ export default function HomePage() {
             </h2>
             <Link
               to="/products"
-              className="font-label-caps text-[11px] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
+              className="font-label-caps text-[0.6875rem] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
             >
               View All
-              <span className="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[1rem] md:text-[1.125rem]">arrow_forward</span>
             </Link>
           </div>
           {productsRow2.length === 0 ? (
@@ -535,7 +535,7 @@ export default function HomePage() {
                           </div>
                         )}
                         {product.badge && (
-                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[10px] md:text-label-caps uppercase">{product.badge}</div>
+                          <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-tertiary text-on-tertiary px-2.5 py-1 rounded-full font-label-caps text-[0.625rem] md:text-label-caps uppercase">{product.badge}</div>
                         )}
                         <button
                           type="button"
@@ -546,20 +546,20 @@ export default function HomePage() {
                           }}
                           className={`absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-surface/80 backdrop-blur rounded-full flex items-center justify-center transition-colors ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                         >
-                          <span className="material-symbols-outlined text-[18px] md:text-[20px]" data-weight={isFavorited ? 'fill' : undefined}>
+                          <span className="material-symbols-outlined text-[1.125rem] md:text-[1.25rem]" data-weight={isFavorited ? 'fill' : undefined}>
                             {isFavorited ? 'favorite' : 'favorite_border'}
                           </span>
                         </button>
                       </div>
                       <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider font-semibold block truncate">
+                        <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider font-semibold block truncate">
                           {product.category || product.categoryTitle}
                         </span>
                         <div className="flex justify-between items-start gap-1">
                           <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
                           {product.rating && (
                             <div className="flex items-center text-secondary gap-0.5 shrink-0">
-                              <span className="material-symbols-outlined text-[15px] fill-icon">star</span>
+                              <span className="material-symbols-outlined text-[0.9375rem] fill-icon">star</span>
                               <span className="font-body-sm text-xs md:text-body-sm">{product.rating}</span>
                             </div>
                           )}

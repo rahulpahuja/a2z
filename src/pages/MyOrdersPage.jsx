@@ -150,7 +150,7 @@ export default function MyOrdersPage() {
                       {order.placedAt ? new Date(order.placedAt).toLocaleString('en-IN') : ''} · {itemCount} item{itemCount === 1 ? '' : 's'}
                     </p>
                     {order.shipment?.awb && (
-                      <p className="font-body-sm text-[12px] text-on-surface-variant mt-1 font-mono">
+                      <p className="font-body-sm text-[0.75rem] text-on-surface-variant mt-1 font-mono">
                         AWB {order.shipment.awb} ({order.shipment.courier})
                       </p>
                     )}
@@ -160,7 +160,7 @@ export default function MyOrdersPage() {
                       {formatCurrency(order.total)}
                     </span>
                     <span
-                      className={`px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider ${
+                      className={`px-2.5 py-1 rounded text-[0.6875rem] font-bold uppercase tracking-wider ${
                         STATUS_STYLES[order.status] || 'bg-primary/10 text-primary'
                       }`}
                     >

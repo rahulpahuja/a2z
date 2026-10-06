@@ -709,28 +709,28 @@ export default function AdminSalesPage() {
         {/* KPI Row */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 shadow-sm hover:shadow transition-shadow">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[10px]">Total Revenue</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[0.625rem]">Total Revenue</span>
             <p className="font-headline-md text-headline-md text-primary mt-2">{formatCurrency(stats.totalRev)}</p>
             <div className="h-1 bg-primary/20 rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-primary rounded-full w-[80%]"></div>
             </div>
           </div>
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 shadow-sm hover:shadow transition-shadow">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[10px]">Total Orders</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[0.625rem]">Total Orders</span>
             <p className="font-headline-md text-headline-md text-secondary mt-2">{stats.totalOrders}</p>
             <div className="h-1 bg-secondary/20 rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-secondary rounded-full w-[65%]"></div>
             </div>
           </div>
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 shadow-sm hover:shadow transition-shadow">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[10px]">Average Order Value</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[0.625rem]">Average Order Value</span>
             <p className="font-headline-md text-headline-md text-tertiary mt-2">{formatCurrency(stats.aov)}</p>
             <div className="h-1 bg-tertiary/20 rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-tertiary rounded-full w-[72%]"></div>
             </div>
           </div>
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 shadow-sm hover:shadow transition-shadow">
-            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[10px]">Top Category</span>
+            <span className="font-label-caps text-label-caps text-on-surface-variant uppercase text-[0.625rem]">Top Category</span>
             <p className="font-headline-md text-headline-md text-on-surface mt-2 truncate">{stats.topCat}</p>
             <div className="h-1 bg-on-surface/10 rounded-full mt-3 overflow-hidden">
               <div className="h-full bg-outline rounded-full w-[90%]"></div>
@@ -760,10 +760,10 @@ export default function AdminSalesPage() {
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Daily Sales Trend</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue progression (Last 14 Days)</p>
+                <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold">Daily Sales Trend</h3>
+                <p className="text-[0.6875rem] text-on-surface-variant/75">Revenue progression (Last 14 Days)</p>
               </div>
-              <span className="text-[10px] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
+              <span className="text-[0.625rem] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
             {loading ? (
               <div className="flex-1 flex items-center justify-center text-on-surface-variant">Loading chart...</div>
@@ -772,17 +772,17 @@ export default function AdminSalesPage() {
                 <canvas ref={dailyChartRef}></canvas>
               </div>
             )}
-            <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on points to drill down to daily logs.</p>
+            <p className="text-[0.625rem] text-on-surface-variant/65 text-center mt-3">Click on points to drill down to daily logs.</p>
           </div>
 
           {/* Monthly bar chart */}
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Monthly Sales breakdown</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue by Calendar Month ({selectedYear})</p>
+                <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold">Monthly Sales breakdown</h3>
+                <p className="text-[0.6875rem] text-on-surface-variant/75">Revenue by Calendar Month ({selectedYear})</p>
               </div>
-              <span className="text-[10px] bg-secondary/10 text-secondary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
+              <span className="text-[0.625rem] bg-secondary/10 text-secondary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
             {loading ? (
               <div className="flex-1 flex items-center justify-center text-on-surface-variant">Loading chart...</div>
@@ -791,17 +791,17 @@ export default function AdminSalesPage() {
                 <canvas ref={monthlyChartRef}></canvas>
               </div>
             )}
-            <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on bars to drill down to monthly logs.</p>
+            <p className="text-[0.625rem] text-on-surface-variant/65 text-center mt-3">Click on bars to drill down to monthly logs.</p>
           </div>
 
           {/* Quarterly doughnut chart */}
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Quarterly Sales Distribution</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue percentage share ({selectedYear})</p>
+                <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold">Quarterly Sales Distribution</h3>
+                <p className="text-[0.6875rem] text-on-surface-variant/75">Revenue percentage share ({selectedYear})</p>
               </div>
-              <span className="text-[10px] bg-tertiary/10 text-tertiary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
+              <span className="text-[0.625rem] bg-tertiary/10 text-tertiary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
             {loading ? (
               <div className="flex-1 flex items-center justify-center text-on-surface-variant">Loading chart...</div>
@@ -810,17 +810,17 @@ export default function AdminSalesPage() {
                 <canvas ref={quarterlyChartRef}></canvas>
               </div>
             )}
-            <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on segments to drill down to quarterly logs.</p>
+            <p className="text-[0.625rem] text-on-surface-variant/65 text-center mt-3">Click on segments to drill down to quarterly logs.</p>
           </div>
 
           {/* Yearly bar chart */}
           <div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/35 flex flex-col min-h-[340px]">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-title-sm text-[15px] text-on-surface font-semibold">Yearly Sales</h3>
-                <p className="text-[11px] text-on-surface-variant/75">Revenue by Year</p>
+                <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold">Yearly Sales</h3>
+                <p className="text-[0.6875rem] text-on-surface-variant/75">Revenue by Year</p>
               </div>
-              <span className="text-[10px] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
+              <span className="text-[0.625rem] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Interactive</span>
             </div>
             {loading ? (
               <div className="flex-1 flex items-center justify-center text-on-surface-variant">Loading chart...</div>
@@ -829,7 +829,7 @@ export default function AdminSalesPage() {
                 <canvas ref={yearlyChartRef}></canvas>
               </div>
             )}
-            <p className="text-[10px] text-on-surface-variant/65 text-center mt-3">Click on bars to drill down to yearly logs.</p>
+            <p className="text-[0.625rem] text-on-surface-variant/65 text-center mt-3">Click on bars to drill down to yearly logs.</p>
           </div>
         </section>
 
@@ -839,11 +839,11 @@ export default function AdminSalesPage() {
             <div>
               <div className="flex items-center gap-3">
                 <h2 className="font-title-sm text-title-sm text-on-surface">Transactions Log</h2>
-                <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded-full font-label-caps text-[10px] uppercase font-bold tracking-wider">
+                <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded-full font-label-caps text-[0.625rem] uppercase font-bold tracking-wider">
                   {drillDownType === 'all' ? 'All Sales' : `Filtered: ${drillDownLabel}`}
                 </span>
               </div>
-              <p className="font-body-sm text-[11px] text-on-surface-variant mt-1">
+              <p className="font-body-sm text-[0.6875rem] text-on-surface-variant mt-1">
                 Showing {displayOrders.length} transactions {drillDownType !== 'all' && `for ${drillDownLabel}`}.
               </p>
             </div>
@@ -857,9 +857,9 @@ export default function AdminSalesPage() {
               {drillDownType !== 'all' && (
                 <button
                   onClick={() => handleDrillDown('all', '', [])}
-                  className="bg-outline-variant hover:bg-outline/20 text-on-surface-variant font-label-caps text-[10px] px-4 py-2 rounded-lg flex items-center gap-1.5 uppercase transition-colors"
+                  className="bg-outline-variant hover:bg-outline/20 text-on-surface-variant font-label-caps text-[0.625rem] px-4 py-2 rounded-lg flex items-center gap-1.5 uppercase transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[14px]">close</span>
+                  <span className="material-symbols-outlined text-[0.875rem]">close</span>
                   Reset Filter
                 </button>
               )}
@@ -868,15 +868,15 @@ export default function AdminSalesPage() {
 
           {selectedOrderIds.length > 0 && (
             <div className="p-4 bg-primary/10 rounded-xl border border-primary/20 flex justify-between items-center animate-fade-in mb-4">
-              <span className="font-body-sm text-[13px] text-on-surface font-semibold">
+              <span className="font-body-sm text-[0.8125rem] text-on-surface font-semibold">
                 Selected <span className="text-primary">{selectedOrderIds.length}</span> orders
               </span>
               <button
                 type="button"
                 onClick={handleOpenBulkModal}
-                className="btn btn-primary py-2 px-4 text-[11px] flex items-center gap-1.5"
+                className="btn btn-primary py-2 px-4 text-[0.6875rem] flex items-center gap-1.5"
               >
-                <span className="material-symbols-outlined text-[16px]">local_shipping</span>
+                <span className="material-symbols-outlined text-[1rem]">local_shipping</span>
                 Bulk Update Tracking
               </button>
             </div>
@@ -892,7 +892,7 @@ export default function AdminSalesPage() {
             <div className="overflow-x-auto border border-outline-variant/20 rounded-lg">
               <table className="w-full border-collapse text-left bg-surface-container-lowest">
                 <thead>
-                  <tr className="bg-surface-container border-b border-outline-variant/30 text-on-surface font-label-caps text-[10px] uppercase tracking-wider">
+                  <tr className="bg-surface-container border-b border-outline-variant/30 text-on-surface font-label-caps text-[0.625rem] uppercase tracking-wider">
                     <th className="p-4 w-12 text-center">
                       <input
                         type="checkbox"
@@ -953,8 +953,8 @@ export default function AdminSalesPage() {
                             className="form-checkbox"
                           />
                         </td>
-                        <td className="p-4 font-mono font-bold text-[12px] text-primary">{order.id}</td>
-                        <td className="p-4 text-on-surface font-semibold whitespace-nowrap text-[12px]">{formattedTime}</td>
+                        <td className="p-4 font-mono font-bold text-[0.75rem] text-primary">{order.id}</td>
+                        <td className="p-4 text-on-surface font-semibold whitespace-nowrap text-[0.75rem]">{formattedTime}</td>
                         <td className="p-4 text-on-surface font-semibold">{customer}</td>
                         <td className="p-4 max-w-[200px]">
                           <div className="flex items-center gap-2">
@@ -965,15 +965,15 @@ export default function AdminSalesPage() {
                                 </div>
                               ))}
                             </div>
-                            <span className="text-[11px] text-on-surface-variant truncate">
+                            <span className="text-[0.6875rem] text-on-surface-variant truncate">
                               {order.items[0]?.title} {itemsCount > 1 ? `+${itemsCount - 1} items` : ''}
                             </span>
                           </div>
                         </td>
                         <td className="p-4 text-right font-semibold text-on-surface">{formatCurrency(order.total)}</td>
-                        <td className="p-4 text-on-surface-variant text-[11px] whitespace-nowrap">{order.paymentMethod}</td>
+                        <td className="p-4 text-on-surface-variant text-[0.6875rem] whitespace-nowrap">{order.paymentMethod}</td>
                         <td className="p-4">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap uppercase tracking-wider ${
+                          <span className={`px-2 py-0.5 rounded-full text-[0.625rem] font-semibold whitespace-nowrap uppercase tracking-wider ${
                             order.status === 'Delivered' 
                               ? 'bg-secondary/15 text-secondary' 
                               : order.status === 'Cancelled'
@@ -993,7 +993,7 @@ export default function AdminSalesPage() {
                             className="w-8 h-8 rounded-full hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors"
                             title="Download Receipt"
                           >
-                            <span className="material-symbols-outlined text-[18px]">download</span>
+                            <span className="material-symbols-outlined text-[1.125rem]">download</span>
                           </button>
                         </td>
                       </tr>
@@ -1013,8 +1013,8 @@ export default function AdminSalesPage() {
             {/* Modal Header */}
             <div className="p-6 border-b border-outline-variant/35 flex justify-between items-center">
               <div>
-                <span className="font-label-caps text-[10px] text-primary uppercase font-bold tracking-widest">Order Detail lookup</span>
-                <h3 className="font-headline-md text-[20px] text-on-surface font-bold mt-1">Transaction {selectedOrder.id}</h3>
+                <span className="font-label-caps text-[0.625rem] text-primary uppercase font-bold tracking-widest">Order Detail lookup</span>
+                <h3 className="font-headline-md text-[1.25rem] text-on-surface font-bold mt-1">Transaction {selectedOrder.id}</h3>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
@@ -1029,18 +1029,18 @@ export default function AdminSalesPage() {
               {/* Order Meta Info */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 text-xs">
                 <div>
-                  <p className="text-[10px] text-on-surface-variant uppercase font-semibold">Timestamp</p>
+                  <p className="text-[0.625rem] text-on-surface-variant uppercase font-semibold">Timestamp</p>
                   <p className="font-semibold text-on-surface mt-1">
                     {new Date(selectedOrder.placedAt).toLocaleString('en-IN')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-on-surface-variant uppercase font-semibold">Payment Status</p>
+                  <p className="text-[0.625rem] text-on-surface-variant uppercase font-semibold">Payment Status</p>
                   <p className="font-semibold text-on-surface mt-1">{selectedOrder.paymentMethod}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-on-surface-variant uppercase font-semibold">Log Status</p>
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider mt-1 ${
+                  <p className="text-[0.625rem] text-on-surface-variant uppercase font-semibold">Log Status</p>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[0.5625rem] font-bold uppercase tracking-wider mt-1 ${
                     selectedOrder.status === 'Delivered' 
                       ? 'bg-secondary/15 text-secondary' 
                       : selectedOrder.status === 'Cancelled'
@@ -1051,28 +1051,28 @@ export default function AdminSalesPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-on-surface-variant uppercase font-semibold">Grand Total</p>
-                  <p className="font-bold text-[14px] text-primary mt-0.5">{formatCurrency(selectedOrder.total)}</p>
+                  <p className="text-[0.625rem] text-on-surface-variant uppercase font-semibold">Grand Total</p>
+                  <p className="font-bold text-[0.875rem] text-primary mt-0.5">{formatCurrency(selectedOrder.total)}</p>
                 </div>
               </div>
 
               {/* Order Status & Tracking Configuration */}
               <div className="admin-card flex flex-col gap-4">
-                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[18px] text-primary">local_shipping</span>
+                <h4 className="font-title-sm text-[0.8125rem] text-on-surface font-semibold flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[1.125rem] text-primary">local_shipping</span>
                   Manage Order Status &amp; Tracking
                 </h4>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Status Dropdown */}
                   <div>
-                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                    <label className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1.5">
                       Order Status
                     </label>
                     <select
                       value={orderStatus}
                       onChange={(e) => setOrderStatus(e.target.value)}
-                      className="form-select text-[12px] py-1.5 px-3"
+                      className="form-select text-[0.75rem] py-1.5 px-3"
                     >
                       <option value="Processing">Processing</option>
                       <option value="Shipped">Shipped</option>
@@ -1084,13 +1084,13 @@ export default function AdminSalesPage() {
 
                   {/* Tracking Partner Dropdown */}
                   <div>
-                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                    <label className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1.5">
                       Tracking Partner
                     </label>
                     <select
                       value={trackingPartner}
                       onChange={(e) => setTrackingPartner(e.target.value)}
-                      className="form-select text-[12px] py-1.5 px-3"
+                      className="form-select text-[0.75rem] py-1.5 px-3"
                     >
                       <option value="">Select Partner</option>
                       {trackingPartners.map((p) => (
@@ -1101,7 +1101,7 @@ export default function AdminSalesPage() {
 
                   {/* Tracking ID Input */}
                   <div>
-                    <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                    <label className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1.5">
                       Tracking ID
                     </label>
                     <input
@@ -1109,7 +1109,7 @@ export default function AdminSalesPage() {
                       value={trackingId}
                       onChange={(e) => setTrackingId(e.target.value)}
                       placeholder="e.g. 123456789"
-                      className="form-input text-[12px] py-1.5 px-3"
+                      className="form-input text-[0.75rem] py-1.5 px-3"
                     />
                   </div>
                 </div>
@@ -1118,35 +1118,35 @@ export default function AdminSalesPage() {
                   type="button"
                   disabled={isSavingTracking}
                   onClick={handleSaveTracking}
-                  className="btn btn-primary self-end py-1.5 px-4 text-[10px]"
+                  className="btn btn-primary self-end py-1.5 px-4 text-[0.625rem]"
                 >
-                  <span className="material-symbols-outlined text-[14px]">save</span>
+                  <span className="material-symbols-outlined text-[0.875rem]">save</span>
                   {isSavingTracking ? 'Saving…' : 'Save Status & Tracking'}
                 </button>
               </div>
 
               {/* Shipping (ShipPrime) */}
               <div className="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex flex-col gap-4">
-                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-primary">local_shipping</span>
+                <h4 className="font-title-sm text-[0.8125rem] text-on-surface font-semibold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[1.125rem] text-primary">local_shipping</span>
                   Shipping (ShipPrime)
                 </h4>
 
                 {(!selectedOrder.shipment || selectedOrder.shipment.status === 'failed') && (
                   <div className="flex flex-col gap-3">
                     {selectedOrder.shipment?.status === 'failed' && (
-                      <p className="text-[12px] text-error">
+                      <p className="text-[0.75rem] text-error">
                         Automatic shipment creation failed: {selectedOrder.shipment.error}
                       </p>
                     )}
                     {!selectedOrder.shipment && (
-                      <p className="text-[12px] text-on-surface-variant">No shipment created yet.</p>
+                      <p className="text-[0.75rem] text-on-surface-variant">No shipment created yet.</p>
                     )}
                     <button
                       type="button"
                       disabled={shipmentBusy}
                       onClick={handleCreateShipment}
-                      className="btn btn-primary self-start py-1.5 px-4 text-[10px]"
+                      className="btn btn-primary self-start py-1.5 px-4 text-[0.625rem]"
                     >
                       {shipmentBusy ? 'Creating…' : 'Create Shipment'}
                     </button>
@@ -1155,17 +1155,17 @@ export default function AdminSalesPage() {
 
                 {selectedOrder.shipment && selectedOrder.shipment.status !== 'failed' && (
                   <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[0.75rem]">
                       <div>
-                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">AWB</span>
+                        <span className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1">AWB</span>
                         <span className="font-mono text-on-surface">{selectedOrder.shipment.awb}</span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">Courier</span>
+                        <span className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1">Courier</span>
                         <span className="text-on-surface">{selectedOrder.shipment.courier}</span>
                       </div>
                       <div>
-                        <span className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1">Status</span>
+                        <span className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1">Status</span>
                         <span className="text-on-surface">
                           {selectedOrder.shipment.status === 'cancelled' ? 'Cancelled' : (selectedOrder.shipment.currentStatus || 'Created')}
                         </span>
@@ -1177,7 +1177,7 @@ export default function AdminSalesPage() {
                           href={selectedOrder.shipment.labelUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="btn btn-secondary py-1.5 px-4 text-[10px]"
+                          className="btn btn-secondary py-1.5 px-4 text-[0.625rem]"
                         >
                           Print Label
                         </a>
@@ -1186,7 +1186,7 @@ export default function AdminSalesPage() {
                         type="button"
                         disabled={shipmentBusy}
                         onClick={handleRefreshTracking}
-                        className="btn btn-secondary py-1.5 px-4 text-[10px]"
+                        className="btn btn-secondary py-1.5 px-4 text-[0.625rem]"
                       >
                         {shipmentBusy ? 'Refreshing…' : 'Refresh Tracking'}
                       </button>
@@ -1195,7 +1195,7 @@ export default function AdminSalesPage() {
                           type="button"
                           disabled={shipmentBusy}
                           onClick={handleCancelShipment}
-                          className="btn py-1.5 px-4 text-[10px] text-error border border-error/30 hover:bg-error/10"
+                          className="btn py-1.5 px-4 text-[0.625rem] text-error border border-error/30 hover:bg-error/10"
                         >
                           Cancel Shipment
                         </button>
@@ -1207,7 +1207,7 @@ export default function AdminSalesPage() {
 
               {/* Items List */}
               <div>
-                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold mb-3">Line Items</h4>
+                <h4 className="font-title-sm text-[0.8125rem] text-on-surface font-semibold mb-3">Line Items</h4>
                 <div className="flex flex-col gap-3">
                   {selectedOrder.items.map((item, idx) => (
                     <div key={idx} className="flex gap-4 p-3 rounded-lg border border-outline-variant/20 bg-surface-container-lowest items-center">
@@ -1215,14 +1215,14 @@ export default function AdminSalesPage() {
                         <ProductImage className="w-full h-full object-cover" alt={item.title} src={item.image} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h5 className="font-title-sm text-[13px] text-on-surface truncate">{item.title}</h5>
-                        <p className="text-[11px] text-on-surface-variant/80 mt-0.5">
+                        <h5 className="font-title-sm text-[0.8125rem] text-on-surface truncate">{item.title}</h5>
+                        <p className="text-[0.6875rem] text-on-surface-variant/80 mt-0.5">
                           {item.color || 'Default Color'} · {item.size || 'Default Size'}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-on-surface">{formatCurrency(item.price)}</p>
-                        <p className="text-[11px] text-on-surface-variant mt-0.5">Qty: {item.quantity}</p>
+                        <p className="text-[0.6875rem] text-on-surface-variant mt-0.5">Qty: {item.quantity}</p>
                       </div>
                     </div>
                   ))}
@@ -1232,9 +1232,9 @@ export default function AdminSalesPage() {
               {/* Shipping Details */}
               {selectedOrder.shippingDetails && (
                 <div>
-                  <h4 className="font-title-sm text-[13px] text-on-surface font-semibold mb-3">Shipping &amp; Delivery Details</h4>
+                  <h4 className="font-title-sm text-[0.8125rem] text-on-surface font-semibold mb-3">Shipping &amp; Delivery Details</h4>
                   <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/20 text-xs text-on-surface-variant space-y-1">
-                    <p className="font-bold text-on-surface text-[13px] mb-1">
+                    <p className="font-bold text-on-surface text-[0.8125rem] mb-1">
                       {[selectedOrder.shippingDetails.firstName, selectedOrder.shippingDetails.lastName].filter(Boolean).join(' ')}
                     </p>
                     <p>{selectedOrder.shippingDetails.address}</p>
@@ -1261,7 +1261,7 @@ export default function AdminSalesPage() {
                   <span>Tax (GST)</span>
                   <span>{formatCurrency(selectedOrder.tax)}</span>
                 </div>
-                <div className="flex justify-between text-[14px] font-bold text-on-surface pt-2 border-t border-dashed border-outline-variant/30">
+                <div className="flex justify-between text-[0.875rem] font-bold text-on-surface pt-2 border-t border-dashed border-outline-variant/30">
                   <span>Total Amount Paid</span>
                   <span className="text-primary">{formatCurrency(selectedOrder.total)}</span>
                 </div>
@@ -1273,7 +1273,7 @@ export default function AdminSalesPage() {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-5 py-2.5 rounded-lg border border-outline text-on-surface font-label-caps text-[10px] uppercase hover:bg-surface-container-high transition-colors"
+                className="px-5 py-2.5 rounded-lg border border-outline text-on-surface font-label-caps text-[0.625rem] uppercase hover:bg-surface-container-high transition-colors"
               >
                 Close
               </button>
@@ -1282,9 +1282,9 @@ export default function AdminSalesPage() {
                 onClick={() => {
                   generateReceiptPdf(selectedOrder);
                 }}
-                className="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-caps text-[10px] uppercase hover:opacity-90 transition-opacity flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-caps text-[0.625rem] uppercase hover:opacity-90 transition-opacity flex items-center gap-1.5"
               >
-                <span className="material-symbols-outlined text-[14px]">download</span>
+                <span className="material-symbols-outlined text-[0.875rem]">download</span>
                 Download Invoice
               </button>
             </div>
@@ -1299,8 +1299,8 @@ export default function AdminSalesPage() {
             {/* Modal Header */}
             <div className="p-6 border-b border-outline-variant/35 flex justify-between items-center">
               <div>
-                <span className="font-label-caps text-[10px] text-primary uppercase font-bold tracking-widest">Batch Processing</span>
-                <h3 className="font-headline-md text-[20px] text-on-surface font-bold mt-1">Bulk Update Tracking Details</h3>
+                <span className="font-label-caps text-[0.625rem] text-primary uppercase font-bold tracking-widest">Batch Processing</span>
+                <h3 className="font-headline-md text-[1.25rem] text-on-surface font-bold mt-1">Bulk Update Tracking Details</h3>
               </div>
               <button
                 onClick={() => setBulkModalOpen(false)}
@@ -1315,13 +1315,13 @@ export default function AdminSalesPage() {
               {/* Batch Configuration */}
               <div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                  <label className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1.5">
                     Batch Order Status
                   </label>
                   <select
                     value={bulkStatus}
                     onChange={(e) => setBulkStatus(e.target.value)}
-                    className="form-select text-[12px] py-1.5 px-3"
+                    className="form-select text-[0.75rem] py-1.5 px-3"
                   >
                     <option value="Processing">Processing</option>
                     <option value="Shipped">Shipped</option>
@@ -1332,13 +1332,13 @@ export default function AdminSalesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-on-surface-variant uppercase font-semibold mb-1.5">
+                  <label className="block text-[0.625rem] text-on-surface-variant uppercase font-semibold mb-1.5">
                     Batch Tracking Partner
                   </label>
                   <select
                     value={bulkPartner}
                     onChange={(e) => setBulkPartner(e.target.value)}
-                    className="form-select text-[12px] py-1.5 px-3"
+                    className="form-select text-[0.75rem] py-1.5 px-3"
                   >
                     <option value="">Select Partner</option>
                     {trackingPartners.map((p) => (
@@ -1350,7 +1350,7 @@ export default function AdminSalesPage() {
 
               {/* Individual Tracking IDs List */}
               <div>
-                <h4 className="font-title-sm text-[13px] text-on-surface font-semibold mb-3">Individual Tracking IDs</h4>
+                <h4 className="font-title-sm text-[0.8125rem] text-on-surface font-semibold mb-3">Individual Tracking IDs</h4>
                 <div className="flex flex-col gap-3 max-h-[35vh] overflow-y-auto pr-1">
                   {selectedOrderIds.map((id) => {
                     const order = allOrders.find((o) => o.id === id);
@@ -1360,8 +1360,8 @@ export default function AdminSalesPage() {
                     return (
                       <div key={id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 rounded-lg border border-outline-variant/20 bg-surface-container-lowest">
                         <div className="flex-1">
-                          <p className="font-mono font-bold text-[12px] text-primary">{id}</p>
-                          <p className="text-[11px] text-on-surface-variant/80 mt-0.5">{customer}</p>
+                          <p className="font-mono font-bold text-[0.75rem] text-primary">{id}</p>
+                          <p className="text-[0.6875rem] text-on-surface-variant/80 mt-0.5">{customer}</p>
                         </div>
                         <div className="w-full sm:w-64">
                           <input
@@ -1372,7 +1372,7 @@ export default function AdminSalesPage() {
                               setBulkTrackingIds((prev) => ({ ...prev, [id]: val }));
                             }}
                             placeholder="Enter unique Tracking ID"
-                            className="form-input text-[12px] py-1 px-3"
+                            className="form-input text-[0.75rem] py-1 px-3"
                           />
                         </div>
                       </div>
@@ -1387,7 +1387,7 @@ export default function AdminSalesPage() {
               <button
                 type="button"
                 onClick={() => setBulkModalOpen(false)}
-                className="btn btn-cancel text-[10px]"
+                className="btn btn-cancel text-[0.625rem]"
               >
                 Cancel
               </button>
@@ -1395,7 +1395,7 @@ export default function AdminSalesPage() {
                 type="button"
                 disabled={isSavingTracking}
                 onClick={handleSaveBulkTracking}
-                className="btn btn-primary text-[10px]"
+                className="btn btn-primary text-[0.625rem]"
               >
                 {isSavingTracking ? 'Saving…' : 'Save Batch Details'}
               </button>

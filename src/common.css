@@ -1,3 +1,8 @@
+/* Root size drives every rem-based text size: 14px on small phones, 16px from ~444px up. */
+html {
+  font-size: clamp(14px, 3.6vw, 16px);
+}
+
 /* Shared theme and common structural components across A2Z Collection */
 
 /* Shimmering placeholder shown on <img> (via ProductImage.jsx) while it is
@@ -85,14 +90,14 @@
 
 .admin-card-title {
   font-family: var(--font-title-sm);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-on-surface);
   margin-bottom: 0.25rem;
 }
 
 .admin-card-subtitle {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-on-surface-variant);
 }
 
@@ -233,7 +238,7 @@
   display: inline-block;
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -274,7 +279,7 @@
   border-bottom: 1px solid rgba(220, 191, 201, 0.3);
   padding: 1rem;
   font-family: var(--font-label-caps);
-  font-size: 10px;
+  font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-on-surface);
@@ -283,7 +288,7 @@
 .admin-table td {
   padding: 1rem;
   border-bottom: 1px solid rgba(220, 191, 201, 0.2);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Storefront top bars all share the "docked" marker class. Darken them

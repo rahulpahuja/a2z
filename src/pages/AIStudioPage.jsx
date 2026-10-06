@@ -222,7 +222,7 @@ export default function AIStudioPage() {
       {/* Main Studio Body */}
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full font-label-caps text-[11px] uppercase tracking-wider font-semibold">
+          <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full font-label-caps text-[0.6875rem] uppercase tracking-wider font-semibold">
             Creative AI Studio
           </span>
           <h1 className="font-headline-md text-3xl md:text-4xl playfair text-on-surface mt-4 mb-3">
@@ -240,7 +240,7 @@ export default function AIStudioPage() {
             {/* Step 1: Upload */}
             <div className="bg-surface-container-low/75 border border-tertiary-container/30 backdrop-blur-md rounded-xl p-6 shadow-sm">
               <h2 className="font-title-sm text-title-sm text-on-surface mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-primary">upload_file</span>
+                <span className="material-symbols-outlined text-[1.25rem] text-primary">upload_file</span>
                 1. Upload Subject Photo
               </h2>
 
@@ -267,7 +267,7 @@ export default function AIStudioPage() {
                 <p className="font-body-sm text-body-sm text-on-surface font-semibold">
                   Drag &amp; drop subject image
                 </p>
-                <p className="font-body-sm text-[12px] text-on-surface-variant mt-1">
+                <p className="font-body-sm text-[0.75rem] text-on-surface-variant mt-1">
                   PNG, JPG, or WEBP with clear subjects
                 </p>
               </div>
@@ -279,7 +279,7 @@ export default function AIStudioPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-body-sm text-body-sm font-semibold truncate text-on-surface">{selectedFile.name}</p>
-                    <p className="font-body-sm text-[11px] text-on-surface-variant">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                    <p className="font-body-sm text-[0.6875rem] text-on-surface-variant">{(selectedFile.size / 1024).toFixed(1)} KB</p>
                   </div>
                   <button
                     type="button"
@@ -292,7 +292,7 @@ export default function AIStudioPage() {
                     }}
                     className="w-8 h-8 rounded-full flex items-center justify-center text-error hover:bg-error/15 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[20px]">close</span>
+                    <span className="material-symbols-outlined text-[1.25rem]">close</span>
                   </button>
                 </div>
               )}
@@ -301,7 +301,7 @@ export default function AIStudioPage() {
             {/* Step 2: Remove BG */}
             <div className="bg-surface-container-low/75 border border-tertiary-container/30 backdrop-blur-md rounded-xl p-6 shadow-sm">
               <h2 className="font-title-sm text-title-sm text-on-surface mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-primary">blur_off</span>
+                <span className="material-symbols-outlined text-[1.25rem] text-primary">blur_off</span>
                 2. Background Removal
               </h2>
               
@@ -318,7 +318,7 @@ export default function AIStudioPage() {
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px]">cut</span>
+                    <span className="material-symbols-outlined text-[1.125rem]">cut</span>
                     Isolate Subject (Remove Background)
                   </>
                 )}
@@ -329,13 +329,13 @@ export default function AIStudioPage() {
                   <div className="w-full bg-white/40 rounded-full h-1.5 mb-2 overflow-hidden border border-outline-variant/30">
                     <div className="bg-primary h-1.5 rounded-full transition-all duration-300" style={{ width: `${removeProgress}%` }} />
                   </div>
-                  <p className="font-body-sm text-[11px] text-primary font-medium animate-pulse">{removeStatus}</p>
+                  <p className="font-body-sm text-[0.6875rem] text-primary font-medium animate-pulse">{removeStatus}</p>
                 </div>
               )}
 
               {transparentUrl && !isRemovingBg && (
-                <div className="mt-3 flex items-center gap-1.5 text-secondary font-body-sm text-[12px]">
-                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                <div className="mt-3 flex items-center gap-1.5 text-secondary font-body-sm text-[0.75rem]">
+                  <span className="material-symbols-outlined text-[1rem]">check_circle</span>
                   <span>Subject isolated successfully! Ready for backdrop addition.</span>
                 </div>
               )}
@@ -344,12 +344,12 @@ export default function AIStudioPage() {
             {/* Step 3: Add/Generate BG */}
             <div className="bg-surface-container-low/75 border border-tertiary-container/30 backdrop-blur-md rounded-xl p-6 shadow-sm">
               <h2 className="font-title-sm text-title-sm text-on-surface mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-primary">palette</span>
+                <span className="material-symbols-outlined text-[1.25rem] text-primary">palette</span>
                 3. Add Custom AI Background
               </h2>
 
               <div className="mb-4">
-                <label className="block font-label-caps text-[10px] text-on-surface-variant mb-1.5 uppercase tracking-wider" htmlFor="bg-prompt-input">
+                <label className="block font-label-caps text-[0.625rem] text-on-surface-variant mb-1.5 uppercase tracking-wider" htmlFor="bg-prompt-input">
                   Describe the background scenery
                 </label>
                 <textarea
@@ -363,7 +363,7 @@ export default function AIStudioPage() {
               </div>
 
               <div className="mb-5">
-                <span className="block font-label-caps text-[10px] text-on-surface-variant mb-2 uppercase tracking-wider">
+                <span className="block font-label-caps text-[0.625rem] text-on-surface-variant mb-2 uppercase tracking-wider">
                   Suggestions (Tap to use)
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -372,7 +372,7 @@ export default function AIStudioPage() {
                       key={suggestion.label}
                       type="button"
                       onClick={() => setBgPrompt(suggestion.text)}
-                      className={`text-body-sm text-[12px] px-3 py-1.5 rounded-full border transition-all ${
+                      className={`text-body-sm text-[0.75rem] px-3 py-1.5 rounded-full border transition-all ${
                         bgPrompt === suggestion.text
                           ? 'bg-primary/10 border-primary text-primary font-semibold'
                           : 'bg-white/40 border-outline-variant/50 hover:bg-white/70 text-on-surface-variant'
@@ -397,7 +397,7 @@ export default function AIStudioPage() {
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px]">brush</span>
+                    <span className="material-symbols-outlined text-[1.125rem]">brush</span>
                     Generate Background &amp; Merge
                   </>
                 )}
@@ -411,7 +411,7 @@ export default function AIStudioPage() {
             <div className="bg-surface-container-low/75 border border-tertiary-container/30 backdrop-blur-md rounded-xl p-6 shadow-sm flex-1 flex flex-col min-h-[480px]">
               <div className="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-4">
                 <h3 className="font-title-sm text-title-sm text-on-surface flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[20px] text-primary">analytics</span>
+                  <span className="material-symbols-outlined text-[1.25rem] text-primary">analytics</span>
                   Studio Live View
                 </h3>
 
@@ -421,7 +421,7 @@ export default function AIStudioPage() {
                     type="button"
                     onClick={() => setActiveTab('original')}
                     disabled={!originalUrl}
-                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[10px] uppercase transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[0.625rem] uppercase transition-colors ${
                       activeTab === 'original'
                         ? 'bg-primary text-on-primary'
                         : 'text-on-surface-variant hover:text-primary disabled:opacity-30'
@@ -433,7 +433,7 @@ export default function AIStudioPage() {
                     type="button"
                     onClick={() => setActiveTab('transparent')}
                     disabled={!transparentUrl}
-                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[10px] uppercase transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[0.625rem] uppercase transition-colors ${
                       activeTab === 'transparent'
                         ? 'bg-primary text-on-primary'
                         : 'text-on-surface-variant hover:text-primary disabled:opacity-30'
@@ -445,7 +445,7 @@ export default function AIStudioPage() {
                     type="button"
                     onClick={() => setActiveTab('generated')}
                     disabled={!generatedBgUrl}
-                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[10px] uppercase transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[0.625rem] uppercase transition-colors ${
                       activeTab === 'generated'
                         ? 'bg-primary text-on-primary'
                         : 'text-on-surface-variant hover:text-primary disabled:opacity-30'
@@ -457,7 +457,7 @@ export default function AIStudioPage() {
                     type="button"
                     onClick={() => setActiveTab('final')}
                     disabled={!mergedUrl}
-                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[10px] uppercase transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-full font-label-caps text-[0.625rem] uppercase transition-colors ${
                       activeTab === 'final'
                         ? 'bg-primary text-on-primary'
                         : 'text-on-surface-variant hover:text-primary disabled:opacity-30'
@@ -547,7 +547,7 @@ export default function AIStudioPage() {
                     onClick={downloadResult}
                     className="flex-1 bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-xl uppercase tracking-wider hover:bg-surface-tint transition-colors flex items-center justify-center gap-2 shadow-sm"
                   >
-                    <span className="material-symbols-outlined text-[20px]">download</span>
+                    <span className="material-symbols-outlined text-[1.25rem]">download</span>
                     Download Composite Image
                   </button>
                   <button
@@ -555,7 +555,7 @@ export default function AIStudioPage() {
                     onClick={handleGenerateBackground}
                     className="bg-white/50 border border-outline-variant hover:bg-white/80 text-on-surface font-label-caps text-label-caps px-6 py-4 rounded-xl uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-[20px]">replay</span>
+                    <span className="material-symbols-outlined text-[1.25rem]">replay</span>
                     Regenerate
                   </button>
                 </div>

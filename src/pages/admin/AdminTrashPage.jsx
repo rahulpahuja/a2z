@@ -196,7 +196,7 @@ export default function AdminTrashPage() {
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
                             {product.categoryTitle} · {formatCurrency(product.price)}
                           </p>
-                          <p className="font-body-sm text-[11px] text-on-surface-variant/70 font-mono">
+                          <p className="font-body-sm text-[0.6875rem] text-on-surface-variant/70 font-mono">
                             ID: {product.id}
                           </p>
                         </div>
@@ -219,7 +219,7 @@ export default function AdminTrashPage() {
                           </button>
                         </div>
                       </div>
-                      <p className="font-body-sm text-[11px] text-on-surface-variant">
+                      <p className="font-body-sm text-[0.6875rem] text-on-surface-variant">
                         Trashed {product.trashedAtMs ? new Date(product.trashedAtMs).toLocaleString('en-IN') : 'recently'} ·{' '}
                         {remaining === 0 ? (
                           <span className="text-error font-semibold">Auto-deleting now</span>

@@ -48,10 +48,10 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
           </h2>
           <Link
             to="/products"
-            className="font-label-caps text-[11px] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
+            className="font-label-caps text-[0.6875rem] md:text-label-caps text-primary hover:underline uppercase tracking-wider flex items-center gap-1 shrink-0"
           >
             View All
-            <span className="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
+            <span className="material-symbols-outlined text-[1rem] md:text-[1.125rem]">arrow_forward</span>
           </Link>
         </div>
         <div className="flex justify-start sm:justify-center w-full overflow-x-auto hide-scrollbar">
@@ -61,13 +61,13 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
                 key={t.key}
                 type="button"
                 onClick={() => setActiveTab(t.key)}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full font-label-caps text-[11px] sm:text-label-caps uppercase transition-colors shrink-0 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full font-label-caps text-[0.6875rem] sm:text-label-caps uppercase transition-colors shrink-0 ${
                   activeTab === t.key
                     ? 'bg-primary text-on-primary'
                     : 'text-on-surface-variant hover:text-primary'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">{t.icon}</span>
+                <span className="material-symbols-outlined text-[1rem]">{t.icon}</span>
                 {t.label}
               </button>
             ))}
@@ -106,8 +106,8 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
                     alt={product.alt}
                   />
-                  <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-surface/90 backdrop-blur text-on-surface px-2.5 py-1 rounded-full font-label-caps text-[10px] md:text-label-caps flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[13px] md:text-[14px]">{tab.icon}</span>
+                  <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-surface/90 backdrop-blur text-on-surface px-2.5 py-1 rounded-full font-label-caps text-[0.625rem] md:text-label-caps flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[0.8125rem] md:text-[0.875rem]">{tab.icon}</span>
                     {product.stat.toLocaleString('en-IN')} {tab.statLabel}
                   </div>
                 </div>

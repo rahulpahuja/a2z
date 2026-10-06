@@ -116,7 +116,7 @@ export default function StoreAppointmentPage() {
             type="submit"
             className="flex items-center justify-center gap-2 bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-xl uppercase tracking-widest hover:opacity-90 transition-opacity"
           >
-            <span className="material-symbols-outlined text-[18px]">chat</span>
+            <span className="material-symbols-outlined text-[1.125rem]">chat</span>
             Confirm via WhatsApp
           </button>
         </form>

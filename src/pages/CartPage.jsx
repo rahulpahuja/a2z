@@ -26,7 +26,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
             className="text-error hover:text-on-error-container transition-colors font-label-caps text-label-caps flex items-center gap-1"
             onClick={() => onRemove(item.id)}
           >
-            <span className="material-symbols-outlined text-[16px]" data-icon="delete">
+            <span className="material-symbols-outlined text-[1rem]" data-icon="delete">
               delete
             </span>{' '}
             Remove
@@ -274,14 +274,14 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-body-lg text-body-lg text-on-surface-variant">Tax ({taxRatePercent}%)</span>
-                  <span className="font-price-display text-price-display text-on-surface text-[16px]">
+                  <span className="font-price-display text-price-display text-on-surface text-[1rem]">
                     {formatCurrency(tax)}
                   </span>
                 </div>
               </div>
               <div className="flex justify-between items-center mb-gutter">
                 <span className="font-title-sm text-title-sm text-on-surface">Grand Total</span>
-                <span className="font-price-display text-price-display text-primary text-[24px]">
+                <span className="font-price-display text-price-display text-primary text-[1.5rem]">
                   {formatCurrency(grandTotal)}
                 </span>
               </div>

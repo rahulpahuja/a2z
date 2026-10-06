@@ -24,7 +24,7 @@ export default function NotFoundPage() {
           styler
         </span>
 
-        <h1 className="notfound-digits playfair font-display-lg text-[96px] md:text-[160px] leading-none font-bold tracking-tight">
+        <h1 className="notfound-digits playfair font-display-lg text-[6rem] md:text-[10rem] leading-none font-bold tracking-tight">
           404
         </h1>
 
