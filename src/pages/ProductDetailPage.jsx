@@ -22,6 +22,8 @@ import ProductFaqs from '../components/ProductFaqs.jsx';
 import { subscribeToProductReviews } from '../services/productReviews.js';
 import { subscribeToProductFaqs } from '../services/productFaqs.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
+import { buildProductHead } from '../seo/productHead.js';
+import { applyDocumentHead } from '../seo/head.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -169,6 +171,10 @@ export default function ProductDetailPage() {
       unsubscribeFaqs();
     };
   }, [product?.id]);
+
+  useEffect(() => {
+    if (product) applyDocumentHead(buildProductHead(product, { faqs, reviews }));
+  }, [product, faqs, reviews]);
 
   if (!product) {
     return <ProductNotFound />;
