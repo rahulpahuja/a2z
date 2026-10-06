@@ -95,7 +95,7 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
           {products.map((product) => (
-            <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
+            <div key={product.id} className="min-w-[clamp(140px,46vw,220px)] w-[clamp(140px,46vw,220px)] sm:min-w-[260px] sm:w-[260px] md:min-w-[270px] md:w-[270px] shrink-0 snap-start">
               <Link
                 to={`/products/${product.id}`}
                 className="group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
