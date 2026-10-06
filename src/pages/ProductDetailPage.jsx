@@ -299,14 +299,24 @@ export default function ProductDetailPage() {
           background: 'var(--custom-backdrop-bg, inherit)',
         }}
       >
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="order-1 md:order-none md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
-        >
-          <span className="material-symbols-outlined text-[1.25rem]">arrow_back</span>
-          Back
-        </button>
+        <div className="order-1 md:order-none md:col-span-12 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined text-[1.25rem]">arrow_back</span>
+            Back
+          </button>
+          <button
+            type="button"
+            aria-label="Share this product"
+            onClick={handleShare}
+            className="text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">share</span>
+          </button>
+        </div>
 
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="order-3 md:order-none md:col-span-7 flex flex-col gap-unit">
@@ -412,14 +422,6 @@ export default function ProductDetailPage() {
                 {product.badge && (
                   <span className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
                 )}
-                <button
-                  type="button"
-                  aria-label="Share this product"
-                  onClick={handleShare}
-                  className="text-on-surface-variant hover:text-primary transition-colors"
-                >
-                  <span className="material-symbols-outlined">share</span>
-                </button>
               </div>
             </div>
             <motion.h1
