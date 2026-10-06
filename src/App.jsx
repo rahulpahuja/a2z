@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import RouteMeta from './components/RouteMeta.jsx'
 import AnalyticsListener from './components/AnalyticsListener.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
@@ -171,6 +172,7 @@ export default function App() {
         <StorefrontThemeProvider>
           <LuxuryBackdrop />
           <ScrollToTop />
+          <RouteMeta />
           <AnalyticsListener />
           <HoneypotLink />
           <Suspense fallback={<RouteFallback />}>

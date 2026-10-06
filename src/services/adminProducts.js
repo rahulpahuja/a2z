@@ -89,6 +89,7 @@ export function createAdminProduct(product) {
       sku: existing?.sku || generateSku(),
       createdAt: existing?.createdAt || new Date().toISOString(),
       createdAtMs: existing?.createdAtMs ?? Date.now(),
+      updatedAtMs: Date.now(),
     };
     const updatedProducts = existing
       ? products.map((p) => (p.id === productId ? newProduct : p))
@@ -106,6 +107,7 @@ export function createAdminProduct(product) {
       sku: existing?.sku || generateSku(),
       createdAt: existing?.createdAt || serverTimestamp(),
       createdAtMs: existing?.createdAtMs ?? Date.now(),
+      updatedAtMs: Date.now(),
     };
     return set(productRef, payload).then(() => ({ id: productId, ...payload }));
   });
