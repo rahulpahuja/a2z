@@ -72,6 +72,6 @@ export const handler = async (event) => {
     return json(200, { token });
   } catch (error) {
     console.error('Firebase createCustomToken failed', error);
-    return json(500, { error: 'Token creation failed', reason: 'firebase_error' });
+    return json(500, { error: 'Token creation failed', reason: 'firebase_error', detail: error.message });
   }
 };

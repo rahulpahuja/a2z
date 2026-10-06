@@ -9,8 +9,8 @@ export async function fetchAdminFirebaseToken(accessToken, phoneNumber) {
   });
   if (response.status === 403) return null;
   if (!response.ok) {
-    const { reason } = await response.json().catch(() => ({}));
-    throw new Error(`Admin sign-in failed (${reason || response.status}).`);
+    const { reason, detail } = await response.json().catch(() => ({}));
+    throw new Error(`Admin sign-in failed (${[reason, detail].filter(Boolean).join(': ') || response.status}).`);
   }
   const { token } = await response.json();
   return token;
