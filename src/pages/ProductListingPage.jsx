@@ -809,7 +809,7 @@ export default function ProductListingPage() {
               {/* Sliders */}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] text-on-surface-variant mb-1 font-medium">Low Price (Min)</label>
+                  <label className="block text-[0.6875rem] text-on-surface-variant mb-1 font-medium">Low Price (Min)</label>
                   <input
                     className="range-slider"
                     max={maxPrice}
@@ -820,7 +820,7 @@ export default function ProductListingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-on-surface-variant mb-1 font-medium">High Price (Max)</label>
+                  <label className="block text-[0.6875rem] text-on-surface-variant mb-1 font-medium">High Price (Max)</label>
                   <input
                     className="range-slider"
                     max={Math.max(maxCatalogPrice, 50000)}
@@ -835,7 +835,7 @@ export default function ProductListingPage() {
               {/* Numeric Inputs */}
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <div>
-                  <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Min Price (₹)</label>
+                  <label className="block text-[0.625rem] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Min Price (₹)</label>
                   <input
                     type="number"
                     min={0}
@@ -846,7 +846,7 @@ export default function ProductListingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Max Price (₹)</label>
+                  <label className="block text-[0.625rem] text-on-surface-variant uppercase tracking-wider mb-1 font-semibold">Max Price (₹)</label>
                   <input
                     type="number"
                     min={minPrice}
@@ -885,7 +885,7 @@ export default function ProductListingPage() {
                     className={`w-8 h-8 rounded-full ${color.className} border ${color.id === 'white' ? 'border-outline' : 'border-outline/20'} ring-2 ${isSelected ? 'ring-primary' : 'ring-transparent'} focus:ring-primary transition-all hover:scale-110 relative`}
                   >
                     {isSelected && (
-                      <span className="material-symbols-outlined absolute inset-0 flex items-center justify-center text-white text-[16px]">check</span>
+                      <span className="material-symbols-outlined absolute inset-0 flex items-center justify-center text-white text-[1rem]">check</span>
                     )}
                   </button>
                 );
@@ -939,7 +939,7 @@ export default function ProductListingPage() {
               <span className="px-3 py-1 rounded-[32px] bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm flex items-center gap-1">
                 Gender: {selectedGender}{' '}
                 <button className="hover:text-error ml-0.5" onClick={() => setSelectedGender('All')}>
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[1rem]">close</span>
                 </button>
               </span>
             )}
@@ -953,7 +953,7 @@ export default function ProductListingPage() {
                     setMaxPrice(maxCatalogPrice || 50000);
                   }}
                 >
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[1rem]">close</span>
                 </button>
               </span>
             )}
@@ -961,7 +961,7 @@ export default function ProductListingPage() {
               <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
                 Color: {selectedColorLabel}{' '}
                 <button className="hover:text-error ml-0.5" onClick={() => setSelectedColor(null)}>
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[1rem]">close</span>
                 </button>
               </span>
             )}
@@ -969,7 +969,7 @@ export default function ProductListingPage() {
               <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
                 Size: {selectedSizeLabel}{' '}
                 <button className="hover:text-error ml-0.5" onClick={() => setSelectedSize(null)}>
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[1rem]">close</span>
                 </button>
               </span>
             )}
@@ -977,7 +977,7 @@ export default function ProductListingPage() {
               <span className="px-3 py-1 rounded-[32px] bg-surface-variant text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
                 Collection: {selectedCollection.name}{' '}
                 <button className="hover:text-error ml-0.5" onClick={() => setSelectedCollectionId(null)}>
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[1rem]">close</span>
                 </button>
               </span>
             )}
@@ -1102,7 +1102,7 @@ export default function ProductListingPage() {
                         )}
                       </Link>
                       <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
-                        <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold block">
+                        <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold block">
                           {product.category || product.categoryTitle}
                         </span>
                         <Link to={`/products/${product.id}`} onClick={() => logSelectItem(product, 'Product Listing')}>
@@ -1128,11 +1128,11 @@ export default function ProductListingPage() {
                               >
                                 {formatCurrency(discountedPrice)}
                               </span>
-                              <span className="font-body-sm text-[11px] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
+                              <span className="font-body-sm text-[0.6875rem] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
                             </div>
                             <DiscountCountdown
                               product={product}
-                              className="text-[10px] text-error font-medium mt-0.5"
+                              className="text-[0.625rem] text-error font-medium mt-0.5"
                               onExpire={() => forceDiscountRecheck((n) => n + 1)}
                             />
                           </div>
@@ -1146,7 +1146,7 @@ export default function ProductListingPage() {
                             </div>
                             {product.rating && (
                               <div className="flex items-center gap-1 text-tertiary">
-                               <span className="material-symbols-outlined text-[16px] fill-current">star</span>
+                               <span className="material-symbols-outlined text-[1rem] fill-current">star</span>
                                 <span className="font-body-sm text-body-sm font-medium">{product.rating}</span>
                               </div>
                             )}
@@ -1200,11 +1200,11 @@ export default function ProductListingPage() {
               <button
                 type="button"
                 onClick={() => setVisibleCount((prev) => Math.min(paginatedProducts.length, prev + 50))}
-                className="btn btn-primary px-6 py-2.5 text-[11px]"
+                className="btn btn-primary px-6 py-2.5 text-[0.6875rem]"
               >
                 Load More Products (+50)
               </button>
-              <p className="text-[11px] text-on-surface-variant/75 font-medium">
+              <p className="text-[0.6875rem] text-on-surface-variant/75 font-medium">
                 Showing {visibleCount} of {paginatedProducts.length} items (Page {currentPage} of {totalPages})
               </p>
             </div>

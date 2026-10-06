@@ -142,7 +142,7 @@ export default function AdminUploadTestPage() {
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
               <p className="font-body-sm text-body-sm text-on-surface-variant/70">
-                You can configure this globally by updating <code className="bg-surface-container px-1 py-0.5 rounded font-mono text-[12px]">VITE_IMAGE_UPLOAD_API_URL</code> in your <code className="bg-surface-container px-1 py-0.5 rounded font-mono text-[12px]">.env</code> file.
+                You can configure this globally by updating <code className="bg-surface-container px-1 py-0.5 rounded font-mono text-[0.75rem]">VITE_IMAGE_UPLOAD_API_URL</code> in your <code className="bg-surface-container px-1 py-0.5 rounded font-mono text-[0.75rem]">.env</code> file.
               </p>
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function AdminUploadTestPage() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-[20px]">upload</span>
+                  <span className="material-symbols-outlined text-[1.25rem]">upload</span>
                   Test Upload
                 </>
               )}
@@ -255,7 +255,7 @@ export default function AdminUploadTestPage() {
 
                     <div className="flex flex-col gap-2">
                       <span className="block font-label-caps text-label-caps text-on-surface-variant">Storage Key / File Name</span>
-                      <code className="bg-surface-container-lowest border border-outline-variant/60 rounded-lg p-3 font-mono text-[12px] break-all block text-on-surface">
+                      <code className="bg-surface-container-lowest border border-outline-variant/60 rounded-lg p-3 font-mono text-[0.75rem] break-all block text-on-surface">
                         {uploadResult.key}
                       </code>
                     </div>
@@ -266,13 +266,13 @@ export default function AdminUploadTestPage() {
                         <input
                           readOnly
                           value={uploadResult.url}
-                          className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-mono text-[11px] text-on-surface truncate"
+                          className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-mono text-[0.6875rem] text-on-surface truncate"
                         />
                         <a
                           href={uploadResult.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-label-caps text-[11px] rounded-lg flex items-center justify-center"
+                          className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-label-caps text-[0.6875rem] rounded-lg flex items-center justify-center"
                         >
                           Open
                         </a>
@@ -293,7 +293,7 @@ export default function AdminUploadTestPage() {
                           }}
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span className="text-white font-body-sm text-[12px] bg-black/60 px-3 py-1.5 rounded-full">R2 Live Load</span>
+                          <span className="text-white font-body-sm text-[0.75rem] bg-black/60 px-3 py-1.5 rounded-full">R2 Live Load</span>
                         </div>
                       </div>
                     </div>
@@ -314,19 +314,19 @@ export default function AdminUploadTestPage() {
                         readOnly
                         rows={6}
                         value={uploadResult.error}
-                        className="w-full bg-surface-container-lowest border border-error/20 text-error font-mono text-[12px] p-3 rounded-lg focus:ring-0 outline-none"
+                        className="w-full bg-surface-container-lowest border border-error/20 text-error font-mono text-[0.75rem] p-3 rounded-lg focus:ring-0 outline-none"
                       />
                     </div>
                     
                     <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/40">
-                      <h4 className="font-title-sm text-[14px] text-on-surface mb-2 font-semibold flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[18px] text-primary">info</span>
+                      <h4 className="font-title-sm text-[0.875rem] text-on-surface mb-2 font-semibold flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[1.125rem] text-primary">info</span>
                         Common issues:
                       </h4>
                       <ul className="list-disc pl-5 font-body-sm text-body-sm text-on-surface-variant space-y-1">
                         <li><strong>CORS policy:</strong> Worker must support preflight OPTIONS request.</li>
                         <li><strong>Missing Secrets:</strong> Wrangler secrets might be unset or typoed.</li>
-                        <li><strong>Account/Bucket typos:</strong> Validate Account ID in <code className="bg-surface-container px-1 rounded text-[11px]">wrangler.toml</code>.</li>
+                        <li><strong>Account/Bucket typos:</strong> Validate Account ID in <code className="bg-surface-container px-1 rounded text-[0.6875rem]">wrangler.toml</code>.</li>
                       </ul>
                     </div>
                   </>

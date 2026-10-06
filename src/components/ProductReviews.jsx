@@ -72,7 +72,7 @@ function ReviewCard({ productId, review }) {
           disabled={voted}
           className="flex items-center gap-1.5 text-on-surface-variant hover:text-primary disabled:opacity-60 disabled:cursor-default transition-colors"
         >
-          <span className="material-symbols-outlined text-[16px]">thumb_up</span>
+          <span className="material-symbols-outlined text-[1rem]">thumb_up</span>
           {voted ? 'Thanks for your feedback' : 'Helpful'}
           {review.helpful > 0 && <span>({review.helpful})</span>}
         </button>

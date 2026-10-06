@@ -107,7 +107,7 @@ function ProductCard({ product }) {
         {product.badge && (
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             <span
-              className={`${product.badge.bg} ${product.badge.text} font-label-caps text-label-caps px-3 py-1 rounded-full uppercase text-[10px]`}
+              className={`${product.badge.bg} ${product.badge.text} font-label-caps text-label-caps px-3 py-1 rounded-full uppercase text-[0.625rem]`}
             >
               {product.badge.label}
             </span>
@@ -118,12 +118,12 @@ function ProductCard({ product }) {
           onClick={(event) => event.preventDefault()}
           className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-surface/80 text-on-surface hover:text-primary transition-colors"
         >
-          <span className="material-symbols-outlined text-[20px]">favorite</span>
+          <span className="material-symbols-outlined text-[1.25rem]">favorite</span>
         </button>
       </Link>
       <div className="p-4 flex flex-col flex-grow">
         {product.category && (
-          <span className="font-label-caps text-[10px] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
+          <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider mb-1 font-semibold block">
             {product.category}
           </span>
         )}
@@ -152,10 +152,10 @@ function ProductCard({ product }) {
               }
               className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]">add</span>
+              <span className="material-symbols-outlined text-[1.25rem]">add</span>
             </button>
           ) : (
-            <span className="px-3 py-1 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-[10px] uppercase opacity-60">
+            <span className="px-3 py-1 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-[0.625rem] uppercase opacity-60">
               OOS
             </span>
           )}
@@ -176,7 +176,7 @@ function VideoCard({ video }) {
         </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-        <span className="font-label-caps text-label-caps text-[10px] bg-black/50 px-2 py-1 rounded backdrop-blur-sm mb-2 inline-block">
+        <span className="font-label-caps text-label-caps text-[0.625rem] bg-black/50 px-2 py-1 rounded backdrop-blur-sm mb-2 inline-block">
           {video.duration}
         </span>
         <h4 className="font-title-sm text-title-sm text-white truncate">{video.title}</h4>
@@ -285,12 +285,12 @@ export default function StorefrontPage() {
             <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 py-4 border-y border-surface-variant">
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors font-body-sm text-body-sm">
-                  <span className="material-symbols-outlined text-[18px]">tune</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">tune</span>
                   Filters
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors font-body-sm text-body-sm hidden md:flex">
                   Size
-                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">expand_more</span>
                 </button>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant hidden md:block">Showing 24 of 142 items</p>
@@ -298,7 +298,7 @@ export default function StorefrontPage() {
                 <span className="font-body-sm text-body-sm text-on-surface-variant hidden md:block">Sort by:</span>
                 <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors font-body-sm text-body-sm">
                   Recommended
-                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">expand_more</span>
                 </button>
               </div>
             </div>

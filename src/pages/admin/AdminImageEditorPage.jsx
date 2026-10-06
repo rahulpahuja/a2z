@@ -250,7 +250,7 @@ export default function AdminImageEditorPage() {
                     setImageFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = '';
                   }}
-                  className="text-[11px] font-label-caps text-label-caps uppercase text-error hover:underline"
+                  className="text-[0.6875rem] font-label-caps text-label-caps uppercase text-error hover:underline"
                 >
                   Choose a different image
                 </button>
@@ -275,11 +275,11 @@ export default function AdminImageEditorPage() {
                 )}
               </div>
               <div className="flex items-center gap-3 flex-wrap">
-                <button type="button" onClick={applyCrop} className="btn btn-secondary text-[12px]">
+                <button type="button" onClick={applyCrop} className="btn btn-secondary text-[0.75rem]">
                   Apply Crop
                 </button>
                 {crop && (
-                  <button type="button" onClick={clearCrop} className="btn btn-secondary text-[12px]">
+                  <button type="button" onClick={clearCrop} className="btn btn-secondary text-[0.75rem]">
                     Clear Crop
                   </button>
                 )}
@@ -297,19 +297,19 @@ export default function AdminImageEditorPage() {
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="text-[11px] font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-primary"
+                  className="text-[0.6875rem] font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-primary"
                 >
                   Reset All
                 </button>
               </div>
 
               <div className="flex gap-2">
-                <button type="button" onClick={() => setRotation((r) => (r + 270) % 360)} className="btn btn-secondary flex-1 text-[12px] flex items-center justify-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px]">rotate_left</span>
+                <button type="button" onClick={() => setRotation((r) => (r + 270) % 360)} className="btn btn-secondary flex-1 text-[0.75rem] flex items-center justify-center gap-1.5">
+                  <span className="material-symbols-outlined text-[1rem]">rotate_left</span>
                   Rotate Left
                 </button>
-                <button type="button" onClick={() => setRotation((r) => (r + 90) % 360)} className="btn btn-secondary flex-1 text-[12px] flex items-center justify-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px]">rotate_right</span>
+                <button type="button" onClick={() => setRotation((r) => (r + 90) % 360)} className="btn btn-secondary flex-1 text-[0.75rem] flex items-center justify-center gap-1.5">
+                  <span className="material-symbols-outlined text-[1rem]">rotate_right</span>
                   Rotate Right
                 </button>
               </div>
@@ -317,17 +317,17 @@ export default function AdminImageEditorPage() {
                 <button
                   type="button"
                   onClick={() => setFlipH((v) => !v)}
-                  className={`btn btn-secondary flex-1 text-[12px] flex items-center justify-center gap-1.5 ${flipH ? 'border-primary text-primary' : ''}`}
+                  className={`btn btn-secondary flex-1 text-[0.75rem] flex items-center justify-center gap-1.5 ${flipH ? 'border-primary text-primary' : ''}`}
                 >
-                  <span className="material-symbols-outlined text-[16px]">flip</span>
+                  <span className="material-symbols-outlined text-[1rem]">flip</span>
                   Flip Horizontal
                 </button>
                 <button
                   type="button"
                   onClick={() => setFlipV((v) => !v)}
-                  className={`btn btn-secondary flex-1 text-[12px] flex items-center justify-center gap-1.5 ${flipV ? 'border-primary text-primary' : ''}`}
+                  className={`btn btn-secondary flex-1 text-[0.75rem] flex items-center justify-center gap-1.5 ${flipV ? 'border-primary text-primary' : ''}`}
                 >
-                  <span className="material-symbols-outlined text-[16px] rotate-90">flip</span>
+                  <span className="material-symbols-outlined text-[1rem] rotate-90">flip</span>
                   Flip Vertical
                 </button>
               </div>
@@ -360,7 +360,7 @@ export default function AdminImageEditorPage() {
                   id="export-format"
                   value={format}
                   onChange={(e) => setFormat(e.target.value)}
-                  className="form-select text-[12px] py-2 px-3"
+                  className="form-select text-[0.75rem] py-2 px-3"
                 >
                   <option value="png">PNG (lossless)</option>
                   <option value="jpeg">JPEG</option>
@@ -385,7 +385,7 @@ export default function AdminImageEditorPage() {
               )}
 
               <button type="button" onClick={handleDownload} className="btn btn-primary flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">download</span>
+                <span className="material-symbols-outlined text-[1.125rem]">download</span>
                 Download Edited Image
               </button>
             </div>

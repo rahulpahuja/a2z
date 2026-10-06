@@ -209,10 +209,10 @@ export default function OrderTrackingPage() {
         {/* Cancelled Banner */}
         {liveOrder.status === 'Cancelled' && (
           <div className="p-5 bg-error/10 text-error rounded-xl border border-error/20 flex items-center gap-4 shadow-sm">
-            <span className="material-symbols-outlined text-[28px] shrink-0">cancel</span>
+            <span className="material-symbols-outlined text-[1.75rem] shrink-0">cancel</span>
             <div>
-              <p className="font-bold text-[15px] font-display">Order Cancelled</p>
-              <p className="text-[12px] opacity-90 mt-0.5">This order has been cancelled and cannot be processed further. If you have questions about refunds or cancellation, please reach out to customer support.</p>
+              <p className="font-bold text-[0.9375rem] font-display">Order Cancelled</p>
+              <p className="text-[0.75rem] opacity-90 mt-0.5">This order has been cancelled and cannot be processed further. If you have questions about refunds or cancellation, please reach out to customer support.</p>
             </div>
           </div>
         )}
@@ -247,27 +247,27 @@ export default function OrderTrackingPage() {
           {liveOrder.trackingId && (
             <div className="mb-8 p-5 bg-secondary/10 rounded-xl border border-secondary/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-secondary text-[26px]">local_shipping</span>
+                <span className="material-symbols-outlined text-secondary text-[1.625rem]">local_shipping</span>
                 <div>
-                  <p className="font-bold text-on-surface text-[14px]">
+                  <p className="font-bold text-on-surface text-[0.875rem]">
                     Shipped via <span className="text-secondary">{liveOrder.trackingPartner || 'Delivery Partner'}</span>
                   </p>
-                  <p className="text-[11px] text-on-surface-variant mt-0.5">Your package is on its way. Use the tracking ID below to check live transit updates.</p>
+                  <p className="text-[0.6875rem] text-on-surface-variant mt-0.5">Your package is on its way. Use the tracking ID below to check live transit updates.</p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                <div className="flex items-center bg-surface-container border border-outline-variant/35 rounded-lg px-4 py-2 font-mono text-[12px] text-on-surface select-all shadow-sm">
-                  <span className="text-on-surface-variant text-[10px] uppercase font-sans font-semibold tracking-wider mr-2">Tracking ID:</span>
+                <div className="flex items-center bg-surface-container border border-outline-variant/35 rounded-lg px-4 py-2 font-mono text-[0.75rem] text-on-surface select-all shadow-sm">
+                  <span className="text-on-surface-variant text-[0.625rem] uppercase font-sans font-semibold tracking-wider mr-2">Tracking ID:</span>
                   {liveOrder.trackingId}
                 </div>
                 <a
                   href={getTrackingPortalUrl(liveOrder.trackingPartner, liveOrder.trackingId)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary py-2 px-3 text-[10px] flex items-center justify-center gap-1.5"
+                  className="btn btn-primary py-2 px-3 text-[0.625rem] flex items-center justify-center gap-1.5"
                 >
                   <span>Track on Portal</span>
-                  <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                  <span className="material-symbols-outlined text-[0.75rem]">open_in_new</span>
                 </a>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function OrderTrackingPage() {
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 Payment: <span className="font-semibold text-on-background">{liveOrder.paymentMethod}</span>
                 {liveOrder.paymentId && (
-                  <span className="ml-2 font-mono text-[11px] text-on-surface-variant">({liveOrder.paymentId})</span>
+                  <span className="ml-2 font-mono text-[0.6875rem] text-on-surface-variant">({liveOrder.paymentId})</span>
                 )}
               </p>
             </div>

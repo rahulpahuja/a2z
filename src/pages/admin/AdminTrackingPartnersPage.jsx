@@ -151,7 +151,7 @@ export default function AdminTrackingPartnersPage() {
             </div>
           </div>
           {shipmentStats.missingCostCount > 0 && (
-            <p className="text-[11px] text-on-surface-variant">
+            <p className="text-[0.6875rem] text-on-surface-variant">
               {shipmentStats.missingCostCount} shipment{shipmentStats.missingCostCount === 1 ? '' : 's'} this month had
               no cost figure in ShipPrime's response — check the ShipPrime dashboard directly for the true total.
             </p>
@@ -185,7 +185,7 @@ export default function AdminTrackingPartnersPage() {
               disabled={saving || !newPartner.trim()}
               className="btn btn-primary w-full"
             >
-              <span className="material-symbols-outlined text-[18px]">add</span>
+              <span className="material-symbols-outlined text-[1.125rem]">add</span>
               {saving ? 'Adding…' : 'Add Partner'}
             </button>
           </form>
@@ -215,9 +215,9 @@ export default function AdminTrackingPartnersPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-secondary/10 text-secondary flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[20px]">local_shipping</span>
+                      <span className="material-symbols-outlined text-[1.25rem]">local_shipping</span>
                     </div>
-                    <span className="font-semibold text-on-surface text-[14px]">{partner}</span>
+                    <span className="font-semibold text-on-surface text-[0.875rem]">{partner}</span>
                   </div>
                   <button
                     type="button"
@@ -226,7 +226,7 @@ export default function AdminTrackingPartnersPage() {
                     className="w-8 h-8 rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error flex items-center justify-center transition-colors disabled:opacity-50"
                     title={`Delete ${partner}`}
                   >
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                    <span className="material-symbols-outlined text-[1.125rem]">delete</span>
                   </button>
                 </div>
               ))}

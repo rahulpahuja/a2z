@@ -536,7 +536,7 @@ export default function AdminWatermarkPage() {
             setActiveStudioTab('remover');
             setResultUrl('');
           }}
-          className={`flex-1 text-center font-label-caps text-[10px] uppercase py-2.5 rounded-md transition-all ${
+          className={`flex-1 text-center font-label-caps text-[0.625rem] uppercase py-2.5 rounded-md transition-all ${
             activeStudioTab === 'remover' 
               ? 'bg-surface shadow text-primary font-bold' 
               : 'text-on-surface-variant hover:text-on-surface font-medium'
@@ -550,7 +550,7 @@ export default function AdminWatermarkPage() {
             setActiveStudioTab('adder');
             setResultUrl('');
           }}
-          className={`flex-1 text-center font-label-caps text-[10px] uppercase py-2.5 rounded-md transition-all ${
+          className={`flex-1 text-center font-label-caps text-[0.625rem] uppercase py-2.5 rounded-md transition-all ${
             activeStudioTab === 'adder' 
               ? 'bg-surface shadow text-primary font-bold' 
               : 'text-on-surface-variant hover:text-on-surface font-medium'
@@ -581,7 +581,7 @@ export default function AdminWatermarkPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="form-input text-[12px] py-2 px-3"
+                className="form-input text-[0.75rem] py-2 px-3"
               />
             </div>
             
@@ -593,7 +593,7 @@ export default function AdminWatermarkPage() {
                     <label className="form-label mb-0" htmlFor="brush-slider">
                       Brush Size ({brushSize}px)
                     </label>
-                    <span className="text-[10px] text-on-surface-variant font-mono">
+                    <span className="text-[0.625rem] text-on-surface-variant font-mono">
                       Adjust thickness
                     </span>
                   </div>
@@ -613,18 +613,18 @@ export default function AdminWatermarkPage() {
                     type="button"
                     onClick={handleUndo}
                     disabled={maskHistory.length === 0 || isProcessing}
-                    className="flex-1 btn btn-secondary text-[11px] py-2 px-3 flex items-center justify-center gap-1"
+                    className="flex-1 btn btn-secondary text-[0.6875rem] py-2 px-3 flex items-center justify-center gap-1"
                   >
-                    <span className="material-symbols-outlined text-[16px]">undo</span>
+                    <span className="material-symbols-outlined text-[1rem]">undo</span>
                     Undo
                   </button>
                   <button
                     type="button"
                     onClick={handleClearMask}
                     disabled={!hasMask || isProcessing}
-                    className="flex-1 btn btn-secondary text-[11px] py-2 px-3 flex items-center justify-center gap-1"
+                    className="flex-1 btn btn-secondary text-[0.6875rem] py-2 px-3 flex items-center justify-center gap-1"
                   >
-                    <span className="material-symbols-outlined text-[16px]">delete_sweep</span>
+                    <span className="material-symbols-outlined text-[1rem]">delete_sweep</span>
                     Clear Mask
                   </button>
                 </div>
@@ -633,16 +633,16 @@ export default function AdminWatermarkPage() {
                   type="button"
                   onClick={handleRemoveWatermark}
                   disabled={!hasMask || isProcessing}
-                  className="w-full btn btn-primary text-[12px] py-3 flex items-center justify-center gap-2"
+                  className="w-full btn btn-primary text-[0.75rem] py-3 flex items-center justify-center gap-2"
                 >
                   {isProcessing ? (
                     <>
-                      <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                      <span className="material-symbols-outlined animate-spin text-[1.125rem]">progress_activity</span>
                       Processing AI Removal...
                     </>
                   ) : (
                     <>
-                      <span className="material-symbols-outlined text-[18px]">auto_fix_high</span>
+                      <span className="material-symbols-outlined text-[1.125rem]">auto_fix_high</span>
                       Remove Watermark (AI)
                     </>
                   )}
@@ -661,7 +661,7 @@ export default function AdminWatermarkPage() {
                     <button
                       type="button"
                       onClick={() => setWatermarkType('text')}
-                      className={`flex-1 text-center text-[11px] py-1.5 rounded-md transition-all ${
+                      className={`flex-1 text-center text-[0.6875rem] py-1.5 rounded-md transition-all ${
                         watermarkType === 'text' 
                           ? 'bg-surface shadow text-primary font-semibold' 
                           : 'text-on-surface-variant hover:text-on-surface font-medium'
@@ -672,7 +672,7 @@ export default function AdminWatermarkPage() {
                     <button
                       type="button"
                       onClick={() => setWatermarkType('image')}
-                      className={`flex-1 text-center text-[11px] py-1.5 rounded-md transition-all ${
+                      className={`flex-1 text-center text-[0.6875rem] py-1.5 rounded-md transition-all ${
                         watermarkType === 'image' 
                           ? 'bg-surface shadow text-primary font-semibold' 
                           : 'text-on-surface-variant hover:text-on-surface font-medium'
@@ -693,7 +693,7 @@ export default function AdminWatermarkPage() {
                         type="text"
                         value={watermarkText}
                         onChange={(e) => setWatermarkText(e.target.value)}
-                        className="form-input text-[12px] py-2 px-3"
+                        className="form-input text-[0.75rem] py-2 px-3"
                       />
                     </div>
                     
@@ -711,7 +711,7 @@ export default function AdminWatermarkPage() {
                           type="text"
                           value={watermarkColor}
                           onChange={(e) => setWatermarkColor(e.target.value)}
-                          className="form-input text-[11px] py-1.5 px-3 flex-1"
+                          className="form-input text-[0.6875rem] py-1.5 px-3 flex-1"
                         />
                       </div>
                     </div>
@@ -740,7 +740,7 @@ export default function AdminWatermarkPage() {
                       type="file"
                       accept="image/*"
                       onChange={handleWatermarkImageChange}
-                      className="form-input text-[12px] py-2 px-3"
+                      className="form-input text-[0.75rem] py-2 px-3"
                     />
                   </div>
                 )}
@@ -767,9 +767,9 @@ export default function AdminWatermarkPage() {
                   type="button"
                   onClick={handleApplyAndDownloadWatermark}
                   disabled={watermarkType === 'image' && !watermarkImageUrl}
-                  className="w-full btn btn-primary text-[12px] py-3 flex items-center justify-center gap-2"
+                  className="w-full btn btn-primary text-[0.75rem] py-3 flex items-center justify-center gap-2"
                 >
-                  <span className="material-symbols-outlined text-[18px]">download</span>
+                  <span className="material-symbols-outlined text-[1.125rem]">download</span>
                   Apply &amp; Download Watermark
                 </button>
               </div>
@@ -778,19 +778,19 @@ export default function AdminWatermarkPage() {
           
           {/* Instructions card */}
           <div className="admin-card flex flex-col gap-3">
-            <h3 className="font-bold text-on-surface text-[13px] flex items-center gap-1">
-              <span className="material-symbols-outlined text-primary text-[16px]">info</span>
+            <h3 className="font-bold text-on-surface text-[0.8125rem] flex items-center gap-1">
+              <span className="material-symbols-outlined text-primary text-[1rem]">info</span>
               How it works
             </h3>
             {activeStudioTab === 'remover' ? (
-              <ol className="list-decimal pl-4 space-y-1.5 text-[11px] text-on-surface-variant/90 leading-relaxed">
+              <ol className="list-decimal pl-4 space-y-1.5 text-[0.6875rem] text-on-surface-variant/90 leading-relaxed">
                 <li>Upload a product photo containing a logo, watermark, or text overlay.</li>
                 <li>Paint a red highlight mask directly over the watermark region.</li>
                 <li>Adjust the <strong>Brush Size</strong> slider for thinner or thicker overlay strokes.</li>
                 <li>Click <strong>Remove Watermark (AI)</strong>. The system will smooth out the watermark.</li>
               </ol>
             ) : (
-              <ol className="list-decimal pl-4 space-y-1.5 text-[11px] text-on-surface-variant/90 leading-relaxed">
+              <ol className="list-decimal pl-4 space-y-1.5 text-[0.6875rem] text-on-surface-variant/90 leading-relaxed">
                 <li>Upload a base product photo.</li>
                 <li>Select watermark type (Text or Brand Logo image).</li>
                 <li><strong>Click and drag a box</strong> on the image canvas to select the area where the watermark should sit.</li>
@@ -806,14 +806,14 @@ export default function AdminWatermarkPage() {
           
           {!originalUrl ? (
             <div className="admin-card flex flex-col items-center justify-center min-h-[360px] border-2 border-dashed border-outline-variant/60 rounded-2xl p-8 bg-surface-container-low/40">
-              <span className="material-symbols-outlined text-[54px] text-outline mb-4">photo_library</span>
+              <span className="material-symbols-outlined text-[3.375rem] text-outline mb-4">photo_library</span>
               <p className="font-title-sm text-on-surface text-center mb-1">No Image Selected</p>
-              <p className="text-body-sm text-[11px] text-on-surface-variant text-center max-w-xs mb-4">
+              <p className="text-body-sm text-[0.6875rem] text-on-surface-variant text-center max-w-xs mb-4">
                 Select a JPEG, PNG, or WebP photo to launch the editor canvas workspace.
               </p>
               <button
                 onClick={() => document.getElementById('image-file').click()}
-                className="btn btn-secondary text-[11px] py-2 px-4"
+                className="btn btn-secondary text-[0.6875rem] py-2 px-4"
               >
                 Choose Photo
               </button>
@@ -821,7 +821,7 @@ export default function AdminWatermarkPage() {
           ) : (
             <div className="admin-card flex flex-col gap-5">
               <div className="flex justify-between items-center pb-3 border-b border-outline-variant/20">
-                <span className="font-bold text-on-surface text-[14px]">
+                <span className="font-bold text-on-surface text-[0.875rem]">
                   {activeStudioTab === 'adder' 
                     ? 'Watermark Placement Area (Drag to draw custom box)' 
                     : !resultUrl ? 'Editor Canvas' : 'Before / After Comparison'
@@ -830,9 +830,9 @@ export default function AdminWatermarkPage() {
                 {resultUrl && activeStudioTab === 'remover' && (
                   <button
                     onClick={handleDownloadRemoverResult}
-                    className="btn btn-primary text-[11px] py-2 px-4 flex items-center gap-1.5"
+                    className="btn btn-primary text-[0.6875rem] py-2 px-4 flex items-center gap-1.5"
                   >
-                    <span className="material-symbols-outlined text-[14px]">download</span>
+                    <span className="material-symbols-outlined text-[0.875rem]">download</span>
                     Download Inpainted Result
                   </button>
                 )}
@@ -855,7 +855,7 @@ export default function AdminWatermarkPage() {
                   </div>
                   <div className="slider-handle" style={{ left: `${compareRatio}%` }}>
                     <div className="slider-handle-button">
-                      <span className="material-symbols-outlined text-[18px]">unfold_more</span>
+                      <span className="material-symbols-outlined text-[1.125rem]">unfold_more</span>
                     </div>
                   </div>
                 </div>
@@ -895,7 +895,7 @@ export default function AdminWatermarkPage() {
                         img.src = originalUrl;
                       }, 50);
                     }}
-                    className="btn btn-secondary text-[11px] py-2 px-5"
+                    className="btn btn-secondary text-[0.6875rem] py-2 px-5"
                   >
                     Modify Mask / Paint Again
                   </button>

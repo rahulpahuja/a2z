@@ -83,7 +83,7 @@ export default function SearchBar({ className = '' }) {
         className="absolute right-0 top-1/2 -translate-y-1/2 h-11 overflow-hidden rounded-full border border-outline-variant bg-surface shadow-md"
       >
         <div className="flex h-full items-center gap-2 pl-3 pr-2" style={{ width: EXPANDED_WIDTH }}>
-          <span className="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+          <span className="material-symbols-outlined text-on-surface-variant text-[1.25rem]">search</span>
           <input
             ref={inputRef}
             type="text"
@@ -94,7 +94,7 @@ export default function SearchBar({ className = '' }) {
             className="flex-1 min-w-0 bg-transparent border-0 focus:ring-0 p-0 font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant"
           />
           <button type="button" aria-label="Close search" onClick={close} className="text-on-surface-variant hover:text-primary transition-colors">
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span className="material-symbols-outlined text-[1.25rem]">close</span>
           </button>
         </div>
       </motion.div>

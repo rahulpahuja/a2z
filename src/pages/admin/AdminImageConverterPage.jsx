@@ -227,7 +227,7 @@ export default function AdminImageConverterPage() {
         <section className="admin-card flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-outline-variant/20 pb-6">
           <div className="flex-1 space-y-1">
             <h2 className="admin-card-title flex items-center gap-2">
-              <span className="material-symbols-outlined text-[20px] text-primary">analytics</span>
+              <span className="material-symbols-outlined text-[1.25rem] text-primary">analytics</span>
               Self-Diagnostic Validator
             </h2>
             <p className="admin-card-subtitle">
@@ -237,12 +237,12 @@ export default function AdminImageConverterPage() {
 
           <div className="flex items-center gap-4 shrink-0 flex-wrap">
             {testStatus && (
-              <span className={`status-badge px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-[11px] ${
+              <span className={`status-badge px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-[0.6875rem] ${
                 testStatus === 'passed' ? 'test-badge-passed' :
                 testStatus === 'failed' ? 'test-badge-failed' :
                 'test-badge-running'
               }`}>
-                <span className="material-symbols-outlined text-[14px]">
+                <span className="material-symbols-outlined text-[0.875rem]">
                   {testStatus === 'passed' ? 'check_circle' :
                    testStatus === 'failed' ? 'cancel' :
                    'progress_activity'}
@@ -254,7 +254,7 @@ export default function AdminImageConverterPage() {
             <button
               onClick={runSelfTest}
               disabled={testStatus === 'running'}
-              className="btn btn-secondary text-[11px] py-2 px-4"
+              className="btn btn-secondary text-[0.6875rem] py-2 px-4"
             >
               Run Diagnostic Test
             </button>
@@ -265,7 +265,7 @@ export default function AdminImageConverterPage() {
           <div className="admin-card bg-secondary/5 border-secondary/20 p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs">
             <div>
               <p className="font-semibold text-secondary flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">verified</span>
+                <span className="material-symbols-outlined text-[1rem]">verified</span>
                 Encoder Signature Verified
               </p>
               <p className="text-on-surface-variant/80 mt-0.5">
@@ -275,10 +275,10 @@ export default function AdminImageConverterPage() {
             <a
               href={testDetails.url}
               download="diagnostic-passed.webp"
-              className="btn btn-outline py-1.5 px-3 text-[10px] flex items-center gap-1 shrink-0"
+              className="btn btn-outline py-1.5 px-3 text-[0.625rem] flex items-center gap-1 shrink-0"
             >
               Download Test WebP
-              <span className="material-symbols-outlined text-[12px]">download</span>
+              <span className="material-symbols-outlined text-[0.75rem]">download</span>
             </a>
           </div>
         )}
@@ -309,7 +309,7 @@ export default function AdminImageConverterPage() {
                 onChange={(e) => setQuality(Number(e.target.value))}
                 className="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary"
               />
-              <div className="flex justify-between text-[9px] text-on-surface-variant/60 font-semibold mt-1">
+              <div className="flex justify-between text-[0.5625rem] text-on-surface-variant/60 font-semibold mt-1">
                 <span>MAX COMPRESSION</span>
                 <span>BALANCED</span>
                 <span>LOSSLESS (100%)</span>
@@ -322,7 +322,7 @@ export default function AdminImageConverterPage() {
                 disabled={files.filter((f) => f.status === 'pending' || f.status === 'error').length === 0}
                 className="btn btn-primary w-full py-3"
               >
-                <span className="material-symbols-outlined text-[18px]">play_arrow</span>
+                <span className="material-symbols-outlined text-[1.125rem]">play_arrow</span>
                 Convert Pending Images
               </button>
 
@@ -331,7 +331,7 @@ export default function AdminImageConverterPage() {
                 disabled={files.filter((f) => f.status === 'success').length === 0}
                 className="btn btn-outline w-full py-3"
               >
-                <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
+                <span className="material-symbols-outlined text-[1.125rem]">download_for_offline</span>
                 Download Converted WebPs
               </button>
             </div>
@@ -365,10 +365,10 @@ export default function AdminImageConverterPage() {
               />
               <span className="material-symbols-outlined text-4xl text-outline-variant">cloud_upload</span>
               <div>
-                <p className="font-semibold text-on-surface text-[14px]">Drag and drop your images here</p>
-                <p className="text-[11px] text-on-surface-variant mt-0.5">Supports PNG, JPEG, WEBP, HEIC, GIF</p>
+                <p className="font-semibold text-on-surface text-[0.875rem]">Drag and drop your images here</p>
+                <p className="text-[0.6875rem] text-on-surface-variant mt-0.5">Supports PNG, JPEG, WEBP, HEIC, GIF</p>
               </div>
-              <button type="button" className="btn btn-outline py-1.5 px-3 text-[10px]">
+              <button type="button" className="btn btn-outline py-1.5 px-3 text-[0.625rem]">
                 Browse Local Files
               </button>
             </div>
@@ -392,10 +392,10 @@ export default function AdminImageConverterPage() {
                       </div>
                       
                       <div className="min-w-0 flex-1 sm:flex-initial">
-                        <p className="font-bold text-on-surface text-[13px] truncate max-w-[200px]" title={file.name}>
+                        <p className="font-bold text-on-surface text-[0.8125rem] truncate max-w-[200px]" title={file.name}>
                           {file.name}
                         </p>
-                        <p className="text-[10px] text-on-surface-variant/60 font-medium">
+                        <p className="text-[0.625rem] text-on-surface-variant/60 font-medium">
                           Size: {formatSize(file.originalSize)}
                         </p>
                       </div>
@@ -406,28 +406,28 @@ export default function AdminImageConverterPage() {
                       <div className="text-right">
                         {file.status === 'success' && (
                           <div>
-                            <span className="px-2 py-0.5 bg-secondary/10 text-secondary rounded font-bold text-[9px] uppercase tracking-wider">
+                            <span className="px-2 py-0.5 bg-secondary/10 text-secondary rounded font-bold text-[0.5625rem] uppercase tracking-wider">
                               Saved {file.savings.toFixed(0)}%
                             </span>
-                            <p className="text-[10px] text-on-surface-variant/75 mt-0.5 font-mono">
+                            <p className="text-[0.625rem] text-on-surface-variant/75 mt-0.5 font-mono">
                               {formatSize(file.convertedSize)}
                             </p>
                           </div>
                         )}
                         {file.status === 'pending' && (
-                          <span className="px-2 py-0.5 bg-outline-variant/25 text-on-surface-variant rounded font-bold text-[9px] uppercase tracking-wider">
+                          <span className="px-2 py-0.5 bg-outline-variant/25 text-on-surface-variant rounded font-bold text-[0.5625rem] uppercase tracking-wider">
                             Pending
                           </span>
                         )}
                         {file.status === 'converting' && (
-                          <span className="px-2 py-0.5 bg-primary/10 text-primary rounded font-bold text-[9px] uppercase tracking-wider flex items-center gap-1">
-                            <span className="material-symbols-outlined animate-spin text-[10px]">progress_activity</span>
+                          <span className="px-2 py-0.5 bg-primary/10 text-primary rounded font-bold text-[0.5625rem] uppercase tracking-wider flex items-center gap-1">
+                            <span className="material-symbols-outlined animate-spin text-[0.625rem]">progress_activity</span>
                             Converting
                           </span>
                         )}
                         {file.status === 'error' && (
                           <span
-                            className="px-2 py-0.5 bg-error/15 text-error rounded font-bold text-[9px] uppercase tracking-wider cursor-help"
+                            className="px-2 py-0.5 bg-error/15 text-error rounded font-bold text-[0.5625rem] uppercase tracking-wider cursor-help"
                             title={file.error}
                           >
                             Error
@@ -442,7 +442,7 @@ export default function AdminImageConverterPage() {
                             type="button"
                             onClick={() => handleConvertFile(file.id)}
                             disabled={file.status === 'converting'}
-                            className="btn btn-primary py-1.5 px-3 rounded-lg text-[10px]"
+                            className="btn btn-primary py-1.5 px-3 rounded-lg text-[0.625rem]"
                           >
                             Convert
                           </button>
@@ -450,10 +450,10 @@ export default function AdminImageConverterPage() {
                           <button
                             type="button"
                             onClick={() => handleDownloadFile(file)}
-                            className="btn btn-outline py-1.5 px-3 rounded-lg text-[10px] flex items-center gap-0.5"
+                            className="btn btn-outline py-1.5 px-3 rounded-lg text-[0.625rem] flex items-center gap-0.5"
                           >
                             Download
-                            <span className="material-symbols-outlined text-[12px]">download</span>
+                            <span className="material-symbols-outlined text-[0.75rem]">download</span>
                           </button>
                         )}
 
@@ -463,7 +463,7 @@ export default function AdminImageConverterPage() {
                           className="w-7 h-7 rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error flex items-center justify-center transition-colors"
                           title="Remove item"
                         >
-                          <span className="material-symbols-outlined text-[16px]">close</span>
+                          <span className="material-symbols-outlined text-[1rem]">close</span>
                         </button>
                       </div>
                     </div>

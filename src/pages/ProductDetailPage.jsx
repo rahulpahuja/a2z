@@ -281,7 +281,7 @@ export default function ProductDetailPage() {
           onClick={() => navigate(-1)}
           className="md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
         >
-          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+          <span className="material-symbols-outlined text-[1.25rem]">arrow_back</span>
           Back
         </button>
 
@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
             <div className="flex justify-between items-start">
               <span className="font-label-caps text-label-caps text-secondary uppercase tracking-widest">{product.category}</span>
               {product.badge && (
-                <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
+                <span className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
               )}
             </div>
             <motion.h1
@@ -405,18 +405,18 @@ export default function ProductDetailPage() {
             )}
             {viewCount !== null && viewCount > 0 && (
               <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
-                <span className="material-symbols-outlined text-[16px]">visibility</span>
+                <span className="material-symbols-outlined text-[1rem]">visibility</span>
                 <span className="font-body-sm text-body-sm">{viewCount.toLocaleString('en-IN')} people viewed this</span>
               </div>
             )}
-            {reviewSummary.count > 0 && (
-              <a href="#reviews" className="flex items-center gap-2 mt-2 font-body-sm text-body-sm text-on-surface-variant hover:underline">
-                <StarRating value={reviewSummary.average} size="text-sm" />
-                <span>
-                  {reviewSummary.average.toFixed(1)} · {reviewSummary.count} {reviewSummary.count === 1 ? 'rating' : 'ratings'}
-                </span>
-              </a>
-            )}
+            <a href="#reviews" className="flex items-center gap-2 mt-2 font-body-sm text-body-sm text-on-surface-variant hover:underline">
+              <StarRating value={reviewSummary.average} size="text-sm" />
+              <span>
+                {reviewSummary.count > 0
+                  ? `${reviewSummary.average.toFixed(1)} out of 5 (${reviewSummary.count} ${reviewSummary.count === 1 ? 'rating' : 'ratings'})`
+                  : 'No ratings yet'}
+              </span>
+            </a>
           </div>
 
           {/* Selectors */}
@@ -526,7 +526,7 @@ export default function ProductDetailPage() {
             {/* Stock & Quantity */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 font-body-sm text-body-sm text-secondary">
-                <span className="material-symbols-outlined text-[16px]">{selectedSizeStock > 0 ? 'check_circle' : 'cancel'}</span>
+                <span className="material-symbols-outlined text-[1rem]">{selectedSizeStock > 0 ? 'check_circle' : 'cancel'}</span>
                 <span>{selectedSizeStock > 0 ? `In Stock (${selectedSizeStock} left)` : 'Out of Stock'}</span>
               </div>
               <div className="flex items-center gap-4">
@@ -556,7 +556,7 @@ export default function ProductDetailPage() {
               disabled={selectedSizeStock === 0}
               className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 rounded-lg hover:opacity-90 transition-opacity uppercase tracking-widest shadow-[0_10px_30px_rgba(172,36,113,0.15)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
+              <span className="material-symbols-outlined text-[1.125rem]">shopping_bag</span>
               BUY IT NOW
             </button>
             <button
@@ -564,11 +564,11 @@ export default function ProductDetailPage() {
               disabled={selectedSizeStock === 0}
               className="w-full border-2 border-primary text-primary bg-transparent font-label-caps text-label-caps py-4 rounded-lg hover:bg-primary-fixed transition-colors uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+              <span className="material-symbols-outlined text-[1.125rem]">add_shopping_cart</span>
               ADD TO CART
             </button>
             <div className="flex items-center justify-center gap-2 text-on-surface-variant font-body-sm text-body-sm mt-2">
-              <span className="material-symbols-outlined text-[16px]">local_shipping</span>
+              <span className="material-symbols-outlined text-[1rem]">local_shipping</span>
               <span>⏱️ Estimated Delivery: 3 to 7 Business Days</span>
             </div>
           </div>
@@ -653,12 +653,12 @@ export default function ProductDetailPage() {
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                     />
                     {related.badge && (
-                      <span className="absolute top-4 left-4 bg-tertiary text-on-tertiary font-label-caps text-[10px] px-3 py-1 rounded-[32px] uppercase tracking-widest">{related.badge}</span>
+                      <span className="absolute top-4 left-4 bg-tertiary text-on-tertiary font-label-caps text-[0.625rem] px-3 py-1 rounded-[32px] uppercase tracking-widest">{related.badge}</span>
                     )}
                   </div>
                   <div>
                     <h4 className="font-title-sm text-title-sm text-on-surface line-clamp-1">{related.name || related.title}</h4>
-                    <p className="font-price-display text-[16px] text-primary mt-1">{formatCurrency(related.price)}</p>
+                    <p className="font-price-display text-[1rem] text-primary mt-1">{formatCurrency(related.price)}</p>
                   </div>
                 </Link>
               ))}
