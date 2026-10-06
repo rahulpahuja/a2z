@@ -46,7 +46,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
         <button
           type="button"
           aria-label="Sign In"
-          className={className}
+          className={`flex items-center justify-center ${className}`}
           onClick={() => setModalOpen(true)}
         >
           <span className={iconClassName}>person</span>
@@ -61,7 +61,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
       <button
         type="button"
         aria-label="Account"
-        className={className}
+        className={`flex items-center justify-center ${className}`}
         onClick={() => setMenuOpen((open) => !open)}
       >
         <span className={iconClassName} style={{ fontVariationSettings: "'FILL' 1" }}>

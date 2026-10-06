@@ -494,7 +494,7 @@ export default function ProductListingPage() {
             type="button"
             aria-label="Open menu"
             onClick={() => setMobileNavOpen(true)}
-            className="inline-block text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
+            className="inline-flex items-center text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity duration-200"
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
@@ -519,7 +519,8 @@ export default function ProductListingPage() {
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
-      <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 flex flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4">
+      {/* On phones the heading and counter only appear once a category or New Arrivals is picked, so browsing all products stays uncluttered. */}
+      <div className={`w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 ${activeFilter !== 'new-arrivals' && activeCategory === 'All' ? 'hidden md:flex' : 'flex'} flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4`}>
         <div>
           <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
             {activeFilter === 'new-arrivals' ? 'NEW ARRIVALS' : activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
