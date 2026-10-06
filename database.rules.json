@@ -32,6 +32,10 @@
       ".read": true,
       ".write": "auth != null"
     },
+    "trashedProducts": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
     "categories": {
       ".read": true,
       ".write": "auth != null"
