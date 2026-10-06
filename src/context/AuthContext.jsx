@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import {
   RecaptchaVerifier,
   onAuthStateChanged,
+  signInWithCustomToken,
   signInWithPhoneNumber,
   signOut,
 } from 'firebase/auth';
@@ -14,6 +15,7 @@ import {
   resetOtpSession as resetMsg91OtpSession,
 } from '../services/msg91Otp.js';
 import { logLogin } from '../services/analytics.js';
+import { fetchAdminFirebaseToken } from '../services/adminSession.js';
 
 const AuthContext = createContext(null);
 
@@ -104,8 +106,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!isFirebaseEnabled) return undefined;
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      // Don't let Firebase's initial null callback clobber a live MSG91 session.
-      if (nextUser || !readMsg91Session()) {
+      // A live MSG91 session owns `user` (it carries the phone the admin check uses);
+      // Firebase's custom-token user is only used for database access.
+      if (!readMsg91Session()) {
         setUser(nextUser);
       }
       setLoading(false);
@@ -152,6 +155,8 @@ export function AuthProvider({ children }) {
     if (isMsg91Enabled) {
       const data = await msg91VerifyOtp(code);
       const identifier = pendingIdentifierRef.current;
+      const firebaseToken = await fetchAdminFirebaseToken(data?.message, identifier);
+      if (firebaseToken && isFirebaseEnabled) await signInWithCustomToken(auth, firebaseToken);
       const session = {
         identifier,
         phoneNumber: identifier,
