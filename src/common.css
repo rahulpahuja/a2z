@@ -293,3 +293,18 @@ body.user-signed-in .docked {
   filter: brightness(0.93);
   transition: filter 0.2s ease;
 }
+
+.a2z-shimmer {
+  background: linear-gradient(90deg, var(--color-surface-container-low) 25%, var(--color-surface-container-high) 37%, var(--color-surface-container-low) 63%);
+  background-size: 400% 100%;
+  animation: a2z-shimmer 1.4s ease infinite;
+}
+
+@keyframes a2z-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a2z-shimmer { animation: none; }
+}

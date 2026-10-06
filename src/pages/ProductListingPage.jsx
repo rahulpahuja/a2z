@@ -11,6 +11,7 @@ import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchBar from '../components/SearchBar.jsx';
+import { ProductGridSkeleton } from '../components/Shimmer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
@@ -113,7 +114,7 @@ export default function ProductListingPage() {
     ? enlargeAspectRatio(theme?.listingImgAspect || '3/4', listingImgEnlargeFactor)
     : 'var(--custom-listing-img-aspect, 3/4)';
 
-  const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES } = useProducts();
+  const { products: CATALOG, categories: CATEGORY_OPTIONS, subcategories: SUBCATEGORIES, loading } = useProducts();
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -981,7 +982,11 @@ export default function ProductListingPage() {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <EmptySegment message="No products match your filters — check back soon or try a different filter." />
+            loading ? (
+              <ProductGridSkeleton />
+            ) : (
+              <EmptySegment message="No products match your filters — check back soon or try a different filter." />
+            )
           ) : (
           productGroups.map((group, groupIdx) => (
             <div key={group.title ?? `group-${groupIdx}`} className={groupIdx > 0 ? 'mt-10' : ''}>
