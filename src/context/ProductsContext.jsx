@@ -11,10 +11,14 @@ export function ProductsProvider({ children }) {
   const [dbCategories, setDbCategories] = useState([]);
   const [dbSubcategories, setDbSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Products and categories arrive on separate subscriptions; both must land before
+  // pages treat the catalogue as loaded.
+  const [productsLoaded, setProductsLoaded] = useState(false);
 
   useEffect(() => {
     const unsubProducts = subscribeToAdminProducts((rows) => {
       setDbProducts(rows);
+      setProductsLoaded(true);
     });
     const unsubCategories = subscribeToCategories((rows) => {
       setDbCategories(rows);
@@ -51,14 +55,16 @@ export function ProductsProvider({ children }) {
 
   const subcategories = useMemo(() => dbSubcategories, [dbSubcategories]);
 
+  const isLoading = loading || !productsLoaded;
+
   const value = useMemo(
     () => ({
       products,
       categories,
       subcategories,
-      loading,
+      loading: isLoading,
     }),
-    [products, categories, subcategories, loading]
+    [products, categories, subcategories, isLoading]
   );
 
   return <ProductsContext.Provider value={value}>{children}</ProductsContext.Provider>;
