@@ -70,7 +70,7 @@ export default function SearchBar({ className = '' }) {
         aria-label="Search"
         aria-expanded={open}
         onClick={() => setOpen(true)}
-        className="hover:opacity-80 transition-opacity duration-200"
+        className="flex items-center hover:opacity-80 transition-opacity duration-200"
       >
         <span className="material-symbols-outlined">search</span>
       </button>
