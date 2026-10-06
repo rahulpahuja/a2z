@@ -1,7 +1,8 @@
 // Exchanges a verified MSG91 OTP access token for a Firebase custom token.
 // Only admin phones (ADMIN_PHONES, server-side) receive a token, and it carries
 // the `admin` claim that database.rules.json checks for every admin write.
-import admin from 'firebase-admin';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
 const MSG91_VERIFY_URL = 'https://control.msg91.com/api/v5/widget/verifyAccessToken';
 
@@ -12,13 +13,11 @@ function isAdminPhone(phoneDigits) {
   return allowList.some((adminDigits) => phoneDigits.endsWith(adminDigits) || adminDigits.endsWith(phoneDigits));
 }
 
-function getFirebaseAdmin() {
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-    });
+function getFirebaseAuth() {
+  if (!getApps().length) {
+    initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
   }
-  return admin;
+  return getAuth();
 }
 
 async function verifyMsg91AccessToken(accessToken) {
@@ -68,7 +67,7 @@ export const handler = async (event) => {
 
   try {
     const uid = `msg91:${phoneDigits}`;
-    const token = await getFirebaseAdmin().auth().createCustomToken(uid, { admin: true });
+    const token = await getFirebaseAuth().createCustomToken(uid, { admin: true });
     return json(200, { token });
   } catch (error) {
     console.error('Firebase createCustomToken failed', error);
