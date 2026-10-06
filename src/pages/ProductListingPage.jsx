@@ -1124,7 +1124,7 @@ export default function ProductListingPage() {
                               </span>
                               <span className="font-body-sm text-[0.6875rem] text-on-surface-variant line-through">{formatCurrency(originalPrice)}</span>
                               {discountLabel && (
-                                <span className="px-2 py-0.5 rounded-[32px] bg-error text-on-error font-label-caps text-[0.625rem] shadow-sm">
+                                <span className="font-label-caps text-[0.625rem] text-error font-bold whitespace-nowrap">
                                   {discountLabel}
                                 </span>
                               )}
