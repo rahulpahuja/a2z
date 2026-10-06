@@ -12,12 +12,13 @@ import { logViewCart } from '../services/analytics.js';
 import { formatCouponBadge } from '../utils/coupons.js';
 
 function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove }) {
+  // Phones: thumbnail and details side by side, price and quantity full width below.
   return (
-    <div className="flex flex-col sm:flex-row gap-gutter sm:items-center border-b border-surface-variant pb-gutter">
-      <div className="w-[100px] h-[133px] sm:w-[120px] sm:h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 sm:flex sm:flex-row sm:gap-gutter sm:items-center border-b border-surface-variant pb-gutter">
+      <div className="w-[88px] h-[116px] sm:w-[120px] sm:h-[160px] flex-shrink-0 rounded-[16px] overflow-hidden border border-[rgba(220,174,150,0.3)]">
         <ProductImage className="w-full h-full object-cover" data-alt={item.alt} alt={item.alt} src={item.image} />
       </div>
-      <div className="flex-grow min-w-0 flex flex-col gap-[8px]">
+      <div className="min-w-0 flex flex-col gap-[8px] sm:flex-grow">
         <h3 className="font-title-sm text-title-sm text-on-surface">{item.title}</h3>
         {item.color && <p className="font-body-sm text-body-sm text-on-surface-variant">Color: {item.color}</p>}
         {item.size && <p className="font-body-sm text-body-sm text-on-surface-variant">Size: {item.size}</p>}
@@ -33,7 +34,7 @@ function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove
           </button>
         </div>
       </div>
-      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-4 w-full sm:w-auto">
+      <div className="col-span-2 flex flex-row sm:flex-col items-center sm:items-end justify-between gap-4 w-full sm:w-auto">
         <span className="font-price-display text-price-display text-on-surface">
           {formatCurrency(item.price * item.quantity)}
         </span>
