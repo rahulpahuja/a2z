@@ -36,6 +36,9 @@ export const DEFAULT_THEME = {
   itemsPerPage: 400,
   gridCols: 4,
 
+  // Shown while catalogue data loads: 'shimmer' (animated placeholder) | 'none' (blank)
+  loadingPlaceholder: 'shimmer',
+
   // Product card actions
   addToCartStyle: 'icon',  // 'icon' (default: bag icon over the image, larger photo) | 'button' (Buy Now + Add to Cart buttons)
 
