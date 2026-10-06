@@ -2,5 +2,9 @@ User-agent: *
 Disallow: /__trap__
 Disallow: /super/
 Disallow: /dashboard
+Disallow: /cart
+Disallow: /checkout/
+Disallow: /orders
+Disallow: /profile
 
 Sitemap: https://www.thea2zcollection.com/sitemap.xml
