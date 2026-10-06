@@ -2,7 +2,7 @@
 // so crawlers that don't run JavaScript index the same content users see. The
 // decisions (what a route's head is, what a product's head is) live in src/seo/ and
 // are unit tested there; this file only fetches data and rewrites the response.
-import { resolveRouteSeo } from '../../src/seo/routes.js';
+import { notFoundHead, resolveRouteSeo } from '../../src/seo/routes.js';
 import { buildProductHead } from '../../src/seo/productHead.js';
 import { injectHeadIntoHtml } from '../../src/seo/head.js';
 
@@ -25,7 +25,7 @@ async function resolveProductHead(databaseUrl, id) {
     readRtdb(databaseUrl, `productFaqs/${key}`),
     readRtdb(databaseUrl, `productReviews/${key}`),
   ]);
-  if (!product) return { status: 404, head: null };
+  if (!product) return { status: 404, head: notFoundHead() };
   const faqs = Array.isArray(faqsRaw) ? faqsRaw : Object.values(faqsRaw ?? {});
   const reviews = Object.entries(reviewsRaw ?? {}).map(([reviewId, row]) => ({ id: reviewId, ...row }));
   return { status: 200, head: buildProductHead({ id, ...product }, { faqs, reviews }) };
