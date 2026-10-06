@@ -75,12 +75,6 @@ export default function AnalyticsListener() {
   const { pathname, search } = useLocation();
   const { products } = useProducts();
 
-  // Keeps the browser tab title correct too — reacts to `products` loading
-  // in so a product page's title fills in once its name is available.
-  useEffect(() => {
-    document.title = `${resolvePageName(pathname, products)} – ${SITE_NAME}`;
-  }, [pathname, products]);
-
   // Fires strictly on navigation, not on every unrelated `products` refresh
   // (a live product-stock update, say), which would otherwise send a
   // duplicate page_view unconnected to any real page change.

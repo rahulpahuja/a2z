@@ -95,17 +95,19 @@ export function resolveRouteSeo(pathname) {
   if (path === '/super' || path.startsWith('/super/')) {
     return { status: 200, head: headForRoute(path, hidden(`Admin | ${BRAND_NAME}`)) };
   }
-  // Unknown URL: a real 404 that must not be indexed, and must not inherit the homepage canonical.
+  return { status: 404, head: notFoundHead() };
+}
+
+// Head for a URL that doesn't exist, or a product that isn't in the catalogue. It
+// must not be indexed and must not inherit the homepage canonical from index.html.
+export function notFoundHead() {
   return {
-    status: 404,
-    head: {
-      title: `Page not found | ${BRAND_NAME}`,
-      description: `The page you were looking for could not be found on ${BRAND_NAME}.`,
-      canonical: null,
-      robots: NOINDEX_ROBOTS,
-      ogType: 'website',
-      jsonLd: [],
-      noscript: '',
-    },
+    title: `Page not found | ${BRAND_NAME}`,
+    description: `The page you were looking for could not be found on ${BRAND_NAME}.`,
+    canonical: null,
+    robots: NOINDEX_ROBOTS,
+    ogType: 'website',
+    jsonLd: [],
+    noscript: '',
   };
 }
