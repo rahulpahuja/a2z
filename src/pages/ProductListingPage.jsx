@@ -1103,7 +1103,7 @@ export default function ProductListingPage() {
                         )}
                       </Link>
                       <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
-                        <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold block">
+                        <span className="font-label-caps text-[0.625rem] text-primary/80 uppercase tracking-wider mb-0.5 sm:mb-1 font-semibold hidden sm:block">
                           {product.category || product.categoryTitle}
                         </span>
                         <Link to={`/products/${product.id}`} onClick={() => logSelectItem(product, 'Product Listing')}>
@@ -1115,7 +1115,7 @@ export default function ProductListingPage() {
                           </h2>
                         </Link>
                         <p
-                          className="text-on-surface-variant mb-1 sm:mb-3 line-clamp-1"
+                          className="text-on-surface-variant mb-1 sm:mb-3 line-clamp-1 hidden sm:block"
                           style={{ fontSize: 'var(--custom-font-desc-size, 12px)' }}
                         >
                           {product.description}
