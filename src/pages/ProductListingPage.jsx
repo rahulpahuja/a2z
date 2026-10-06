@@ -163,7 +163,9 @@ export default function ProductListingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState({});
-  const toggleSection = (key) => setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  // A section is collapsed on mobile until the shopper opens it; on desktop it starts open.
+  const isCollapsed = (key) => collapsedSections[key] ?? isMobileViewport;
+  const toggleSection = (key) => setCollapsedSections((prev) => ({ ...prev, [key]: !(prev[key] ?? isMobileViewport) }));
   const [mobileViewMode, setMobileViewMode] = useState('grid'); // 'list' | 'grid' — mobile-only layout toggle
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
 
@@ -640,10 +642,10 @@ export default function ProductListingPage() {
             >
               Category
               <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                {collapsedSections.category ? 'add' : 'remove'}
+                {isCollapsed('category') ? 'add' : 'remove'}
               </span>
             </h3>
-            <div className={collapsedSections.category ? 'hidden' : 'space-y-3'}>
+            <div className={isCollapsed('category') ? 'hidden' : 'space-y-3'}>
               {categoryOptions.map((category) => (
                 <label key={category} className="flex items-center gap-3 cursor-pointer group">
                   <input
@@ -672,10 +674,10 @@ export default function ProductListingPage() {
               >
                 Gender
                 <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                  {collapsedSections.gender ? 'add' : 'remove'}
+                  {isCollapsed('gender') ? 'add' : 'remove'}
                 </span>
               </h3>
-              <div className={collapsedSections.gender ? 'hidden' : 'space-y-3'}>
+              <div className={isCollapsed('gender') ? 'hidden' : 'space-y-3'}>
                 {['All', 'Male', 'Female', 'Unisex'].map((genderOption) => (
                   <label key={genderOption} className="flex items-center gap-3 cursor-pointer group">
                     <input
@@ -705,10 +707,10 @@ export default function ProductListingPage() {
               >
                 Subcategory
                 <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                  {collapsedSections.subcategory ? 'add' : 'remove'}
+                  {isCollapsed('subcategory') ? 'add' : 'remove'}
                 </span>
               </h3>
-              <div className={collapsedSections.subcategory ? 'hidden' : 'space-y-3'}>
+              <div className={isCollapsed('subcategory') ? 'hidden' : 'space-y-3'}>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={activeSubcategory === 'All'}
@@ -749,10 +751,10 @@ export default function ProductListingPage() {
               >
                 Collection
                 <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                  {collapsedSections.collection ? 'add' : 'remove'}
+                  {isCollapsed('collection') ? 'add' : 'remove'}
                 </span>
               </h3>
-              <div className={collapsedSections.collection ? 'hidden' : 'space-y-3'}>
+              <div className={isCollapsed('collection') ? 'hidden' : 'space-y-3'}>
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input
                     checked={!selectedCollectionId}
@@ -794,10 +796,10 @@ export default function ProductListingPage() {
             >
               Price Range
               <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                {collapsedSections.price ? 'add' : 'remove'}
+                {isCollapsed('price') ? 'add' : 'remove'}
               </span>
             </h3>
-            <div className={collapsedSections.price ? 'hidden' : 'pt-1 space-y-4'}>
+            <div className={isCollapsed('price') ? 'hidden' : 'pt-1 space-y-4'}>
               <div className="flex items-center justify-between text-xs font-semibold text-primary">
                 <span>Min: ₹{minPrice.toLocaleString('en-IN')}</span>
                 <span>Max: ₹{maxPrice.toLocaleString('en-IN')}</span>
@@ -865,10 +867,10 @@ export default function ProductListingPage() {
             >
               Color
               <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                {collapsedSections.color ? 'add' : 'remove'}
+                {isCollapsed('color') ? 'add' : 'remove'}
               </span>
             </h3>
-            <div className={collapsedSections.color ? 'hidden' : 'flex flex-wrap gap-3'}>
+            <div className={isCollapsed('color') ? 'hidden' : 'flex flex-wrap gap-3'}>
               {COLORS.map((color) => {
                 const isSelected = selectedColor === color.id;
                 return (
@@ -899,10 +901,10 @@ export default function ProductListingPage() {
             >
               Size
               <span className="material-symbols-outlined text-on-surface-variant text-sm">
-                {collapsedSections.size ? 'add' : 'remove'}
+                {isCollapsed('size') ? 'add' : 'remove'}
               </span>
             </h3>
-            <div className={collapsedSections.size ? 'hidden' : 'flex flex-wrap gap-2'}>
+            <div className={isCollapsed('size') ? 'hidden' : 'flex flex-wrap gap-2'}>
               {SIZES.map((size) => {
                 const isSelected = selectedSize === size.id;
                 return (
@@ -1065,7 +1067,7 @@ export default function ProductListingPage() {
                             event.preventDefault();
                             toggleFavorite(product.id);
                           }}
-                          className={`absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
+                          className={`absolute top-3 right-3 z-10 a2z-card-action rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-colors shadow-sm ${isFavorited ? 'text-primary' : 'text-on-surface hover:text-primary'}`}
                         >
                           <span className="material-symbols-outlined" data-weight={isFavorited ? 'fill' : undefined}>
                             {isFavorited ? 'favorite' : 'favorite_border'}
@@ -1088,9 +1090,9 @@ export default function ProductListingPage() {
                                 size: null,
                               });
                             }}
-                            className="absolute top-16 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm"
+                            className="absolute right-3 z-10 a2z-card-action a2z-card-action-bag rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm"
                           >
-                            <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
+                            <span className="material-symbols-outlined">shopping_bag</span>
                           </button>
                         )}
                       </Link>
