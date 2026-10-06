@@ -319,7 +319,7 @@ export default function ProductDetailPage() {
               scale: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
               y: { type: 'spring', duration: 0.6, bounce: 0.25 },
             }}
-            className="relative w-full bg-surface-container overflow-hidden group"
+            className="relative w-full max-h-[65vh] md:max-h-none bg-surface-container overflow-hidden group"
             style={{
               aspectRatio: 'var(--custom-detail-img-aspect, 3/4)',
               borderRadius: 'var(--custom-border-radius, 12px)',
