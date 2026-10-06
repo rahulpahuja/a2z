@@ -30,31 +30,31 @@
     },
     "adminProducts": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "trashedProducts": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      ".read": "auth.token.admin === true",
+      ".write": "auth.token.admin === true"
     },
     "categories": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "collections": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "subcategories": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "settings": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "fileMetadata": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      ".read": "auth.token.admin === true",
+      ".write": "auth.token.admin === true"
     },
     "orders": {
       ".read": "auth != null",
@@ -78,20 +78,20 @@
       }
     },
     "referrers": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      ".read": "auth.token.admin === true",
+      ".write": "auth.token.admin === true"
     },
     "jobs": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "feedback": {
-      ".read": "auth != null",
+      ".read": "auth.token.admin === true",
       ".write": true
     },
     "productFaqs": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth.token.admin === true"
     },
     "productReviews": {
       ".read": true,
@@ -113,7 +113,7 @@
       }
     },
     "checkoutFailures": {
-      ".read": "auth != null",
+      ".read": "auth.token.admin === true",
       ".write": true
     },
     ".read": false,
