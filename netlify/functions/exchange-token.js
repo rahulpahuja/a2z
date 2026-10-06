@@ -27,9 +27,16 @@ async function verifyMsg91AccessToken(accessToken) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ authkey: process.env.MSG91_AUTH_KEY, 'access-token': accessToken }),
   });
-  if (!response.ok) return null;
-  const data = await response.json();
-  return data?.type === 'success' ? data : null;
+  const text = await response.text();
+  console.error('MSG91 verifyAccessToken', response.status, text);
+  const data = (() => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  })();
+  return response.ok && data?.type === 'success' ? data : null;
 }
 
 const json = (statusCode, body) => ({
@@ -56,9 +63,15 @@ export const handler = async (event) => {
   const verified = await verifyMsg91AccessToken(accessToken);
   // Fail closed: the verified identifier must be present and must be this phone.
   const verifiedDigits = digitsOnly(verified?.mobile ?? verified?.identifier);
-  if (!verified || verifiedDigits !== phoneDigits) return json(401, { error: 'OTP verification failed' });
+  if (!verified) return json(401, { error: 'OTP verification failed', reason: 'msg91_rejected' });
+  if (verifiedDigits !== phoneDigits) return json(401, { error: 'OTP verification failed', reason: 'msg91_phone_mismatch' });
 
-  const uid = `msg91:${phoneDigits}`;
-  const token = await getFirebaseAdmin().auth().createCustomToken(uid, { admin: true });
-  return json(200, { token });
+  try {
+    const uid = `msg91:${phoneDigits}`;
+    const token = await getFirebaseAdmin().auth().createCustomToken(uid, { admin: true });
+    return json(200, { token });
+  } catch (error) {
+    console.error('Firebase createCustomToken failed', error);
+    return json(500, { error: 'Token creation failed', reason: 'firebase_error' });
+  }
 };
