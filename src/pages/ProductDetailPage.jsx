@@ -6,6 +6,7 @@ import ProfileButton from '../components/ProfileButton.jsx';
 import VideoPlayer from '../components/VideoPlayer.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 import { ProductDetailSkeleton } from '../components/Shimmer.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
 import { logViewItem } from '../services/analytics.js';
@@ -25,7 +26,7 @@ import { subscribeToProductFaqs } from '../services/productFaqs.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
 import { buildProductHead } from '../seo/productHead.js';
 import { applyDocumentHead } from '../seo/head.js';
-import { notFoundHead } from '../seo/routes.js';
+import { SITE_URL, notFoundHead } from '../seo/routes.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -118,6 +119,7 @@ export default function ProductDetailPage() {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { products: allProducts, loading } = useProducts();
+  const { showToast } = useToast();
   const product = allProducts.find((p) => p.id === id) || null;
 
   const [selectedThumbnail, setSelectedThumbnail] = useState(0);
@@ -256,6 +258,27 @@ export default function ProductDetailPage() {
     alt: product.alt,
   });
 
+  // Shares the product's public URL: the native share sheet where the device has one,
+  // otherwise copies the link.
+  const handleShare = async () => {
+    const url = `${SITE_URL}/products/${encodeURIComponent(product.id)}`;
+    const title = product.name || product.title;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {
+        // The shopper dismissed the share sheet.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('Product link copied to clipboard.');
+    } catch {
+      showToast('Could not copy the link. Please try again.');
+    }
+  };
+
   const handleAddToCart = () => addItem(cartLine(), quantity);
   const handleBuyNow = () => {
     addItem(cartLine(), quantity);
@@ -279,7 +302,7 @@ export default function ProductDetailPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+          className="order-first md:col-span-12 flex items-center gap-2 self-start font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
         >
           <span className="material-symbols-outlined text-[1.25rem]">arrow_back</span>
           Back
@@ -377,14 +400,25 @@ export default function ProductDetailPage() {
         </section>
 
         {/* Right: Product Info (40% -> 5 columns) */}
-        <section className="md:col-span-5 flex flex-col gap-6">
+        {/* On phones the title, price and buy actions come straight after Back, above the photo gallery. */}
+        <section className="order-first md:order-none md:col-span-5 flex flex-col gap-6">
           {/* Title & Description */}
           <div className="flex flex-col gap-2 border-b border-outline-variant/30 pb-6">
             <div className="flex justify-between items-start">
               <span className="font-label-caps text-label-caps text-secondary uppercase tracking-widest">{product.category}</span>
-              {product.badge && (
-                <span className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
-              )}
+              <div className="flex items-center gap-3">
+                {product.badge && (
+                  <span className="bg-primary-container text-on-primary-container font-label-caps text-[0.625rem] px-3 py-1 rounded-full font-bold uppercase tracking-widest">{product.badge}</span>
+                )}
+                <button
+                  type="button"
+                  aria-label="Share this product"
+                  onClick={handleShare}
+                  className="text-on-surface-variant hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined">share</span>
+                </button>
+              </div>
             </div>
             <motion.h1
               key={product.id}
