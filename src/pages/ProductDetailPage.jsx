@@ -16,6 +16,12 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
 import { getPriceBreakdown } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
+import StarRating from '../components/StarRating.jsx';
+import ProductReviews from '../components/ProductReviews.jsx';
+import ProductFaqs from '../components/ProductFaqs.jsx';
+import { subscribeToProductReviews } from '../services/productReviews.js';
+import { subscribeToProductFaqs } from '../services/productFaqs.js';
+import { summarizeReviews } from '../utils/reviewStats.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -115,6 +121,8 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
   const [viewCount, setViewCount] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   // Bumped when the discount countdown expires, to force the price below
   // (computed fresh each render from the real clock) to re-evaluate and
   // revert without a page reload.
@@ -150,6 +158,18 @@ export default function ProductDetailPage() {
     return unsubscribe;
   }, [product?.id]);
 
+  useEffect(() => {
+    if (!product) return undefined;
+    setReviews([]);
+    setFaqs([]);
+    const unsubscribeReviews = subscribeToProductReviews(product.id, (rows) => setReviews(rows));
+    const unsubscribeFaqs = subscribeToProductFaqs(product.id, (rows) => setFaqs(rows));
+    return () => {
+      unsubscribeReviews();
+      unsubscribeFaqs();
+    };
+  }, [product?.id]);
+
   if (!product) {
     return <ProductNotFound />;
   }
@@ -163,6 +183,7 @@ export default function ProductDetailPage() {
   ];
   const mainMedia = media[selectedThumbnail] ?? media[0];
   const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+  const reviewSummary = summarizeReviews(reviews);
 
   const availableColors =
     product.colors && product.colors.length > 0
@@ -368,21 +389,13 @@ export default function ProductDetailPage() {
                 <span className="font-body-sm text-body-sm">{viewCount.toLocaleString('en-IN')} people viewed this</span>
               </div>
             )}
-            {product.rating && (
-              <div className="flex items-center gap-2 mt-2">
-                <div className="flex text-tertiary-container text-sm">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className="material-symbols-outlined"
-                      style={{ fontVariationSettings: i < Math.round(product.rating) ? "'FILL' 1" : "'FILL' 0" }}
-                    >
-                      star
-                    </span>
-                  ))}
-                </div>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">{product.rating}/5</span>
-              </div>
+            {reviewSummary.count > 0 && (
+              <a href="#reviews" className="flex items-center gap-2 mt-2 font-body-sm text-body-sm text-on-surface-variant hover:underline">
+                <StarRating value={reviewSummary.average} size="text-sm" />
+                <span>
+                  {reviewSummary.average.toFixed(1)} · {reviewSummary.count} {reviewSummary.count === 1 ? 'rating' : 'ratings'}
+                </span>
+              </a>
             )}
           </div>
 
@@ -600,6 +613,12 @@ export default function ProductDetailPage() {
               </div>
             </div>
           </div>
+
+          <section id="reviews" className="mb-16 scroll-mt-24">
+            <ProductReviews productId={product.id} reviews={reviews} />
+          </section>
+
+          <ProductFaqs faqs={faqs} />
 
           {/* Related Products */}
           <section className="py-8">

@@ -85,6 +85,29 @@
       ".read": "auth != null",
       ".write": true
     },
+    "productFaqs": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "productReviews": {
+      ".read": true,
+      "$productId": {
+        "$reviewId": {
+          ".write": "auth != null || (!data.exists() && newData.exists())",
+          ".validate": "newData.hasChildren(['name', 'rating', 'title', 'body', 'helpful', 'createdAtMs']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 60 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('rating').val() % 1 == 0 && newData.child('title').isString() && newData.child('title').val().length <= 100 && newData.child('body').isString() && newData.child('body').val().length >= 10 && newData.child('body').val().length <= 2000 && newData.child('createdAtMs').isNumber()",
+          "helpful": {
+            ".write": true,
+            ".validate": "newData.isNumber() && ((!data.exists() && newData.val() == 0) || (data.exists() && newData.val() == data.val() + 1))"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
     "checkoutFailures": {
       ".read": "auth != null",
       ".write": true
