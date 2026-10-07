@@ -533,41 +533,46 @@ export default function ProductListingPage() {
             </span>
           </div>
         </div>
-        <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden flex-wrap mt-4 md:mt-0 items-center gap-3">
-          {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
-          {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('desktop')}
-          {genderFilterOnTop && renderGenderQuickFilter('desktop')}
-          {collectionFilterOnTop && publishedCollections.length > 0 && renderCollectionQuickFilter('desktop')}
-          {priceFilterOnTop && renderPriceQuickFilter('desktop')}
-          {colorFilterOnTop && renderColorQuickFilter('desktop')}
-          {sizeFilterOnTop && renderSizeQuickFilter('desktop')}
-          <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
-          <div className="relative">
-            <select
-              className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
-              id="sort-by"
-              value={sortSelectValue}
-              onChange={(e) => handleSortSelectChange(e.target.value)}
+      </div>
+      {/* Desktop sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
+      <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface dark:bg-surface-container-highest border-b border-surface-variant">
+        <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-3">
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
+            {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('desktop')}
+            {genderFilterOnTop && renderGenderQuickFilter('desktop')}
+            {collectionFilterOnTop && publishedCollections.length > 0 && renderCollectionQuickFilter('desktop')}
+            {priceFilterOnTop && renderPriceQuickFilter('desktop')}
+            {colorFilterOnTop && renderColorQuickFilter('desktop')}
+            {sizeFilterOnTop && renderSizeQuickFilter('desktop')}
+            <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
+            <div className="relative">
+              <select
+                className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                id="sort-by"
+                value={sortSelectValue}
+                onChange={(e) => handleSortSelectChange(e.target.value)}
+              >
+                <option value="newest">Newest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="popular">Popularity</option>
+                <optgroup label="Gender">
+                  <option value={`${GENDER_SORT_PREFIX}Male`}>Male / Men</option>
+                  <option value={`${GENDER_SORT_PREFIX}Female`}>Female / Women</option>
+                  <option value={`${GENDER_SORT_PREFIX}Unisex`}>Unisex</option>
+                </optgroup>
+              </select>
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+            </div>
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
             >
-              <option value="newest">Newest</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="popular">Popularity</option>
-              <optgroup label="Gender">
-                <option value={`${GENDER_SORT_PREFIX}Male`}>Male / Men</option>
-                <option value={`${GENDER_SORT_PREFIX}Female`}>Female / Women</option>
-                <option value={`${GENDER_SORT_PREFIX}Unisex`}>Unisex</option>
-              </optgroup>
-            </select>
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+              Clear Filters
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={clearAllFilters}
-            className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
-          >
-            Clear Filters
-          </button>
         </div>
       </div>
 
