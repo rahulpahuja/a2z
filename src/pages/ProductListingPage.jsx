@@ -1107,12 +1107,6 @@ export default function ProductListingPage() {
                             {product.name || product.title}
                           </h2>
                         </Link>
-                        <p
-                          className="text-on-surface-variant mb-1 sm:mb-3 line-clamp-1 hidden sm:block"
-                          style={{ fontSize: 'var(--custom-font-desc-size, 12px)' }}
-                        >
-                          {product.description}
-                        </p>
                         {hasDiscount ? (
                           <div className="mt-auto flex flex-col justify-between">
                             <div className="flex items-baseline gap-2">
