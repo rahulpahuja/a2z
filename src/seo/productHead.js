@@ -8,7 +8,11 @@ const REVIEW_SNIPPETS = 5;
 
 const truncate = (text, max) => {
   const clean = String(text ?? '').replace(/\s+/g, ' ').trim();
-  return clean.length > max ? `${clean.slice(0, max - 1).trimEnd()}…` : clean;
+  if (clean.length <= max) return clean;
+  // Cut at a word boundary so the snippet never ends mid-word.
+  const cut = clean.slice(0, max - 1);
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${(lastSpace > max / 2 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
 };
 
 const isoDate = (ms) => (ms ? new Date(ms).toISOString() : undefined);
@@ -30,7 +34,8 @@ export function buildProductHead(product, { faqs = [], reviews = [], now = new D
   const colors = normalizeColors(product.colors, product.sizes);
   const inStock = !product.outOfStock && (colors.length === 0 || colors.some((c) => !isColorOutOfStock(c)));
   const description = truncate(product.description || `Shop ${name} from ${BRAND_NAME}.`, DESCRIPTION_MAX);
-  const image = [...(product.images ?? []), product.image].find((src) => typeof src === 'string' && src.startsWith('http'));
+  const images = [...new Set([...(product.images ?? []), product.image].filter((src) => typeof src === 'string' && src.startsWith('http')))];
+  const image = images[0];
   const summary = summarizeReviews(reviews);
 
   const productSchema = {
@@ -42,7 +47,7 @@ export function buildProductHead(product, { faqs = [], reviews = [], now = new D
     brand: { '@type': 'Brand', name: BRAND_NAME },
     category: product.categoryTitle || product.category || undefined,
     sku: product.sku || undefined,
-    ...(image ? { image } : {}),
+    ...(images.length > 0 ? { image: images } : {}),
     offers: {
       '@type': 'Offer',
       url,

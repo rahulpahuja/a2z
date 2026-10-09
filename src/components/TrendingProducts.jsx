@@ -6,6 +6,7 @@ import { getDiscountedPrice } from '../utils/discount.js';
 import { subscribeToTopProducts } from '../services/productStats.js';
 import ProductCardImage from './ProductCardImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
+import { getProductAlt } from '../utils/productImages.js';
 
 const TABS = [
   { key: 'views', label: 'Most Viewed', statLabel: 'views', icon: 'visibility' },
@@ -105,7 +106,7 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
                     images={product.images && product.images.length > 0 ? product.images : [product.image]}
                     alts={product.imageAlts}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius"
-                    alt={product.alt}
+                    alt={getProductAlt(product)}
                   />
                   <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-surface/90 backdrop-blur text-on-surface px-2.5 py-1 rounded-full font-label-caps text-[0.625rem] md:text-label-caps flex items-center gap-1">
                     <span className="material-symbols-outlined text-[0.8125rem] md:text-[0.875rem]">{tab.icon}</span>

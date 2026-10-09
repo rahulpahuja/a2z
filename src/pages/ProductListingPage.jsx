@@ -18,6 +18,7 @@ import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
 import { logViewItemList, logSelectItem } from '../services/analytics.js';
 import './ProductListingPage.css';
+import { getProductAlt } from '../utils/productImages.js';
 
 const COLORS = [
   { id: 'red', label: 'Red', className: 'bg-red-600' },
@@ -1014,7 +1015,7 @@ export default function ProductListingPage() {
                       title: product.name || product.title,
                       price: discountedPrice,
                       image: product.image,
-                      alt: product.alt,
+                      alt: getProductAlt(product),
                       categoryId: product.categoryId,
                       subcategoryId: product.subcategoryId,
                       color: null,
@@ -1050,7 +1051,7 @@ export default function ProductListingPage() {
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
                           alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                          alt={product.alt}
+                          alt={getProductAlt(product)}
                         />
                         {!isAvailable && (
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
@@ -1088,7 +1089,7 @@ export default function ProductListingPage() {
                                 title: product.name || product.title,
                                 price: discountedPrice,
                                 image: product.image,
-                                alt: product.alt,
+                                alt: getProductAlt(product),
                                 categoryId: product.categoryId,
                                 subcategoryId: product.subcategoryId,
                                 color: null,
@@ -1167,7 +1168,7 @@ export default function ProductListingPage() {
                                 title: product.name || product.title,
                                 price: discountedPrice,
                                 image: product.image,
-                                alt: product.alt,
+                                alt: getProductAlt(product),
                                 categoryId: product.categoryId,
                                 subcategoryId: product.subcategoryId,
                                 color: null,

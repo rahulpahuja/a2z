@@ -1,3 +1,6 @@
+// Alt text for a product's primary image: the admin-written one when set, else the product name.
+export const getProductAlt = (product) => product.alt || product.title || product.name || '';
+
 export function getR2KeyFromUrl(url) {
   try {
     const parsed = new URL(url);

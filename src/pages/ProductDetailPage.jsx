@@ -27,6 +27,7 @@ import { summarizeReviews } from '../utils/reviewStats.js';
 import { buildProductHead } from '../seo/productHead.js';
 import { applyDocumentHead } from '../seo/head.js';
 import { SITE_URL, notFoundHead } from '../seo/routes.js';
+import { getProductAlt } from '../utils/productImages.js';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -255,7 +256,7 @@ export default function ProductDetailPage() {
     size: selectedSize,
     price: discountedPrice,
     image: images[0],
-    alt: product.alt,
+    alt: getProductAlt(product),
   });
 
   // Shares the product's public URL: the native share sheet where the device has one,
@@ -689,7 +690,7 @@ export default function ProductDetailPage() {
                     <ProductCardImage
                       images={related.images && related.images.length > 0 ? related.images : [related.image]}
                       alts={related.imageAlts}
-                      alt={related.alt}
+                      alt={getProductAlt(related)}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                     />
                     {related.badge && (

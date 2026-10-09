@@ -8,6 +8,7 @@ import ProductCardImage from './ProductCardImage.jsx';
 import ProductImage from './ProductImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
 import { isProductAvailable } from '../utils/productColors.js';
+import { getProductAlt } from '../utils/productImages.js';
 
 function CollectionRow({ collection, products }) {
   const scrollRef = useRef(null);
@@ -63,7 +64,7 @@ function CollectionRow({ collection, products }) {
                     images={product.images && product.images.length > 0 ? product.images : [product.image]}
                     alts={product.imageAlts}
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                    alt={product.alt}
+                    alt={getProductAlt(product)}
                   />
                   {!isAvailable && (
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
