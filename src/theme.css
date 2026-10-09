@@ -45,6 +45,8 @@
   --color-inverse-primary: #ffb0d0;
   --color-tertiary-fixed-dim: #ecbda4;
   --color-surface: #fcf9f8c0;
+  /* Opaque twin of --color-surface for sticky bars, so scrolled content can't show through. */
+  --color-surface-solid: #fcf9f8;
   --color-on-tertiary-container: #4d2f1e;
   --color-on-secondary-fixed: #0b2000;
   --color-surface-dim: #dcd9d999;
