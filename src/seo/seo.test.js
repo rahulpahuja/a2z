@@ -178,3 +178,18 @@ describe('page meta overrides', () => {
     expect(pageMetaKey('/return-exchange-policy')).toBe('return-exchange-policy');
   });
 });
+
+describe('product head descriptions and images', () => {
+  it('cuts long descriptions at a word boundary', () => {
+    const description = `${'tailored '.repeat(30)}fit`;
+    const { description: out } = buildProductHead({ ...product, description });
+    expect(out.endsWith('…')).toBe(true);
+    expect(out.length).toBeLessThanOrEqual(160);
+    expect(out.slice(0, -1).endsWith('tailored')).toBe(true);
+  });
+
+  it('lists every product image in the structured data', () => {
+    const { jsonLd } = buildProductHead({ ...product, images: ['https://cdn.example.com/a.jpg', 'https://cdn.example.com/b.jpg'] });
+    expect(jsonLd[0].image).toEqual(['https://cdn.example.com/a.jpg', 'https://cdn.example.com/b.jpg']);
+  });
+});

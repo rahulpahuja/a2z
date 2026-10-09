@@ -20,6 +20,7 @@ import EmptySegment from '../components/EmptySegment.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import { getDiscountedPrice } from '../utils/discount.js';
 import './HomePage.css';
+import { getProductAlt } from '../utils/productImages.js';
 
 // Product slices are computed inside the component using the useProducts hook
 
@@ -243,6 +244,7 @@ export default function HomePage() {
       </header>
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
       <main className="w-full max-w-full overflow-x-clip">
+        <h1 className="sr-only">A2Z Collection: co-ord sets, jeans, jackets and footwear from Indore</h1>
         {/* Hero Carousel */}
         <section onClick={dismissBannerHint} className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
           <div
@@ -420,7 +422,7 @@ export default function HomePage() {
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
                           alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                          alt={product.alt}
+                          alt={getProductAlt(product)}
                         />
                         {!isAvailable && (
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
@@ -527,7 +529,7 @@ export default function HomePage() {
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
                           alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                          alt={product.alt}
+                          alt={getProductAlt(product)}
                         />
                         {!isAvailable && (
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
@@ -588,25 +590,27 @@ export default function HomePage() {
         </section>
 
         {/* Video Grid Lookbook Section */}
-        <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full max-w-full overflow-hidden">
-          <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-center mb-2 md:mb-4">
-            Stories in Motion
-          </h2>
-          <p className="font-body-sm text-body-sm md:font-body-lg md:text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-8 md:mb-12 px-2">
-            Hover over our lookbooks to witness traditional craftsmanship come to life.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-gutter w-full max-w-full">
-            {(theme.lookbookVideos || []).map((video, idx) => (
-              <VideoCard
-                key={video.id || idx}
-                src={video.src}
-                poster={video.poster || productsRow1[idx % productsRow1.length]?.image}
-                title={video.title}
-                description={video.description}
-              />
-            ))}
-          </div>
-        </section>
+        {(theme.lookbookVideos ?? []).length > 0 && (
+          <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full max-w-full overflow-hidden">
+            <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-center mb-2 md:mb-4">
+              Stories in Motion
+            </h2>
+            <p className="font-body-sm text-body-sm md:font-body-lg md:text-body-lg text-on-surface-variant text-center max-w-xl mx-auto mb-8 md:mb-12 px-2">
+              Hover over our lookbooks to witness traditional craftsmanship come to life.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-gutter w-full max-w-full">
+              {theme.lookbookVideos.map((video, idx) => (
+                <VideoCard
+                  key={video.id || idx}
+                  src={video.src}
+                  poster={video.poster || productsRow1[idx % productsRow1.length]?.image}
+                  title={video.title}
+                  description={video.description}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <SiteFooter />
     </>

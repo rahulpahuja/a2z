@@ -10,6 +10,7 @@ import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { isProductAvailable } from '../utils/productColors.js';
+import { getProductAlt } from '../utils/productImages.js';
 
 const categories = [
   {
@@ -94,7 +95,7 @@ function ProductCard({ product }) {
       <Link to={`/products/${product.id}`} className="relative aspect-[3/4] w-full overflow-hidden rounded-t-xl bg-surface-variant block">
         <ProductImage
           className={`object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-          alt={product.alt}
+          alt={getProductAlt(product)}
           src={product.src}
         />
         {!isAvailable && (
@@ -143,7 +144,7 @@ function ProductCard({ product }) {
                   title: product.name,
                   price: product.priceValue,
                   image: product.src,
-                  alt: product.alt,
+                  alt: getProductAlt(product),
                   categoryId: product.categoryId,
                   subcategoryId: product.subcategoryId,
                   color: null,
@@ -190,7 +191,7 @@ export default function StorefrontPage() {
   const { products: allProducts } = useProducts();
   const products = allProducts.slice(4, 8).map((product) => ({
     id: product.id,
-    alt: product.alt,
+    alt: getProductAlt(product),
     src: product.image,
     badge: product.badge ? { label: product.badge, ...BADGE_STYLES[product.badge] } : null,
     name: product.name || product.title,
