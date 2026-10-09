@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { resolveRouteSeo, SITE_URL } from './routes.js';
 import { buildProductHead } from './productHead.js';
+import { buildCollectionHead } from './collectionHead.js';
 import { injectHeadIntoHtml, renderHeadTags } from './head.js';
 import { applyPageMeta, hasNoindex, pageMetaKey, sanitizeMetaTags } from './pageMeta.js';
 
@@ -199,5 +200,23 @@ describe('hasNoindex', () => {
     expect(hasNoindex({ metaTags: [{ attr: 'name', key: 'robots', content: 'noindex, follow' }] })).toBe(true);
     expect(hasNoindex({ metaTags: [{ attr: 'name', key: 'keywords', content: 'noindex' }] })).toBe(false);
     expect(hasNoindex(undefined)).toBe(false);
+  });
+});
+
+describe('buildCollectionHead', () => {
+  const collection = { id: '-Nabc', name: 'Festive <Edit>', published: true };
+
+  it('builds an indexable head with a canonical, cover image and escaped crawlable copy', () => {
+    const head = buildCollectionHead(collection, { image: 'https://cdn.example.com/cover.webp' });
+    expect(head.title).toBe('Festive <Edit> | A2Z Collection');
+    expect(head.canonical).toBe(`${SITE_URL}/collections/-Nabc`);
+    expect(head.robots).toBe('index, follow');
+    expect(head.ogImage).toBe('https://cdn.example.com/cover.webp');
+    expect(head.jsonLd.map((item) => item['@type'])).toEqual(['CollectionPage', 'BreadcrumbList']);
+    expect(head.noscript).toContain('<h1>Festive &lt;Edit&gt;</h1>');
+  });
+
+  it('omits a cover that is not an absolute URL', () => {
+    expect(buildCollectionHead(collection, { image: '/local.webp' }).ogImage).toBeUndefined();
   });
 });

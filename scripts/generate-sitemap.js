@@ -63,6 +63,15 @@ async function fetchNoindexedPaths(databaseUrl) {
   return new Set(listIndexableRoutes().filter(({ path: route }) => hasNoindex(overrides[pageMetaKey(route)])).map(({ path: route }) => route));
 }
 
+async function fetchPublishedCollections(databaseUrl) {
+  const res = await fetch(`${databaseUrl}/collections.json`);
+  if (!res.ok) throw new Error(`Firebase REST read failed with status ${res.status}`);
+  const data = (await res.json()) ?? {};
+  return Object.entries(data)
+    .map(([id, collection]) => ({ id, ...collection }))
+    .filter((collection) => collection.published && Object.keys(collection.productIds ?? {}).length > 0);
+}
+
 function urlEntry(loc, { lastmod, images = [] } = {}) {
   return [
     '  <url>',
@@ -96,6 +105,13 @@ async function main() {
       );
     }
     console.log(`generate-sitemap: included ${products.length} product page(s).`);
+
+    // Collapsed or not, a published collection has its own page worth indexing.
+    const collections = await fetchPublishedCollections(databaseUrl).catch(() => []);
+    for (const collection of collections) {
+      entries.push(urlEntry(`${SITE_URL}/collections/${encodeURIComponent(collection.id)}`, { images: collection.coverImage ? [collection.coverImage] : [] }));
+    }
+    console.log(`generate-sitemap: included ${collections.length} collection page(s).`);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${entries.join('\n')}\n</urlset>\n`;

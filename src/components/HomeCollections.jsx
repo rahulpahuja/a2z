@@ -2,32 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { subscribeToCollections } from '../services/collections.js';
 import { useProducts } from '../context/ProductsContext.jsx';
-import { formatCurrency } from '../context/CartContext.jsx';
-import { getDiscountedPrice } from '../utils/discount.js';
-import ProductCardImage from './ProductCardImage.jsx';
 import ProductImage from './ProductImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
-import { isProductAvailable } from '../utils/productColors.js';
-import { getProductAlt } from '../utils/productImages.js';
-import { logSelectItem } from '../services/analytics.js';
+import ProductCard from './ProductCard.jsx';
+import { logSelectPromotion } from '../services/analytics.js';
+import { collectionPath, getCollectionProducts, groupCollectionsForHome, resolveCollectionCover } from '../utils/collections.js';
 
 function CollectionRow({ collection, products }) {
   const scrollRef = useRef(null);
-  const heroProduct = products.find((p) => p.id === collection.heroProductId);
-  const collectionProducts = collection.productIds
-    .map((id) => products.find((p) => p.id === id))
-    .filter(Boolean);
+  const cover = resolveCollectionCover(collection, products);
+  const collectionProducts = getCollectionProducts(collection, products);
 
   return (
     <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
       <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-8 md:mb-12 px-2">
-        {heroProduct && (
+        {cover && (
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-primary shrink-0">
-            <ProductImage
-              src={(heroProduct.images && heroProduct.images[0]) || heroProduct.image}
-              alt={heroProduct.name || heroProduct.title}
-              className="w-full h-full object-cover"
-            />
+            <ProductImage src={cover.src} alt={cover.alt} className="w-full h-full object-cover" />
           </div>
         )}
         <h2 className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-center truncate">
@@ -52,38 +43,11 @@ function CollectionRow({ collection, products }) {
           ref={scrollRef}
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
-          {collectionProducts.map((product) => {
-            const isAvailable = isProductAvailable(product);
-            return (
+          {collectionProducts.map((product) => (
             <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
-              <Link
-                to={`/products/${product.id}`}
-                onClick={() => logSelectItem(product, `Home - ${collection.name}`)}
-                className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
-              >
-                <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
-                  <ProductCardImage
-                    images={product.images && product.images.length > 0 ? product.images : [product.image]}
-                    alts={product.imageAlts}
-                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
-                    alt={getProductAlt(product)}
-                  />
-                  {!isAvailable && (
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
-                      <span className="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded-full uppercase tracking-wider font-bold shadow-md text-xs">
-                        Out of Stock
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-3.5 md:p-4 flex flex-col gap-1.5 md:gap-2 mt-auto">
-                  <h3 className="font-title-sm text-sm md:text-title-sm text-on-surface truncate">{product.name || product.title}</h3>
-                  <p className="font-price-display text-base md:text-price-display text-primary">{formatCurrency(getDiscountedPrice(product))}</p>
-                </div>
-              </Link>
+              <ProductCard product={product} listName={`Home - ${collection.name}`} />
             </div>
-            );
-          })}
+          ))}
         </div>
 
         <button
@@ -100,10 +64,42 @@ function CollectionRow({ collection, products }) {
   );
 }
 
-// Renders every admin-published Collection as its own homepage section — a
-// hero-product thumbnail + collection name heading, followed by a horizontal
-// scroll row of that collection's products. Built only from the existing
-// product catalog, so nothing here can reference a deleted/unknown product.
+// A collapsed collection: one cover tile with its name over it. Opens the collection's own page.
+function CollectionTiles({ collections, products }) {
+  return (
+    <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-gutter">
+        {collections.map((collection) => {
+          const cover = resolveCollectionCover(collection, products);
+          return (
+            <Link
+              key={collection.id}
+              to={collectionPath(collection)}
+              onClick={() => logSelectPromotion(collection.name, collectionPath(collection))}
+              className="group relative block aspect-[3/4] rounded-xl overflow-hidden bg-surface-variant border border-tertiary-container/30"
+            >
+              {cover && (
+                <ProductImage
+                  src={cover.src}
+                  alt={cover.alt}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-transparent" />
+              <h2 className="absolute top-0 inset-x-0 p-4 md:p-5 font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-white drop-shadow-lg">
+                {collection.name}
+              </h2>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// Renders every admin-published Collection on the home page, in the admin's order. An
+// expanded collection is its own product row; collapsed ones show as cover tiles that
+// open the collection's page.
 export default function HomeCollections() {
   const { products } = useProducts();
   const [collections, setCollections] = useState([]);
@@ -113,15 +109,16 @@ export default function HomeCollections() {
     return unsub;
   }, []);
 
-  const published = collections.filter((c) => c.published);
+  const blocks = groupCollectionsForHome(
+    collections.filter((c) => c.published),
+    products
+  );
 
-  if (published.length === 0) return null;
-
-  return (
-    <>
-      {published.map((collection) => (
-        <CollectionRow key={collection.id} collection={collection} products={products} />
-      ))}
-    </>
+  return blocks.map((block) =>
+    block.type === 'row' ? (
+      <CollectionRow key={block.collection.id} collection={block.collection} products={products} />
+    ) : (
+      <CollectionTiles key={block.collections[0].id} collections={block.collections} products={products} />
+    )
   );
 }

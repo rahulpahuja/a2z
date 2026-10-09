@@ -63,6 +63,7 @@ const AdminBillTemplatePage = lazy(() => import('./pages/admin/AdminBillTemplate
 const AdminReferrerDetailsPage = lazy(() => import('./pages/admin/AdminReferrerDetailsPage.jsx'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage.jsx'))
 const AdminPageMetaPage = lazy(() => import('./pages/admin/AdminPageMetaPage.jsx'))
+const CollectionPage = lazy(() => import('./pages/CollectionPage.jsx'))
 const AdminDocsPage = lazy(() => import('./pages/admin/AdminDocsPage.jsx'))
 const AdminTrackingPartnersPage = lazy(() => import('./pages/admin/AdminTrackingPartnersPage.jsx'))
 const AdminPaymentGatewayPage = lazy(() => import('./pages/admin/AdminPaymentGatewayPage.jsx'))
@@ -84,6 +85,7 @@ const ROUTES = [
   { path: '/storefront', Component: StorefrontPage },
   { path: '/products', Component: ProductListingPage },
   { path: '/products/:id', Component: ProductDetailPage },
+  { path: '/collections/:collectionId', Component: CollectionPage },
   { path: '/product-alt', Component: ProductDetailAltPage },
   { path: '/cart', Component: CartPage },
   { path: '/checkout/shipping', Component: CheckoutShippingPage },

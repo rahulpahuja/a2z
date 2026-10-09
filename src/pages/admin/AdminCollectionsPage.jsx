@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   subscribeToCollections,
   createCollection,
@@ -10,13 +10,25 @@ import {
 import { useProducts } from '../../context/ProductsContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
+import { compressImageFile } from '../../utils/imageCompression.js';
+import { convertHeicFileToPng, isHeicFile } from '../../utils/heic.js';
+import { DISPLAY_MODES, getDisplayMode, resolveCollectionCover } from '../../utils/collections.js';
+import { deleteUploadedImage, uploadImageToExternalServer } from '../../services/imageUpload.js';
 
-const EMPTY_FORM = { name: '', productIds: [], heroProductId: '', published: true };
+const EMPTY_FORM = { name: '', productIds: [], heroProductId: '', published: true, coverImage: '', displayMode: DISPLAY_MODES.EXPANDED };
 
-function CollectionEditorModal({ initial, products, onClose, onSave }) {
+const DISPLAY_MODE_OPTIONS = [
+  { value: DISPLAY_MODES.EXPANDED, label: 'Expanded', hint: 'Every product in the collection shows on the home page.' },
+  { value: DISPLAY_MODES.COLLAPSED, label: 'Collapsed', hint: 'One cover tile with the name on top; it opens a page with only this collection.' },
+];
+
+function CollectionEditorModal({ initial, products, onClose, onSave, onError }) {
   const [form, setForm] = useState(initial);
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
+  // A newly chosen cover waits here, as a compressed file, until the collection is saved.
+  const [coverUpload, setCoverUpload] = useState(null);
+  const coverInputRef = useRef(null);
 
   const filteredProducts = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -41,13 +53,44 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
     });
   };
 
+  const handleCoverChange = async (event) => {
+    let file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      if (isHeicFile(file)) file = await convertHeicFileToPng(file);
+      const compressed = await compressImageFile(file);
+      if (coverUpload) URL.revokeObjectURL(coverUpload.previewUrl);
+      setCoverUpload(compressed);
+    } catch (err) {
+      console.error('Cover photo processing failed', err);
+      onError('Could not use this image. Please try a JPG or PNG.');
+    }
+  };
+
+  const removeCover = () => {
+    if (coverUpload) URL.revokeObjectURL(coverUpload.previewUrl);
+    setCoverUpload(null);
+    setForm((prev) => ({ ...prev, coverImage: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return;
     if (form.productIds.length === 0) return;
     setSaving(true);
+    let uploadedUrl = '';
     try {
-      await onSave(form);
+      if (coverUpload) uploadedUrl = await uploadImageToExternalServer(coverUpload.file, `collection_${Date.now()}_cover${coverUpload.extension}`);
+      const saved = await onSave({ ...form, coverImage: uploadedUrl || form.coverImage });
+      // Whichever file the saved record no longer points at is now an orphan.
+      if (saved) {
+        if (initial.coverImage && initial.coverImage !== (uploadedUrl || form.coverImage)) deleteUploadedImage(initial.coverImage);
+      } else if (uploadedUrl) {
+        deleteUploadedImage(uploadedUrl);
+      }
+    } catch (err) {
+      onError(err.message || 'Could not upload the cover photo.');
     } finally {
       setSaving(false);
     }
@@ -84,9 +127,66 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
             />
           </div>
 
+          <div className="flex flex-col gap-2">
+            <span className="font-label-caps text-[0.625rem] text-on-surface-variant">Cover Photo</span>
+            <div className="flex items-center gap-4">
+              <div className="w-24 aspect-[3/4] rounded-lg overflow-hidden bg-surface-container border border-outline-variant/40 shrink-0">
+                {(() => {
+                  const shown = coverUpload ? { src: coverUpload.previewUrl, alt: form.name } : resolveCollectionCover(form, products);
+                  return shown ? (
+                    <ProductImage src={shown.src} alt={shown.alt} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
+                      <span className="material-symbols-outlined">image</span>
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => coverInputRef.current?.click()}
+                    className="border border-outline text-on-surface font-label-caps text-[0.625rem] px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-surface-container-high transition-colors"
+                  >
+                    {coverUpload || form.coverImage ? 'Replace photo' : 'Upload photo'}
+                  </button>
+                  {(coverUpload || form.coverImage) && (
+                    <button type="button" onClick={removeCover} className="text-error font-label-caps text-[0.625rem] uppercase tracking-widest px-2">
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <input ref={coverInputRef} type="file" accept="image/*,.heic,.heif" onChange={handleCoverChange} className="hidden" />
+                <p className="text-[0.625rem] text-on-surface-variant/60">
+                  Optional. Shown as the collection's thumbnail and page banner. Without one, the thumbnail product's photo is used.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <fieldset className="flex flex-col gap-2">
+            <legend className="font-label-caps text-[0.625rem] text-on-surface-variant mb-1">Home Page Display</legend>
+            {DISPLAY_MODE_OPTIONS.map((option) => (
+              <label key={option.value} className="flex items-start gap-2 text-[0.75rem] text-on-surface cursor-pointer">
+                <input
+                  type="radio"
+                  name="collection-display-mode"
+                  checked={getDisplayMode(form) === option.value}
+                  onChange={() => setForm((prev) => ({ ...prev, displayMode: option.value }))}
+                  className="accent-primary mt-0.5"
+                />
+                <span>
+                  <span className="font-semibold">{option.label}</span>
+                  <span className="block text-[0.625rem] text-on-surface-variant/70">{option.hint}</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+
           <div className="flex flex-col gap-1.5">
             <label className="font-label-caps text-[0.625rem] text-on-surface-variant" htmlFor="collection-hero">
-              Thumbnail / Hero Product
+              Thumbnail Product
             </label>
             <select
               id="collection-hero"
@@ -101,7 +201,7 @@ function CollectionEditorModal({ initial, products, onClose, onSave }) {
               ))}
             </select>
             <p className="text-[0.625rem] text-on-surface-variant/60">
-              Must be one of the products picked for this collection — used as its thumbnail on the homepage.
+              Must be one of the products picked for this collection. Its photo is the cover when no cover photo is uploaded.
             </p>
           </div>
 
@@ -199,6 +299,7 @@ export default function AdminCollectionsPage() {
     return unsub;
   }, []);
 
+  // Resolves to whether the collection was saved, so the editor can clean up any cover upload.
   const handleSave = async (form) => {
     try {
       if (editing?.id) {
@@ -209,8 +310,10 @@ export default function AdminCollectionsPage() {
         showToast('Collection created.');
       }
       setEditing(null);
+      return true;
     } catch (err) {
       showToast(err.message || 'Could not save collection.');
+      return false;
     }
   };
 
@@ -218,6 +321,7 @@ export default function AdminCollectionsPage() {
     if (!window.confirm(`Delete the "${collection.name}" collection? This cannot be undone.`)) return;
     try {
       await deleteCollection(collection.id);
+      if (collection.coverImage) deleteUploadedImage(collection.coverImage);
       showToast('Collection deleted.');
     } catch (err) {
       showToast(err.message || 'Could not delete collection.');
@@ -263,7 +367,7 @@ export default function AdminCollectionsPage() {
         <div>
           <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Collections</h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-            Curate named groups of existing products, each with a hero thumbnail, and publish them on the home page.
+            Curate named groups of existing products with a cover photo, and publish them on the home page expanded (all products) or collapsed (one tile linking to the collection's page).
           </p>
         </div>
         <button
@@ -287,7 +391,7 @@ export default function AdminCollectionsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {collections.map((collection, idx) => {
-              const heroProduct = products.find((p) => p.id === collection.heroProductId);
+              const cover = resolveCollectionCover(collection, products);
               const validProductCount = collection.productIds.filter((id) => products.some((p) => p.id === id)).length;
               return (
                 <div
@@ -295,12 +399,8 @@ export default function AdminCollectionsPage() {
                   className="bg-surface-container-low rounded-xl border border-outline-variant/30 flex flex-col overflow-hidden shadow-sm hover:shadow transition-shadow"
                 >
                   <div className="aspect-video bg-surface-container relative">
-                    {heroProduct ? (
-                      <ProductImage
-                        src={(heroProduct.images && heroProduct.images[0]) || heroProduct.image}
-                        alt={heroProduct.name || heroProduct.title}
-                        className="w-full h-full object-cover"
-                      />
+                    {cover ? (
+                      <ProductImage src={cover.src} alt={cover.alt} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-on-surface-variant/40">
                         <span className="material-symbols-outlined text-[2rem]">image</span>
@@ -312,6 +412,9 @@ export default function AdminCollectionsPage() {
                       }`}
                     >
                       {collection.published ? 'Published' : 'Hidden'}
+                    </span>
+                    <span className="absolute top-3 left-3 font-label-caps text-[0.625rem] uppercase px-2.5 py-1 rounded-full bg-surface/90 text-on-surface-variant backdrop-blur">
+                      {getDisplayMode(collection)}
                     </span>
                   </div>
 
@@ -394,6 +497,7 @@ export default function AdminCollectionsPage() {
           products={products}
           onClose={() => setEditing(null)}
           onSave={handleSave}
+          onError={showToast}
         />
       )}
     </div>

@@ -11,6 +11,7 @@ import ProductContentModal from '../../components/admin/ProductContentModal.jsx'
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { getR2KeyFromUrl } from '../../utils/productImages.js';
+import { uploadImageToExternalServer } from '../../services/imageUpload.js';
 import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, DISCOUNT_END_TIME_MODES, validateDiscountInput } from '../../utils/discount.js';
 import {
   getColorName,
@@ -23,30 +24,6 @@ import {
 } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
 import './AdminProductsPage.css';
-
-const uploadImageToExternalServer = async (file, customName) => {
-  const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
-  if (apiUrl) {
-    const formData = new FormData();
-    formData.append('file', file, customName);
-
-    const response = await fetch(`${apiUrl}/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Upload failed: ${errorText || response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.url;
-  }
-
-  await new Promise((resolve) => setTimeout(resolve, 800)); // simulate network delay
-  return `https://external-image-server.com/uploads/${customName}`;
-};
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 // Waist/chest sizing (in inches) for categories sold by inch size rather than
