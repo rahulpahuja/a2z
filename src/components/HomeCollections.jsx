@@ -5,7 +5,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import ProductImage from './ProductImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
 import ProductCard from './ProductCard.jsx';
-import { logSelectPromotion } from '../services/analytics.js';
+import { logSelectContent, logSelectPromotion, logViewPromotion } from '../services/analytics.js';
 import { collectionPath, getCollectionProducts, groupCollectionsForHome, resolveCollectionCover } from '../utils/collections.js';
 
 function CollectionRow({ collection, products }) {
@@ -32,7 +32,10 @@ function CollectionRow({ collection, products }) {
       <div className="relative group/arrows w-full max-w-full min-w-0">
         <button
           type="button"
-          onClick={() => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+          onClick={() => {
+            scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
+            logSelectContent('collection_scroll', collection.name);
+          }}
           className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
           aria-label="Scroll Left"
         >
@@ -52,7 +55,10 @@ function CollectionRow({ collection, products }) {
 
         <button
           type="button"
-          onClick={() => scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+          onClick={() => {
+            scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
+            logSelectContent('collection_scroll', collection.name);
+          }}
           className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full bg-surface/90 hover:bg-surface border border-outline-variant/30 text-on-surface hover:text-primary shadow-lg hidden sm:flex items-center justify-center z-20 opacity-0 group-hover/arrows:opacity-100 transition-opacity duration-300 cursor-pointer"
           aria-label="Scroll Right"
         >
@@ -66,8 +72,27 @@ function CollectionRow({ collection, products }) {
 
 // A collapsed collection: one cover tile with its name over it. Opens the collection's own page.
 function CollectionTiles({ collections, products }) {
+  const sectionRef = useRef(null);
+
+  // One impression per tile per page view, the first time the grid is mostly on screen.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        collections.forEach((collection) => logViewPromotion(collection.name, collectionPath(collection)));
+        observer.disconnect();
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collections.map((c) => c.id).join()]);
+
   return (
-    <section className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
+    <section ref={sectionRef} className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-gutter">
         {collections.map((collection) => {
           const cover = resolveCollectionCover(collection, products);

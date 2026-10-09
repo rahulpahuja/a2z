@@ -7,7 +7,7 @@ import ProductImage from '../components/ProductImage.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { subscribeToCollections } from '../services/collections.js';
-import { logViewItemList } from '../services/analytics.js';
+import { logPageNotFound, logViewCollection, logViewItemList } from '../services/analytics.js';
 import { getCollectionProducts, resolveCollectionCover } from '../utils/collections.js';
 import { applyDocumentHead } from '../seo/head.js';
 import { notFoundHead } from '../seo/routes.js';
@@ -47,10 +47,17 @@ export default function CollectionPage() {
     applyDocumentHead(collection ? buildCollectionHead(collection, { image: cover?.src }) : notFoundHead());
   }, [isLoading, collection, cover?.src]);
 
+  // Once per collection opened, after its products have loaded.
   useEffect(() => {
-    if (collection && members.length > 0) logViewItemList(members, `Collection - ${collection.name}`);
+    if (isLoading) return;
+    if (!collection) {
+      logPageNotFound(`/collections/${collectionId}`);
+      return;
+    }
+    logViewCollection(collection, members.length);
+    if (members.length > 0) logViewItemList(members, `Collection - ${collection.name}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection?.id, members.length > 0]);
+  }, [isLoading, collection?.id, members.length > 0]);
 
   return (
     <>
