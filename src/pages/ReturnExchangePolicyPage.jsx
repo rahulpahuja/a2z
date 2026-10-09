@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import SiteFooter from '../components/SiteFooter.jsx';
+import BrandName from '../components/BrandName.jsx';
 
 export default function ReturnExchangePolicyPage() {
   return (
     <>
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-          A2Z Collection
+          <BrandName />
         </Link>
         <Link to="/" className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors">
           Back to Home

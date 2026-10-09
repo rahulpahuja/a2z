@@ -8,6 +8,7 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import { INDIAN_STATES_AND_UT, STATE_CITIES } from '../data/indiaData.js';
+import BrandName from '../components/BrandName.jsx';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3 py-2.5 font-body-sm text-body-sm text-on-surface transition-colors';
@@ -159,7 +160,7 @@ export default function ProfilePage() {
               <span className="material-symbols-outlined">menu</span>
             </button>
             <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-              A2Z Collection
+              <BrandName />
             </Link>
           </div>
         </header>
@@ -187,7 +188,7 @@ export default function ProfilePage() {
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
         </div>
         <nav className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-8 items-center font-label-caps text-label-caps">

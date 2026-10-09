@@ -13,6 +13,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import OrderSuccessCelebration from '../components/OrderSuccessCelebration.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './OrderTrackingPage.css';
+import BrandName from '../components/BrandName.jsx';
 
 export default function OrderTrackingPage() {
   const { lastOrder } = useCart();
@@ -59,7 +60,7 @@ export default function OrderTrackingPage() {
       <>
         <nav className="bg-surface dark:bg-surface-container-highest docked full-width top-0 sticky flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto z-50 flat no shadows border-b-0">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
           <CartIconButton className="text-primary dark:text-primary-fixed-dim" />
         </nav>
@@ -182,7 +183,7 @@ export default function OrderTrackingPage() {
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
           <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-6 ml-8">
             {navLinks.map((link) => (

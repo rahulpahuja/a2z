@@ -7,6 +7,7 @@ import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, loadR
 import { isValidAmount } from '../utils/security.js';
 import { logAddPaymentInfo, logPaymentFailure } from '../services/analytics.js';
 import { logCheckoutFailure } from '../services/checkoutLog.js';
+import BrandName from '../components/BrandName.jsx';
 
 export default function PaymentPage() {
   const { items: cartItems, placeOrder, taxRatePercent, totals, appliedCoupon } = useCart();
@@ -113,7 +114,7 @@ export default function PaymentPage() {
     <>
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-          A2Z Collection
+          <BrandName />
         </Link>
       </header>
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16">

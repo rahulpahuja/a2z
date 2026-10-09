@@ -4,6 +4,7 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import CartIconButton from './CartIconButton.jsx';
 import ProfileButton from './ProfileButton.jsx';
 import MobileNavDrawer from './MobileNavDrawer.jsx';
+import BrandName from './BrandName.jsx';
 
 export default function TopNav() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function TopNav() {
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">A2Z Collection</Link>
+          <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim"><BrandName /></Link>
         </div>
         <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-gutter items-center">
           {navLinks.map((link) => (

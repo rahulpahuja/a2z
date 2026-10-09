@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
 import { subscribeToOrders } from '../services/orders.js';
 import { orderBelongsToUser } from '../utils/orderMatch.js';
+import BrandName from '../components/BrandName.jsx';
 
 const STATUS_STYLES = {
   Delivered: 'bg-secondary/15 text-secondary',
@@ -66,7 +67,7 @@ export default function MyOrdersPage() {
               <span className="material-symbols-outlined">menu</span>
             </button>
             <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-              A2Z Collection
+              <BrandName />
             </Link>
           </div>
         </header>
@@ -94,7 +95,7 @@ export default function MyOrdersPage() {
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
         </div>
         <nav className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-8 items-center font-label-caps text-label-caps">

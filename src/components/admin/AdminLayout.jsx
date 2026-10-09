@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import BrandName from '../BrandName.jsx';
 
 export const NAV_ITEMS = [
   { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
@@ -36,7 +37,7 @@ export default function AdminLayout({ children }) {
       <aside className="w-[240px] bg-surface-container border-r border-outline-variant flex flex-col shrink-0">
         <div className="p-gutter border-b border-outline-variant">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary playfair">
-            A2Z Collection
+            <BrandName />
           </Link>
           <p className="font-label-caps text-label-caps text-on-surface-variant mt-1">Admin Panel</p>
         </div>

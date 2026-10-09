@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import AuthModal from '../components/AuthModal.jsx';
 import { logAnalyticsEvent, logBeginCheckout, logAddShippingInfo } from '../services/analytics.js';
+import BrandName from '../components/BrandName.jsx';
 
 const inputClassName =
   'w-full bg-surface-container-lowest border-b border-tertiary/30 focus:border-primary focus:ring-0 px-0 py-3 font-body-lg text-body-lg text-on-surface transition-colors duration-200';
@@ -165,7 +166,7 @@ export default function CheckoutShippingPage() {
       <>
         <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
         </header>
         <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 flex flex-col items-center text-center gap-3">
@@ -186,7 +187,7 @@ export default function CheckoutShippingPage() {
       {/* TopNavBar: Suppressed because this is a transactional flow (Checkout) */}
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-center items-center">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-          A2Z Collection
+          <BrandName />
         </Link>
       </header>
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-16">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { logSelectContent, logShare } from '../services/analytics.js';
+import BrandName from './BrandName.jsx';
 
 const DEFAULT_FALLBACK_LINKS = [
   { label: 'New Arrivals', to: '/products?filter=new-arrivals' },
@@ -90,7 +91,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
             onClick={onClose}
             className="flex items-center gap-2 font-headline-md-mobile text-headline-md-mobile font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight"
           >
-            <span>A2Z Collection</span>
+            <BrandName />
           </Link>
           <button
             type="button"

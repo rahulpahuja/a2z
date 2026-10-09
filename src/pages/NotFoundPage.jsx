@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { logPageNotFound } from '../services/analytics.js';
 import './NotFoundPage.css';
+import BrandName from '../components/BrandName.jsx';
 
 export default function NotFoundPage() {
   const { pathname, search } = useLocation();
@@ -11,7 +12,7 @@ export default function NotFoundPage() {
     <div className="min-h-screen flex flex-col bg-surface overflow-hidden relative">
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto relative z-10">
         <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim playfair">
-          A2Z Collection
+          <BrandName />
         </Link>
         <Link to="/" className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors">
           Back to Home

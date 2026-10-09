@@ -10,6 +10,7 @@ import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductDetailAltPage.css';
+import BrandName from '../components/BrandName.jsx';
 
 const PRODUCT = { id: 'crop-shirt-side-dori', title: 'Crop Shirt with Side Dori', price: 360 };
 
@@ -169,7 +170,7 @@ export default function ProductDetailAltPage() {
             </button>
             {/* Brand Logo */}
             <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-              A2Z Collection
+              <BrandName />
             </Link>
           </div>
           {/* Navigation Links (Desktop) */}
