@@ -7,7 +7,8 @@ import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 // before it finishes, which reads as rapid flickering rather than a cycle.
 const SLIDE_TRANSITION_MS = 700;
 
-export default function ProductCardImage({ images, alt, className = '', loading = 'lazy', activeIndex = 0 }) {
+// `alts` is parallel to `images`; a slide without its own alt text falls back to `alt`.
+export default function ProductCardImage({ images, alts, alt, className = '', loading = 'lazy', activeIndex = 0 }) {
   const { theme } = useStorefrontTheme();
   // After this many ms of continuous hover, start auto-sliding through the
   // product's other images (one slide in from the right per interval).
@@ -40,7 +41,7 @@ export default function ProductCardImage({ images, alt, className = '', loading 
   if (list.length === 0) return null;
 
   if (list.length === 1) {
-    return <ProductImage src={list[0]} alt={alt} className={className} loading={loading} />;
+    return <ProductImage src={list[0]} alt={alts?.[0] || alt} className={className} loading={loading} />;
   }
 
   const handleMouseEnter = () => {
@@ -74,7 +75,7 @@ export default function ProductCardImage({ images, alt, className = '', loading 
         <ProductImage
           key={`${src}-${i}`}
           src={src}
-          alt={alt}
+          alt={alts?.[i] || alt}
           loading={loading}
           className={`absolute inset-0 ${className}`}
           style={{ transform: `translateX(${(i - index) * 100}%)`, transition: `transform ${SLIDE_TRANSITION_MS}ms ease-in-out` }}

@@ -119,6 +119,7 @@ export default function SearchBar({ className = '' }) {
               <div className="relative w-14 h-16 rounded-md overflow-hidden bg-surface-variant shrink-0">
                 <ProductCardImage
                   images={product.images?.length ? product.images : [product.image]}
+                  alts={product.imageAlts}
                   alt={product.title || product.name}
                   className="w-full h-full object-cover"
                 />

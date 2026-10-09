@@ -2,7 +2,8 @@
 // so crawlers that don't run JavaScript index the same content users see. The
 // decisions (what a route's head is, what a product's head is) live in src/seo/ and
 // are unit tested there; this file only fetches data and rewrites the response.
-import { notFoundHead, resolveRouteSeo } from '../../src/seo/routes.js';
+import { normalizePath, notFoundHead, resolveRouteSeo } from '../../src/seo/routes.js';
+import { applyPageMeta, pageMetaKey } from '../../src/seo/pageMeta.js';
 import { buildProductHead } from '../../src/seo/productHead.js';
 import { injectHeadIntoHtml } from '../../src/seo/head.js';
 
@@ -49,6 +50,14 @@ export default async function seo(request, context) {
     }
   } else {
     ({ status, head } = resolveRouteSeo(pathname));
+    if (status === 200 && databaseUrl) {
+      try {
+        const entry = await readRtdb(databaseUrl, `settings/pageMeta/${pageMetaKey(normalizePath(pathname))}`);
+        head = applyPageMeta(head, entry);
+      } catch (err) {
+        console.error('seo: page meta lookup failed, serving default head', err);
+      }
+    }
   }
 
   const html = injectHeadIntoHtml(await response.text(), head);

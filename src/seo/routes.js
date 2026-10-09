@@ -69,7 +69,13 @@ const ROUTE_SEO = {
   '/__trap__': hidden('Page'),
 };
 
-const normalizePath = (pathname) => (pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname);
+export const normalizePath = (pathname) => (pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname);
+
+// Pages worth customising in the admin: the ones search engines may index.
+export const listIndexableRoutes = () =>
+  Object.entries(ROUTE_SEO)
+    .filter(([, entry]) => entry.indexable !== false)
+    .map(([path, entry]) => ({ path, title: entry.title, description: entry.description }));
 
 // Builds the head spec for a static route. The shape is shared by applyDocumentHead
 // (browser) and injectHeadIntoHtml (edge).

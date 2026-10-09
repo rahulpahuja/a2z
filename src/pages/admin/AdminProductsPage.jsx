@@ -96,6 +96,7 @@ export default function AdminProductsPage() {
   const [imagePreviews, setImagePreviews] = useState(['', '', '', '', '']);
   const [imageNames, setImageNames] = useState(['', '', '', '', '']);
   const [imageColors, setImageColors] = useState(['', '', '', '', '']);
+  const [imageAlts, setImageAlts] = useState(['', '', '', '', '']);
   const [displayImageIndex, setDisplayImageIndex] = useState(0);
   const [editingProductId, setEditingProductId] = useState(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
@@ -157,12 +158,14 @@ export default function AdminProductsPage() {
     const initialPreviews = ['', '', '', '', ''];
     const initialNames = ['', '', '', '', ''];
     const initialColors = ['', '', '', '', ''];
+    const initialAlts = ['', '', '', '', ''];
     if (product.images && product.images.length > 0) {
       product.images.forEach((url, idx) => {
         if (idx < 5) {
           initialPreviews[idx] = url;
           initialNames[idx] = getR2KeyFromUrl(url) || '';
           initialColors[idx] = product.imageColors?.[idx] || '';
+          initialAlts[idx] = product.imageAlts?.[idx] || '';
         }
       });
     } else if (product.image) {
@@ -173,6 +176,7 @@ export default function AdminProductsPage() {
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
     setImageColors(initialColors);
+    setImageAlts(initialAlts);
     setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -207,12 +211,14 @@ export default function AdminProductsPage() {
     const initialPreviews = ['', '', '', '', ''];
     const initialNames = ['', '', '', '', ''];
     const initialColors = ['', '', '', '', ''];
+    const initialAlts = ['', '', '', '', ''];
     if (product.images && product.images.length > 0) {
       product.images.forEach((url, idx) => {
         if (idx < 5) {
           initialPreviews[idx] = url;
           initialNames[idx] = getR2KeyFromUrl(url) || '';
           initialColors[idx] = product.imageColors?.[idx] || '';
+          initialAlts[idx] = product.imageAlts?.[idx] || '';
         }
       });
     } else if (product.image) {
@@ -223,6 +229,7 @@ export default function AdminProductsPage() {
     setImagePreviews(initialPreviews);
     setImageNames(initialNames);
     setImageColors(initialColors);
+    setImageAlts(initialAlts);
     setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -278,6 +285,7 @@ export default function AdminProductsPage() {
             image: product.image || (product.images ?? [])[0],
             images: product.images ?? (product.image ? [product.image] : []),
             imageColors: product.imageColors ?? [],
+            imageAlts: product.imageAlts ?? [],
           })
         )
       );
@@ -391,6 +399,10 @@ export default function AdminProductsPage() {
     });
   };
 
+  const handleImageAltChange = (index, value) => {
+    setImageAlts((prev) => prev.map((alt, i) => (i === index ? value : alt)));
+  };
+
   // Downloads an image box's current photo (existing R2 upload or a
   // freshly-chosen local file) to the admin's machine. Fetches it as a blob
   // first — a plain <a download> is silently ignored by the browser for a
@@ -455,6 +467,7 @@ export default function AdminProductsPage() {
       copy[index] = '';
       return copy;
     });
+    handleImageAltChange(index, '');
   };
 
   const chooseDisplayImage = (index) => setDisplayImageIndex(index);
@@ -650,6 +663,7 @@ export default function AdminProductsPage() {
     setImagePreviews(['', '', '', '', '']);
     setImageNames(['', '', '', '', '']);
     setImageColors(['', '', '', '', '']);
+    setImageAlts(['', '', '', '', '']);
     setDisplayImageIndex(0);
     setRemovedImageKeys([]);
     setProductId(generateProductId());
@@ -706,12 +720,14 @@ export default function AdminProductsPage() {
         const file = imageFiles[idx];
         const customName = imageNames[idx].trim();
         const color = imageColors[idx].trim();
+        const alt = imageAlts[idx].trim();
         if (file) {
           const url = await uploadImageToExternalServer(file, customName);
           return {
             url,
             key: customName,
             color,
+            alt,
             name: file.name,
             size: file.size,
             type: file.type,
@@ -722,6 +738,7 @@ export default function AdminProductsPage() {
             url: imagePreviews[idx],
             key: customName,
             color,
+            alt,
             isNew: false,
           };
         }
@@ -730,6 +747,7 @@ export default function AdminProductsPage() {
       const uploadedFiles = (await Promise.all(uploadPromises)).filter((f) => f.url);
       const uploadedUrls = uploadedFiles.map((f) => f.url);
       const uploadedColors = uploadedFiles.map((f) => f.color);
+      const uploadedAlts = uploadedFiles.map((f) => f.alt);
       const derivedColorNamesAtSubmit = [...new Set(uploadedColors.filter(Boolean))];
       const colorsPayload = derivedColorNamesAtSubmit.map((name) => {
         const entry = colorSizeStocks[name];
@@ -774,6 +792,7 @@ export default function AdminProductsPage() {
         image: uploadedUrls[0],
         images: uploadedUrls,
         imageColors: uploadedColors,
+        imageAlts: uploadedAlts,
       });
 
       // Save file metadata only for new uploads in Firebase Realtime Database
@@ -1070,6 +1089,22 @@ export default function AdminProductsPage() {
                               value={imageColors[index]}
                               onChange={(e) => handleImageColorChange(index, e.target.value)}
                               placeholder="e.g. Rani Pink"
+                              className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-[0.6875rem] text-on-surface"
+                            />
+                          </div>
+                        )}
+
+                        {(hasImage || preview) && (
+                          <div className="flex flex-col gap-1 mt-1">
+                            <label className="font-body-sm text-[0.625rem] text-on-surface-variant/80" htmlFor={`alt-${index}`}>
+                              Alt text
+                            </label>
+                            <input
+                              id={`alt-${index}`}
+                              type="text"
+                              value={imageAlts[index]}
+                              onChange={(e) => handleImageAltChange(index, e.target.value)}
+                              placeholder="Describe this photo"
                               className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded px-2 py-1 font-body-sm text-[0.6875rem] text-on-surface"
                             />
                           </div>

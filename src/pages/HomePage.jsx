@@ -418,6 +418,7 @@ export default function HomePage() {
                       <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
                         <ProductCardImage
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
+                          alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                           alt={product.alt}
                         />
@@ -524,6 +525,7 @@ export default function HomePage() {
                       <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
                         <ProductCardImage
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
+                          alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-image-radius ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                           alt={product.alt}
                         />

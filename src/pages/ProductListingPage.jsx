@@ -1048,6 +1048,7 @@ export default function ProductListingPage() {
                       >
                         <ProductCardImage
                           images={product.images && product.images.length > 0 ? product.images : [product.image]}
+                          alts={product.imageAlts}
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out ${!isAvailable ? 'grayscale opacity-50' : ''}`}
                           alt={product.alt}
                         />
