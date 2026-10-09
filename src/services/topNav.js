@@ -101,3 +101,14 @@ export function topNavLinkToPath(link) {
   }
   return '/products';
 }
+
+// A multi-category link such as "Girl's Wear" stands for a set of categories. While the
+// shopper is viewing exactly that set, its label is the page heading, rather than every
+// category name joined together. Returns null when no such link matches.
+export function findNavLinkLabel(links, categories) {
+  if (categories.length < 2) return null;
+  const key = (list) => [...list].sort().join('\n');
+  const wanted = key(categories);
+  const match = links.find((link) => link.type === 'category' && link.categories?.length > 1 && key(link.categories) === wanted);
+  return match?.label?.trim() || null;
+}

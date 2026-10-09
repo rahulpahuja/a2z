@@ -12,7 +12,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import { ProductGridSkeleton } from '../components/Shimmer.jsx';
-import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
+import { subscribeToTopNav, topNavLinkToPath, findNavLinkLabel, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
@@ -171,6 +171,10 @@ export default function ProductListingPage() {
   const toggleSection = (key) => setCollapsedSections((prev) => ({ ...prev, [key]: !(prev[key] ?? isMobileViewport) }));
   const [mobileViewMode, setMobileViewMode] = useState('grid'); // 'list' | 'grid' — mobile-only layout toggle
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
+  const categoryHeading = useMemo(
+    () => findNavLinkLabel(topNavLinks, activeCategoryList) ?? activeCategoryList.join(' & '),
+    [topNavLinks, activeCategoryList]
+  );
 
   useEffect(() => {
     const unsub = subscribeToTopNav((links) => setTopNavLinks(links));
@@ -455,7 +459,7 @@ export default function ProductListingPage() {
   }, [paginatedProducts, visibleCount]);
 
   useEffect(() => {
-    const listName = activeFilter === 'new-arrivals' ? 'New Arrivals' : activeCategory === 'All' ? 'All Products' : activeCategory;
+    const listName = activeFilter === 'new-arrivals' ? 'New Arrivals' : activeCategory === 'All' ? 'All Products' : categoryHeading;
     logViewItemList(lazyLoadedProducts, listName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, activeSubcategory, selectedGender, sortBy, selectedCollectionId]);
@@ -517,7 +521,7 @@ export default function ProductListingPage() {
 
   return (
     <>
-      <header className="bg-surface dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
+      <header className="bg-surface-solid dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
         <div className="flex items-center gap-6">
           <button
             type="button"
@@ -552,7 +556,7 @@ export default function ProductListingPage() {
       <div className={`w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 ${activeFilter !== 'new-arrivals' && activeCategory === 'All' ? 'hidden md:flex' : 'flex'} flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4`}>
         <div>
           <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
-            {activeFilter === 'new-arrivals' ? 'NEW ARRIVALS' : activeCategory === 'All' ? 'ALL PRODUCTS' : activeCategoryList.map((c) => c.toUpperCase()).join(' & ')}
+            {activeFilter === 'new-arrivals' ? 'NEW ARRIVALS' : activeCategory === 'All' ? 'ALL PRODUCTS' : categoryHeading.toUpperCase()}
           </h1>
           {/* Top Counter Banner showing X of Y products */}
           <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm font-semibold">
@@ -564,7 +568,7 @@ export default function ProductListingPage() {
         </div>
       </div>
       {/* Desktop sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface dark:bg-surface-container-highest border-b border-surface-variant">
+      <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface-solid dark:bg-surface-container-highest border-b border-surface-variant">
         <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-3">
           <div className="flex flex-wrap items-center justify-end gap-3">
             {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
@@ -606,7 +610,7 @@ export default function ProductListingPage() {
       </div>
 
       {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3 overflow-x-auto">
+      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface-solid dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3 overflow-x-auto">
         {showFilterSidebar && (
         <button
           type="button"
