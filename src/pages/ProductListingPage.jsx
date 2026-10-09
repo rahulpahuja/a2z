@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
