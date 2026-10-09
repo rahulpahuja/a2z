@@ -208,3 +208,16 @@ export function logPageNotFound(path) {
 export function logVideoStart(videoTitle, source) {
   logAnalyticsEvent('video_start', { video_title: videoTitle, source });
 }
+
+export function logViewPromotion(promotionName, destination) {
+  logAnalyticsEvent('view_promotion', { promotion_name: promotionName, creative_name: destination });
+}
+
+export function logViewCollection(collection, productCount) {
+  logAnalyticsEvent('view_collection', {
+    collection_id: collection.id,
+    collection_name: collection.name,
+    display_mode: collection.displayMode || 'expanded',
+    product_count: productCount,
+  });
+}
