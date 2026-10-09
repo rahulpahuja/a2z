@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { resolveRouteSeo, SITE_URL } from './routes.js';
 import { buildProductHead } from './productHead.js';
 import { injectHeadIntoHtml, renderHeadTags } from './head.js';
+import { applyPageMeta, pageMetaKey, sanitizeMetaTags } from './pageMeta.js';
 
 const INDEX_HTML = `<!doctype html>
 <html lang="en">
@@ -130,5 +131,50 @@ describe('injectHeadIntoHtml', () => {
 
   it('returns the HTML unchanged when there is no head', () => {
     expect(injectHeadIntoHtml(INDEX_HTML, null)).toBe(INDEX_HTML);
+  });
+});
+
+describe('page meta overrides', () => {
+  const base = resolveRouteSeo('/faqs').head;
+
+  it('leaves the head alone without an override', () => {
+    expect(applyPageMeta(base, null)).toBe(base);
+  });
+
+  it('replaces the title and description, keeping defaults for blanks', () => {
+    const head = applyPageMeta(base, { title: ' Custom ', description: '', metaTags: [] });
+    expect(head.title).toBe('Custom');
+    expect(head.description).toBe(base.description);
+  });
+
+  it('drops malformed tags and keeps the last of a repeated name', () => {
+    expect(
+      sanitizeMetaTags([
+        { attr: 'name', key: 'keywords', content: 'a' },
+        { attr: 'name', key: 'keywords', content: 'b' },
+        { attr: 'name', key: 'bad key', content: 'x' },
+        { attr: 'http-equiv', key: 'refresh', content: '0' },
+        { attr: 'name', key: 'empty', content: ' ' },
+      ])
+    ).toEqual([{ attr: 'name', key: 'keywords', content: 'b' }]);
+  });
+
+  it('renders custom tags and lets them replace the page default and index.html', () => {
+    const head = applyPageMeta(base, {
+      metaTags: [
+        { attr: 'name', key: 'robots', content: 'noindex' },
+        { attr: 'name', key: 'keywords', content: 'kurti, indore' },
+      ],
+    });
+    const html = injectHeadIntoHtml(INDEX_HTML.replace('<title>', '<meta name="keywords" content="old" />\n<title>'), head);
+    expect(html.match(/name="robots"/g)).toHaveLength(1);
+    expect(html).toContain('<meta name="robots" content="noindex" />');
+    expect(html.match(/name="keywords"/g)).toHaveLength(1);
+    expect(html).toContain('<meta name="keywords" content="kurti, indore" />');
+  });
+
+  it('keys routes without "/" so they are valid database keys', () => {
+    expect(pageMetaKey('/')).toBe('_home');
+    expect(pageMetaKey('/return-exchange-policy')).toBe('return-exchange-policy');
   });
 });

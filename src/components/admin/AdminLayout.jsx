@@ -19,6 +19,7 @@ export const NAV_ITEMS = [
   { to: '/super/jobs', label: 'Job Portal', icon: 'work' },
   { to: '/super/feedback', label: 'Customer Feedback', icon: 'reviews' },
   { to: '/super/settings', label: 'Store Settings', icon: 'storefront' },
+  { to: '/super/page-meta', label: 'Page SEO', icon: 'travel_explore' },
   { to: '/super/tracking-partners', label: 'Tracking Partners', icon: 'local_shipping' },
   { to: '/super/payment-gateway', label: 'Payment Gateways', icon: 'credit_card' },
   { to: '/super/usage-billing', label: 'Usage & Billing', icon: 'monitoring' },

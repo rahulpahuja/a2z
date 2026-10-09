@@ -200,7 +200,7 @@ export default function ProductDetailPage() {
   const images = product.images && product.images.length > 1 ? product.images : [product.image];
   const videos = product.videos ?? [];
   const media = [
-    ...images.map((src) => ({ type: 'image', src })),
+    ...images.map((src, i) => ({ type: 'image', src, alt: product.imageAlts?.[i] })),
     ...videos.map((src) => ({ type: 'video', src })),
   ];
   const mainMedia = media[selectedThumbnail] ?? media[0];
@@ -343,6 +343,7 @@ export default function ProductDetailPage() {
             ) : (
               <ProductCardImage
                 images={images}
+                alts={product.imageAlts}
                 activeIndex={selectedThumbnail}
                 alt={product.name}
                 className={`object-cover w-full h-full ${isProductOutOfStock ? 'grayscale opacity-60' : ''}`}
@@ -401,7 +402,7 @@ export default function ProductDetailPage() {
                       <span className="material-symbols-outlined text-on-surface-variant">play_circle</span>
                     </div>
                   ) : (
-                    <ProductImage alt={`${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={item.src} />
+                    <ProductImage alt={item.alt || `${product.name || product.title} ${index + 1}`} className="object-cover w-full h-full" src={item.src} />
                   )}
                 </button>
               ))}
@@ -687,6 +688,7 @@ export default function ProductDetailPage() {
                   <div className="relative aspect-[3/4] rounded-[16px] overflow-hidden bg-surface-container border border-[#DCAE96]/30">
                     <ProductCardImage
                       images={related.images && related.images.length > 0 ? related.images : [related.image]}
+                      alts={related.imageAlts}
                       alt={related.alt}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                     />

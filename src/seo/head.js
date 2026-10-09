@@ -22,7 +22,10 @@ const SITE_DEFAULT_HEAD_TAGS = [
   /<script\s+type="application\/ld\+json"\s+id="seo-jsonld"[\s\S]*?<\/script>\s*/gi,
 ];
 
+const metaAttr = ({ attr, key, content }) => `<meta ${attr}="${escapeAttr(key)}" content="${escapeAttr(content)}" />`;
+
 export function renderHeadTags(head) {
+  const extraMeta = head.extraMeta ?? [];
   const tags = [`<title>${escapeAttr(head.title)}</title>`];
   if (head.canonical) tags.push(`<link rel="canonical" href="${escapeAttr(head.canonical)}" />`);
   tags.push(
@@ -38,14 +41,19 @@ export function renderHeadTags(head) {
   if (head.jsonLd.length > 0) {
     tags.push(`<script type="application/ld+json" id="${JSON_LD_ID}">${serializeJsonLd(head.jsonLd)}</script>`);
   }
-  return tags.join('\n    ');
+  // Admin-set tags replace the page's own tag for the same name/property.
+  const isOverridden = (tag) => extraMeta.some(({ attr, key }) => tag.startsWith(`<meta ${attr}="${escapeAttr(key)}"`));
+  return [...tags.filter((tag) => !isOverridden(tag)), ...extraMeta.map(metaAttr)].join('\n    ');
 }
 
 // Used by the Edge Function: swaps the site-wide head in index.html for the page's
 // own, and adds crawlable body copy where the app mounts.
 export function injectHeadIntoHtml(html, head) {
   if (!head) return html;
-  const stripped = SITE_DEFAULT_HEAD_TAGS.reduce((acc, pattern) => acc.replace(pattern, ''), html);
+  const customPatterns = (head.extraMeta ?? []).map(
+    ({ attr, key }) => new RegExp(`<meta\\s+${attr}="${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^>]*>\\s*`, 'gi')
+  );
+  const stripped = [...SITE_DEFAULT_HEAD_TAGS, ...customPatterns].reduce((acc, pattern) => acc.replace(pattern, ''), html);
   const withHead = stripped.replace(/<\/head>/i, `    ${renderHeadTags(head)}\n  </head>`);
   if (!head.noscript) return withHead;
   return withHead.replace(/<div id="root"><\/div>/i, `<noscript>${head.noscript}</noscript>\n    <div id="root"></div>`);
@@ -59,6 +67,7 @@ const upsertMeta = (attr, key, content) => {
     document.head.appendChild(el);
   }
   el.setAttribute('content', content);
+  return el;
 };
 
 const upsertCanonical = (href) => {
@@ -90,8 +99,32 @@ const upsertJsonLd = (items) => {
   script.textContent = serializeJsonLd(items);
 };
 
+// Admin-set tags are marked so the next navigation can undo them: a tag that
+// replaced one already in the document (e.g. keywords) gets its content back.
+const clearCustomMeta = () => {
+  document.head.querySelectorAll('meta[data-custom-meta]').forEach((el) => {
+    const original = el.getAttribute('data-original-content');
+    if (original === null) {
+      el.remove();
+      return;
+    }
+    el.setAttribute('content', original);
+    el.removeAttribute('data-original-content');
+    el.removeAttribute('data-custom-meta');
+  });
+};
+
+const applyCustomMeta = ({ attr, key, content }) => {
+  const existing = document.head.querySelector(`meta[${attr}="${key}"]`);
+  const original = existing?.getAttribute('content');
+  const el = upsertMeta(attr, key, content);
+  if (original !== undefined) el.setAttribute('data-original-content', original ?? '');
+  el.setAttribute('data-custom-meta', '');
+};
+
 // Used by the browser so client-side navigation keeps titles and meta in step.
 export function applyDocumentHead(head) {
+  clearCustomMeta();
   document.title = head.title;
   upsertMeta('name', 'description', head.description);
   upsertMeta('name', 'robots', head.robots);
@@ -102,4 +135,5 @@ export function applyDocumentHead(head) {
   upsertCanonical(head.canonical);
   if (head.canonical) upsertMeta('property', 'og:url', head.canonical);
   upsertJsonLd(head.jsonLd);
+  (head.extraMeta ?? []).forEach(applyCustomMeta);
 }
