@@ -21,6 +21,7 @@ import SearchBar from '../components/SearchBar.jsx';
 import { getDiscountedPrice } from '../utils/discount.js';
 import './HomePage.css';
 import { getProductAlt } from '../utils/productImages.js';
+import { logSelectPromotion, logSelectContent, logSelectItem, logVideoStart } from '../services/analytics.js';
 
 // Product slices are computed inside the component using the useProducts hook
 
@@ -53,6 +54,7 @@ function VideoCard({ src, poster, title, description }) {
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
+      logVideoStart(title, 'home_lookbook');
       video.play().catch(() => {});
     } else {
       video.pause();
@@ -254,6 +256,7 @@ export default function HomePage() {
             {heroSlides.map((slide, index) => (
               <Link
                 to={slide.link || '/products'}
+                onClick={() => logSelectPromotion(slide.title || slide.id || `slide_${index + 1}`, slide.link || '/products')}
                 key={slide.id || index}
                 className="w-full h-full flex-shrink-0 relative overflow-hidden block"
               >
@@ -327,6 +330,7 @@ export default function HomePage() {
             <Link
               key={gender}
               to={`/products?gender=${gender}`}
+              onClick={() => logSelectContent('home_gender_tile', gender)}
               className="group flex items-center justify-center h-24 sm:h-36 rounded-xl bg-surface-container-low border border-tertiary-container/30 hover:border-primary hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
             >
               <span className="playfair text-headline-md md:text-headline-lg text-on-surface group-hover:text-primary transition-colors">
@@ -353,6 +357,7 @@ export default function HomePage() {
               <Link
                 key={category.id || category.name}
                 to={category.link || '/products'}
+                onClick={() => logSelectContent('home_category', category.name)}
                 className="flex flex-col items-center gap-2.5 sm:gap-4 min-w-[90px] sm:min-w-[120px] carousel-item"
               >
                 <div className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] rounded-full border-[3px] border-primary p-1 cursor-pointer hover:scale-105 transition-transform duration-300">
@@ -415,6 +420,7 @@ export default function HomePage() {
                   <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/products/${product.id}`}
+                      onClick={() => logSelectItem(product, 'Home - Featured Elegance')}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
                     >
                       <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">
@@ -522,6 +528,7 @@ export default function HomePage() {
                   <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
                     <Link
                       to={`/products/${product.id}`}
+                      onClick={() => logSelectItem(product, 'Home - Heritage Masterpieces')}
                       className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
                     >
                       <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">

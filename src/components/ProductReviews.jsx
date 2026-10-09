@@ -10,6 +10,7 @@ import {
   sanitizeReview,
 } from '../services/productReviews.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
+import { logFormSubmit } from '../services/analytics.js';
 
 const PAGE_SIZE = 5;
 
@@ -103,9 +104,11 @@ function ReviewForm({ productId, onDone }) {
     setSubmitting(true);
     try {
       await createProductReview(productId, cleaned);
+      logFormSubmit('product_review', 'success');
       showToast('Thanks! Your review has been posted.');
       onDone();
     } catch {
+      logFormSubmit('product_review', 'error');
       setError('We could not post your review. Please try again.');
     } finally {
       setSubmitting(false);

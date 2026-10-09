@@ -1,7 +1,12 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { logPageNotFound } from '../services/analytics.js';
 import './NotFoundPage.css';
 
 export default function NotFoundPage() {
+  const { pathname, search } = useLocation();
+  useEffect(() => logPageNotFound(pathname + search), [pathname, search]);
+
   return (
     <div className="min-h-screen flex flex-col bg-surface overflow-hidden relative">
       <header className="w-full px-margin-mobile md:px-margin-desktop py-4 bg-surface border-b border-surface-variant flex justify-between items-center max-w-container-max mx-auto relative z-10">

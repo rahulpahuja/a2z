@@ -4,6 +4,7 @@ import { WHATSAPP_NUMBER } from '../config/store.js';
 import { buildWhatsAppLink } from '../utils/whatsapp.js';
 import { useToast } from '../context/ToastContext.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { logFormSubmit } from '../services/analytics.js';
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
@@ -41,6 +42,7 @@ export default function StoreAppointmentPage() {
     const greeting = name.trim() ? `Hi, I'm ${name.trim()}.` : 'Hi,';
     const message = `${greeting} I am planning to come to your store on ${formatDate(date)} at ${formatTime(time)}. Please let me know if that works!`;
 
+    logFormSubmit('store_appointment', 'whatsapp_opened');
     window.open(buildWhatsAppLink(WHATSAPP_NUMBER, message), '_blank', 'noopener,noreferrer');
     showToast('Opening WhatsApp — just hit send to confirm your visit.');
   };

@@ -16,7 +16,7 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
-import { logViewItemList, logSelectItem } from '../services/analytics.js';
+import { logViewItemList, logSelectItem, logFilterProducts, logAddToWishlist } from '../services/analytics.js';
 import './ProductListingPage.css';
 import { getProductAlt } from '../utils/productImages.js';
 
@@ -249,6 +249,8 @@ export default function ProductListingPage() {
   };
 
   const toggleFavorite = (id) => {
+    const product = CATALOG.find((p) => p.id === id);
+    if (product && !favorites[id]) logAddToWishlist(product);
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -456,6 +458,31 @@ export default function ProductListingPage() {
     logViewItemList(lazyLoadedProducts, listName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, activeSubcategory, selectedGender, sortBy, selectedCollectionId]);
+
+  // One event per change in what the shopper is narrowing by. The price slider fires
+  // continuously while dragged, so the event waits for it to settle.
+  const filtersMounted = useRef(false);
+  useEffect(() => {
+    if (!filtersMounted.current) {
+      filtersMounted.current = true;
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      logFilterProducts({
+        category: activeCategory,
+        subcategory: activeSubcategory,
+        gender: selectedGender,
+        color: selectedColorLabel,
+        size: selectedSize,
+        sort: sortBy,
+        collection_id: selectedCollectionId,
+        min_price: minPrice > minCatalogPrice ? minPrice : null,
+        max_price: maxPrice < maxCatalogPrice ? maxPrice : null,
+      });
+    }, 800);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory, activeSubcategory, selectedGender, selectedColorLabel, selectedSize, sortBy, selectedCollectionId, minPrice, maxPrice]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
   const PAGES = useMemo(() => {

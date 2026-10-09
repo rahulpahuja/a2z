@@ -4,6 +4,7 @@ import { WHATSAPP_NUMBER, INSTAGRAM_HANDLE } from '../config/store.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { buildWhatsAppLink } from '../utils/whatsapp.js';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { logFormSubmit } from '../services/analytics.js';
 
 const CONTACT_METHODS = [
   {
@@ -33,6 +34,7 @@ export default function ContactUsPage() {
     event.preventDefault();
     setSubmitting(true);
     setTimeout(() => {
+      logFormSubmit('contact_us', 'success');
       showToast(`Thanks${form.name.trim() ? `, ${form.name.trim().split(' ')[0]}` : ''}! We'll get back to you soon.`);
       setForm({ name: '', email: '', message: '' });
       setSubmitting(false);

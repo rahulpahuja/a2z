@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
-import { logAddToCart, logRemoveFromCart, logPurchase } from '../services/analytics.js';
+import { logAddToCart, logRemoveFromCart, logPurchase, logApplyCoupon } from '../services/analytics.js';
 import { createFirebaseOrder, updateFirebaseOrder, hasPriorOrders } from '../services/orders.js';
 import { reserveProductStock, releaseProductStock } from '../services/adminProducts.js';
 import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
@@ -124,6 +124,7 @@ export function CartProvider({ children }) {
     if (!coupon) {
       const err = new Error('Invalid coupon code.');
       err.code = 'COUPON_NOT_FOUND';
+      logApplyCoupon(code, 'not_found');
       throw err;
     }
     const now = await getServerNow();
@@ -132,8 +133,10 @@ export function CartProvider({ children }) {
     if (!result.ok) {
       const err = new Error(result.message);
       err.code = result.code;
+      logApplyCoupon(code, result.code || 'rejected');
       throw err;
     }
+    logApplyCoupon(code, 'applied');
     setAppliedCoupon(coupon);
     return coupon;
   };
