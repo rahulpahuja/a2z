@@ -1,10 +1,12 @@
 User-agent: *
 Disallow: /__trap__
-Disallow: /super/
+Disallow: /super
 Disallow: /dashboard
 Disallow: /cart
-Disallow: /checkout/
+Disallow: /checkout
 Disallow: /orders
 Disallow: /profile
+# Filtered listing views (?category=, ?gender=, ?filter=...) canonicalise to /products.
+Disallow: /products?
 
 Sitemap: https://www.thea2zcollection.com/sitemap.xml
