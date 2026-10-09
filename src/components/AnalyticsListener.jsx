@@ -62,6 +62,8 @@ const ROUTE_TITLES = {
 function resolvePageName(pathname, products) {
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname];
 
+  if (/^\/collections\/[^/]+$/.test(pathname)) return 'Collection';
+
   const productMatch = pathname.match(/^\/products\/([^/]+)$/);
   if (productMatch) {
     const product = products.find((p) => p.id === decodeURIComponent(productMatch[1]));

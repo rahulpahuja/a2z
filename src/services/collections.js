@@ -1,5 +1,6 @@
 import { onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
+import { getDisplayMode } from '../utils/collections.js';
 
 const ROOT = 'collections';
 
@@ -47,13 +48,20 @@ export function subscribeToCollections(callback) {
   );
 }
 
-export function createCollection({ name, productIds, heroProductId, published }) {
-  const payload = {
+// The one place a collection's stored shape is defined; create and update both go through it.
+function toPayload({ name, productIds, heroProductId, published, coverImage, displayMode }) {
+  return {
     name: name.trim(),
     productIds: productIds || [],
     heroProductId: heroProductId || (productIds && productIds[0]) || '',
     published: !!published,
+    coverImage: coverImage || '',
+    displayMode: getDisplayMode({ displayMode }),
   };
+}
+
+export function createCollection(input) {
+  const payload = toPayload(input);
 
   if (!isFirebaseEnabled) {
     const collections = getLocalCollections();
@@ -78,13 +86,8 @@ export function createCollection({ name, productIds, heroProductId, published })
   }).then(() => ({ id: newRef.key, ...payload }));
 }
 
-export function updateCollection(id, { name, productIds, heroProductId, published }) {
-  const payload = {
-    name: name.trim(),
-    productIds: productIds || [],
-    heroProductId: heroProductId || (productIds && productIds[0]) || '',
-    published: !!published,
-  };
+export function updateCollection(id, input) {
+  const payload = toPayload(input);
 
   if (!isFirebaseEnabled) {
     const collections = getLocalCollections();

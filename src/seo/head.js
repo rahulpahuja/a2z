@@ -3,7 +3,7 @@ import { BRAND_NAME, SITE_URL } from './routes.js';
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/mustard_kurti_set.jpg`;
 const JSON_LD_ID = 'seo-jsonld';
 
-const escapeAttr = (text) =>
+export const escapeAttr = (text) =>
   String(text ?? '')
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
