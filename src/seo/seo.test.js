@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { resolveRouteSeo, SITE_URL } from './routes.js';
 import { buildProductHead } from './productHead.js';
 import { injectHeadIntoHtml, renderHeadTags } from './head.js';
-import { applyPageMeta, pageMetaKey, sanitizeMetaTags } from './pageMeta.js';
+import { applyPageMeta, hasNoindex, pageMetaKey, sanitizeMetaTags } from './pageMeta.js';
 
 const INDEX_HTML = `<!doctype html>
 <html lang="en">
@@ -191,5 +191,13 @@ describe('product head descriptions and images', () => {
   it('lists every product image in the structured data', () => {
     const { jsonLd } = buildProductHead({ ...product, images: ['https://cdn.example.com/a.jpg', 'https://cdn.example.com/b.jpg'] });
     expect(jsonLd[0].image).toEqual(['https://cdn.example.com/a.jpg', 'https://cdn.example.com/b.jpg']);
+  });
+});
+
+describe('hasNoindex', () => {
+  it('detects an admin-set robots noindex tag', () => {
+    expect(hasNoindex({ metaTags: [{ attr: 'name', key: 'robots', content: 'noindex, follow' }] })).toBe(true);
+    expect(hasNoindex({ metaTags: [{ attr: 'name', key: 'keywords', content: 'noindex' }] })).toBe(false);
+    expect(hasNoindex(undefined)).toBe(false);
   });
 });

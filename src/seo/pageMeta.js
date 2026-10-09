@@ -31,3 +31,7 @@ export function applyPageMeta(head, entry) {
     extraMeta: sanitizeMetaTags(entry.metaTags),
   };
 }
+
+// True when the admin set a robots meta tag that tells search engines not to index the page.
+export const hasNoindex = (entry) =>
+  sanitizeMetaTags(entry?.metaTags).some(({ attr, key, content }) => attr === 'name' && key.toLowerCase() === 'robots' && /noindex/i.test(content));
