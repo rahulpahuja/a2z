@@ -11,6 +11,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { isProductAvailable } from '../utils/productColors.js';
 import { getProductAlt } from '../utils/productImages.js';
+import BrandName from '../components/BrandName.jsx';
 
 const categories = [
   {
@@ -233,7 +234,7 @@ export default function StorefrontPage() {
           </button>
           {/* Brand Logo */}
           <Link to="/" className="font-headline-md-mobile md:font-headline-md text-headline-md-mobile md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden items-center gap-6">

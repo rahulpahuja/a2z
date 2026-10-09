@@ -22,6 +22,7 @@ import { getDiscountedPrice } from '../utils/discount.js';
 import './HomePage.css';
 import { getProductAlt } from '../utils/productImages.js';
 import { logSelectPromotion, logSelectContent, logSelectItem, logVideoStart } from '../services/analytics.js';
+import BrandName from '../components/BrandName.jsx';
 
 // Product slices are computed inside the component using the useProducts hook
 
@@ -223,7 +224,7 @@ export default function HomePage() {
               to="/"
               className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md [@media(orientation:landscape)_and_(max-height:500px)]:!font-headline-md-mobile [@media(orientation:landscape)_and_(max-height:500px)]:!text-headline-md-mobile font-bold text-primary dark:text-primary-fixed-dim playfair tracking-tight truncate"
             >
-              A2Z Collection
+              <BrandName />
             </Link>
           </div>
           <nav className="hidden md:flex space-x-8 [@media(orientation:landscape)_and_(max-height:500px)]:!hidden">

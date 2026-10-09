@@ -19,6 +19,7 @@ import DiscountCountdown from '../components/DiscountCountdown.jsx';
 import { logViewItemList, logSelectItem, logFilterProducts, logAddToWishlist } from '../services/analytics.js';
 import './ProductListingPage.css';
 import { getProductAlt } from '../utils/productImages.js';
+import BrandName from '../components/BrandName.jsx';
 
 const COLORS = [
   { id: 'red', label: 'Red', className: 'bg-red-600' },
@@ -526,7 +527,7 @@ export default function ProductListingPage() {
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <Link to="/" className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim truncate">A2Z Collection</Link>
+          <Link to="/" className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md font-bold text-primary dark:text-primary-fixed-dim truncate"><BrandName /></Link>
         </div>
         <nav className="hidden md:flex items-center gap-8 [@media(orientation:landscape)_and_(max-height:500px)]:!hidden">
           {navLinks.map((link) => (

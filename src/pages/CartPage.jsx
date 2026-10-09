@@ -10,6 +10,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { logViewCart } from '../services/analytics.js';
 import { formatCouponBadge } from '../utils/coupons.js';
+import BrandName from '../components/BrandName.jsx';
 
 function CartLineItem({ item, onIncrease, onDecrease, onQuantityChange, onRemove }) {
   // Phones: thumbnail and details side by side, price and quantity full width below.
@@ -147,7 +148,7 @@ export default function CartPage() {
             <span className="material-symbols-outlined">menu</span>
           </button>
           <Link to="/" className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
-            A2Z Collection
+            <BrandName />
           </Link>
           <nav className="hidden md:flex [@media(orientation:landscape)_and_(max-height:500px)]:!hidden gap-6 font-body-lg text-body-lg">
             {navLinks.map((link) => (
