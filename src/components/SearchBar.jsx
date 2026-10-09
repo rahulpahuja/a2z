@@ -6,7 +6,7 @@ import { formatCurrency } from '../context/CartContext.jsx';
 import { getDiscountedPrice } from '../utils/discount.js';
 import ProductCardImage from './ProductCardImage.jsx';
 import { createProductSearchIndex } from '../utils/productSearch.js';
-import { logSearch, logSelectItem } from '../services/analytics.js';
+import { logSearch, logSelectItem, logSearchNoResults } from '../services/analytics.js';
 
 const EXPANDED_WIDTH = 260;
 
@@ -57,7 +57,10 @@ export default function SearchBar({ className = '' }) {
 
   useEffect(() => {
     const needle = debouncedQuery.trim();
-    if (needle) logSearch(needle);
+    if (!needle) return;
+    logSearch(needle);
+    if (results.length === 0) logSearchNoResults(needle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
 
   const close = () => setOpen(false);

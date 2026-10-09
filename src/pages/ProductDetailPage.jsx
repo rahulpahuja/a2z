@@ -9,7 +9,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { ProductDetailSkeleton } from '../components/Shimmer.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
-import { logViewItem } from '../services/analytics.js';
+import { logViewItem, logSelectVariant, logShare, logSelectContent, logSelectItem } from '../services/analytics.js';
 import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
@@ -230,6 +230,7 @@ export default function ProductDetailPage() {
 
   const handleSelectColor = (colorName) => {
     setSelectedColor(colorName);
+    logSelectVariant('color', colorName, product);
     const colorObj = availableColors.find((c) => c.name === colorName);
     if (colorObj && colorObj.sizes.length > 0) {
       const stillAvailable = colorObj.sizes.some(
@@ -267,6 +268,7 @@ export default function ProductDetailPage() {
     if (navigator.share) {
       try {
         await navigator.share({ title, url });
+        logShare('native', 'product');
       } catch {
         // The shopper dismissed the share sheet.
       }
@@ -274,6 +276,7 @@ export default function ProductDetailPage() {
     }
     try {
       await navigator.clipboard.writeText(url);
+      logShare('copy_link', 'product');
       showToast('Product link copied to clipboard.');
     } catch {
       showToast('Could not copy the link. Please try again.');
@@ -388,7 +391,10 @@ export default function ProductDetailPage() {
               {media.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedThumbnail(index)}
+                  onClick={() => {
+                    setSelectedThumbnail(index);
+                    logSelectContent('product_image', `${product.id}#${index + 1}`);
+                  }}
                   className={`relative overflow-hidden border transition-all shrink-0 ${
                     selectedThumbnail === index ? 'border-primary ring-2 ring-primary/20' : 'border-outline-variant/60 hover:border-primary'
                   }`}
@@ -465,7 +471,7 @@ export default function ProductDetailPage() {
             <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center">
                 <span className="font-title-sm text-title-sm text-on-surface">Size</span>
-                <a className="font-body-sm text-body-sm text-primary hover:underline" href="#">Size Guide</a>
+                <a className="font-body-sm text-body-sm text-primary hover:underline" href="#" onClick={() => logSelectContent('size_guide', product.id)}>Size Guide</a>
               </div>
               <div className="flex gap-2 flex-wrap">
                 {availableSizes.map((s) => {
@@ -476,7 +482,10 @@ export default function ProductDetailPage() {
                     <button
                       key={s.size}
                       disabled={isOutOfStock}
-                      onClick={() => setSelectedSize(s.size)}
+                      onClick={() => {
+                        setSelectedSize(s.size);
+                        logSelectVariant('size', s.size, product);
+                      }}
                       className={`w-12 h-12 rounded-full border font-label-caps text-label-caps flex items-center justify-center transition-colors uppercase relative ${
                         isOutOfStock
                           ? 'opacity-40 border-outline-variant text-on-surface-variant cursor-not-allowed line-through'
@@ -685,7 +694,7 @@ export default function ProductDetailPage() {
             <h2 className="font-headline-md text-headline-md text-center text-on-surface mb-10">You May Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
               {relatedProducts.map((related) => (
-                <Link key={related.id} to={`/products/${related.id}`} className="group flex flex-col gap-3">
+                <Link key={related.id} to={`/products/${related.id}`} onClick={() => logSelectItem(related, 'Related Products')} className="group flex flex-col gap-3">
                   <div className="relative aspect-[3/4] rounded-[16px] overflow-hidden bg-surface-container border border-[#DCAE96]/30">
                     <ProductCardImage
                       images={related.images && related.images.length > 0 ? related.images : [related.image]}

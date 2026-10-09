@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createFeedback } from '../services/feedback.js';
 import { useToast } from '../context/ToastContext.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { logFormSubmit } from '../services/analytics.js';
 
 const EMPTY_FORM = { name: '', email: '', rating: 0, message: '' };
 
@@ -20,9 +21,11 @@ export default function FeedbackPage() {
     setSubmitting(true);
     try {
       await createFeedback(form);
+      logFormSubmit('feedback', 'success');
       showToast('Thank you for your feedback!');
       setForm(EMPTY_FORM);
     } catch (err) {
+      logFormSubmit('feedback', 'error');
       showToast(err.message || 'Could not submit your feedback right now.');
     } finally {
       setSubmitting(false);

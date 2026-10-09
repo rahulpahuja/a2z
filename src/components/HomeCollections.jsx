@@ -9,6 +9,7 @@ import ProductImage from './ProductImage.jsx';
 import EmptySegment from './EmptySegment.jsx';
 import { isProductAvailable } from '../utils/productColors.js';
 import { getProductAlt } from '../utils/productImages.js';
+import { logSelectItem } from '../services/analytics.js';
 
 function CollectionRow({ collection, products }) {
   const scrollRef = useRef(null);
@@ -57,6 +58,7 @@ function CollectionRow({ collection, products }) {
             <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
               <Link
                 to={`/products/${product.id}`}
+                onClick={() => logSelectItem(product, `Home - ${collection.name}`)}
                 className={`group flex flex-col h-full bg-surface-container-low rounded-xl border border-tertiary-container/30 overflow-hidden hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300 ${!isAvailable ? 'opacity-85' : ''}`}
               >
                 <div className="relative w-full aspect-[3/4] overflow-hidden bg-surface-variant">

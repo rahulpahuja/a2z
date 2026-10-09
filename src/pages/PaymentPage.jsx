@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { createRazorpayOrder, verifyRazorpayPayment, openRazorpayCheckout, loadRazorpayScript, isTestMode } from '../services/razorpay.js';
 import { isValidAmount } from '../utils/security.js';
-import { logAddPaymentInfo } from '../services/analytics.js';
+import { logAddPaymentInfo, logPaymentFailure } from '../services/analytics.js';
 import { logCheckoutFailure } from '../services/checkoutLog.js';
 
 export default function PaymentPage() {
@@ -89,10 +89,12 @@ export default function PaymentPage() {
           }
         },
         onFailure: (error) => {
+          logPaymentFailure('declined', total);
           showToast(error?.description || 'Payment failed. Please try again.');
           setIsProcessing(false);
         },
         onDismiss: () => {
+          logPaymentFailure('dismissed', total);
           showToast('Payment cancelled.');
           setIsProcessing(false);
         },

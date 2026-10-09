@@ -1,5 +1,6 @@
 import { push, ref, serverTimestamp, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
+import { logPaymentFailure } from './analytics.js';
 
 const ROOT = 'checkoutFailures';
 
@@ -15,6 +16,7 @@ const ROOT = 'checkoutFailures';
 // thing to debug at the worst possible moment.
 export function logCheckoutFailure({ stage, error, paymentId = null, orderId = null, amount = null }) {
   console.error(`Checkout failed at "${stage}":`, error);
+  logPaymentFailure(stage, amount);
 
   if (!isFirebaseEnabled) return Promise.resolve();
 

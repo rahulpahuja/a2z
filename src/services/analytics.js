@@ -156,3 +156,55 @@ export function logSelectContent(contentType, itemId) {
 export function logShare(method, contentType) {
   logAnalyticsEvent('share', { method, content_type: contentType });
 }
+
+// Behaviour events beyond the GA4 ecommerce set: what visitors do between landing and buying.
+export function logSelectPromotion(promotionName, destination) {
+  logAnalyticsEvent('select_promotion', { promotion_name: promotionName, creative_name: destination });
+}
+
+export function logAddToWishlist(product) {
+  logAnalyticsEvent('add_to_wishlist', {
+    currency: CURRENCY,
+    value: Number(product.price) || 0,
+    items: [toGA4Item(product)],
+  });
+}
+
+export function logSelectVariant(variantType, variantValue, product) {
+  logAnalyticsEvent('select_variant', {
+    variant_type: variantType,
+    variant_value: variantValue,
+    item_id: product.id,
+    item_name: product.title || product.name,
+  });
+}
+
+// Only the filters actually in use are sent, so GA4 reports show what shoppers narrow by.
+export function logFilterProducts(filters) {
+  const active = Object.fromEntries(Object.entries(filters).filter(([, value]) => value != null && value !== '' && value !== 'All'));
+  logAnalyticsEvent('filter_products', active);
+}
+
+export function logApplyCoupon(coupon, outcome) {
+  logAnalyticsEvent('apply_coupon', { coupon: String(coupon ?? '').toUpperCase(), outcome });
+}
+
+export function logSearchNoResults(searchTerm) {
+  logAnalyticsEvent('search_no_results', { search_term: searchTerm });
+}
+
+export function logFormSubmit(formName, outcome) {
+  logAnalyticsEvent('form_submit', { form_name: formName, outcome });
+}
+
+export function logPaymentFailure(reason, value) {
+  logAnalyticsEvent('payment_failed', { reason, currency: CURRENCY, value: Number(value) || 0 });
+}
+
+export function logPageNotFound(path) {
+  logAnalyticsEvent('page_not_found', { page_path: path, referrer: typeof document === 'undefined' ? '' : document.referrer });
+}
+
+export function logVideoStart(videoTitle, source) {
+  logAnalyticsEvent('video_start', { video_title: videoTitle, source });
+}
