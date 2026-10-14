@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
+import './AdminSettingsPage.css';
 
 const PICKUP_FIELDS = [
   { key: 'name', label: 'Warehouse Contact Name', placeholder: 'Acme WH' },
@@ -62,6 +63,11 @@ export default function AdminSettingsPage() {
     setSettings((prev) => ({ ...prev, homeProductsPerRow: value === '' ? '' : Number(value) }));
   };
 
+  const updateMobileHeroHeight = (event) => {
+    const value = event.target.value;
+    setSettings((prev) => ({ ...prev, mobileHeroHeightVh: value === '' ? '' : Number(value) }));
+  };
+
   const updatePickupField = (key) => (event) =>
     setSettings((prev) => ({
       ...prev,
@@ -74,7 +80,8 @@ export default function AdminSettingsPage() {
     try {
       const taxRatePercent = Math.min(100, Math.max(0, Number(settings.taxRatePercent) || 0));
       const homeProductsPerRow = Math.min(10, Math.max(4, Number(settings.homeProductsPerRow) || 8));
-      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow });
+      const mobileHeroHeightVh = Math.min(60, Math.max(15, Math.round(Number(settings.mobileHeroHeightVh)) || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh));
+      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh });
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -173,6 +180,26 @@ export default function AdminSettingsPage() {
                 placeholder="8"
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
               />
+            </div>
+
+            <div className="admin-settings-field">
+              <label className="admin-settings-field__label" htmlFor="mobileHeroHeightVh">
+                Banner Height on Phones (% of screen height)
+              </label>
+              <input
+                id="mobileHeroHeightVh"
+                className="admin-settings-field__input"
+                type="number"
+                min="15"
+                max="60"
+                step="1"
+                value={settings.mobileHeroHeightVh ?? ''}
+                onChange={updateMobileHeroHeight}
+                placeholder={String(DEFAULT_STORE_SETTINGS.mobileHeroHeightVh)}
+              />
+              <p className="admin-settings-field__hint">
+                Lower it to trim the blurred space above and below the home page banner on phones. Between 15 and 60; default {DEFAULT_STORE_SETTINGS.mobileHeroHeightVh}. Tablets and desktop are unchanged.
+              </p>
             </div>
 
             <SettingToggle

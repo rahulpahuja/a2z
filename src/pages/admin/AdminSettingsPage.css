@@ -1,0 +1,38 @@
+.admin-settings-field {
+  max-width: 320px;
+  margin-top: 1.25rem;
+}
+
+.admin-settings-field__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-settings-field__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  font-family: var(--font-body-sm);
+  color: var(--color-on-surface);
+  transition: border-color 0.15s ease;
+}
+
+.admin-settings-field__input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.admin-settings-field__hint {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}

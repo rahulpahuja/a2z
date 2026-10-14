@@ -124,6 +124,8 @@ export default function HomePage() {
   const [homeProductsPerRow, setHomeProductsPerRow] = useState(DEFAULT_STORE_SETTINGS.homeProductsPerRow);
   const [showCategoryBubbles, setShowCategoryBubbles] = useState(DEFAULT_STORE_SETTINGS.showCategoryBubbles);
   const [showBannerHint, setShowBannerHint] = useState(DEFAULT_STORE_SETTINGS.showBannerHint);
+  const [mobileHeroHeightVh, setMobileHeroHeightVh] = useState(DEFAULT_STORE_SETTINGS.mobileHeroHeightVh);
+  const heroRef = useRef(null);
   const [bannerHintSeen, setBannerHintSeen] = useState(readBannerHintSeen);
 
   const productsRow1 = products.slice(0, homeProductsPerRow);
@@ -140,11 +142,17 @@ export default function HomePage() {
     return unsub;
   }, []);
 
+  // Hands the admin-set mobile banner height to CSS (see .home-hero--mobile-custom in HomePage.css).
+  useEffect(() => {
+    heroRef.current?.style.setProperty('--home-hero-mobile-height', `${mobileHeroHeightVh}vh`);
+  }, [mobileHeroHeightVh]);
+
   useEffect(() => {
     const unsub = subscribeToStoreSettings((data) => {
       setHomeProductsPerRow(data.homeProductsPerRow || DEFAULT_STORE_SETTINGS.homeProductsPerRow);
       setShowCategoryBubbles(data.showCategoryBubbles ?? DEFAULT_STORE_SETTINGS.showCategoryBubbles);
       setShowBannerHint(data.showBannerHint ?? DEFAULT_STORE_SETTINGS.showBannerHint);
+      setMobileHeroHeightVh(data.mobileHeroHeightVh || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh);
     });
     return unsub;
   }, []);
@@ -251,7 +259,7 @@ export default function HomePage() {
       <main className="w-full max-w-full overflow-x-clip">
         <h1 className="sr-only">A2Z Collection: co-ord sets, jeans, jackets and footwear from Indore</h1>
         {/* Hero Carousel */}
-        <section onClick={dismissBannerHint} className="relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden">
+        <section ref={heroRef} onClick={dismissBannerHint} className={`${mobileHeroHeightVh !== DEFAULT_STORE_SETTINGS.mobileHeroHeightVh ? 'home-hero--mobile-custom ' : ''}relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden`}>
           <div
             className="w-full h-full flex transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}

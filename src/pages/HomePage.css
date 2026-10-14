@@ -1,2 +1,10 @@
 .carousel-container { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 .carousel-item { scroll-snap-align: start; }
+
+/* Admin-set hero banner height on phones (Settings > Home Page Layout). Applies only when it differs from the default. */
+@media (max-width: 639px) {
+  .home-hero--mobile-custom {
+    height: var(--home-hero-mobile-height, 42vh);
+    min-height: 0;
+  }
+}
