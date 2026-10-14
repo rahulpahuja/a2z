@@ -41,6 +41,8 @@ const EMPTY_FORM = {
   subcategoryId: '',
   price: '',
   hsnCode: '',
+  origin: '',
+  care: '',
   gender: 'Unisex',
   discountUnit: DISCOUNT_UNITS.PERCENTAGE,
   discountValue: '',
@@ -117,6 +119,8 @@ export default function AdminProductsPage() {
       subcategoryId: product.subcategoryId || '',
       price: product.price || '',
       hsnCode: product.hsnCode || '',
+      origin: product.origin || '',
+      care: product.care || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -170,6 +174,8 @@ export default function AdminProductsPage() {
       subcategoryId: product.subcategoryId || '',
       price: product.price || '',
       hsnCode: product.hsnCode || '',
+      origin: product.origin || '',
+      care: product.care || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -257,6 +263,8 @@ export default function AdminProductsPage() {
             subcategoryTitle: product.subcategoryTitle || '',
             price: product.price || 0,
             hsnCode: product.hsnCode || '',
+            origin: product.origin || '',
+            care: product.care || '',
             colors: product.colors ?? [],
             sizes: product.sizes ?? [],
             image: product.image || (product.images ?? [])[0],
@@ -755,6 +763,8 @@ export default function AdminProductsPage() {
         subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
+        origin: form.origin.trim(),
+        care: form.care.trim(),
         discountUnit: form.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
         discountValue: form.discountValue === '' ? null : Number(form.discountValue),
         discountDurationType: form.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
@@ -980,6 +990,39 @@ export default function AdminProductsPage() {
                   onChange={updateField('description')}
                   className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                 />
+              </div>
+
+              {/* Origin & care: shown in the storefront Specifications only when filled in. */}
+              <div className="admin-products-details">
+                <div className="admin-products-details__field">
+                  <label className="admin-products-details__label" htmlFor="p-origin">
+                    Origin (optional)
+                  </label>
+                  <input
+                    id="p-origin"
+                    value={form.origin}
+                    onChange={updateField('origin')}
+                    maxLength={80}
+                    placeholder="e.g. Jaipur, Rajasthan"
+                    className="admin-products-details__input"
+                  />
+                </div>
+                <div className="admin-products-details__field">
+                  <label className="admin-products-details__label" htmlFor="p-care">
+                    Care (optional)
+                  </label>
+                  <input
+                    id="p-care"
+                    value={form.care}
+                    onChange={updateField('care')}
+                    maxLength={120}
+                    placeholder="e.g. Dry clean only"
+                    className="admin-products-details__input"
+                  />
+                </div>
+                <p className="admin-products-details__hint">
+                  Leave blank to hide the row on the product page. Only enter details you can stand behind.
+                </p>
               </div>
 
               {/* Product Images (5 Slots) */}

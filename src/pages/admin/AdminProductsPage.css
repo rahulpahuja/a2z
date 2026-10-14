@@ -171,3 +171,51 @@
   border-color: var(--color-primary);
   outline: none;
 }
+
+/* Origin & care (optional product details) */
+.admin-products-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .admin-products-details {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.admin-products-details__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-on-surface-variant);
+}
+
+.admin-products-details__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font-family: var(--font-body-lg);
+  font-size: var(--text-body-lg);
+  transition: border-color 150ms ease;
+}
+
+.admin-products-details__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.admin-products-details__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}

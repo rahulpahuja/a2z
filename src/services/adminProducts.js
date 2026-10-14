@@ -73,7 +73,8 @@ export function subscribeToAdminProducts(callback) {
 }
 
 // product: { title, description, hashtags: string[], categoryId, categoryTitle,
-//            price: number, hsnCode,
+//            price: number, hsnCode, origin?: string, care?: string (shown on the
+//            product page only when non-empty),
 //            colors: [{ name, hex, outOfStock: bool, sizes: [{ size, stock: number|null }] }] }
 // Each color owns its own sizes — colors[].sizes[].stock is the joint
 // (color, size) inventory count. stock === null means that size isn't

@@ -19,6 +19,7 @@ import StarRating from '../components/StarRating.jsx';
 import ProductReviews from '../components/ProductReviews.jsx';
 import ProductFaqs from '../components/ProductFaqs.jsx';
 import ProductDescription from '../components/ProductDescription.jsx';
+import { getOptionalSpecs } from '../utils/productSpecs.js';
 import { subscribeToProductReviews } from '../services/productReviews.js';
 import { subscribeToProductFaqs } from '../services/productFaqs.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
@@ -656,17 +657,15 @@ export default function ProductDetailPage() {
                   <span className="font-body-sm text-body-sm text-on-surface">{product.category}</span>
                 </div>
                 <div>
-                  <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Care</span>
-                  <span className="font-body-sm text-body-sm text-on-surface">Dry Clean Only</span>
-                </div>
-                <div>
                   <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Availability</span>
                   <span className="font-body-sm text-body-sm text-on-surface">{!isProductOutOfStock && product.inStock !== false ? 'In Stock' : 'Out of Stock'}</span>
                 </div>
-                <div>
-                  <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Origin</span>
-                  <span className="font-body-sm text-body-sm text-on-surface">Handcrafted in India</span>
-                </div>
+                {getOptionalSpecs(product).map((spec) => (
+                  <div key={spec.label}>
+                    <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">{spec.label}</span>
+                    <span className="font-body-sm text-body-sm text-on-surface">{spec.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
