@@ -133,13 +133,104 @@ function renderLine(line) {
   return !line.labelled && needsPeriod(text) ? `${text}.` : text;
 }
 
+// --- Paragraph -> intro, feature bullets, occasion bullets ----------------------
+// A single plain paragraph ("Designed with a, b, c and d, these pants ... Perfect for x, y,
+// and z.") reads better as an intro, a bulleted feature list and a bulleted "Perfect for:"
+// list. Only the structure changes: every word the admin wrote is kept, nothing is added
+// except the "Perfect for:" / "Designed with:" lead-in that repeats the original phrase.
+// Text that already has several lines, bullets or labels is left alone, so the result of
+// formatDescription never gets restructured a second time.
+const MIN_SENTENCES_TO_STRUCTURE = 3;
+const MIN_LIST_ITEMS = 3;
+const MAX_LIST_ITEM_WORDS = 6;
+const OCCASION_LEAD = /^(perfect|ideal|great|suitable|best)\s+for\s+(.+?)[.!?]*$/i;
+const FEATURE_LEAD = /^(designed with|made with|crafted with|equipped with|packed with|comes with|featuring|features|includes)\s+(.+?)[.!?]*$/i;
+const LEADING_ARTICLE = /^(a|an|the)\s+/i;
+const GERUND_START = /^[a-z]+ing\b/i;
+const CLAUSE_START = /^(and|or)\s+/i;
+
+const upperFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
+const splitSentences = (text) => {
+  const sentences = [];
+  let start = 0;
+  for (const match of text.matchAll(/[.!?]+(\s+)(?=[A-Z0-9"'“(])/g)) {
+    const before = text.slice(start, match.index);
+    const word = /([A-Za-z.]+)$/.exec(before)?.[1]?.toLowerCase();
+    if (match[0].startsWith('.') && word && (word.length === 1 || ABBREVIATIONS.has(word.replace(/\.$/, '')))) continue;
+    sentences.push(text.slice(start, match.index + match[0].length - match[1].length));
+    start = match.index + match[0].length;
+  }
+  sentences.push(text.slice(start));
+  return sentences.map((sentence) => sentence.trim()).filter(Boolean);
+};
+
+const isCleanListItem = (item) =>
+  item.length > 0 && item.split(/\s+/).length <= MAX_LIST_ITEM_WORDS && !/\sfor\s/i.test(item) && !GERUND_START.test(item);
+
+// "casual outings, Korean-inspired outfits, and trendy urban looks" -> three items, or
+// null when the sentence is not a plain noun list (so it stays an ordinary sentence).
+const parseOccasionItems = (body) => {
+  const parts = body.split(/\s*,\s*/).map((part) => part.replace(CLAUSE_START, '').trim());
+  if (parts.length < 2) return null;
+  const last = parts[parts.length - 1];
+  const items = [...parts.slice(0, -1), ...last.split(/\s+(?:and|or)\s+/i)].filter(Boolean);
+  return items.length >= MIN_LIST_ITEMS && items.every(isCleanListItem) ? items.map(upperFirst) : null;
+};
+
+// "a comfortable waistband, adjustable drawstring, and a light feel, these pants combine ..."
+// -> the list up to the first "and ..." item, plus whatever clause follows it.
+const parseFeatureItems = (body) => {
+  const parts = body.split(/\s*,\s*/).map((part) => part.trim()).filter(Boolean);
+  const endIndex = parts.findIndex((part) => CLAUSE_START.test(part));
+  if (endIndex === -1) return null;
+  const items = [...parts.slice(0, endIndex), parts[endIndex].replace(CLAUSE_START, '')]
+    .map((item) => item.replace(LEADING_ARTICLE, '').trim())
+    .filter(Boolean);
+  if (items.length < MIN_LIST_ITEMS || !items.every(isCleanListItem)) return null;
+  return { items: items.map(upperFirst), trailing: parts.slice(endIndex + 1).join(', ') };
+};
+
+function restructureParagraph(raw) {
+  const lines = toLines(raw).filter(Boolean);
+  if (lines.length !== 1 || BULLET_MARKER.test(lines[0])) return raw;
+  const text = tidySpacing(lines[0]);
+  if (startsWithLabel(text) || splitLabelledRuns(text)) return raw;
+
+  const sentences = splitSentences(capitaliseSentences(text));
+  if (sentences.length < MIN_SENTENCES_TO_STRUCTURE) return raw;
+
+  const [intro, ...rest] = sentences;
+  let extracted = false;
+  const blocks = rest.map((sentence) => {
+    const occasion = OCCASION_LEAD.exec(sentence);
+    const items = occasion && parseOccasionItems(occasion[2]);
+    if (items) {
+      extracted = true;
+      return [`${upperFirst(occasion[1])} for:`, ...items.map((item) => `- ${item}`)];
+    }
+    const feature = FEATURE_LEAD.exec(sentence);
+    const parsed = feature && parseFeatureItems(feature[2]);
+    if (parsed) {
+      extracted = true;
+      const lines = [`${upperFirst(feature[1])}:`, ...parsed.items.map((item) => `- ${item}`)];
+      return parsed.trailing ? [...lines, '', upperFirst(parsed.trailing)] : lines;
+    }
+    return [sentence];
+  });
+
+  // No list found: fall back to one bullet per remaining sentence.
+  const body = extracted ? blocks.flatMap((block) => ['', ...block]) : ['', ...rest.map((sentence) => `- ${sentence}`)];
+  return [intro, ...body].join('\n');
+}
+
 /**
  * Tidies a description. Pure and idempotent.
  * @param {unknown} raw
  * @returns {string}
  */
 export function formatDescription(raw) {
-  const rendered = promoteLabelRuns(parseLines(raw)).map(renderLine);
+  const rendered = promoteLabelRuns(parseLines(restructureParagraph(raw))).map(renderLine);
   const collapsed = rendered.filter((line, index) => line !== '' || (index > 0 && rendered[index - 1] !== ''));
   return collapsed.join('\n').replace(/^\n+|\n+$/g, '');
 }
