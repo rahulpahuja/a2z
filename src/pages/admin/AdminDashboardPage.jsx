@@ -4,6 +4,7 @@ import { formatCurrency } from '../../context/CartContext.jsx';
 import { PRODUCTS } from '../../data/products.js';
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
+import { useToast } from '../../context/ToastContext.jsx';
 import { subscribeToAdminProducts } from '../../services/adminProducts.js';
 import { subscribeToOrders } from '../../services/orders.js';
 import { isProductAvailable, getSizeStockSummary } from '../../utils/productColors.js';
@@ -116,6 +117,7 @@ function ProductRankTable({ title, rows, emptyText }) {
 }
 
 export default function AdminDashboardPage() {
+  const { showToast } = useToast();
   const [liveOrders, setLiveOrders] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);
 
@@ -170,6 +172,14 @@ export default function AdminDashboardPage() {
   const handleOrderLookup = (event) => {
     event.preventDefault();
     setOrderResult(findOrderById(allOrders, orderQuery));
+  };
+
+  const handleDownloadReceipt = async (order) => {
+    try {
+      await generateReceiptPdf(order);
+    } catch (err) {
+      showToast(err.message || 'Could not generate the receipt.');
+    }
   };
 
   const handleProductLookup = (event) => {
@@ -247,7 +257,7 @@ export default function AdminDashboardPage() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => generateReceiptPdf(orderResult)}
+                    onClick={() => handleDownloadReceipt(orderResult)}
                     className="px-3 py-1 rounded border border-primary text-primary font-label-caps text-[0.625rem] uppercase hover:bg-surface-container transition-colors"
                   >
                     Download Invoice

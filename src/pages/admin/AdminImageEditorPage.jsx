@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
+import { downloadBlob } from '../../utils/download.js';
 
 const DEFAULT_ADJUSTMENTS = { brightness: 100, contrast: 100, saturation: 100 };
 
@@ -182,15 +183,8 @@ export default function AdminImageEditorPage() {
           showToast('Could not export this image.');
           return;
         }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
         const baseName = (imageFile?.name || 'image').replace(/\.[^.]+$/, '');
-        link.href = url;
-        link.download = `${baseName}-edited.${format === 'jpeg' ? 'jpg' : 'png'}`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        downloadBlob(blob, `${baseName}-edited.${format === 'jpeg' ? 'jpg' : 'png'}`);
       },
       mimeType,
       format === 'jpeg' ? quality / 100 : undefined
