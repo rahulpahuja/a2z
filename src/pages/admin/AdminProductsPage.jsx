@@ -10,7 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import ProductContentModal from '../../components/admin/ProductContentModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
-import { getR2KeyFromUrl } from '../../utils/productImages.js';
+import { getR2KeyFromUrl, getDownloadFetchUrl } from '../../utils/productImages.js';
 import { uploadImageToExternalServer } from '../../services/imageUpload.js';
 import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, DISCOUNT_END_TIME_MODES, validateDiscountInput } from '../../utils/discount.js';
 import {
@@ -397,7 +397,7 @@ export default function AdminProductsPage() {
   // admin can still save it manually.
   const downloadImage = async (url, suggestedName) => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(getDownloadFetchUrl(url, import.meta.env.VITE_IMAGE_UPLOAD_API_URL));
       if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
