@@ -185,6 +185,11 @@ export default function AdminSettingsPage() {
               onChange={(showBannerHint) => setSettings((prev) => ({ ...prev, showBannerHint }))}
               label="Show a &quot;Tap to shop&quot; hint on the home page banner to first-time visitors"
             />
+            <SettingToggle
+              checked={settings.showBuyOnWhatsapp ?? DEFAULT_STORE_SETTINGS.showBuyOnWhatsapp}
+              onChange={(showBuyOnWhatsapp) => setSettings((prev) => ({ ...prev, showBuyOnWhatsapp }))}
+              label="Show a &quot;Buy on WhatsApp&quot; button on product pages"
+            />
           </div>
 
           {/* Refund Policy Provision for Super User */}

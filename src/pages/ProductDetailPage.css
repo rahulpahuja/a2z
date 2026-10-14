@@ -1,0 +1,34 @@
+.pdp-whatsapp-buy {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-block: 1rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pdp-whatsapp-buy svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.pdp-whatsapp-buy:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.pdp-whatsapp-buy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
