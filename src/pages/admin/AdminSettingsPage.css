@@ -36,3 +36,65 @@
   font-size: var(--text-body-sm);
   color: var(--color-on-surface-variant);
 }
+
+.admin-settings-field--wide {
+  max-width: 560px;
+}
+
+.admin-settings-field__textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.admin-settings-field__actions {
+  margin-top: 0.5rem;
+}
+
+.admin-settings-field__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.admin-settings-field__link:hover {
+  text-decoration: underline;
+}
+
+.admin-settings-field__placeholders {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.admin-settings-field__placeholders code {
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.admin-settings-field__warning {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-error);
+}
+
+.admin-settings-field__preview {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  font-family: var(--font-body-sm);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

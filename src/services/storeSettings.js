@@ -1,6 +1,7 @@
 import { get, onValue, ref, set } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
 import { FACEBOOK_URL } from '../config/store.js';
+import { DEFAULT_ORDER_TEMPLATE } from '../utils/whatsapp.js';
 
 const PATH = 'settings/store';
 
@@ -45,6 +46,8 @@ export const DEFAULT_STORE_SETTINGS = {
   // Shows a "Buy on WhatsApp" button on each product page that opens a chat
   // with the store number, prefilled with the product, variant and quantity.
   showBuyOnWhatsapp: true,
+  // Message prefilled by the Buy on WhatsApp button; {placeholders} are filled per product.
+  whatsappOrderTemplate: DEFAULT_ORDER_TEMPLATE,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.

@@ -89,6 +89,7 @@ export default function ProductDetailPage() {
   const [reviews, setReviews] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [showBuyOnWhatsapp, setShowBuyOnWhatsapp] = useState(DEFAULT_STORE_SETTINGS.showBuyOnWhatsapp);
+  const [whatsappOrderTemplate, setWhatsappOrderTemplate] = useState(DEFAULT_STORE_SETTINGS.whatsappOrderTemplate);
   // Bumped when the discount countdown expires, to force the price below
   // (computed fresh each render from the real clock) to re-evaluate and
   // revert without a page reload.
@@ -97,6 +98,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const unsub = subscribeToStoreSettings((data) => {
       setShowBuyOnWhatsapp(data.showBuyOnWhatsapp ?? DEFAULT_STORE_SETTINGS.showBuyOnWhatsapp);
+      setWhatsappOrderTemplate(data.whatsappOrderTemplate || DEFAULT_STORE_SETTINGS.whatsappOrderTemplate);
     });
     return unsub;
   }, []);
@@ -258,6 +260,7 @@ export default function ProductDetailPage() {
       quantity,
       unitPrice: formatCurrency(discountedPrice),
       total: formatCurrency(discountedPrice * quantity),
+      template: whatsappOrderTemplate,
     });
     logBuyOnWhatsapp(cartLine(), quantity);
     window.open(buildWhatsAppLink(WHATSAPP_NUMBER, message), '_blank', 'noopener,noreferrer');
