@@ -16,6 +16,7 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import MobileQuickNav from '../components/MobileQuickNav.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import { getDiscountedPrice } from '../utils/discount.js';
@@ -245,6 +246,7 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+      <MobileQuickNav />
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
       <main className="w-full max-w-full overflow-x-clip">
         <h1 className="sr-only">A2Z Collection: co-ord sets, jeans, jackets and footwear from Indore</h1>

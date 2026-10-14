@@ -346,3 +346,56 @@ body.user-signed-in .docked {
 @media (prefers-reduced-motion: reduce) {
   .a2z-shimmer { animation: none; }
 }
+
+/* Phone-only "All Products" strip under the header (MobileQuickNav). Hidden wherever the
+   header shows its own nav links: md and wider, except on short landscape screens where
+   those links are hidden. */
+.mobile-quick-nav {
+  width: 100%;
+  background-color: var(--color-surface-solid);
+  border-bottom: 1px solid var(--color-surface-variant);
+}
+
+.mobile-quick-nav__inner {
+  max-width: var(--spacing-container-max);
+  margin: 0 auto;
+  padding: 0 var(--spacing-margin-mobile);
+}
+
+.mobile-quick-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-family: var(--font-label-caps);
+  font-size: var(--text-label-caps);
+  font-weight: var(--text-label-caps--font-weight);
+  letter-spacing: var(--text-label-caps--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.mobile-quick-nav__icon {
+  font-size: 1.125rem;
+}
+
+.mobile-quick-nav__link:hover,
+.mobile-quick-nav__link[aria-current='page'] {
+  color: var(--color-primary);
+}
+
+.mobile-quick-nav__link[aria-current='page'] {
+  border-bottom-color: var(--color-primary);
+}
+
+.mobile-quick-nav__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+
+@media (min-width: 768px) and (not ((orientation: landscape) and (max-height: 500px))) {
+  .mobile-quick-nav { display: none; }
+}

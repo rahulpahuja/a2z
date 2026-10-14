@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findNavLinkLabel } from './topNav.js';
+import { findNavLinkLabel, isAllProductsView } from './topNav.js';
 
 const links = [
   { id: '1', label: 'New Arrivals', type: 'all' },
@@ -16,5 +16,24 @@ describe('findNavLinkLabel', () => {
     expect(findNavLinkLabel(links, ['Top', 'Gown'])).toBeNull();
     expect(findNavLinkLabel(links, ['Kurti'])).toBeNull();
     expect(findNavLinkLabel(links, [])).toBeNull();
+  });
+});
+
+describe('isAllProductsView', () => {
+  it('is true only for the unfiltered /products listing', () => {
+    expect(isAllProductsView('/products')).toBe(true);
+    expect(isAllProductsView('/products/')).toBe(true);
+    expect(isAllProductsView('/products', '?sort=price')).toBe(true);
+  });
+
+  it('is false for category and New Arrivals views of the same path', () => {
+    expect(isAllProductsView('/products', '?category=Kurti')).toBe(false);
+    expect(isAllProductsView('/products', '?filter=new-arrivals')).toBe(false);
+  });
+
+  it('is false for other routes, including product detail pages', () => {
+    expect(isAllProductsView('/')).toBe(false);
+    expect(isAllProductsView('/products/abc')).toBe(false);
+    expect(isAllProductsView('/cart')).toBe(false);
   });
 });

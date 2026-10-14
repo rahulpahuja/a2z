@@ -9,6 +9,7 @@ import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
+import MobileQuickNav from '../components/MobileQuickNav.jsx';
 import EmptySegment from '../components/EmptySegment.jsx';
 import SearchBar from '../components/SearchBar.jsx';
 import { ProductGridSkeleton } from '../components/Shimmer.jsx';
@@ -550,6 +551,7 @@ export default function ProductListingPage() {
           <ProfileButton className="hover:opacity-80 transition-opacity duration-200" />
         </div>
       </header>
+      <MobileQuickNav />
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       {/* On phones the heading and counter only appear once a category or New Arrivals is picked, so browsing all products stays uncluttered. */}
