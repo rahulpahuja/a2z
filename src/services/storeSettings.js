@@ -34,6 +34,9 @@ export const DEFAULT_STORE_SETTINGS = {
   // Number of product cards shown per row in the home page product rows
   // (Trending Now, Featured Elegance, Heritage Masterpieces).
   homeProductsPerRow: 8,
+  // Height of the home page hero banner on phones, as a % of the screen height.
+  // Lower it to trim the blurred space above and below wide banner images.
+  mobileHeroHeightVh: 42,
   // Whether the circular "shop by category" bubbles row (Shots, Bags, Best
   // Sellers, Coords, New Arrivals, Tops, Trousers) shows on the home page.
   showCategoryBubbles: false,
