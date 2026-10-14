@@ -4,6 +4,7 @@ import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../s
 import CartIconButton from './CartIconButton.jsx';
 import ProfileButton from './ProfileButton.jsx';
 import MobileNavDrawer from './MobileNavDrawer.jsx';
+import MobileQuickNav from './MobileQuickNav.jsx';
 import BrandName from './BrandName.jsx';
 
 export default function TopNav() {
@@ -47,6 +48,7 @@ export default function TopNav() {
           <ProfileButton className="p-2 hover:opacity-80 transition-opacity duration-200" />
         </div>
       </nav>
+      <MobileQuickNav />
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
     </>
   );

@@ -102,6 +102,14 @@ export function topNavLinkToPath(link) {
   return '/products';
 }
 
+// True while the shopper is on the unfiltered all-products listing. A category or
+// New Arrivals view shares the /products path but is a different nav entry.
+export function isAllProductsView(pathname, search = '') {
+  if (pathname !== '/products' && pathname !== '/products/') return false;
+  const params = new URLSearchParams(search);
+  return !params.has('category') && !params.has('filter');
+}
+
 // A multi-category link such as "Girl's Wear" stands for a set of categories. While the
 // shopper is viewing exactly that set, its label is the page heading, rather than every
 // category name joined together. Returns null when no such link matches.
