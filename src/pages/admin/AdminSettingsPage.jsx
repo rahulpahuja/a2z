@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { INDIAN_STATES_AND_UT } from '../../data/indiaData.js';
+import { DEFAULT_ORDER_TEMPLATE, MAX_ORDER_TEMPLATE_LENGTH, ORDER_TEMPLATE_PLACEHOLDERS, buildProductOrderMessage, findUnknownPlaceholders } from '../../utils/whatsapp.js';
 import './AdminSettingsPage.css';
 
 const PICKUP_FIELDS = [
@@ -81,7 +82,8 @@ export default function AdminSettingsPage() {
       const taxRatePercent = Math.min(100, Math.max(0, Number(settings.taxRatePercent) || 0));
       const homeProductsPerRow = Math.min(10, Math.max(4, Number(settings.homeProductsPerRow) || 8));
       const mobileHeroHeightVh = Math.min(60, Math.max(15, Math.round(Number(settings.mobileHeroHeightVh)) || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh));
-      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh });
+      const whatsappOrderTemplate = String(settings.whatsappOrderTemplate ?? '').trim().slice(0, MAX_ORDER_TEMPLATE_LENGTH) || DEFAULT_ORDER_TEMPLATE;
+      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate });
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -217,6 +219,59 @@ export default function AdminSettingsPage() {
               onChange={(showBuyOnWhatsapp) => setSettings((prev) => ({ ...prev, showBuyOnWhatsapp }))}
               label="Show a &quot;Buy on WhatsApp&quot; button on product pages"
             />
+
+            <div className="admin-settings-field admin-settings-field--wide">
+              <label className="admin-settings-field__label" htmlFor="whatsappOrderTemplate">
+                WhatsApp Order Message
+              </label>
+              <textarea
+                id="whatsappOrderTemplate"
+                className="admin-settings-field__input admin-settings-field__textarea"
+                rows={8}
+                maxLength={MAX_ORDER_TEMPLATE_LENGTH}
+                value={settings.whatsappOrderTemplate ?? DEFAULT_ORDER_TEMPLATE}
+                onChange={updateField('whatsappOrderTemplate')}
+              />
+              <div className="admin-settings-field__actions">
+                <button
+                  type="button"
+                  className="admin-settings-field__link"
+                  onClick={() => setSettings((prev) => ({ ...prev, whatsappOrderTemplate: DEFAULT_ORDER_TEMPLATE }))}
+                >
+                  Reset to default message
+                </button>
+              </div>
+              <p className="admin-settings-field__hint">
+                Sent to your WhatsApp number when a shopper taps Buy on WhatsApp. Use these placeholders and they are filled in
+                for each product; a line whose value is empty (for example no colour chosen) is left out:
+              </p>
+              <ul className="admin-settings-field__placeholders">
+                {ORDER_TEMPLATE_PLACEHOLDERS.map(({ key, description }) => (
+                  <li key={key}>
+                    <code>{`{${key}}`}</code> {description}
+                  </li>
+                ))}
+              </ul>
+              {findUnknownPlaceholders(settings.whatsappOrderTemplate).length > 0 && (
+                <p className="admin-settings-field__warning" role="alert">
+                  Not a known placeholder, so it will be sent as typed:{' '}
+                  {findUnknownPlaceholders(settings.whatsappOrderTemplate).map((key) => `{${key}}`).join(', ')}
+                </p>
+              )}
+              <p className="admin-settings-field__label">Preview (sample product, quantity 2)</p>
+              <pre className="admin-settings-field__preview">
+                {buildProductOrderMessage({
+                  name: 'Silk Kurta',
+                  url: 'https://www.thea2zcollection.com/products/example',
+                  color: 'Pink',
+                  size: 'M',
+                  quantity: 2,
+                  unitPrice: '\u20B91,299',
+                  total: '\u20B92,598',
+                  template: settings.whatsappOrderTemplate,
+                })}
+              </pre>
+            </div>
           </div>
 
           {/* Refund Policy Provision for Super User */}
