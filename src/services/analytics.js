@@ -157,6 +157,16 @@ export function logShare(method, contentType) {
   logAnalyticsEvent('share', { method, content_type: contentType });
 }
 
+// A shopper tapped "Buy on WhatsApp" on a product page. Counts intent to order, not a placed order.
+export function logBuyOnWhatsapp(line, quantity = 1) {
+  const item = toGA4Item(line, { quantity });
+  logAnalyticsEvent('buy_on_whatsapp', {
+    currency: CURRENCY,
+    value: itemsValue([item]),
+    items: [item],
+  });
+}
+
 // Behaviour events beyond the GA4 ecommerce set: what visitors do between landing and buying.
 export function logSelectPromotion(promotionName, destination) {
   logAnalyticsEvent('select_promotion', { promotion_name: promotionName, creative_name: destination });

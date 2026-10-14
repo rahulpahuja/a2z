@@ -8,7 +8,7 @@ import { useProducts } from '../context/ProductsContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { ProductDetailSkeleton } from '../components/Shimmer.jsx';
 import { recordView, subscribeToProductStats } from '../services/productStats.js';
-import { logViewItem, logSelectVariant, logShare, logSelectContent, logSelectItem } from '../services/analytics.js';
+import { logViewItem, logSelectVariant, logShare, logSelectContent, logSelectItem, logBuyOnWhatsapp } from '../services/analytics.js';
 import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
@@ -257,7 +257,7 @@ export default function ProductDetailPage() {
       unitPrice: formatCurrency(discountedPrice),
       total: formatCurrency(discountedPrice * quantity),
     });
-    logShare('whatsapp', 'product_buy');
+    logBuyOnWhatsapp(cartLine(), quantity);
     window.open(buildWhatsAppLink(WHATSAPP_NUMBER, message), '_blank', 'noopener,noreferrer');
   };
 
