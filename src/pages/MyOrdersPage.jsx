@@ -7,8 +7,7 @@ import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart, formatCurrency } from '../context/CartContext.jsx';
-import { subscribeToOrders } from '../services/orders.js';
-import { orderBelongsToUser } from '../utils/orderMatch.js';
+import { subscribeToMyOrders } from '../services/orders.js';
 import BrandName from '../components/BrandName.jsx';
 
 const STATUS_STYLES = {
@@ -38,10 +37,7 @@ export default function MyOrdersPage() {
       setLoading(false);
       return;
     }
-    const unsubscribe = subscribeToOrders((allOrders) => {
-      const mine = allOrders
-        .filter((o) => orderBelongsToUser(o, user))
-        .sort((a, b) => new Date(b.placedAt) - new Date(a.placedAt));
+    const unsubscribe = subscribeToMyOrders(user, (mine) => {
       setOrders(mine);
       setLoading(false);
     });

@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
-import { subscribeToOrders } from '../services/orders.js';
+import { subscribeToMyOrders } from '../services/orders.js';
 import { getTrackingPortalUrl } from '../utils/trackingPortal.js';
-import { orderBelongsToUser } from '../utils/orderMatch.js';
 import AuthModal from './AuthModal.jsx';
 
 function displayName(user, profile) {
@@ -26,9 +25,7 @@ export default function ProfileButton({ className = '', iconClassName = 'materia
       setUserOrders([]);
       return;
     }
-    const unsubscribe = subscribeToOrders((orders) => {
-      setUserOrders(orders.filter((o) => orderBelongsToUser(o, user)));
-    });
+    const unsubscribe = subscribeToMyOrders(user, setUserOrders);
     return unsubscribe;
   }, [user]);
 
