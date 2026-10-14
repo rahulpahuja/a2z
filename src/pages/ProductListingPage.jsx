@@ -75,6 +75,25 @@ function useIsMobileViewport(breakpointPx = 640) {
   return isMobile;
 }
 
+// Viewports where the Filters panel is a full-screen sheet instead of an inline
+// column. Keep in sync with the matching @media block in ProductListingPage.css.
+const FILTER_SHEET_QUERY = '(max-width: 767px), (orientation: landscape) and (max-height: 500px)';
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mql = window.matchMedia(query);
+    const handleChange = (e) => setMatches(e.matches);
+    handleChange(mql);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, [query]);
+  return matches;
+}
+
 const FILTER_SELECT_CLASS = 'appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors';
 
 const BADGE_STYLES = {
@@ -166,6 +185,28 @@ export default function ProductListingPage() {
   const [visibleCount, setVisibleCount] = useState(50);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const isFilterSheet = useMediaQuery(FILTER_SHEET_QUERY);
+  const filtersButtonRef = useRef(null);
+  const filtersCloseRef = useRef(null);
+  const filterSheetOpen = mobileFiltersOpen && isFilterSheet;
+
+  // While the filters sheet is open: lock the page scroll behind it, close on
+  // Escape, move focus into it, and hand focus back to the Filters button on close.
+  useEffect(() => {
+    if (!filterSheetOpen) return undefined;
+    const filtersButton = filtersButtonRef.current;
+    document.body.classList.add('listing-filters-lock');
+    filtersCloseRef.current?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setMobileFiltersOpen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.classList.remove('listing-filters-lock');
+      document.removeEventListener('keydown', handleKeyDown);
+      filtersButton?.focus();
+    };
+  }, [filterSheetOpen]);
   const [collapsedSections, setCollapsedSections] = useState({});
   // A section is collapsed on mobile until the shopper opens it; on desktop it starts open.
   const isCollapsed = (key) => collapsedSections[key] ?? isMobileViewport;
@@ -616,6 +657,7 @@ export default function ProductListingPage() {
         {showFilterSidebar && (
         <button
           type="button"
+          ref={filtersButtonRef}
           onClick={() => setMobileFiltersOpen((open) => !open)}
           aria-expanded={mobileFiltersOpen}
           className="shrink-0 flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
@@ -670,11 +712,29 @@ export default function ProductListingPage() {
         }}
       >
         {showFilterSidebar && (
-        <aside className={
-          mobileFiltersOpen
-            ? 'block md:block [@media(orientation:landscape)_and_(max-height:500px)]:!block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
-            : 'hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
-        }>
+        <aside
+          role={filterSheetOpen ? 'dialog' : undefined}
+          aria-modal={filterSheetOpen ? 'true' : undefined}
+          aria-label={filterSheetOpen ? 'Filters' : undefined}
+          className={
+            mobileFiltersOpen
+              ? 'listing-filters listing-filters--open block md:block [@media(orientation:landscape)_and_(max-height:500px)]:!block w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
+              : 'listing-filters hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden w-full md:w-[260px] flex-shrink-0 space-y-8 pr-4'
+          }
+        >
+          {/* Sheet chrome — only displayed when the panel is a full-screen sheet (see ProductListingPage.css) */}
+          <div className="listing-filters__sheet-header">
+            <h2 className="listing-filters__sheet-title">Filters</h2>
+            <button
+              type="button"
+              ref={filtersCloseRef}
+              onClick={() => setMobileFiltersOpen(false)}
+              aria-label="Close filters"
+              className="listing-filters__close"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
           {/* Category Filter on Left Side (only when placement is set to "left") */}
           {(!categoryFilterOnTop || isMobileViewport) && (
           <div className="space-y-4 border-b border-surface-variant pb-6">
@@ -971,6 +1031,15 @@ export default function ProductListingPage() {
             </div>
           </div>
           )}
+          <div className="listing-filters__sheet-footer">
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(false)}
+              className="listing-filters__apply"
+            >
+              Show {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+            </button>
+          </div>
         </aside>
         )}
 

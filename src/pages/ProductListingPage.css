@@ -44,3 +44,104 @@
     grid-template-columns: repeat(var(--custom-grid-cols, 4), minmax(0, 1fr)) !important;
   }
 }
+
+/* Mobile Filters panel: a full-screen sheet so it is visible wherever the page is scrolled to.
+   The query must match FILTER_SHEET_QUERY in ProductListingPage.jsx. */
+.listing-filters__sheet-header,
+.listing-filters__sheet-footer {
+  display: none;
+}
+
+body.listing-filters-lock {
+  overflow: hidden;
+}
+
+@media (max-width: 767px), (orientation: landscape) and (max-height: 500px) {
+  .listing-filters--open {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    padding: 0 var(--spacing-margin-mobile);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background-color: var(--color-surface-solid);
+  }
+
+  .dark .listing-filters--open,
+  .dark .listing-filters--open .listing-filters__sheet-header,
+  .dark .listing-filters--open .listing-filters__sheet-footer {
+    background-color: var(--color-surface-container-highest);
+  }
+
+  .listing-filters--open .listing-filters__sheet-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0.75rem 0;
+    background-color: var(--color-surface-solid);
+    border-bottom: 1px solid var(--color-surface-variant);
+  }
+
+  .listing-filters__sheet-title {
+    margin: 0;
+    font-family: var(--font-title-sm);
+    font-size: var(--text-title-sm);
+    color: var(--color-on-surface);
+  }
+
+  .listing-filters__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-on-surface);
+    cursor: pointer;
+  }
+
+  .listing-filters__close:hover,
+  .listing-filters__close:focus-visible {
+    color: var(--color-primary);
+  }
+
+  .listing-filters--open .listing-filters__sheet-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    display: block;
+    margin: auto 0 0;
+    padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+    background-color: var(--color-surface-solid);
+    border-top: 1px solid var(--color-surface-variant);
+  }
+
+  .listing-filters__apply {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    font-family: var(--font-label-caps);
+    font-size: var(--text-label-caps);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .listing-filters__apply:hover {
+    opacity: 0.9;
+  }
+}
