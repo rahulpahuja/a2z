@@ -170,7 +170,7 @@
       ".read": true,
       "$productId": {
         "$reviewId": {
-          ".write": "auth != null || (!data.exists() && newData.exists())",
+          ".write": "auth.token.admin === true || (!data.exists() && newData.exists())",
           ".validate": "newData.hasChildren(['name', 'rating', 'title', 'body', 'helpful', 'createdAtMs']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 60 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('rating').val() % 1 == 0 && newData.child('title').isString() && newData.child('title').val().length <= 100 && newData.child('body').isString() && newData.child('body').val().length >= 10 && newData.child('body').val().length <= 2000 && newData.child('createdAtMs').isNumber()",
           "helpful": {
             ".write": true,
@@ -179,6 +179,11 @@
           "createdAt": {
             ".validate": "newData.isNumber()"
           },
+          "name": { ".validate": true },
+          "rating": { ".validate": true },
+          "title": { ".validate": true },
+          "body": { ".validate": true },
+          "createdAtMs": { ".validate": true },
           "$other": {
             ".validate": false
           }
