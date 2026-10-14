@@ -1,14 +1,18 @@
-import { ref, set, get, child, onValue } from 'firebase/database';
-import { db, isFirebaseEnabled } from '../firebase.js';
+import { ref, set, get, child, onValue, query, orderByChild, equalTo } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db, isFirebaseEnabled } from '../firebase.js';
 import { orderBelongsToUser } from '../utils/orderMatch.js';
+import { isCustomerUid } from '../utils/customerUid.js';
 
 const ROOT = 'orders';
 
-// database.rules.json only lets an admin list the orders collection, so a
-// customer's browser cannot ask "which orders are mine?". Instead each browser
-// remembers the ids of the orders it placed and looks them up one by one (a
-// single order is readable by anyone who knows its unguessable id — that is
-// also how order tracking works).
+// database.rules.json only lets an admin list the orders collection. A customer
+// signed in with a server-issued Firebase identity (see exchange-token.js) may list
+// it only through a query on their own `ownerUid`, which is how "My orders" follows
+// them across devices. Orders placed before sign-in, or as a guest, carry no
+// ownerUid, so each browser also remembers the ids of the orders it placed and looks
+// them up one by one (a single order is readable by anyone who knows its
+// unguessable id — that is also how order tracking works).
 const MY_ORDER_IDS_KEY = 'a2z_my_order_ids';
 const MAX_REMEMBERED_ORDER_IDS = 50;
 
@@ -31,6 +35,14 @@ export function rememberOrderId(id) {
     // Storage can be unavailable (private mode); "My Orders" then just starts empty.
   }
 }
+
+// The signed-in customer's Firebase uid, or null for guests, admins and local mode.
+export function currentCustomerUid() {
+  const uid = isFirebaseEnabled ? auth?.currentUser?.uid : null;
+  return isCustomerUid(uid) ? uid : null;
+}
+
+const ownedOrdersQuery = (ownerUid) => query(ref(db, ROOT), orderByChild('ownerUid'), equalTo(ownerUid));
 
 export function createFirebaseOrder(order) {
   if (!isFirebaseEnabled) {
@@ -113,37 +125,86 @@ export function hasPriorOrders(user) {
     const localOrders = JSON.parse(localStorage.getItem(ROOT) || '[]');
     return Promise.resolve(localOrders.some((o) => o.status !== 'Cancelled' && orderBelongsToUser(o, user)));
   }
-  return Promise.all(readRememberedOrderIds().map((id) => getFirebaseOrder(id).catch(() => null))).then((orders) =>
+  const remembered = Promise.all(readRememberedOrderIds().map((id) => getFirebaseOrder(id).catch(() => null))).then((orders) =>
     orders.some((order) => order && order.status !== 'Cancelled' && orderBelongsToUser(order, user))
   );
+  const ownerUid = currentCustomerUid();
+  if (!ownerUid) return remembered;
+  // Orders tied to the verified phone follow the customer across devices.
+  const owned = get(ownedOrdersQuery(ownerUid))
+    .then((snapshot) => {
+      let found = false;
+      snapshot.forEach((row) => {
+        if (row.val()?.status !== 'Cancelled') found = true;
+      });
+      return found;
+    })
+    .catch(() => false);
+  return Promise.all([owned, remembered]).then(([a, b]) => a || b);
 }
 
 const byNewestFirst = (a, b) => new Date(b.placedAt) - new Date(a.placedAt);
 
-// Live list of the signed-in customer's own orders. With Firebase this
-// subscribes to each order id this browser placed rather than listing the whole
-// collection (which only admins may do), then keeps the ones that match `user`.
+// Live list of the signed-in customer's own orders. With Firebase this never lists
+// the whole collection: it merges (de-duplicated by id) the orders owned by the
+// customer's verified uid (a query constrained to their own ownerUid) with the orders
+// this browser remembers placing, looked up by id and matched to `user`. It restarts
+// when the Firebase identity changes, e.g. when it finishes restoring after a reload.
 export function subscribeToMyOrders(user, callback) {
   if (!isFirebaseEnabled) {
     return subscribeToOrders((rows) => callback(rows.filter((o) => orderBelongsToUser(o, user)).sort(byNewestFirst)));
   }
+  let stopCurrent = () => {};
+  const stopAuthWatch = onAuthStateChanged(auth, () => {
+    stopCurrent();
+    stopCurrent = listenToMyOrders(user, currentCustomerUid(), callback);
+  });
+  return () => {
+    stopAuthWatch();
+    stopCurrent();
+  };
+}
+
+function listenToMyOrders(user, ownerUid, callback) {
   const ids = readRememberedOrderIds();
-  if (ids.length === 0) {
+  if (ids.length === 0 && !ownerUid) {
     callback([]);
     return () => {};
   }
-  const latest = new Map();
+  const remembered = new Map();
   const reported = new Set();
+  let owned = ownerUid ? null : new Map();
+  const emit = () => {
+    // Wait until every source has reported once so the list doesn't flicker in piecemeal.
+    if (owned === null || reported.size < ids.length) return;
+    const merged = new Map();
+    remembered.forEach((order, id) => {
+      if (orderBelongsToUser(order, user)) merged.set(id, order);
+    });
+    owned.forEach((order, id) => merged.set(id, order));
+    callback([...merged.values()].sort(byNewestFirst));
+  };
   const unsubscribes = ids.map((id) =>
     subscribeToOrder(id, (order) => {
       reported.add(id);
-      if (order) latest.set(id, order);
-      else latest.delete(id);
-      // Wait until every id has reported once so the list doesn't flicker in piecemeal.
-      if (reported.size < ids.length) return;
-      callback([...latest.values()].filter((o) => orderBelongsToUser(o, user)).sort(byNewestFirst));
+      if (order) remembered.set(id, order);
+      else remembered.delete(id);
+      emit();
     })
   );
+  if (ownerUid) {
+    const setOwned = (snapshot) => {
+      owned = new Map();
+      if (snapshot) {
+        snapshot.forEach((row) => {
+          const order = row.val();
+          if (order) owned.set(row.key, order);
+        });
+      }
+      emit();
+    };
+    unsubscribes.push(onValue(ownedOrdersQuery(ownerUid), setOwned, () => setOwned(null)));
+  }
   return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
 }
 

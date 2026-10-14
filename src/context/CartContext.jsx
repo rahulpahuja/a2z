@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
 import { logAddToCart, logRemoveFromCart, logPurchase, logApplyCoupon } from '../services/analytics.js';
-import { createFirebaseOrder, setOrderShipment, rememberOrderId, hasPriorOrders } from '../services/orders.js';
+import { createFirebaseOrder, setOrderShipment, rememberOrderId, hasPriorOrders, currentCustomerUid } from '../services/orders.js';
 import { generateOrderId } from '../utils/orderId.js';
 import { reserveProductStock, releaseProductStock } from '../services/adminProducts.js';
 import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
@@ -214,6 +214,9 @@ export function CartProvider({ children }) {
       }
     }
 
+    // Tie the order to the verified customer identity (if any) so "My orders" works on
+    // any device. Guests, and customers whose identity exchange failed, omit it.
+    const ownerUid = user ? currentCustomerUid() : null;
     const order = {
       id: generateOrderId(),
       items,
@@ -228,6 +231,7 @@ export function CartProvider({ children }) {
       shippingDetails,
       status: 'Processing',
       customerId: customerId ?? null,
+      ...(ownerUid ? { ownerUid } : {}),
     };
 
     try {

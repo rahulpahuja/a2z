@@ -15,7 +15,8 @@ import {
   resetOtpSession as resetMsg91OtpSession,
 } from '../services/msg91Otp.js';
 import { logLogin } from '../services/analytics.js';
-import { fetchAdminFirebaseToken } from '../services/adminSession.js';
+import { fetchFirebaseSessionToken } from '../services/adminSession.js';
+import { isCustomerUid } from '../utils/customerUid.js';
 
 const AuthContext = createContext(null);
 
@@ -109,6 +110,14 @@ export function AuthProvider({ children }) {
       // A live MSG91 session owns `user` (it carries the phone the admin check uses);
       // Firebase's custom-token user is only used for database access.
       if (!readMsg91Session()) {
+        // A customer identity restored from a previous visit whose 12-hour MSG91 session
+        // has since expired: treat the customer as signed out instead of showing a
+        // phone-less "Account" user.
+        if (isCustomerUid(nextUser?.uid)) {
+          signOut(auth).catch(() => {});
+          setLoading(false);
+          return;
+        }
         setUser(nextUser);
       }
       setLoading(false);
@@ -155,15 +164,44 @@ export function AuthProvider({ children }) {
     if (isMsg91Enabled) {
       const data = await msg91VerifyOtp(code);
       const identifier = pendingIdentifierRef.current;
-      const firebaseToken = await fetchAdminFirebaseToken(data?.message, identifier);
-      if (firebaseToken && isFirebaseEnabled) await signInWithCustomToken(auth, firebaseToken);
+      // Server-side OTP verification mints the Firebase identity: admin claim for admin
+      // phones, a pseudonymous customer uid for everyone else. Admins must get it (their
+      // writes depend on it); for customers it only enables cross-device "My orders", so
+      // a failure falls back to the per-browser behaviour instead of blocking login.
+      let firebaseSession = null;
+      if (isFirebaseEnabled) {
+        try {
+          firebaseSession = await fetchFirebaseSessionToken(data?.message);
+        } catch (error) {
+          if (computeIsAdmin({ phoneNumber: identifier })) throw error;
+          console.warn('Customer identity unavailable; continuing with this browser only.');
+        }
+      }
       const session = {
         identifier,
         phoneNumber: identifier,
         token: data?.message || null,
         verifiedAt: Date.now(),
       };
+      // Written before the Firebase sign-in so onAuthStateChanged sees a live session.
       writeMsg91Session(session);
+      let signedInToFirebase = false;
+      if (firebaseSession) {
+        try {
+          await signInWithCustomToken(auth, firebaseSession.token);
+          signedInToFirebase = true;
+        } catch (error) {
+          if (firebaseSession.role === 'admin') {
+            clearMsg91Session();
+            throw error;
+          }
+          console.warn('Customer identity sign-in failed; continuing with this browser only.');
+        }
+      }
+      // Never leave a previous customer's identity attached to this login.
+      if (!signedInToFirebase && isFirebaseEnabled && isCustomerUid(auth.currentUser?.uid)) {
+        await signOut(auth).catch(() => {});
+      }
       setUser(msg91SessionToUser(session));
       resetMsg91OtpSession();
       pendingIdentifierRef.current = null;

@@ -1,17 +1,22 @@
-// Trades a verified MSG91 OTP for a Firebase custom token so admin writes pass
-// database.rules.json. Resolves null for non-admin phones (403) so customers keep
-// their local session without a Firebase identity.
-export async function fetchAdminFirebaseToken(accessToken, phoneNumber) {
+// Trades a verified MSG91 OTP access token for a Firebase custom token. The server
+// decides who the caller is from MSG91's own verification result (the phone number is
+// never sent): admin phones get the `admin` claim so writes pass database.rules.json,
+// every other phone gets a pseudonymous customer uid used as `ownerUid` on orders.
+//
+// Resolves { token, role } or null when the server has customer sign-in switched off
+// (503), so customers keep their local session without a Firebase identity. Any other
+// failure throws; callers decide whether that is fatal (admins) or ignorable (customers).
+export async function fetchFirebaseSessionToken(accessToken) {
   const response = await fetch('/.netlify/functions/exchange-token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ accessToken, phoneNumber }),
+    body: JSON.stringify({ accessToken }),
   });
-  if (response.status === 403) return null;
+  if (response.status === 503) return null;
   if (!response.ok) {
     const { reason, detail } = await response.json().catch(() => ({}));
-    throw new Error(`Admin sign-in failed (${[reason, detail].filter(Boolean).join(': ') || response.status}).`);
+    throw new Error(`Sign-in exchange failed (${[reason, detail].filter(Boolean).join(': ') || response.status}).`);
   }
-  const { token } = await response.json();
-  return token;
+  const { token, role } = await response.json();
+  return token ? { token, role: role === 'admin' ? 'admin' : 'customer' } : null;
 }
