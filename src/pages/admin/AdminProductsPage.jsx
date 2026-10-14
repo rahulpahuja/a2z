@@ -23,6 +23,7 @@ import {
   getAllSizeNames,
 } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
+import DescriptionAssistant from '../../components/admin/DescriptionAssistant.jsx';
 import './AdminProductsPage.css';
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -41,6 +42,8 @@ const EMPTY_FORM = {
   subcategoryId: '',
   price: '',
   hsnCode: '',
+  origin: '',
+  care: '',
   gender: 'Unisex',
   discountUnit: DISCOUNT_UNITS.PERCENTAGE,
   discountValue: '',
@@ -117,6 +120,8 @@ export default function AdminProductsPage() {
       subcategoryId: product.subcategoryId || '',
       price: product.price || '',
       hsnCode: product.hsnCode || '',
+      origin: product.origin || '',
+      care: product.care || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -170,6 +175,8 @@ export default function AdminProductsPage() {
       subcategoryId: product.subcategoryId || '',
       price: product.price || '',
       hsnCode: product.hsnCode || '',
+      origin: product.origin || '',
+      care: product.care || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -257,6 +264,8 @@ export default function AdminProductsPage() {
             subcategoryTitle: product.subcategoryTitle || '',
             price: product.price || 0,
             hsnCode: product.hsnCode || '',
+            origin: product.origin || '',
+            care: product.care || '',
             colors: product.colors ?? [],
             sizes: product.sizes ?? [],
             image: product.image || (product.images ?? [])[0],
@@ -556,6 +565,20 @@ export default function AdminProductsPage() {
     [imageColors]
   );
 
+  // What the description assistant compares the text against (colours, sizes, gender, keywords).
+  const descriptionContext = useMemo(
+    () => ({
+      title: form.title,
+      categoryTitle: categories.find((c) => c.id === form.categoryId)?.title ?? '',
+      subcategoryTitle: subcategories.find((s) => s.id === form.subcategoryId)?.title ?? '',
+      hashtags: form.hashtagsInput,
+      colors: derivedColorNames.map((name) => ({ name })),
+      sizes,
+      gender: form.gender,
+    }),
+    [form.title, form.categoryId, form.subcategoryId, form.hashtagsInput, form.gender, categories, subcategories, derivedColorNames, sizes]
+  );
+
   const updateColorSizeStock = (colorName, size, stock) => {
     setColorSizeStocks((prev) => ({
       ...prev,
@@ -755,6 +778,8 @@ export default function AdminProductsPage() {
         subcategoryTitle: subcategory?.title ?? '',
         price: Number(form.price) || 0,
         hsnCode: form.hsnCode.trim(),
+        origin: form.origin.trim(),
+        care: form.care.trim(),
         discountUnit: form.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
         discountValue: form.discountValue === '' ? null : Number(form.discountValue),
         discountDurationType: form.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
@@ -980,6 +1005,44 @@ export default function AdminProductsPage() {
                   onChange={updateField('description')}
                   className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
                 />
+                <DescriptionAssistant
+                  value={form.description}
+                  product={descriptionContext}
+                  onApply={(description) => setForm((prev) => ({ ...prev, description }))}
+                />
+              </div>
+
+              {/* Origin & care: shown in the storefront Specifications only when filled in. */}
+              <div className="admin-products-details">
+                <div className="admin-products-details__field">
+                  <label className="admin-products-details__label" htmlFor="p-origin">
+                    Origin (optional)
+                  </label>
+                  <input
+                    id="p-origin"
+                    value={form.origin}
+                    onChange={updateField('origin')}
+                    maxLength={80}
+                    placeholder="e.g. Jaipur, Rajasthan"
+                    className="admin-products-details__input"
+                  />
+                </div>
+                <div className="admin-products-details__field">
+                  <label className="admin-products-details__label" htmlFor="p-care">
+                    Care (optional)
+                  </label>
+                  <input
+                    id="p-care"
+                    value={form.care}
+                    onChange={updateField('care')}
+                    maxLength={120}
+                    placeholder="e.g. Dry clean only"
+                    className="admin-products-details__input"
+                  />
+                </div>
+                <p className="admin-products-details__hint">
+                  Leave blank to hide the row on the product page. Only enter details you can stand behind.
+                </p>
               </div>
 
               {/* Product Images (5 Slots) */}

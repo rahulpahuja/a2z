@@ -100,6 +100,13 @@ describe('buildProductHead', () => {
     const escaped = buildProductHead(product, {});
     expect(escaped.noscript).toContain('Rani Kurti &lt;Set&gt;');
   });
+
+  it('flattens multi-paragraph and bulleted descriptions to one clean line', () => {
+    const head = buildProductHead({ ...product, description: 'Festive kurti\r\n\r\n- Soft cotton\n• Relaxed fit' }, {});
+    expect(head.description).toBe('Festive kurti. Soft cotton. Relaxed fit');
+    expect(head.jsonLd[0].description).toBe(head.description);
+    expect(head.noscript).not.toMatch(/[\n•]/);
+  });
 });
 
 describe('injectHeadIntoHtml', () => {

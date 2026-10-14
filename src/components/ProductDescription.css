@@ -1,0 +1,54 @@
+.product-description {
+  /* No display rule here: call sites toggle visibility with utility classes (hidden / md:hidden). */
+  font-family: var(--font-body-sm);
+  line-height: 1.6;
+  color: var(--color-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+
+/* Font size follows the storefront typography setting the admin can change. */
+.product-description--compact {
+  font-size: var(--custom-font-desc-size-detail, 14px);
+}
+
+.product-description--full {
+  font-size: var(--custom-font-desc-size-detail, 16px);
+}
+
+.product-description__paragraph + .product-description__paragraph,
+.product-description__paragraph + .product-description__list,
+.product-description__list + .product-description__paragraph,
+.product-description__list + .product-description__list {
+  margin-top: 0.5rem;
+}
+
+.product-description--full .product-description__paragraph + .product-description__paragraph,
+.product-description--full .product-description__paragraph + .product-description__list,
+.product-description--full .product-description__list + .product-description__paragraph,
+.product-description--full .product-description__list + .product-description__list {
+  margin-top: 1rem;
+}
+
+.product-description__paragraph {
+  margin: 0;
+  /* Keeps single line breaks typed by the admin without needing <br>. */
+  white-space: pre-line;
+}
+
+.product-description__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.product-description__item {
+  padding-left: 0.25rem;
+}
+
+.product-description__item + .product-description__item {
+  margin-top: 0.25rem;
+}
+
+.product-description__item::marker {
+  color: var(--color-primary);
+}

@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { listIndexableRoutes } from '../src/seo/routes.js';
 import { hasNoindex, pageMetaKey } from '../src/seo/pageMeta.js';
+import { descriptionToPlain } from '../src/utils/richText.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.join(__dirname, '..');
@@ -95,7 +96,7 @@ function buildLlmsTxt(products, faqsByProduct) {
       const name = singleLine(product.title || product.name);
       const url = `${SITE_URL}/products/${encodeURIComponent(product.id)}`;
       const category = singleLine(product.categoryTitle || product.category);
-      const description = singleLine(product.description);
+      const description = singleLine(descriptionToPlain(product.description));
       const faqs = Object.values(faqsByProduct[product.id] ?? {}).filter((faq) => faq?.question && faq?.answer);
       return [
         `### [${name}](${url})`,
