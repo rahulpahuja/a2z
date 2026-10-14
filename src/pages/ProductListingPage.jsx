@@ -94,7 +94,7 @@ function useMediaQuery(query) {
   return matches;
 }
 
-const FILTER_SELECT_CLASS = 'appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors';
+const FILTER_SELECT_CLASS = 'appearance-none bg-transparent border border-outline rounded-lg py-1.5 pl-3 pr-9 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors';
 
 const BADGE_STYLES = {
   Handcrafted: 'bg-secondary-container text-on-secondary-container',
@@ -441,7 +441,7 @@ export default function ProductListingPage() {
         onChange={(e) => setMinPrice(Math.max(0, Math.min(Number(e.target.value) || 0, maxPrice)))}
         aria-label="Minimum price"
         placeholder="Min ₹"
-        className="w-[72px] bg-transparent border border-outline rounded-lg py-2 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+        className="w-[72px] bg-transparent border border-outline rounded-lg py-1.5 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
       />
       <span className="text-on-surface-variant text-xs">–</span>
       <input
@@ -451,7 +451,7 @@ export default function ProductListingPage() {
         onChange={(e) => setMaxPrice(Math.max(minPrice, Number(e.target.value) || 0))}
         aria-label="Maximum price"
         placeholder="Max ₹"
-        className="w-[72px] bg-transparent border border-outline rounded-lg py-2 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+        className="w-[72px] bg-transparent border border-outline rounded-lg py-1.5 px-2.5 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
       />
     </div>
   );
@@ -596,13 +596,13 @@ export default function ProductListingPage() {
       <MobileNavDrawer open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} links={navLinks} />
 
       {/* On phones the heading and counter only appear once a category or New Arrivals is picked, so browsing all products stays uncluttered. */}
-      <div className={`w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 md:py-12 ${activeFilter !== 'new-arrivals' && activeCategory === 'All' ? 'hidden md:flex' : 'flex'} flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4`}>
-        <div>
-          <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">
+      <div className={`w-full max-w-[1680px] mx-auto px-6 md:px-12 py-4 md:py-5 ${activeFilter !== 'new-arrivals' && activeCategory === 'All' ? 'hidden md:flex' : 'flex'} flex-col md:flex-row justify-between items-baseline border-b border-surface-variant gap-4`}>
+        <div className="md:flex md:items-center md:gap-4">
+          <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-headline-md md:text-headline-md text-on-surface">
             {activeFilter === 'new-arrivals' ? 'NEW ARRIVALS' : activeCategory === 'All' ? 'ALL PRODUCTS' : categoryHeading.toUpperCase()}
           </h1>
           {/* Top Counter Banner showing X of Y products */}
-          <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm font-semibold">
+          <div className="mt-2 md:mt-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-body-sm text-body-sm font-semibold">
             <span className="material-symbols-outlined text-base">inventory_2</span>
             <span>
               Showing <strong className="font-bold">{lazyLoadedProducts.length}</strong> of <strong className="font-bold">{filteredProducts.length}</strong> products
@@ -612,8 +612,8 @@ export default function ProductListingPage() {
       </div>
       {/* Desktop sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
       <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface-solid dark:bg-surface-container-highest border-b border-surface-variant">
-        <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-3">
-          <div className="flex flex-wrap items-center justify-end gap-3">
+        <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
             {subcategoryFilterOnTop && subcategoryOptions.length > 0 && renderSubcategoryQuickFilter('desktop')}
             {genderFilterOnTop && renderGenderQuickFilter('desktop')}
@@ -624,7 +624,7 @@ export default function ProductListingPage() {
             <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="sort-by">Sort by:</label>
             <div className="relative">
               <select
-                className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                className="appearance-none bg-transparent border border-outline rounded-lg py-1.5 pl-3 pr-9 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                 id="sort-by"
                 value={sortSelectValue}
                 onChange={(e) => handleSortSelectChange(e.target.value)}
@@ -644,7 +644,7 @@ export default function ProductListingPage() {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+              className="shrink-0 border border-outline rounded-lg py-1.5 px-3 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
             >
               Clear Filters
             </button>
@@ -704,7 +704,7 @@ export default function ProductListingPage() {
       </div>
 
       <main
-        className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row gap-8"
+        className="flex-grow w-full max-w-[1680px] mx-auto px-6 md:px-12 py-4 md:py-5 flex flex-col md:flex-row gap-8"
         style={{
           backgroundColor: 'var(--custom-store-bg, transparent)',
           backdropFilter: 'var(--custom-backdrop-filter, none)',
