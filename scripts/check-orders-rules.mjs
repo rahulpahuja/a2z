@@ -37,9 +37,13 @@ const NS = 'a2z-orders-rules-check';
 
 const b64 = (obj) => Buffer.from(JSON.stringify(obj)).toString('base64url');
 const token = (claims) => `${b64({ alg: 'none', typ: 'JWT' })}.${b64({ iat: 1, sub: claims.uid, user_id: claims.uid, ...claims })}.`;
+const UID_A = `c_${'A'.repeat(32)}`;
+const UID_B = `c_${'B'.repeat(32)}`;
 const WHO = {
   anon: null,
   customer: token({ uid: 'customer-1' }),
+  custA: token({ uid: UID_A, customer: true }),
+  custB: token({ uid: UID_B, customer: true }),
   admin: token({ uid: 'msg91:919999999999', admin: true }),
 };
 
@@ -53,7 +57,7 @@ async function call(method, path, who, body) {
   const init = { method, headers };
   if (body !== undefined) init.body = JSON.stringify(body);
   const res = await fetch(url, init);
-  return { ok: res.ok, status: res.status };
+  return { ok: res.ok, status: res.status, text: res.ok ? await res.text() : '' };
 }
 
 const order = (id, extra = {}) => ({
@@ -186,6 +190,61 @@ try {
   await expect('admin: overwrite shipment with tracking history', true, () =>
     call('PUT', 'orders/ORD-SHIP0000001/shipment', 'admin', { ...SHIP_OK, currentStatus: 'In Transit', history: [{ s: 'x', at: 1 }], lastTrackedAt: 'now' }));
   await expect('admin: cancel shipment', true, () => call('PUT', 'orders/ORD-SHIP0000001/shipment/status', 'admin', 'cancelled'));
+
+  console.log('--- customer identity: owner queries and ownerUid');
+  await seed('ORD-OWNED00001A', order('ORD-OWNED00001A', { ownerUid: UID_A }));
+  await seed('ORD-OWNED00002A', order('ORD-OWNED00002A', { ownerUid: UID_A }));
+  await seed('ORD-OWNED00001B', order('ORD-OWNED00001B', { ownerUid: UID_B }));
+  const byOwner = (uid, child = 'ownerUid') => `orders?orderBy="${child}"&equalTo="${uid}"`;
+  const ids = (r) => Object.keys(JSON.parse(r.text || 'null') || {}).sort().join(',');
+  await expect('anon: query by ownerUid A', false, () => call('GET', byOwner(UID_A), 'anon'));
+  await expect('customer A: query own ownerUid', true, () => call('GET', byOwner(UID_A), 'custA'));
+  await expect('customer A: own query returns exactly their orders', true, async () => {
+    const r = await call('GET', byOwner(UID_A), 'custA');
+    return { ...r, ok: r.ok && ids(r) === 'ORD-OWNED00001A,ORD-OWNED00002A' };
+  });
+  await expect("customer A: query B's ownerUid", false, () => call('GET', byOwner(UID_B), 'custA'));
+  await expect('customer A: unconstrained list', false, () => call('GET', 'orders', 'custA'));
+  await expect('customer A: shallow enumeration', false, () => call('GET', 'orders?shallow=true', 'custA'));
+  await expect('customer A: orderBy ownerUid without equalTo', false, () => call('GET', 'orders?orderBy="ownerUid"', 'custA'));
+  await expect('customer A: orderBy ownerUid with startAt only', false, () => call('GET', `orders?orderBy="ownerUid"&startAt="${UID_A}"`, 'custA'));
+  await expect('customer A: equalTo own uid on a different child', false, () => call('GET', byOwner(UID_A, 'customerId'), 'custA'));
+  await expect('customer B: query own ownerUid', true, () => call('GET', byOwner(UID_B), 'custB'));
+  await expect("customer B: query A's ownerUid", false, () => call('GET', byOwner(UID_A), 'custB'));
+  await expect('customer A: read one order by id (tracking), own', true, () => call('GET', 'orders/ORD-OWNED00001A', 'custA'));
+  await expect('anon: read one order by id (tracking), owned', true, () => call('GET', 'orders/ORD-OWNED00001A', 'anon'));
+  await expect('admin: list all orders incl. owned', true, () => call('GET', 'orders', 'admin'));
+  await expect('admin: query by ownerUid', true, () => call('GET', byOwner(UID_A), 'admin'));
+
+  console.log('--- customer identity: creating orders with ownerUid');
+  const ownerCases = [
+    ['anon: create with ownerUid', 'anon', UID_A, false],
+    ['anon: create without ownerUid', 'anon', undefined, true],
+    ['customer A: create with own ownerUid', 'custA', UID_A, true],
+    ['customer A: create without ownerUid', 'custA', undefined, true],
+    ["customer A: create with B's ownerUid", 'custA', UID_B, false],
+    ['customer A: create with non-string ownerUid', 'custA', 12345, false],
+    ['customer A: create with empty ownerUid', 'custA', '', false],
+    ['admin: create with any ownerUid', 'admin', UID_B, true],
+  ];
+  for (const [label, who, ownerUid, allowed] of ownerCases) {
+    const id = fresh();
+    await expect(label, allowed, () => call('PUT', `orders/${id}`, who, clean(order(id, ownerUid === undefined ? {} : { ownerUid }))));
+  }
+
+  console.log('--- customer identity: ownerUid is immutable');
+  await seed('ORD-LEGACY00001');
+  const guard = [
+    ['customer A: re-assign own order to B', () => call('PUT', 'orders/ORD-OWNED00001A/ownerUid', 'custA', UID_B)],
+    ['customer A: patch own order ownerUid', () => call('PATCH', 'orders/ORD-OWNED00001A', 'custA', { ownerUid: UID_A })],
+    ['customer A: delete ownerUid on own order', () => call('DELETE', 'orders/ORD-OWNED00001A/ownerUid', 'custA')],
+    ["customer A: take over B's order", () => call('PUT', 'orders/ORD-OWNED00001B/ownerUid', 'custA', UID_A)],
+    ['customer A: claim a legacy order', () => call('PUT', 'orders/ORD-LEGACY00001/ownerUid', 'custA', UID_A)],
+    ['anon: claim a legacy order', () => call('PUT', 'orders/ORD-LEGACY00001/ownerUid', 'anon', UID_A)],
+    ['customer A: overwrite own order', () => call('PUT', 'orders/ORD-OWNED00001A', 'custA', clean(order('ORD-OWNED00001A', { ownerUid: UID_A, total: 1 })))],
+  ];
+  for (const [label, fn] of guard) await expect(label, false, fn);
+  await expect('admin: change ownerUid', true, () => call('PUT', 'orders/ORD-OWNED00001B/ownerUid', 'admin', UID_A));
 
   console.log(`\n${n - failures}/${n} checks passed`);
 } catch (err) {

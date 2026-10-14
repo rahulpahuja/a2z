@@ -64,6 +64,23 @@ resetOtpSession()                        // clears the cached reqId (call when t
 
 ## Notes / limitations
 
-- MSG91 verification does not produce a Firebase user — the resulting `user` object is a lightweight local record (`{ uid: 'msg91:<identifier>', phoneNumber, provider: 'msg91' }`), sufficient for the storefront's "logged in as / my orders" UI but not a Firebase-authenticated identity. If a backend needs to trust this login, verify the MSG91 `reqId`/token server-side rather than trusting the client-stored session.
+- The `user` object in the UI is still a lightweight local record (`{ uid: 'msg91:<identifier>', phoneNumber, provider: 'msg91' }`). Separately, after OTP verification the app asks `netlify/functions/exchange-token` for a Firebase custom token (see "Customer identity" below).
 - Only phone-number SMS OTP is wired into the UI. The MSG91 widget also supports email OTP and WhatsApp/voice retry channels — the service module supports these (`identifier` can be an email; `retryOtp` accepts a channel), but `AuthModal.jsx` only exposes the phone + SMS path today.
 - Super-user/admin login (`/super/*`) is unaffected — `RequireAdmin.jsx` currently bypasses auth entirely and was intentionally left alone.
+
+## Customer identity (cross-device "My orders")
+
+`netlify/functions/exchange-token.js` verifies the MSG91 access token server-side and takes the phone number **only** from MSG91's response (a `phoneNumber` in the request body is ignored). It then mints a Firebase custom token:
+
+| Verified phone | uid | claims |
+| --- | --- | --- |
+| in `ADMIN_PHONES` | `msg91:<digits>` | `{ admin: true }` (unchanged) |
+| anyone else | `c_` + first 32 chars of base64url(HMAC-SHA256(`CUSTOMER_UID_SECRET`, `a2z-customer-v1:` + phone)) | `{ customer: true }` |
+
+Netlify environment variables (server-side only, never `VITE_*`): `MSG91_AUTH_KEY`, `ADMIN_PHONES`, `FIREBASE_SERVICE_ACCOUNT` (existing) and `CUSTOMER_UID_SECRET` (new; at least 16 random characters, e.g. `openssl rand -base64 32`). While `CUSTOMER_UID_SECRET` is unset, customers get a 503 and the storefront behaves as before (per-browser "My orders"); admin sign-in is unaffected. **Do not rotate or lose the secret** once customers have orders: the uid changes and old orders stop appearing in "My orders" on the owner query (they remain reachable by order id).
+
+`AuthContext` signs the customer in with that token after OTP verification (failure never blocks login for customers; for admins it does). Orders placed while signed in carry `ownerUid` (= the Firebase uid). `database.rules.json` lets a signed-in user list `orders` only through `orderBy="ownerUid"&equalTo=<their uid>` (indexed); `ownerUid` must equal the creator's uid on create and cannot be changed afterwards by non-admins. `subscribeToMyOrders` / `hasPriorOrders` use that query and merge in the orders remembered in this browser (`a2z_my_order_ids`) for ones placed as a guest or before login.
+
+Privacy: the uid cannot be reversed to a phone number without `CUSTOMER_UID_SECRET`, but it is stable per phone, so it links all of one customer's orders. Because a single order is readable by anyone who knows its id (order tracking), `ownerUid` is visible to whoever holds that order link; it reveals nothing beyond "these orders share an owner".
+
+Verify the rules with `node scripts/check-orders-rules.mjs` (needs the cached Realtime Database emulator JAR and Java).
