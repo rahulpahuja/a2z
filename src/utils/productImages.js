@@ -11,6 +11,18 @@ export function getR2KeyFromUrl(url) {
   }
 }
 
+// The URL to fetch when downloading an image as a blob. Stored product images point at the
+// public r2.dev host, which sends no CORS header, so the browser blocks reading them. The
+// upload worker serves the same keys with CORS enabled, so go through it when it is configured.
+// Local (blob:/data:) previews and anything without a usable key are fetched as they are.
+export function getDownloadFetchUrl(url, apiUrl) {
+  if (!url || !apiUrl || /^(blob|data):/i.test(url)) return url;
+  const key = getR2KeyFromUrl(url);
+  if (!key) return url;
+  // `key` comes from URL.pathname, so it is already percent-encoded; the worker decodes it once.
+  return `${apiUrl.replace(/\/+$/, '')}/${key}`;
+}
+
 export async function deleteProductImagesFromR2(product) {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
   const urls = product.images || (product.image ? [product.image] : []);

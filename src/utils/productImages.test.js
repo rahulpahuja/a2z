@@ -1,0 +1,30 @@
+import { describe, it, expect } from 'vitest';
+import { getDownloadFetchUrl } from './productImages.js';
+
+const API = 'https://uploader.example.workers.dev';
+const R2_URL = 'https://pub-abc.r2.dev/prod_123_image_1.webp';
+
+describe('getDownloadFetchUrl', () => {
+  it('routes a stored r2.dev image through the upload worker by key', () => {
+    expect(getDownloadFetchUrl(R2_URL, API)).toBe(`${API}/prod_123_image_1.webp`);
+  });
+
+  it('ignores trailing slashes on the worker url and keeps the key encoded exactly once', () => {
+    expect(getDownloadFetchUrl('https://pub-abc.r2.dev/a b.webp', `${API}//`)).toBe(`${API}/a%20b.webp`);
+  });
+
+  it('leaves the url alone when no worker is configured', () => {
+    expect(getDownloadFetchUrl(R2_URL, undefined)).toBe(R2_URL);
+    expect(getDownloadFetchUrl(R2_URL, '')).toBe(R2_URL);
+  });
+
+  it('leaves local previews alone', () => {
+    expect(getDownloadFetchUrl('blob:https://site/1234-uuid', API)).toBe('blob:https://site/1234-uuid');
+    expect(getDownloadFetchUrl('data:image/png;base64,AAAA', API)).toBe('data:image/png;base64,AAAA');
+  });
+
+  it('leaves unparseable or empty urls alone', () => {
+    expect(getDownloadFetchUrl('not a url', API)).toBe('not a url');
+    expect(getDownloadFetchUrl('', API)).toBe('');
+  });
+});
