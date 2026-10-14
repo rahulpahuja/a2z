@@ -39,6 +39,9 @@ export const DEFAULT_STORE_SETTINGS = {
   showCategoryBubbles: false,
   // First-time visitors see a "tap to shop" hint on the home page banner.
   showBannerHint: true,
+  // Shows a "Buy on WhatsApp" button on each product page that opens a chat
+  // with the store number, prefilled with the product, variant and quantity.
+  showBuyOnWhatsapp: true,
   // Structured warehouse address used as the pickupAddress for shipping
   // (ShipPrime etc.) — the free-text `address`/`location` fields above
   // aren't reliably parseable into courier-required fields.

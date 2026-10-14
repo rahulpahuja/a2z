@@ -25,6 +25,11 @@ import { buildProductHead } from '../seo/productHead.js';
 import { applyDocumentHead } from '../seo/head.js';
 import { SITE_URL, notFoundHead } from '../seo/routes.js';
 import { getProductAlt } from '../utils/productImages.js';
+import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
+import { WHATSAPP_NUMBER } from '../config/store.js';
+import { buildWhatsAppLink, buildProductOrderMessage } from '../utils/whatsapp.js';
+import WhatsAppIcon from '../components/WhatsAppIcon.jsx';
+import './ProductDetailPage.css';
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -81,10 +86,18 @@ export default function ProductDetailPage() {
   const [viewCount, setViewCount] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [faqs, setFaqs] = useState([]);
+  const [showBuyOnWhatsapp, setShowBuyOnWhatsapp] = useState(DEFAULT_STORE_SETTINGS.showBuyOnWhatsapp);
   // Bumped when the discount countdown expires, to force the price below
   // (computed fresh each render from the real clock) to re-evaluate and
   // revert without a page reload.
   const [, forceDiscountRecheck] = useState(0);
+
+  useEffect(() => {
+    const unsub = subscribeToStoreSettings((data) => {
+      setShowBuyOnWhatsapp(data.showBuyOnWhatsapp ?? DEFAULT_STORE_SETTINGS.showBuyOnWhatsapp);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -232,6 +245,20 @@ export default function ProductDetailPage() {
     } catch {
       showToast('Could not copy the link. Please try again.');
     }
+  };
+
+  const handleBuyOnWhatsapp = () => {
+    const message = buildProductOrderMessage({
+      name: product.name || product.title,
+      url: `${SITE_URL}/products/${encodeURIComponent(product.id)}`,
+      color: selectedColor,
+      size: selectedSize,
+      quantity,
+      unitPrice: formatCurrency(discountedPrice),
+      total: formatCurrency(discountedPrice * quantity),
+    });
+    logShare('whatsapp', 'product_buy');
+    window.open(buildWhatsAppLink(WHATSAPP_NUMBER, message), '_blank', 'noopener,noreferrer');
   };
 
   const handleAddToCart = () => addItem(cartLine(), quantity);
@@ -567,6 +594,17 @@ export default function ProductDetailPage() {
               <span className="material-symbols-outlined text-[1.125rem]">add_shopping_cart</span>
               ADD TO CART
             </button>
+            {showBuyOnWhatsapp && WHATSAPP_NUMBER && (
+              <button
+                type="button"
+                onClick={handleBuyOnWhatsapp}
+                disabled={selectedSizeStock === 0}
+                className="pdp-whatsapp-buy"
+              >
+                <WhatsAppIcon />
+                BUY ON WHATSAPP
+              </button>
+            )}
             <div className="flex items-center justify-center gap-2 text-on-surface-variant font-body-sm text-body-sm mt-2">
               <span className="material-symbols-outlined text-[1rem]">local_shipping</span>
               <span>⏱️ Estimated Delivery: 3 to 7 Business Days</span>
