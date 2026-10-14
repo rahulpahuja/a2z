@@ -23,6 +23,7 @@ import {
   getAllSizeNames,
 } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
+import DescriptionAssistant from '../../components/admin/DescriptionAssistant.jsx';
 import './AdminProductsPage.css';
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -564,6 +565,20 @@ export default function AdminProductsPage() {
     [imageColors]
   );
 
+  // What the description assistant compares the text against (colours, sizes, gender, keywords).
+  const descriptionContext = useMemo(
+    () => ({
+      title: form.title,
+      categoryTitle: categories.find((c) => c.id === form.categoryId)?.title ?? '',
+      subcategoryTitle: subcategories.find((s) => s.id === form.subcategoryId)?.title ?? '',
+      hashtags: form.hashtagsInput,
+      colors: derivedColorNames.map((name) => ({ name })),
+      sizes,
+      gender: form.gender,
+    }),
+    [form.title, form.categoryId, form.subcategoryId, form.hashtagsInput, form.gender, categories, subcategories, derivedColorNames, sizes]
+  );
+
   const updateColorSizeStock = (colorName, size, stock) => {
     setColorSizeStocks((prev) => ({
       ...prev,
@@ -989,6 +1004,11 @@ export default function AdminProductsPage() {
                   value={form.description}
                   onChange={updateField('description')}
                   className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                />
+                <DescriptionAssistant
+                  value={form.description}
+                  product={descriptionContext}
+                  onApply={(description) => setForm((prev) => ({ ...prev, description }))}
                 />
               </div>
 
