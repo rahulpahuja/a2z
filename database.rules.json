@@ -30,7 +30,20 @@
     },
     "adminProducts": {
       ".read": true,
-      ".write": "auth.token.admin === true"
+      ".write": "auth.token.admin === true",
+      "$productId": {
+        "colors": {
+          "$colorIndex": {
+            "sizes": {
+              "$sizeIndex": {
+                "stock": {
+                  ".write": "data.isNumber() && newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0 && newData.val() - data.val() <= 50 && data.val() - newData.val() <= 50"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "trashedProducts": {
       ".read": "auth.token.admin === true",

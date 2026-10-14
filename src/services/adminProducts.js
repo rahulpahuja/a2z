@@ -296,9 +296,9 @@ export function reduceProductStock(productId, size, quantity, color) {
 // Applies a stock delta to one (color, size) pair and reports whether it was
 // applied: a negative delta (reserving stock for an order) is rejected
 // in-place — without mutating anything — once it would take that size below
-// zero; a positive delta (releasing a reservation) always succeeds. Shared
-// by both the atomic Firebase transaction and the local/no-Firebase
-// simulation below so the two can never disagree on when stock runs out.
+// zero; a positive delta (releasing a reservation) always succeeds. Used by
+// the local/no-Firebase simulation below; the Firebase path applies the same
+// rules to a single stock leaf (see applyFirebaseStockDelta).
 function applyColorSizeDelta(colors, colorName, sizeName, delta) {
   let insufficient = false;
   const updated = colors.map((c) => {
@@ -320,6 +320,88 @@ function applyColorSizeDelta(colors, colorName, sizeName, delta) {
   return insufficient ? undefined : updated;
 }
 
+// Largest stock change a single checkout write may make. database.rules.json
+// bounds the stock leaf by the same number (keep the two in sync): the rules
+// let a customer touch only `colors/$ci/sizes/$si/stock`, by at most this much
+// per write. Larger reservations are refused up front (treated as not
+// fulfillable online) and larger releases are split into chunks.
+//
+// RESIDUAL RISK: rules cannot tell a checkout reservation from any other
+// in-bound write, so anyone holding the database URL can still drain a size to
+// 0 (or inflate it) directly, MAX_STOCK_DELTA units per request. Only a
+// server-side function using the Admin SDK removes that; until then, watch
+// stock for unexplained swings (e.g. compare adminProducts stock against the
+// orders collection).
+export const MAX_STOCK_DELTA = 50;
+
+const entriesOf = (collection) => {
+  if (Array.isArray(collection)) {
+    return collection.map((value, index) => [String(index), value]).filter(([, value]) => value != null);
+  }
+  return collection && typeof collection === 'object' ? Object.entries(collection) : [];
+};
+
+// Locates the stock leaf for one (color, size) pair by name, returning its
+// database path and current value, or null when there is nothing to track:
+// legacy string colours, a colour without sizes, an unknown colour/size, or a
+// stock that is null/undefined/non-numeric (all treated as always available,
+// exactly as applyColorSizeDelta does for the local simulation).
+function findStockLeaf(productId, colors, colorName, sizeName) {
+  const colorEntry = entriesOf(colors).find(
+    ([, c]) => c && typeof c === 'object' && c.name === colorName && c.sizes
+  );
+  if (!colorEntry) return null;
+  const [colorKey, colorValue] = colorEntry;
+  const sizeEntry = entriesOf(colorValue.sizes).find(([, s]) => s && typeof s === 'object' && s.size === sizeName);
+  if (!sizeEntry || typeof sizeEntry[1].stock !== 'number') return null;
+  return {
+    path: `${ROOT}/${productId}/colors/${colorKey}/sizes/${sizeEntry[0]}/stock`,
+    stock: sizeEntry[1].stock,
+  };
+}
+
+// Atomically adds `delta` to one stock leaf. `expected` is the value seen by
+// the pre-read: the SDK's first local run of the update function can see
+// null when nothing is cached, and returning undefined there would abort
+// before the server value is ever compared, so we offer the pre-read value
+// and let the SDK re-run with the real one if it differs. Aborts (committed
+// false) if the value is no longer a number or would go negative.
+function transactStockLeaf(path, expected, delta) {
+  return runTransaction(ref(db, path), (current) => {
+    const base = typeof current === 'number' ? current : current === null ? expected : undefined;
+    if (base === undefined) return undefined;
+    const next = base + delta;
+    return next < 0 ? undefined : next;
+  }).then((result) => result.committed);
+}
+
+// Customers have no admin claim, so database.rules.json only lets them write
+// this single numeric leaf, never the colors array. The colour/size are
+// resolved to array indices with one read just before the write. KNOWN
+// LIMITATION: if an admin reorders, inserts or removes colours/sizes in that
+// short window the index could point at a different size. The window is one
+// round trip, an admin's whole-array save would equally clobber a concurrent
+// reservation in the previous design, and the leaf transaction still refuses
+// to go negative; we deliberately do not add a post-write re-check.
+async function applyFirebaseStockDelta(productId, color, size, delta) {
+  if (!Number.isInteger(delta) || delta === 0) return delta === 0;
+  if (delta < -MAX_STOCK_DELTA) return false;
+  const snapshot = await get(ref(db, `${ROOT}/${productId}/colors`));
+  const leaf = snapshot.exists() ? findStockLeaf(productId, snapshot.val(), color, size) : null;
+  if (!leaf) return true; // nothing tracked for this product/size — allow without changes
+  if (delta > 0) {
+    let remaining = delta;
+    let ok = true;
+    while (remaining > 0 && ok) {
+      const chunk = Math.min(remaining, MAX_STOCK_DELTA);
+      ok = await transactStockLeaf(leaf.path, leaf.stock, chunk);
+      remaining -= chunk;
+    }
+    return ok;
+  }
+  return transactStockLeaf(leaf.path, leaf.stock, delta);
+}
+
 // Atomically reserves (negative delta) or releases (positive delta) stock
 // for one order line. A size whose stock isn't tracked (stock === null) is
 // treated as always available, matching the rest of the app. Returns
@@ -339,11 +421,7 @@ function applyStockDelta(productId, color, size, delta) {
     return Promise.resolve(true);
   }
 
-  const colorsRef = ref(db, `${ROOT}/${productId}/colors`);
-  return runTransaction(colorsRef, (colors) => {
-    if (!colors) return colors; // nothing tracked for this product — allow without changes
-    return applyColorSizeDelta(colors, color, size, delta);
-  }).then((result) => result.committed);
+  return applyFirebaseStockDelta(productId, color, size, delta);
 }
 
 // Reserves `quantity` units of one (color, size) pair for an order about to
