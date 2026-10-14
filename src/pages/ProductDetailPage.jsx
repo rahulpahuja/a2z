@@ -18,6 +18,7 @@ import DiscountCountdown from '../components/DiscountCountdown.jsx';
 import StarRating from '../components/StarRating.jsx';
 import ProductReviews from '../components/ProductReviews.jsx';
 import ProductFaqs from '../components/ProductFaqs.jsx';
+import ProductDescription from '../components/ProductDescription.jsx';
 import { subscribeToProductReviews } from '../services/productReviews.js';
 import { subscribeToProductFaqs } from '../services/productFaqs.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
@@ -395,7 +396,7 @@ export default function ProductDetailPage() {
           )}
         </section>
         {product.description && (
-          <p className="order-4 md:hidden font-body-sm text-body-sm text-on-surface-variant" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
+          <ProductDescription text={product.description} className="order-4 md:hidden" />
         )}
 
         {/* Right: Product Info (40% -> 5 columns). On phones it flattens into the grid so each part can be ordered. */}
@@ -425,7 +426,7 @@ export default function ProductDetailPage() {
               {product.name || product.title}
             </motion.h1>
             {product.description && (
-              <p className="hidden md:block font-body-sm text-body-sm text-on-surface-variant mt-1" style={{ fontSize: 'var(--custom-font-desc-size-detail, 14px)' }}>{product.description}</p>
+              <ProductDescription text={product.description} className="hidden md:block mt-1" />
             )}
             {viewCount !== null && viewCount > 0 && (
               <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
@@ -643,9 +644,7 @@ export default function ProductDetailPage() {
             {/* Description */}
             <div>
               <h2 className="font-headline-md text-headline-md text-on-surface mb-6">The Artisan's Touch</h2>
-              <div className="font-body-lg text-body-lg text-on-surface-variant space-y-4">
-                <p style={{ fontSize: 'var(--custom-font-desc-size-detail, 16px)' }}>{product.description}</p>
-              </div>
+              <ProductDescription text={product.description} variant="full" />
             </div>
 
             {/* Specifications Bento */}

@@ -1,5 +1,6 @@
 import { getPriceBreakdown } from '../utils/discount.js';
 import { isColorOutOfStock, normalizeColors } from '../utils/productColors.js';
+import { descriptionToPlain } from '../utils/richText.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
 import { BRAND_NAME, DEFAULT_ROBOTS, SITE_URL } from './routes.js';
 
@@ -33,7 +34,7 @@ export function buildProductHead(product, { faqs = [], reviews = [], now = new D
   const { discountedPrice } = getPriceBreakdown(product, now);
   const colors = normalizeColors(product.colors, product.sizes);
   const inStock = !product.outOfStock && (colors.length === 0 || colors.some((c) => !isColorOutOfStock(c)));
-  const description = truncate(product.description || `Shop ${name} from ${BRAND_NAME}.`, DESCRIPTION_MAX);
+  const description = truncate(descriptionToPlain(product.description) || `Shop ${name} from ${BRAND_NAME}.`, DESCRIPTION_MAX);
   const images = [...new Set([...(product.images ?? []), product.image].filter((src) => typeof src === 'string' && src.startsWith('http')))];
   const image = images[0];
   const summary = summarizeReviews(reviews);
