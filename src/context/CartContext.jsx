@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
 import { logAddToCart, logRemoveFromCart, logPurchase, logApplyCoupon } from '../services/analytics.js';
-import { createFirebaseOrder, updateFirebaseOrder, hasPriorOrders } from '../services/orders.js';
+import { createFirebaseOrder, setOrderShipment, rememberOrderId, hasPriorOrders } from '../services/orders.js';
+import { generateOrderId } from '../utils/orderId.js';
 import { reserveProductStock, releaseProductStock } from '../services/adminProducts.js';
 import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
 import { createForwardShipment, buildDeliveryAddress, extractShipmentCost } from '../services/shipprime.js';
@@ -26,14 +27,6 @@ export const parsePrice = (value) =>
   typeof value === 'number' ? value : Number(String(value).replace(/[^0-9.]/g, '')) || 0;
 
 export const formatCurrency = (value) => `₹${Math.round(value).toLocaleString('en-IN')}`;
-
-// Generates a collision-safe order id (timestamp + random suffix) instead of
-// an in-memory counter, which resets on every reload/tab and can silently
-// overwrite a different order at the same Firebase key.
-function generateOrderId() {
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `ORD-${Date.now().toString(36).toUpperCase()}${rand}`;
-}
 
 // Runs a side effect that happens after an order is already written, without
 // ever letting it escape. By that point the customer has paid and their order
@@ -65,21 +58,18 @@ async function autoCreateShipment(order) {
     const stateName = INDIAN_STATES_AND_UT.find((s) => s.code === order.shippingDetails?.state)?.name;
     const deliveryAddress = buildDeliveryAddress(order.shippingDetails, stateName);
     const result = await createForwardShipment({ order, pickupAddress, deliveryAddress });
-    await updateFirebaseOrder({
-      ...order,
-      shipment: {
-        status: 'created',
-        awb: result.awb,
-        courier: result.courier,
-        labelUrl: result.labelUrl,
-        cost: extractShipmentCost(result),
-        createdAt: new Date().toISOString(),
-      },
+    await setOrderShipment(order.id, {
+      status: 'created',
+      awb: result.awb,
+      courier: result.courier,
+      labelUrl: result.labelUrl,
+      cost: extractShipmentCost(result),
+      createdAt: new Date().toISOString(),
     });
   } catch (err) {
-    await updateFirebaseOrder({
-      ...order,
-      shipment: { status: 'failed', error: err.message || 'Shipment creation failed.' },
+    await setOrderShipment(order.id, {
+      status: 'failed',
+      error: String(err.message || 'Shipment creation failed.').slice(0, 300),
     }).catch(() => {});
   }
 }
@@ -242,6 +232,7 @@ export function CartProvider({ children }) {
 
     try {
       await createFirebaseOrder(order);
+      rememberOrderId(order.id);
     } catch (err) {
       await Promise.all(reserved.map((r) => releaseProductStock(r.productId, r.color, r.size, r.quantity)));
       if (couponReserved) await releaseCouponUsage(appliedCoupon.code, customerId);
