@@ -5,6 +5,8 @@ import { subscribeToTrackingPartners } from '../../services/trackingPartners.js'
 import { MOCK_ORDERS } from '../../data/mockOrders.js';
 import { formatCurrency } from '../../context/CartContext.jsx';
 import { generateReceiptPdf } from '../../utils/generateReceipt.js';
+import { downloadBlob } from '../../utils/download.js';
+import { ordersToCsv, ordersCsvFilename } from '../../services/exportService.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
 import { getStoreSettingsOnce } from '../../services/storeSettings.js';
@@ -449,6 +451,28 @@ export default function AdminSalesPage() {
     return list;
   }, [allOrders, drillDownType, drillDownLabel, searchQuery, selectedYear]);
 
+  // Exports exactly what the Transactions Log is currently showing (drill-down
+  // + search applied), from the orders this page has already loaded.
+  const handleExportCsv = () => {
+    if (displayOrders.length === 0) return;
+    try {
+      const csv = ordersToCsv(displayOrders);
+      downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), ordersCsvFilename());
+      showToast(`Exported ${displayOrders.length} ${displayOrders.length === 1 ? 'order' : 'orders'} to CSV.`);
+    } catch (err) {
+      console.error('Orders CSV export failed', err);
+      showToast('Could not export orders to CSV.');
+    }
+  };
+
+  const handleDownloadReceipt = async (order) => {
+    try {
+      await generateReceiptPdf(order);
+    } catch (err) {
+      showToast(err.message || 'Could not generate the receipt.');
+    }
+  };
+
   // Render Charts
   useEffect(() => {
     if (loading) return;
@@ -854,6 +878,16 @@ export default function AdminSalesPage() {
                 placeholder="Search orders, customers, payment..."
                 className="flex-1 sm:w-64 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-3.5 py-2 font-body-sm text-body-sm text-on-surface transition-colors placeholder:text-on-surface-variant/50"
               />
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                disabled={displayOrders.length === 0}
+                title={displayOrders.length === 0 ? 'No transactions to export' : `Export ${displayOrders.length} transactions as CSV`}
+                className="btn btn-outline sales-export-btn"
+              >
+                <span className="material-symbols-outlined sales-export-btn__icon">file_download</span>
+                Export CSV
+              </button>
               {drillDownType !== 'all' && (
                 <button
                   onClick={() => handleDrillDown('all', '', [])}
@@ -988,7 +1022,7 @@ export default function AdminSalesPage() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              generateReceiptPdf(order);
+                              handleDownloadReceipt(order);
                             }}
                             className="w-8 h-8 rounded-full hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors"
                             title="Download Receipt"
@@ -1280,7 +1314,7 @@ export default function AdminSalesPage() {
               <button
                 type="button"
                 onClick={() => {
-                  generateReceiptPdf(selectedOrder);
+                  handleDownloadReceipt(selectedOrder);
                 }}
                 className="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-caps text-[0.625rem] uppercase hover:opacity-90 transition-opacity flex items-center gap-1.5"
               >

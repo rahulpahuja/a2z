@@ -13,3 +13,22 @@
   position: relative;
   min-height: 280px;
 }
+
+/* Export CSV button in the Transactions Log toolbar (composes .btn / .btn-outline from common.css). */
+.btn.sales-export-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  font-size: 0.625rem;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn.sales-export-btn:disabled {
+  border-color: var(--color-outline-variant);
+  color: var(--color-on-surface-variant);
+}
+
+.sales-export-btn__icon {
+  font-size: 1rem;
+}
