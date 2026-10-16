@@ -39,7 +39,9 @@ Leave both blank to keep MSG91 disabled — the app falls back to the previous b
 4. **Session restore** — on mount, `AuthContext` reads that `localStorage` session (if unexpired) and restores `user` from it, so a page refresh doesn't log the user out. This restore is guarded so Firebase's initial (async) `onAuthStateChanged(null)` callback can't clobber a live MSG91 session.
 5. **Sign out** — `signOutUser()` clears the MSG91 `localStorage` session in addition to any Firebase sign-out.
 
-The `containerId` prop AuthModal already renders (`otp-widget-container`) doubles as both the Firebase `RecaptchaVerifier` container and MSG91's `captchaRenderId` — only one is active at a time depending on which provider handled `sendOtp`.
+The captcha container id (`OTP_WIDGET_CONTAINER_ID` in `OtpCaptchaHost.jsx`, currently `a2z-otp-captcha`) doubles as both the Firebase `RecaptchaVerifier` container and MSG91's `captchaRenderId` — only one is active at a time depending on which provider handled `sendOtp`.
+
+**Never name that container `otp-widget-container`.** MSG91's `otp-provider.js` checks for an element with that exact id when it loads and, if present, calls `initSendOTP` itself with its own demo widget (`exposeMethods: false`, no captcha container). That extra init runs before ours, breaks the captcha (blank checkbox, "Failed to load widget" after the modal is reopened) and can bind `window.sendOtp` to the wrong widget.
 
 ## `src/services/msg91Otp.js` API
 
