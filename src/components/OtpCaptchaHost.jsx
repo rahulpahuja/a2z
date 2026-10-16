@@ -11,7 +11,11 @@
 // own layout on open, and relocates it back here on close — the node itself,
 // and any captcha state MSG91 rendered into it, survives the whole time.
 export const OTP_WIDGET_HOST_ID = 'otp-widget-host';
-export const OTP_WIDGET_CONTAINER_ID = 'otp-widget-container';
+// Never name this 'otp-widget-container': MSG91's otp-provider.js looks for an
+// element with that exact id when it loads and, if found, auto-initializes its
+// own demo widget into it. That second initSendOTP (before ours) leaves the
+// captcha broken and can bind window.sendOtp to the wrong widget.
+export const OTP_WIDGET_CONTAINER_ID = 'a2z-otp-captcha';
 
 export default function OtpCaptchaHost() {
   return (
