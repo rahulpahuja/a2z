@@ -1092,13 +1092,13 @@ export default function AdminProductsPage() {
                                 Download
                               </button>
                             )}
-                            {hasImage && (
+                            {preview && (
                               <button
                                 type="button"
                                 onClick={() => clearImageSlot(index)}
                                 className="text-error font-body-sm text-[0.625rem] hover:underline"
                               >
-                                Clear
+                                Delete
                               </button>
                             )}
                           </div>
