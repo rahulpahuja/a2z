@@ -23,6 +23,13 @@ export function getDownloadFetchUrl(url, apiUrl) {
   return `${apiUrl.replace(/\/+$/, '')}/${key}`;
 }
 
+// Keys queued for deletion after a product save, minus any the saved product still uses.
+// A replacement that reuses the old file name would otherwise be deleted along with it.
+export function getKeysToDelete(removedKeys, keysInUse) {
+  const inUse = new Set(keysInUse);
+  return [...new Set(removedKeys)].filter((key) => !inUse.has(key));
+}
+
 export async function deleteProductImagesFromR2(product) {
   const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
   const urls = product.images || (product.image ? [product.image] : []);

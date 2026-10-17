@@ -10,7 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import ProductContentModal from '../../components/admin/ProductContentModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
-import { getR2KeyFromUrl, getDownloadFetchUrl } from '../../utils/productImages.js';
+import { getR2KeyFromUrl, getDownloadFetchUrl, getKeysToDelete } from '../../utils/productImages.js';
 import { uploadImageToExternalServer } from '../../services/imageUpload.js';
 import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, DISCOUNT_END_TIME_MODES, validateDiscountInput } from '../../utils/discount.js';
 import {
@@ -334,7 +334,12 @@ export default function AdminProductsPage() {
         return;
       }
 
-      const autoName = `${productId}_image_${index + 1}${compressed.extension}`;
+      // A replacement must not reuse the old key: the upload would overwrite the
+      // file in place (same URL, so the cached old image keeps showing) and the
+      // old key queued for deletion on save would then delete the new file.
+      const isReplacingStoredImage = Boolean(imagePreviews[index]) && !imagePreviews[index].startsWith('blob:');
+      const versionSuffix = isReplacingStoredImage ? `_${Date.now().toString(36)}` : '';
+      const autoName = `${productId}_image_${index + 1}${versionSuffix}${compressed.extension}`;
 
       setImageFiles((prev) => {
         const copy = [...prev];
@@ -814,9 +819,12 @@ export default function AdminProductsPage() {
       // Only now that the product record itself has saved successfully do we
       // remove the replaced/deleted images from R2 — deleting first and
       // failing the save would leave the product pointing at nothing.
-      if (removedImageKeys.length > 0) {
+      // Never delete a key the saved product still points at (e.g. a replacement
+      // given the same file name as the image it replaced).
+      const keysToDelete = getKeysToDelete(removedImageKeys, uploadedFiles.map((f) => f.key));
+      if (keysToDelete.length > 0) {
         const apiUrl = import.meta.env.VITE_IMAGE_UPLOAD_API_URL;
-        const deletePromises = removedImageKeys.map(async (key) => {
+        const deletePromises = keysToDelete.map(async (key) => {
           if (!apiUrl) return;
           try {
             await fetch(`${apiUrl}/${key}`, { method: 'DELETE' });

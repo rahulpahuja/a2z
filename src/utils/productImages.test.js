@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDownloadFetchUrl } from './productImages.js';
+import { getDownloadFetchUrl, getKeysToDelete } from './productImages.js';
 
 const API = 'https://uploader.example.workers.dev';
 const R2_URL = 'https://pub-abc.r2.dev/prod_123_image_1.webp';
@@ -26,5 +26,15 @@ describe('getDownloadFetchUrl', () => {
   it('leaves unparseable or empty urls alone', () => {
     expect(getDownloadFetchUrl('not a url', API)).toBe('not a url');
     expect(getDownloadFetchUrl('', API)).toBe('');
+  });
+});
+
+describe('getKeysToDelete', () => {
+  it('drops a replaced key the saved product still points at', () => {
+    expect(getKeysToDelete(['prod_1_image_1.webp'], ['prod_1_image_1.webp', 'prod_1_image_2.webp'])).toEqual([]);
+  });
+
+  it('keeps genuinely removed keys and de-duplicates them', () => {
+    expect(getKeysToDelete(['old.webp', 'old.webp', 'gone.webp'], ['new.webp'])).toEqual(['old.webp', 'gone.webp']);
   });
 });
