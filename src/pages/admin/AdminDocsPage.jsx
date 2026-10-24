@@ -213,7 +213,7 @@ export default function AdminDocsPage() {
 
             <h3 className="font-semibold text-on-surface mt-4 mb-2">Upload Logic &amp; Constraints</h3>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>Slots</strong>: Product creation supports uploading **3 to 5 images** in parallel. First image is the primary thumbnail.</li>
+              <li><strong>Slots</strong>: Product creation supports uploading **1 to 5 images** in parallel (a single image is fine). First image is the primary thumbnail.</li>
               <li><strong>Renaming</strong>: Images are auto-renamed to `{`productId`}_image_{`index`}.{`ext`}` (a replaced image gets a unique suffix so it never overwrites the old file). Filenames are fully editable in the UI before submitting.</li>
               <li><strong>Metadata</strong>: After successful R2 uploads, complete file logs are saved in Firebase RTDB at <Code>fileMetadata/</Code> (tracking sizes, keys, URLs, and timestamps).</li>
             </ul>

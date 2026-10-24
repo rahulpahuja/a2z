@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDownloadFetchUrl, getKeysToDelete } from './productImages.js';
+import { getDownloadFetchUrl, getKeysToDelete, productImageCountError } from './productImages.js';
 
 const API = 'https://uploader.example.workers.dev';
 const R2_URL = 'https://pub-abc.r2.dev/prod_123_image_1.webp';
@@ -36,5 +36,16 @@ describe('getKeysToDelete', () => {
 
   it('keeps genuinely removed keys and de-duplicates them', () => {
     expect(getKeysToDelete(['old.webp', 'old.webp', 'gone.webp'], ['new.webp'])).toEqual(['old.webp', 'gone.webp']);
+  });
+});
+
+describe('productImageCountError', () => {
+  it('accepts one to five images, including a single image', () => {
+    for (const count of [1, 2, 3, 5]) expect(productImageCountError(count)).toBe('');
+  });
+
+  it('asks for at least one image, and refuses more than five', () => {
+    expect(productImageCountError(0)).toMatch(/at least 1 image/);
+    expect(productImageCountError(6)).toMatch(/at most 5/);
   });
 });

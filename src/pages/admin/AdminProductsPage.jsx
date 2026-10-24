@@ -10,7 +10,7 @@ import BarcodeModal from '../../components/admin/BarcodeModal.jsx';
 import ProductContentModal from '../../components/admin/ProductContentModal.jsx';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { compressImageFile } from '../../utils/imageCompression.js';
-import { getR2KeyFromUrl, getDownloadFetchUrl, getKeysToDelete } from '../../utils/productImages.js';
+import { getR2KeyFromUrl, getDownloadFetchUrl, getKeysToDelete, productImageCountError } from '../../utils/productImages.js';
 import { uploadImageToExternalServer } from '../../services/imageUpload.js';
 import { DISCOUNT_UNITS, DISCOUNT_DURATIONS, DISCOUNT_END_TIME_MODES, validateDiscountInput } from '../../utils/discount.js';
 import {
@@ -701,8 +701,9 @@ export default function AdminProductsPage() {
     const activeSlots = [0, 1, 2, 3, 4].filter(
       (idx) => imageFiles[idx] || imagePreviews[idx]
     );
-    if (activeSlots.length < 3) {
-      showToast('Please provide at least 3 images (max 5) for the product.');
+    const imageCountError = productImageCountError(activeSlots.length);
+    if (imageCountError) {
+      showToast(imageCountError);
       return;
     }
 
@@ -1081,7 +1082,7 @@ export default function AdminProductsPage() {
               {/* Product Images (5 Slots) */}
               <div className="space-y-4 border border-outline-variant/35 rounded-xl p-5 bg-surface-container-low/40">
                 <div>
-                  <h3 className="font-title-sm text-[1rem] text-on-surface">Product Images (Upload 3 to 5 images)</h3>
+                  <h3 className="font-title-sm text-[1rem] text-on-surface">Product Images (Upload 1 to 5 images)</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     Check "Display Image" under a photo to make it the primary thumbnail shown across the storefront. Filenames are customizable and automatically name-spaced to the Product ID.
                     Tag each photo with the color shown so the storefront color filter and swatches work correctly.

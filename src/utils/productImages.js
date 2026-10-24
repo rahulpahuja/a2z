@@ -1,4 +1,14 @@
 // Alt text for a product's primary image: the admin-written one when set, else the product name.
+export const MIN_PRODUCT_IMAGES = 1;
+export const MAX_PRODUCT_IMAGES = 5;
+
+// The message to show when a product has too few or too many photos, or '' when the count is fine.
+export function productImageCountError(count) {
+  if (count < MIN_PRODUCT_IMAGES) return 'Please add at least 1 image for the product (up to 5).';
+  if (count > MAX_PRODUCT_IMAGES) return `A product can have at most ${MAX_PRODUCT_IMAGES} images.`;
+  return '';
+}
+
 export const getProductAlt = (product) => product.alt || product.title || product.name || '';
 
 export function getR2KeyFromUrl(url) {
