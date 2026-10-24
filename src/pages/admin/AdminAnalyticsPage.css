@@ -1,0 +1,76 @@
+/* Channel tabs on the Analytics product-views table. */
+
+.channel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.channel-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface-variant);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.channel-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.channel-tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.channel-tab--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.channel-tab--active:hover {
+  color: var(--color-on-primary);
+}
+
+.channel-tab__icon {
+  font-size: 1.125rem;
+}
+
+.channel-tab__count {
+  min-width: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.6875rem;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.channel-tab--active .channel-tab__count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.referrer-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.referrer-cell__icon {
+  font-size: 1.125rem;
+  color: var(--color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .channel-tab {
+    transition: none;
+  }
+}
