@@ -8,3 +8,20 @@
     min-height: 0;
   }
 }
+
+/* Super-user layout overrides (Home Layout page). Each wrapper carries the variable and a
+   marker attribute only for the sizes that were actually set; see utils/homeLayout.js. */
+.home-layout-section[data-hl-pad] section {
+  padding-top: var(--hl-pad-y);
+  padding-bottom: var(--hl-pad-y);
+}
+
+.home-layout-section[data-hl-width] section {
+  max-width: min(var(--hl-max-w), 100%);
+}
+
+/* Capped at 85vw so a large card can never overflow a phone screen. */
+.home-layout-section[data-hl-card] .home-card {
+  width: min(var(--hl-card-w), 85vw);
+  min-width: min(var(--hl-card-w), 85vw);
+}
