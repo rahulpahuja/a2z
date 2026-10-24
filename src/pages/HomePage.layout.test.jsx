@@ -106,6 +106,9 @@ describe('HomePage driven by the saved layout', () => {
     const classes = banner.className.split(/\s+/);
     expect(classes).not.toContain('sticky');
     expect(classes).toContain('md:sticky');
+    // The banner is exactly as tall as the header's sticky offset (md:top-[32px]); any difference lets the page show through between them.
+    expect(classes).toContain('md:h-8');
+    expect(container.querySelector('header').className.split(/\s+/)).toContain('md:top-[32px]');
     const header = container.querySelector('header');
     expect(header.className.split(/\s+/)).toContain('top-0');
   });
