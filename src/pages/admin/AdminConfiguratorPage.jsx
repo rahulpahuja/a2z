@@ -156,6 +156,15 @@ export default function AdminConfiguratorPage() {
   const [uploadingSlideIdx, setUploadingSlideIdx] = useState(null);
   const [uploadPreview, setUploadPreview] = useState(null); // { idx, url } — local blob preview while an upload is in flight
   const [heroPreviewIdx, setHeroPreviewIdx] = useState(0);
+  // Which slide the editor shows; one at a time. Clamped because the slide list can shrink
+  // (e.g. Reset Defaults) while a later slide is selected.
+  const [editingSlideIdx, setEditingSlideIdx] = useState(0);
+  const slideIdx = Math.min(editingSlideIdx, Math.max(0, heroSlides.length - 1));
+  const selectSlide = (idx) => {
+    const next = Math.min(Math.max(0, idx), Math.max(0, heroSlides.length - 1));
+    setEditingSlideIdx(next);
+    setHeroPreviewIdx(next);
+  };
   const uploadControllerRef = useRef(null);
 
   // Category Bubble states
@@ -740,22 +749,51 @@ export default function AdminConfiguratorPage() {
                   {heroLoading ? (
                     <p className="text-[0.75rem] text-on-surface-variant">Loading…</p>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="hero-slide-editor">
+                      <div className="hero-slide-picker">
+                        <label className="form-label text-[0.6875rem]" htmlFor="hero-slide-select">Slide</label>
+                        <div className="hero-slide-picker__row">
+                          <button
+                            type="button"
+                            className="hero-slide-picker__nav"
+                            onClick={() => selectSlide(slideIdx - 1)}
+                            disabled={slideIdx === 0}
+                            aria-label="Previous slide"
+                          >
+                            <span className="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+                          </button>
+                          <select
+                            id="hero-slide-select"
+                            value={slideIdx}
+                            onChange={(e) => selectSlide(Number(e.target.value))}
+                            className="form-select hero-slide-picker__select"
+                          >
+                            {heroSlides.map((s, i) => (
+                              <option key={s.id || i} value={i}>
+                                {`Slide ${i + 1} — ${s.title?.trim() || 'Untitled'}${uploadingSlideIdx === i ? ' (uploading…)' : ''}`}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            className="hero-slide-picker__nav"
+                            onClick={() => selectSlide(slideIdx + 1)}
+                            disabled={slideIdx >= heroSlides.length - 1}
+                            aria-label="Next slide"
+                          >
+                            <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                          </button>
+                          <span className="hero-slide-picker__count" aria-live="polite">{slideIdx + 1} of {heroSlides.length}</span>
+                        </div>
+                      </div>
                       {heroSlides.map((slide, idx) => {
+                        if (idx !== slideIdx) return null;
                         const isUploading = uploadingSlideIdx === idx;
                         return (
                           <div key={slide.id || idx} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/30 flex flex-col gap-3">
                             <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
                               <h4 className="font-title-sm text-[0.75rem] text-primary font-bold uppercase tracking-wider">Slide {idx + 1}</h4>
-                              <button
-                                type="button"
-                                onClick={() => setHeroPreviewIdx(idx)}
-                                className={`text-[0.625rem] uppercase font-label-caps px-2 py-1 rounded transition-colors ${
-                                  heroPreviewIdx === idx ? 'bg-primary text-on-primary' : 'text-primary bg-primary/5 border border-primary/25'
-                                }`}
-                              >
-                                Preview
-                              </button>
+                              <span className="text-[0.625rem] uppercase font-label-caps text-on-surface-variant/70">Shown in preview</span>
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-3 items-center">
@@ -1527,6 +1565,50 @@ export default function AdminConfiguratorPage() {
                 <>
                   <div className="admin-card flex flex-col gap-5">
                     <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">grid_view</span>
+                      Image Gallery Layout
+                    </h3>
+                    <p className="text-[0.625rem] text-on-surface-variant/60 -mt-2">
+                      How a product's photos and videos appear on its page. With the grid, only the first four show as equal tiles;
+                      the rest open in a full-screen viewer. A product with a single image always shows it large.
+                    </p>
+                    <div className="gallery-layout-options" role="radiogroup" aria-label="Image gallery layout">
+                      {[
+                        { value: 'carousel', label: 'Large image + thumbnails', hint: 'One big image with arrows and a thumbnail strip.' },
+                        { value: 'grid', label: '2 × 2 grid', hint: 'Four equal images, two across and two down.' },
+                      ].map((option) => (
+                        <label
+                          key={option.value}
+                          className={`gallery-layout-option${(form.detailGalleryLayout || 'carousel') === option.value ? ' gallery-layout-option--active' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="detail-gallery-layout"
+                            value={option.value}
+                            checked={(form.detailGalleryLayout || 'carousel') === option.value}
+                            onChange={() => handleChange('detailGalleryLayout', option.value)}
+                          />
+                          <span className={`gallery-layout-option__art gallery-layout-option__art--${option.value}`} aria-hidden="true">
+                            {option.value === 'grid' ? (
+                              <>
+                                <i /><i /><i /><i />
+                              </>
+                            ) : (
+                              <>
+                                <i className="gallery-layout-option__main" />
+                                <b><i /><i /><i /></b>
+                              </>
+                            )}
+                          </span>
+                          <span className="gallery-layout-option__label">{option.label}</span>
+                          <span className="gallery-layout-option__hint">{option.hint}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="admin-card flex flex-col gap-5">
+                    <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-semibold flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary text-[1.25rem]">aspect_ratio</span>
                       Image Dimensions
                     </h3>
@@ -2271,6 +2353,26 @@ export default function AdminConfiguratorPage() {
 
                   {activeSurface === 'detail' && (
                     <div className="flex flex-col gap-4 max-w-[260px] mx-auto">
+                      {form.detailGalleryLayout === 'grid' ? (
+                        <div className="preview-gallery-grid">
+                          {Array.from({ length: 4 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className="preview-aspect-box shadow-sm"
+                              style={{
+                                aspectRatio: form.detailImgAspect,
+                                borderRadius: form.borderRadius,
+                                borderWidth: form.borderWidth,
+                                borderColor: form.borderColor,
+                                borderStyle: 'solid',
+                              }}
+                            >
+                              <span className="material-symbols-outlined text-outline-variant text-xl">image</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <>
                       <div
                         className="preview-aspect-box shadow-sm"
                         style={{
@@ -2301,6 +2403,8 @@ export default function AdminConfiguratorPage() {
                           </div>
                         ))}
                       </div>
+                        </>
+                      )}
 
                       <div
                         className="space-y-2 border-t border-outline-variant/30 pt-3 backdrop-blur-md p-3 rounded-xl border"

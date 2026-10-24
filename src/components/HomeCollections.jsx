@@ -47,7 +47,7 @@ function CollectionRow({ collection, products }) {
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
           {collectionProducts.map((product) => (
-            <div key={product.id} className="min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
+            <div key={product.id} className="home-card min-w-[220px] sm:min-w-[260px] md:min-w-[270px] w-[220px] sm:w-[260px] md:w-[270px] shrink-0 snap-start">
               <ProductCard product={product} listName={`Home - ${collection.name}`} />
             </div>
           ))}

@@ -97,7 +97,7 @@ export default function TrendingProducts({ productsPerRow = 8 }) {
           className="flex gap-4 md:gap-gutter overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory scroll-smooth w-full max-w-full min-w-0"
         >
           {products.map((product) => (
-            <div key={product.id} className="min-w-[clamp(140px,46vw,220px)] w-[clamp(140px,46vw,220px)] sm:min-w-[260px] sm:w-[260px] md:min-w-[270px] md:w-[270px] shrink-0 snap-start">
+            <div key={product.id} className="home-card min-w-[clamp(140px,46vw,220px)] w-[clamp(140px,46vw,220px)] sm:min-w-[260px] sm:w-[260px] md:min-w-[270px] md:w-[270px] shrink-0 snap-start">
               <Link
                 to={`/products/${product.id}`}
                 onClick={() => logSelectItem(product, 'Home - Trending Now')}

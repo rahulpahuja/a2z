@@ -71,6 +71,17 @@
         "productFooterText": {
           ".validate": "newData.isString() && newData.val().length <= 500"
         }
+      },
+      "homeLayout": {
+        ".validate": "newData.hasChildren(['version', 'rev', 'sections']) && newData.child('version').val() === 1 && newData.child('rev').isNumber()",
+        "sections": {
+          ".validate": "newData.numChildren() <= 20"
+        },
+        "products": {
+          "top": { ".validate": "newData.numChildren() <= 200" },
+          "bottom": { ".validate": "newData.numChildren() <= 200" },
+          "hidden": { ".validate": "newData.numChildren() <= 200" }
+        }
       }
     },
     "fileMetadata": {

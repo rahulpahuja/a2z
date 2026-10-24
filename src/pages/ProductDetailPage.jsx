@@ -11,6 +11,9 @@ import { recordView, subscribeToProductStats } from '../services/productStats.js
 import { logViewItem, logSelectVariant, logShare, logSelectContent, logSelectItem, logBuyOnWhatsapp } from '../services/analytics.js';
 import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
+import ProductGalleryGrid from '../components/ProductGalleryGrid.jsx';
+import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
+import { getGalleryMode } from '../utils/productGallery.js';
 import SiteFooter from '../components/SiteFooter.jsx';
 import { ProductFooterNote } from '../components/FooterNote.jsx';
 import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
@@ -83,6 +86,7 @@ export default function ProductDetailPage() {
   const product = allProducts.find((p) => p.id === id) || null;
 
   const [selectedThumbnail, setSelectedThumbnail] = useState(0);
+  const { theme } = useStorefrontTheme();
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedColor, setSelectedColor] = useState('Pink');
   const [quantity, setQuantity] = useState(1);
@@ -174,6 +178,7 @@ export default function ProductDetailPage() {
     ...videos.map((src) => ({ type: 'video', src })),
   ];
   const mainMedia = media[selectedThumbnail] ?? media[0];
+  const galleryMode = getGalleryMode(theme?.detailGalleryLayout, media.length);
   const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
   const reviewSummary = summarizeReviews(reviews);
 
@@ -308,6 +313,15 @@ export default function ProductDetailPage() {
 
         {/* Left: Image Gallery (60% -> 7 columns) */}
         <section className="order-3 md:order-none md:col-span-7 flex flex-col gap-unit">
+          {galleryMode === 'grid' ? (
+            <ProductGalleryGrid
+              media={media}
+              leadIndex={selectedThumbnail}
+              name={product.name || product.title}
+              dimmed={isProductOutOfStock}
+            />
+          ) : (
+            <>
           <motion.div
             key={product.id}
             initial={{ opacity: 0, scale: 1.06, y: 18 }}
@@ -398,6 +412,8 @@ export default function ProductDetailPage() {
                 </button>
               ))}
             </div>
+          )}
+            </>
           )}
         </section>
         {product.description && (
