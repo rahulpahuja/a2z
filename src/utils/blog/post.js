@@ -161,6 +161,31 @@ export function toIndexEntry(input) {
   };
 }
 
+// Brings a stored index record to a known shape (the index is public, so treat it as untrusted too).
+export function normalizeIndexEntry(raw) {
+  const r = raw && typeof raw === 'object' ? raw : {};
+  const p = normalizePost({ ...r, body: '' });
+  return {
+    id: p.id,
+    slug: p.slug,
+    type: p.type,
+    title: p.title,
+    excerpt: str(r.excerpt, POST_LIMITS.excerpt),
+    coverImage: p.coverImage,
+    coverAlt: p.coverAlt,
+    author: p.author,
+    categoryId: p.categoryId,
+    tags: p.tags,
+    publishedAt: p.publishedAt ?? 0,
+    featured: p.featured,
+    productCount: Number.isInteger(r.productCount) && r.productCount >= 0 ? r.productCount : 0,
+    heroProductId: p.heroProductId,
+    primaryCollectionId: p.primaryCollectionId,
+    readingMinutes: Number.isInteger(r.readingMinutes) && r.readingMinutes > 0 ? r.readingMinutes : 1,
+    searchText: String(r.searchText ?? '').slice(0, SEARCH_TEXT_LENGTH),
+  };
+}
+
 // What visitors read: no drafts' bookkeeping, only published content.
 export function toPublicRecord(input) {
   const post = normalizePost(input);

@@ -92,12 +92,83 @@
       "homeLayout": {
         ".validate": "newData.hasChildren(['version', 'rev', 'sections']) && newData.child('version').val() === 1 && newData.child('rev').isNumber()",
         "sections": {
-          "$index": { ".validate": "$index.matches(/^([0-9]|1[0-9])$/)" }
+          "$index": {
+            ".validate": "$index.matches(/^([0-9]|1[0-9])$/)"
+          }
         },
         "products": {
-          "top": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } },
-          "bottom": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } },
-          "hidden": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } }
+          "top": {
+            "$index": {
+              ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)"
+            }
+          },
+          "bottom": {
+            "$index": {
+              ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)"
+            }
+          },
+          "hidden": {
+            "$index": {
+              ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)"
+            }
+          }
+        }
+      }
+    },
+    "blogs": {
+      "admin": {
+        ".read": "auth.token.admin === true",
+        ".write": "auth.token.admin === true",
+        ".indexOn": [
+          "status"
+        ],
+        "$postId": {
+          ".validate": "newData.hasChildren(['id', 'title', 'status', 'body']) && newData.child('id').val() === $postId && newData.child('title').isString() && newData.child('title').val().length <= 200 && newData.child('body').isString() && newData.child('body').val().length <= 300000 && (newData.child('status').val() === 'draft' || newData.child('status').val() === 'scheduled' || newData.child('status').val() === 'published' || newData.child('status').val() === 'archived')",
+          "slug": {
+            ".validate": "newData.isString() && newData.val().length <= 80 && newData.val().matches(/^[a-z0-9]+(-[a-z0-9]+)*$/)"
+          }
+        }
+      },
+      "slugClaims": {
+        ".read": "auth.token.admin === true",
+        ".write": "auth.token.admin === true",
+        "$slug": {
+          ".validate": "$slug.matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && newData.isString()"
+        }
+      },
+      "public": {
+        ".read": true,
+        ".write": "auth.token.admin === true",
+        "$postId": {
+          ".validate": "newData.hasChildren(['id', 'slug', 'title', 'body', 'status', 'publishedAt']) && newData.child('id').val() === $postId && newData.child('status').val() === 'published' && newData.child('slug').val().matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && newData.child('body').isString() && newData.child('body').val().length <= 300000 && newData.child('title').val().length <= 200"
+        }
+      },
+      "index": {
+        ".read": true,
+        ".write": "auth.token.admin === true",
+        "$postId": {
+          ".validate": "newData.hasChildren(['id', 'slug', 'title', 'publishedAt']) && newData.child('id').val() === $postId && newData.child('slug').val().matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && (!newData.child('searchText').exists() || newData.child('searchText').val().length <= 3200)"
+        }
+      },
+      "slugs": {
+        ".read": true,
+        ".write": "auth.token.admin === true",
+        "$slug": {
+          ".validate": "$slug.matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && newData.isString()"
+        }
+      },
+      "redirects": {
+        ".read": true,
+        ".write": "auth.token.admin === true",
+        "$slug": {
+          ".validate": "$slug.matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && newData.isString() && newData.val().matches(/^[a-z0-9]+(-[a-z0-9]+)*$/)"
+        }
+      },
+      "categories": {
+        ".read": true,
+        ".write": "auth.token.admin === true",
+        "$categoryId": {
+          ".validate": "newData.hasChildren(['name', 'slug']) && newData.child('name').isString() && newData.child('name').val().length <= 60"
         }
       }
     },
@@ -107,7 +178,9 @@
     },
     "orders": {
       ".read": "auth.token.admin === true || (auth != null && query.orderByChild === 'ownerUid' && query.equalTo === auth.uid)",
-      ".indexOn": ["ownerUid"],
+      ".indexOn": [
+        "ownerUid"
+      ],
       "$orderId": {
         ".read": true,
         ".write": "auth.token.admin === true || (!data.exists() && newData.exists())",
@@ -215,11 +288,21 @@
           "createdAt": {
             ".validate": "newData.isNumber()"
           },
-          "name": { ".validate": true },
-          "rating": { ".validate": true },
-          "title": { ".validate": true },
-          "body": { ".validate": true },
-          "createdAtMs": { ".validate": true },
+          "name": {
+            ".validate": true
+          },
+          "rating": {
+            ".validate": true
+          },
+          "title": {
+            ".validate": true
+          },
+          "body": {
+            ".validate": true
+          },
+          "createdAtMs": {
+            ".validate": true
+          },
           "$other": {
             ".validate": false
           }
