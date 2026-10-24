@@ -12,7 +12,7 @@ import { useToast } from '../../context/ToastContext.jsx';
 import ProductImage from '../../components/ProductImage.jsx';
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { convertHeicFileToPng, isHeicFile } from '../../utils/heic.js';
-import { DISPLAY_MODES, getDisplayMode, resolveCollectionCover } from '../../utils/collections.js';
+import { MAX_PUBLISHED_COLLECTIONS, PUBLISH_LIMIT_MESSAGE, canPublishCollection, countPublished, formatCollectionDate, DISPLAY_MODES, getDisplayMode, resolveCollectionCover } from '../../utils/collections.js';
 import { deleteUploadedImage, uploadImageToExternalServer } from '../../services/imageUpload.js';
 
 const EMPTY_FORM = { name: '', productIds: [], heroProductId: '', published: true, coverImage: '', displayMode: DISPLAY_MODES.EXPANDED };
@@ -22,7 +22,7 @@ const DISPLAY_MODE_OPTIONS = [
   { value: DISPLAY_MODES.COLLAPSED, label: 'Collapsed', hint: 'One cover tile with the name on top; it opens a page with only this collection.' },
 ];
 
-function CollectionEditorModal({ initial, products, onClose, onSave, onError }) {
+function CollectionEditorModal({ initial, products, onClose, onSave, onError, publishLocked }) {
   const [form, setForm] = useState(initial);
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
@@ -255,12 +255,14 @@ function CollectionEditorModal({ initial, products, onClose, onSave, onError }) 
           <label className="flex items-center gap-2 text-[0.75rem] text-on-surface cursor-pointer">
             <input
               type="checkbox"
-              checked={form.published}
+              checked={form.published && !publishLocked}
+              disabled={publishLocked}
               onChange={(e) => setForm((prev) => ({ ...prev, published: e.target.checked }))}
               className="accent-primary"
             />
             Publish on Home Page
           </label>
+          {publishLocked && <p className="text-[0.6875rem] text-error mt-1" role="status">{PUBLISH_LIMIT_MESSAGE}</p>}
         </div>
 
         <div className="p-5 border-t border-outline-variant/30 flex justify-end gap-3 bg-surface-container shrink-0">
@@ -329,6 +331,10 @@ export default function AdminCollectionsPage() {
   };
 
   const handleTogglePublished = async (collection) => {
+    if (!canPublishCollection(collections, collection)) {
+      showToast(PUBLISH_LIMIT_MESSAGE);
+      return;
+    }
     try {
       await updateCollection(collection.id, { ...collection, published: !collection.published });
     } catch (err) {
@@ -366,6 +372,7 @@ export default function AdminCollectionsPage() {
       <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Collections</h1>
+          <p className="text-[0.75rem] text-on-surface-variant mt-1" role="status">{countPublished(collections)} of {MAX_PUBLISHED_COLLECTIONS} collections published</p>
           <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
             Curate named groups of existing products with a cover photo, and publish them on the home page expanded (all products) or collapsed (one tile linking to the collection's page).
           </p>
@@ -423,6 +430,11 @@ export default function AdminCollectionsPage() {
                       <h3 className="font-title-sm text-[0.9375rem] text-on-surface font-bold truncate">{collection.name}</h3>
                       <p className="text-[0.6875rem] text-on-surface-variant/70 mt-0.5">
                         {validProductCount} product{validProductCount === 1 ? '' : 's'}
+                      </p>
+                      <p className="text-[0.625rem] text-on-surface-variant/70 mt-1" data-testid="collection-dates">
+                        Published: {collection.published ? formatCollectionDate(collection.publishedAt) : 'not published'}
+                        <br />
+                        Last edited: {formatCollectionDate(collection.updatedAt)}
                       </p>
                     </div>
 
@@ -494,6 +506,7 @@ export default function AdminCollectionsPage() {
       {editing && (
         <CollectionEditorModal
           initial={editing}
+          publishLocked={!canPublishCollection(collections, collections.find((c) => c.id === editing.id) ?? null)}
           products={products}
           onClose={() => setEditing(null)}
           onSave={handleSave}

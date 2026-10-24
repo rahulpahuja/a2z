@@ -41,3 +41,24 @@ export function groupCollectionsForHome(collections, products) {
   });
   return blocks;
 }
+
+// At most this many collections may be published (shown on the home page and linked from articles) at once.
+export const MAX_PUBLISHED_COLLECTIONS = 11;
+
+export const countPublished = (collections) => (collections ?? []).filter((c) => c?.published).length;
+
+// Whether `collection` (or a new one, when it is null) may be published right now. A collection that is already
+// published stays allowed even if the shop was already over the limit; only newly published ones are blocked.
+export function canPublishCollection(collections, collection) {
+  if (collection?.published) return true;
+  return countPublished((collections ?? []).filter((c) => c.id !== collection?.id)) < MAX_PUBLISHED_COLLECTIONS;
+}
+
+export const PUBLISH_LIMIT_MESSAGE = `${MAX_PUBLISHED_COLLECTIONS} collections are already published. Unpublish one first, then publish this one.`;
+
+// '24 Oct 2026, 3:10 pm', or a dash for collections created before dates were recorded.
+export function formatCollectionDate(ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return '—';
+  return new Date(ms).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+

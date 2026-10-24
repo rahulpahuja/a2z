@@ -1,6 +1,14 @@
-import { onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database';
+import { get, onValue, push, ref, remove, serverTimestamp, set, update } from 'firebase/database';
 import { db, isFirebaseEnabled } from '../firebase.js';
-import { getDisplayMode } from '../utils/collections.js';
+import { MAX_PUBLISHED_COLLECTIONS, PUBLISH_LIMIT_MESSAGE, getDisplayMode } from '../utils/collections.js';
+
+export class CollectionLimitError extends Error {
+  constructor() {
+    super(PUBLISH_LIMIT_MESSAGE);
+    this.name = 'CollectionLimitError';
+    this.code = 'PUBLISH_LIMIT';
+  }
+}
 
 const ROOT = 'collections';
 
@@ -60,14 +68,38 @@ function toPayload({ name, productIds, heroProductId, published, coverImage, dis
   };
 }
 
-export function createCollection(input) {
+async function loadAllCollections() {
+  if (!isFirebaseEnabled) return getLocalCollections();
+  const snapshot = await get(ref(db, ROOT));
+  return Object.entries(snapshot.val() ?? {}).map(([id, value]) => ({ id, ...value }));
+}
+
+// Enforces the publish limit and stamps the dates: `updatedAt` on every save, and `publishedAt` whenever a
+// collection goes from hidden to published. Collections already published keep their original date.
+async function prepare(id, input) {
   const payload = toPayload(input);
+  const all = await loadAllCollections();
+  const previous = all.find((c) => c.id === id);
+  const now = Date.now();
+  const stamped = { ...payload, updatedAt: now };
+  if (payload.published && !previous?.published) {
+    const others = all.filter((c) => c.id !== id && c.published).length;
+    if (others >= MAX_PUBLISHED_COLLECTIONS) throw new CollectionLimitError();
+    stamped.publishedAt = now;
+  } else if (payload.published && previous?.publishedAt) {
+    stamped.publishedAt = previous.publishedAt;
+  }
+  return stamped;
+}
+
+export async function createCollection(input) {
+  const payload = await prepare(null, input);
 
   if (!isFirebaseEnabled) {
     const collections = getLocalCollections();
     const maxOrder = collections.reduce((max, c) => Math.max(max, c.order ?? 0), -1);
     const newCollection = {
-      id: `col_${Date.now()}`,
+      id: `col_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       ...payload,
       order: maxOrder + 1,
       createdAt: Date.now(),
@@ -86,8 +118,8 @@ export function createCollection(input) {
   }).then(() => ({ id: newRef.key, ...payload }));
 }
 
-export function updateCollection(id, input) {
-  const payload = toPayload(input);
+export async function updateCollection(id, input) {
+  const payload = await prepare(id, input);
 
   if (!isFirebaseEnabled) {
     const collections = getLocalCollections();
