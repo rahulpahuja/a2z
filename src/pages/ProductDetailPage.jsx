@@ -23,7 +23,8 @@ import StarRating from '../components/StarRating.jsx';
 import ProductReviews from '../components/ProductReviews.jsx';
 import ProductFaqs from '../components/ProductFaqs.jsx';
 import ProductDescription from '../components/ProductDescription.jsx';
-import { getOptionalSpecs } from '../utils/productSpecs.js';
+import ProductSpecifications from '../components/ProductSpecifications.jsx';
+import { findSimilarProducts } from '../utils/similarProducts.js';
 import { subscribeToProductReviews } from '../services/productReviews.js';
 import { subscribeToProductFaqs } from '../services/productFaqs.js';
 import { summarizeReviews } from '../utils/reviewStats.js';
@@ -36,6 +37,9 @@ import { WHATSAPP_NUMBER } from '../config/store.js';
 import { buildWhatsAppLink, buildProductOrderMessage } from '../utils/whatsapp.js';
 import WhatsAppIcon from '../components/WhatsAppIcon.jsx';
 import './ProductDetailPage.css';
+
+// Three rows of the four-column grid.
+const RELATED_PRODUCT_COUNT = 12;
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
@@ -179,7 +183,7 @@ export default function ProductDetailPage() {
   ];
   const mainMedia = media[selectedThumbnail] ?? media[0];
   const galleryMode = getGalleryMode(theme?.detailGalleryLayout, media.length);
-  const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+  const relatedProducts = findSimilarProducts(product, allProducts, RELATED_PRODUCT_COUNT);
   const reviewSummary = summarizeReviews(reviews);
 
   const availableColors =
@@ -190,6 +194,7 @@ export default function ProductDetailPage() {
   const availableSizes = sizeNames.length > 0 ? sizeNames.map((size) => ({ size })) : SIZES.map((size) => ({ size }));
 
   const isProductOutOfStock = Boolean(product.outOfStock);
+  const specsInStock = !isProductOutOfStock && product.inStock !== false;
   const selectedColorObj = availableColors.find((c) => c.name === selectedColor) ?? null;
   const isSelectedColorOutOfStock = selectedColorObj ? isColorOutOfStock(selectedColorObj) : false;
   const selectedSizeStockRaw = selectedColorObj ? getColorSizeStock(selectedColorObj, selectedSize) : null;
@@ -416,10 +421,17 @@ export default function ProductDetailPage() {
           )}
             </>
           )}
+          {product.description && (
+            <div className="hidden md:block mt-8">
+              <h2 className="font-headline-md text-headline-md text-on-surface mb-4">The Artisan's Touch</h2>
+              <ProductDescription text={product.description} variant="full" />
+            </div>
+          )}
         </section>
         {product.description && (
           <ProductDescription text={product.description} className="order-4 md:hidden" />
         )}
+        <ProductSpecifications product={product} inStock={specsInStock} className="order-4 md:hidden" />
 
         {/* Right: Product Info (40% -> 5 columns). On phones it flattens into the grid so each part can be ordered. */}
         <section className="max-md:contents md:col-span-5 md:flex md:flex-col md:gap-6">
@@ -450,6 +462,7 @@ export default function ProductDetailPage() {
             {product.description && (
               <ProductDescription text={product.description} className="hidden md:block mt-1" />
             )}
+            <ProductSpecifications product={product} inStock={specsInStock} className="hidden md:block mt-2" />
             {viewCount !== null && viewCount > 0 && (
               <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant">
                 <span className="material-symbols-outlined text-[1rem]">visibility</span>
@@ -662,34 +675,13 @@ export default function ProductDetailPage() {
       {/* Below Fold Content */}
       <div className="bg-surface-container-low py-16">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
-            {/* Description */}
-            <div>
+          {/* On desktop the Artisan's Touch sits under the product images; phones read it here. */}
+          {product.description && (
+            <div className="md:hidden mb-16">
               <h2 className="font-headline-md text-headline-md text-on-surface mb-6">The Artisan's Touch</h2>
               <ProductDescription text={product.description} variant="full" />
             </div>
-
-            {/* Specifications Bento */}
-            <div className="bg-surface rounded-xl p-8 shadow-[0_10px_30px_rgba(172,36,113,0.05)] border border-[#DCAE96]/30">
-              <h3 className="font-title-sm text-title-sm text-on-surface mb-6 uppercase tracking-widest border-b border-outline-variant/30 pb-2">Specifications</h3>
-              <div className="grid grid-cols-2 gap-y-6 gap-x-8">
-                <div>
-                  <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Category</span>
-                  <span className="font-body-sm text-body-sm text-on-surface">{product.category}</span>
-                </div>
-                <div>
-                  <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">Availability</span>
-                  <span className="font-body-sm text-body-sm text-on-surface">{!isProductOutOfStock && product.inStock !== false ? 'In Stock' : 'Out of Stock'}</span>
-                </div>
-                {getOptionalSpecs(product).map((spec) => (
-                  <div key={spec.label}>
-                    <span className="block font-label-caps text-label-caps text-outline mb-1 uppercase">{spec.label}</span>
-                    <span className="font-body-sm text-body-sm text-on-surface">{spec.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          )}
 
           <section id="reviews" className="mb-16 scroll-mt-24">
             <ProductReviews productId={product.id} reviews={reviews} />
