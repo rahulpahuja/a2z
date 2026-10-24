@@ -1,0 +1,42 @@
+import { bold, doc, h2, h3, li, p, ul } from './_doc.mjs';
+
+export default {
+  id: 'blog_bomber_jacket_styling',
+  categoryName: 'Styling guide',
+  post: {
+    type: 'general',
+    title: 'How to Style a Bomber Jacket: 5 Easy Looks',
+    slug: 'how-to-style-a-bomber-jacket',
+    author: 'A2Z Collection',
+    excerpt: 'A bomber jacket works with almost everything in your wardrobe. Five easy looks, and what to check before you pick one.',
+    tags: ['bomber jacket', 'jackets', 'streetwear', 'styling guide', 'winter fashion'],
+    seoTitle: 'How to Style a Bomber Jacket: 5 Easy Looks',
+    seoDescription: 'Five easy ways to wear a bomber jacket, from tees and jeans to layered winter looks, plus the fit details worth checking before you buy.',
+    body: doc(
+      p('A bomber jacket is one of the easiest layers to wear. The short, boxy cut, the zip front and the fitted cuffs and hem give it a clean shape that sits well over most outfits. These five looks show how far one jacket can go.'),
+      h2('Why the bomber shape works'),
+      p('The cuffs and hem are snug while the body is relaxed, so the jacket frames your waist without clinging. That is why it pairs well with both slim and wide bottoms, and why it looks right whether it is zipped up or worn open.'),
+      h2('5 ways to wear it'),
+      h3('1. Plain tee and straight jeans'),
+      p('The simplest combination. Keep the tee in a neutral colour so a bold jacket, such as a graphic or racing-inspired one, is the only statement.'),
+      h3('2. Over a hoodie for colder days'),
+      p('Wear a slim hoodie under the jacket and leave the hood out for a sporty, layered look. Choose a hoodie that is not much bulkier than the jacket, or the shape gets lost.'),
+      h3('3. With baggy jeans or cargo pants'),
+      p('A short jacket balances a wide leg well, because it keeps the top half neat while the bottom half has room. Finish with chunky sneakers.'),
+      h3('4. Open over a shirt'),
+      p('For a smart-casual look, wear the jacket open over a collared shirt and dark trousers. It is a good option for dinners and weekend outings.'),
+      h3('5. Tonal outfit'),
+      p('Pick one colour family for the jacket, top and trousers. A white or light jacket over light layers looks fresh, and a dark set looks sharp.'),
+      h2('What to check before you buy'),
+      ul(
+        li(bold('Shoulders: '), 'the seam should sit at the edge of your shoulder, not hang down your arm.'),
+        li(bold('Length: '), 'it should end around the waistband or just below. Longer than that and it stops looking like a bomber.'),
+        li(bold('Cuffs and hem: '), 'they should grip comfortably without squeezing, and the zip should close smoothly over the layer you plan to wear underneath.'),
+        li(bold('Print and detailing: '), 'a loud jacket does best with plain pieces underneath.'),
+      ),
+      h2('Keeping it looking good'),
+      p('Follow the care instructions on the product page and the garment label, zip it before washing or cleaning, and store it on a wide hanger so the shoulders hold their shape.'),
+      p('Browse our jackets to find a bomber, and try two or three of these looks with pieces you already own.'),
+    ),
+  },
+};
