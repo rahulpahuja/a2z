@@ -8,12 +8,14 @@ import { buildProductHead } from '../../src/seo/productHead.js';
 import { injectHeadIntoHtml } from '../../src/seo/head.js';
 import { buildCollectionHead } from '../../src/seo/collectionHead.js';
 import { buildShotHead } from '../../src/seo/shotHead.js';
+import { resolveBlogRoute } from '../../src/seo/blogResolve.js';
 import { parseShotParam, shotProductId } from '../../src/utils/shotShare.js';
 
 export const config = { path: '/*', excludedPath: ['/assets/*', '/*.*'] };
 
 const PRODUCT_PATH = /^\/products\/([^/]+)\/?$/;
 const COLLECTION_PATH = /^\/collections\/([^/]+)\/?$/;
+const BLOG_PATH = /^\/blogs\/([^/]+)\/?$/;
 
 async function readRtdb(databaseUrl, path) {
   const res = await fetch(`${databaseUrl}/${path}.json`);
@@ -65,6 +67,7 @@ export default async function seo(request, context) {
   const databaseUrl = Deno.env.get('VITE_FIREBASE_DATABASE_URL');
   const productMatch = pathname.match(PRODUCT_PATH);
   const collectionMatch = pathname.match(COLLECTION_PATH);
+  const blogMatch = pathname.match(BLOG_PATH);
 
   let status = response.status;
   let head = null;
@@ -74,6 +77,17 @@ export default async function seo(request, context) {
         ({ status, head } = await resolveProductHead(databaseUrl, decodeURIComponent(productMatch[1])));
       } catch (err) {
         console.error('seo: product lookup failed, serving shell', err);
+      }
+    }
+  } else if (blogMatch) {
+    if (databaseUrl) {
+      try {
+        const route = await resolveBlogRoute((path) => readRtdb(databaseUrl, path), decodeURIComponent(blogMatch[1]));
+        // A renamed article answers with a real permanent redirect, which search engines follow.
+        if (route.kind === 'redirect') return Response.redirect(new URL(route.location, request.url), 301);
+        ({ status, head } = route);
+      } catch (err) {
+        console.error('seo: blog lookup failed, serving shell', err);
       }
     }
   } else if (collectionMatch) {
