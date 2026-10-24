@@ -11,6 +11,7 @@ export const DEFAULT_THEME = {
   detailImgAspect: '3/4',     // '3/4', '1/1', '16/9', '4/3'
   galleryThumbW: '64px',
   galleryThumbH: '80px',
+  detailGalleryLayout: 'carousel', // 'carousel' (large image + thumbnails) | 'grid' (2 x 2 equal tiles)
   
   // Borders
   borderRadius: '16px',
