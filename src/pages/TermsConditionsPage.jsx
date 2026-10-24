@@ -77,6 +77,22 @@ export default function TermsConditionsPage() {
           </section>
 
           <section>
+            <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Website Developer</h2>
+            <p>
+              This website was designed and developed by{' '}
+              <a href="https://mobile1x.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                mobile1x.com
+              </a>
+              , which acts only as the developer of the website. mobile1x.com is not the seller, manufacturer,
+              supplier or distributor of any goods listed here, and has no role in the products sold, their
+              pricing, orders, payments, delivery, returns or refunds. It is not a party to any transaction
+              between you and A2Z Collection. To the fullest extent permitted by law, mobile1x.com is not liable
+              for any goods or services sold on this website, or for any business conducted through it; all such
+              matters are the sole responsibility of A2Z Collection.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-title-sm text-title-sm text-on-surface mb-3">Changes to These Terms</h2>
             <p>
               We may update these terms from time to time. Continued use of the website after changes are posted

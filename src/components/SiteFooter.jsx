@@ -124,12 +124,13 @@ export default function SiteFooter() {
         <p className="text-[0.625rem] text-on-surface-variant/50">
           Powered by{' '}
           <a
-            href="https://mobile1x.com/"
+            href="https://mobile1x.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-primary hover:underline transition-colors"
+            // Monospace so the "1" in the name reads as a digit instead of the brand font's flagged glyph.
+            className="font-mono underline underline-offset-2 hover:text-primary transition-colors"
           >
-            Mobile1x
+            mobile1x.com
           </a>{' '}
           · Founder Rahul Pahuja · +91-8819091000
         </p>
