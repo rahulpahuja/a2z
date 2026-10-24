@@ -19,9 +19,9 @@ export default function FloatingContactButtons() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  // The Shots feed has its own bottom-right "Buy Now" bar — sit higher there
-  // so this stack doesn't cover it.
-  const bottomOffsetClass = location.pathname === '/shots' ? 'bottom-32' : 'bottom-6';
+  // The Shots feed is a full-screen video player with its own close, like, share and Buy Now controls,
+  // so these floating shortcuts (including the one back to Shots) would only sit on top of them.
+  const hidden = location.pathname.replace(/\/$/, '') === '/shots';
 
   const handleWhatsApp = () => {
     if (!WHATSAPP_NUMBER) {
@@ -41,8 +41,10 @@ export default function FloatingContactButtons() {
     window.open(`https://instagram.com/${INSTAGRAM_HANDLE}`, '_blank', 'noopener,noreferrer');
   };
 
+  if (hidden) return null;
+
   return (
-    <div className={`fixed ${bottomOffsetClass} right-6 z-[150] flex flex-col gap-3 transition-[bottom]`}>
+    <div className="fixed bottom-6 right-6 z-[150] flex flex-col gap-3">
       <button
         type="button"
         aria-label="Watch Shots"
