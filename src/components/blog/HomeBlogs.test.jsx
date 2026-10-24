@@ -7,7 +7,7 @@ vi.mock('../../services/blog.js', () => ({
   subscribeToBlogIndex: (cb) => { cb(entries); return () => {}; },
   subscribeToCategories: (cb) => { cb([{ id: 'styling', name: 'Styling guide' }]); return () => {}; },
 }));
-vi.mock('../../services/analytics.js', () => ({ logBlogCardClick: vi.fn() }));
+vi.mock('../../services/analytics.js', () => ({ logBlogCardClick: vi.fn(), logSelectContent: vi.fn() }));
 
 const { default: HomeBlogs } = await import('./HomeBlogs.jsx');
 
@@ -33,5 +33,6 @@ describe('HomeBlogs', () => {
     expect(screen.queryByText('Post 4')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /View All/ })).toHaveAttribute('href', '/blogs');
     expect(screen.getAllByText('Styling guide')).toHaveLength(3);
+    expect(screen.getByRole('link', { name: 'Read the Journal' })).toHaveAttribute('href', '/blogs');
   });
 });

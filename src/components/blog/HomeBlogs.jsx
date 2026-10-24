@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BlogCard from './BlogCard.jsx';
 import { subscribeToBlogIndex, subscribeToCategories } from '../../services/blog.js';
-import { logBlogCardClick } from '../../services/analytics.js';
+import { logBlogCardClick, logSelectContent } from '../../services/analytics.js';
 import './blog.css';
 
 export const HOME_BLOG_COUNT = 3;
@@ -42,6 +42,9 @@ export default function HomeBlogs() {
             <BlogCard key={entry.id} entry={entry} categoryName={categoryName(entry.categoryId)} onOpen={(e) => logBlogCardClick(e, 'home')} />
           ))}
         </div>
+        <Link to="/blogs" className="blog-more blog-more--link" onClick={() => logSelectContent('home_blog_button', 'Read the Journal')}>
+          Read the Journal
+        </Link>
       </div>
     </section>
   );
