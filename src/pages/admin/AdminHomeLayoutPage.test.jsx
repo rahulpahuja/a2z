@@ -65,8 +65,8 @@ describe('AdminHomeLayoutPage', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: 'Move Hero banner down' }));
     const titles = [...document.querySelectorAll('.hl-section__title')].map((n) => n.textContent);
-    expect(titles.slice(0, 2)).toEqual(['From the Journal', 'Hero banner']);
-    expect(screen.getByRole('button', { name: 'Move From the Journal up' })).toBeDisabled();
+    expect(titles.slice(0, 2)).toEqual(['Shop by gender', 'Hero banner']);
+    expect(screen.getByRole('button', { name: 'Move Shop by gender up' })).toBeDisabled();
   });
 
   it('will not hide the last visible section', () => {

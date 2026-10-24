@@ -218,7 +218,7 @@ describe('placement edits', () => {
 describe('section edits', () => {
   it('reorders sections and ignores out-of-range or identical moves', () => {
     const layout = createDefaultHomeLayout();
-    expect(ids(moveSection(layout, 0, 2)).slice(0, 3)).toEqual(['blogs', 'genderTiles', 'hero']);
+    expect(ids(moveSection(layout, 0, 2)).slice(0, 3)).toEqual(['genderTiles', 'blogs', 'hero']);
     expect(moveSection(layout, 0, 0)).toBe(layout);
     expect(moveSection(layout, 0, -1)).toBe(layout);
     expect(moveSection(layout, 0, 99)).toBe(layout);
@@ -297,18 +297,18 @@ describe('getVisibleSections', () => {
   it('returns only visible sections in order', () => {
     const layout = updateSection(moveSection(createDefaultHomeLayout(), 0, 1), 'trending', { visible: false });
     const visible = getVisibleSections(layout).map((s) => s.id);
-    expect(visible[0]).toBe('blogs');
+    expect(visible[0]).toBe('genderTiles');
     expect(visible).not.toContain('trending');
   });
 });
 
 describe('blogs section', () => {
-  it('is on by default, right after the hero banner', () => {
-    expect(ids(createDefaultHomeLayout()).slice(0, 2)).toEqual(['hero', 'blogs']);
-    expect(createDefaultHomeLayout().sections[1].visible).toBe(true);
+  it('is on by default, right below the Men / Women tiles', () => {
+    expect(ids(createDefaultHomeLayout()).slice(0, 3)).toEqual(['hero', 'genderTiles', 'blogs']);
+    expect(createDefaultHomeLayout().sections[2].visible).toBe(true);
   });
 
-  it('is added after the hero for a layout saved before it existed, keeping the saved order', () => {
+  it('is added below the Men / Women tiles for a layout saved before it existed, keeping the saved order', () => {
     const saved = SECTION_IDS.filter((id) => id !== 'blogs');
     const layout = normalizeHomeLayout({ sections: saved.map((id) => ({ id })) });
     expect(ids(layout)).toEqual(SECTION_IDS);
@@ -316,9 +316,16 @@ describe('blogs section', () => {
     expect(ids(normalizeHomeLayout({ sections: reordered.map((id) => ({ id })) }))[0]).toBe('featured1');
   });
 
+  it('lands right below the Men / Women tiles in the layout the store has saved, which has no blogs entry', () => {
+    const live = ['hero', 'genderTiles', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2', 'lookbook'];
+    const layout = normalizeHomeLayout({ sections: live.map((id) => ({ id, visible: id !== 'trending' })) });
+    expect(ids(layout)).toEqual(['hero', 'genderTiles', 'blogs', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2', 'lookbook']);
+    expect(layout.sections.find((s) => s.id === 'trending').visible).toBe(false);
+  });
+
   it('can be hidden and moved to the very top', () => {
     const layout = createDefaultHomeLayout();
-    expect(updateSection(layout, 'blogs', { visible: false }).sections[1].visible).toBe(false);
-    expect(ids(moveSection(layout, 1, 0))[0]).toBe('blogs');
+    expect(updateSection(layout, 'blogs', { visible: false }).sections[2].visible).toBe(false);
+    expect(ids(moveSection(layout, 2, 0))[0]).toBe('blogs');
   });
 });

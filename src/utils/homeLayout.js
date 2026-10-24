@@ -55,8 +55,8 @@ export const SIZE_FIELD_LABELS = {
 // Default order. `supports` lists the size controls that make sense for the section.
 export const SECTION_DEFS = [
   { id: 'hero', label: 'Hero banner', description: 'The full-width banner carousel.', supports: [] },
-  { id: 'blogs', label: 'From the Journal', description: 'The latest blog articles. Stays out of the way until an article is published.', supports: ['padY', 'maxWidth'] },
   { id: 'genderTiles', label: 'Shop by gender', description: 'The two big Women / Men tiles.', supports: ['padY', 'maxWidth'] },
+  { id: 'blogs', label: 'From the Journal', description: 'The latest blog articles. Stays out of the way until an article is published.', supports: ['padY', 'maxWidth'] },
   { id: 'categoryBubbles', label: 'Category bubbles', description: 'Circular category shortcuts (also needs the Store Settings toggle).', supports: ['padY', 'maxWidth'] },
   { id: 'trending', label: 'Trending Now', description: 'Most viewed / best sellers, from live shop stats.', supports: ['padY', 'maxWidth', 'cardWidth'] },
   { id: 'collections', label: 'Collections', description: 'Published collections, in the order set on the Collections page.', supports: ['padY', 'maxWidth', 'cardWidth'] },

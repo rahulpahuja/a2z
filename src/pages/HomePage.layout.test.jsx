@@ -65,7 +65,7 @@ beforeEach(() => {
 describe('HomePage driven by the saved layout', () => {
   it('renders every section in the default order', () => {
     const { container } = renderHome();
-    expect(order(container)).toEqual(['hero', 'blogs', 'genderTiles', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2']);
+    expect(order(container)).toEqual(['hero', 'genderTiles', 'blogs', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2']);
   });
 
   it('follows a reordered layout', () => {
