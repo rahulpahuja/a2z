@@ -1,3 +1,6 @@
+import { normalizePath } from '../seo/routes.js';
+import { pageMetaKey } from '../seo/pageMeta.js';
+
 export const MAX_FOOTER_TEXT_LENGTH = 500;
 
 // Control characters (except tab/newline, handled separately), zero-width
@@ -26,4 +29,25 @@ export function sanitizeFooterText(raw) {
 export function isFooterNotePath(pathname) {
   const path = String(pathname || '');
   return !(path === '/super' || path.startsWith('/super/') || path === '/dashboard' || path.startsWith('/dashboard/'));
+}
+
+// The footer note for a page: the text written for that page if there is one, otherwise the site-wide default.
+export function resolvePageFooterText(settings, pathname) {
+  const own = sanitizeFooterText(settings?.pageFooters?.[pageMetaKey(normalizePath(String(pathname || '/')))]);
+  return own || sanitizeFooterText(settings?.siteFooterText);
+}
+
+// The footer note for a product: the product's own text, otherwise the default for every product page.
+export function resolveProductFooterText(settings, product) {
+  return sanitizeFooterText(product?.footerText) || sanitizeFooterText(settings?.productFooterText);
+}
+
+// Keeps only well-formed page texts (known key shape, non-empty after cleaning) when saving.
+export function cleanPageFooters(value) {
+  const out = {};
+  Object.entries(value && typeof value === 'object' ? value : {}).forEach(([key, text]) => {
+    const clean = sanitizeFooterText(text);
+    if (/^[A-Za-z0-9_-]{1,120}$/.test(key) && clean) out[key] = clean;
+  });
+  return out;
 }

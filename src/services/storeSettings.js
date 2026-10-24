@@ -50,6 +50,8 @@ export const DEFAULT_STORE_SETTINGS = {
   siteFooterText: '',
   // Plain-text note shown on every product detail page.
   productFooterText: '',
+  // Footer text for individual pages, keyed by pageMetaKey(path); overrides siteFooterText on that page.
+  pageFooters: {},
   // Message prefilled by the Buy on WhatsApp button; {placeholders} are filled per product.
   whatsappOrderTemplate: DEFAULT_ORDER_TEMPLATE,
   // Structured warehouse address used as the pickupAddress for shipping

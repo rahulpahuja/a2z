@@ -24,6 +24,7 @@ import {
 } from '../../utils/productColors.js';
 import ProductImage from '../../components/ProductImage.jsx';
 import DescriptionAssistant from '../../components/admin/DescriptionAssistant.jsx';
+import { MAX_FOOTER_TEXT_LENGTH, sanitizeFooterText } from '../../utils/footerText.js';
 import './AdminProductsPage.css';
 
 const QUICK_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -44,6 +45,7 @@ const EMPTY_FORM = {
   hsnCode: '',
   origin: '',
   care: '',
+  footerText: '',
   gender: 'Unisex',
   discountUnit: DISCOUNT_UNITS.PERCENTAGE,
   discountValue: '',
@@ -122,6 +124,7 @@ export default function AdminProductsPage() {
       hsnCode: product.hsnCode || '',
       origin: product.origin || '',
       care: product.care || '',
+      footerText: product.footerText || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -177,6 +180,7 @@ export default function AdminProductsPage() {
       hsnCode: product.hsnCode || '',
       origin: product.origin || '',
       care: product.care || '',
+      footerText: product.footerText || '',
       hashtagsInput: (product.hashtags ?? []).join(', '),
       gender: product.gender || 'Unisex',
       discountUnit: product.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
@@ -266,6 +270,7 @@ export default function AdminProductsPage() {
             hsnCode: product.hsnCode || '',
             origin: product.origin || '',
             care: product.care || '',
+            footerText: product.footerText || '',
             colors: product.colors ?? [],
             sizes: product.sizes ?? [],
             image: product.image || (product.images ?? [])[0],
@@ -785,6 +790,7 @@ export default function AdminProductsPage() {
         hsnCode: form.hsnCode.trim(),
         origin: form.origin.trim(),
         care: form.care.trim(),
+        footerText: sanitizeFooterText(form.footerText),
         discountUnit: form.discountUnit || DISCOUNT_UNITS.PERCENTAGE,
         discountValue: form.discountValue === '' ? null : Number(form.discountValue),
         discountDurationType: form.discountDurationType || DISCOUNT_DURATIONS.FOREVER,
@@ -1050,6 +1056,25 @@ export default function AdminProductsPage() {
                 </div>
                 <p className="admin-products-details__hint">
                   Leave blank to hide the row on the product page. Only enter details you can stand behind.
+                </p>
+              </div>
+
+              {/* Shown at the bottom of this product's page; blank uses the default from Store Settings > Footer. */}
+              <div>
+                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="p-footer">
+                  Footer text for this product (optional)
+                </label>
+                <textarea
+                  id="p-footer"
+                  rows={2}
+                  maxLength={MAX_FOOTER_TEXT_LENGTH}
+                  value={form.footerText}
+                  onChange={updateField('footerText')}
+                  placeholder="e.g. Final sale. Colours may vary slightly from the photos."
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                />
+                <p className="admin-products-details__hint">
+                  Plain text, up to {MAX_FOOTER_TEXT_LENGTH} characters ({String(form.footerText ?? '').length} used). Leave blank to use the default for every product page.
                 </p>
               </div>
 

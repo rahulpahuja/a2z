@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { subscribeToStoreSettings } from '../services/storeSettings.js';
-import { sanitizeFooterText, isFooterNotePath } from '../utils/footerText.js';
+import { isFooterNotePath, resolvePageFooterText, resolveProductFooterText } from '../utils/footerText.js';
 import './FooterNote.css';
 
-function useFooterText(key) {
+// Follows the store settings and picks this page's (or product's) text with `resolve`.
+function useFooterText(resolve) {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    const unsubscribe = subscribeToStoreSettings((settings) => setText(sanitizeFooterText(settings?.[key])));
+    const unsubscribe = subscribeToStoreSettings((settings) => setText(resolve(settings)));
     return unsubscribe;
-  }, [key]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolve.key]);
 
   return text;
 }
@@ -20,7 +22,8 @@ function useFooterText(key) {
 // each page, so pages without SiteFooter (cart, checkout, 404…) get it too.
 export function SiteFooterNote() {
   const { pathname } = useLocation();
-  const text = useFooterText('siteFooterText');
+  const resolver = useMemo(() => Object.assign((settings) => resolvePageFooterText(settings, pathname), { key: pathname }), [pathname]);
+  const text = useFooterText(resolver);
   if (!text || !isFooterNotePath(pathname)) return null;
   return (
     <div className="footer-note footer-note--site" role="note">
@@ -30,8 +33,10 @@ export function SiteFooterNote() {
 }
 
 // Super-user-managed note shown on every product detail page.
-export function ProductFooterNote() {
-  const text = useFooterText('productFooterText');
+export function ProductFooterNote({ product }) {
+  const footerText = product?.footerText;
+  const resolver = useMemo(() => Object.assign((settings) => resolveProductFooterText(settings, { footerText }), { key: footerText }), [footerText]);
+  const text = useFooterText(resolver);
   if (!text) return null;
   return (
     <div className="footer-note footer-note--product" role="note">

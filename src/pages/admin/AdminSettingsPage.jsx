@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
-import { MAX_FOOTER_TEXT_LENGTH, sanitizeFooterText } from '../../utils/footerText.js';
+import { MAX_FOOTER_TEXT_LENGTH, cleanPageFooters, sanitizeFooterText } from '../../utils/footerText.js';
+import { listAllRoutes } from '../../seo/routes.js';
+import { pageMetaKey } from '../../seo/pageMeta.js';
 import { DEFAULT_ORDER_TEMPLATE, MAX_ORDER_TEMPLATE_LENGTH, ORDER_TEMPLATE_PLACEHOLDERS, buildProductOrderMessage, findUnknownPlaceholders } from '../../utils/whatsapp.js';
 import './AdminSettingsPage.css';
 
@@ -17,6 +19,8 @@ const FIELDS = [
 
 // The settings are grouped into tabs; every panel stays mounted (hidden when inactive) so one Save covers all of
 // them and nothing typed in another tab is lost.
+const FOOTER_ROUTES = listAllRoutes();
+
 const TABS = [
   { id: 'store', label: 'Store', icon: 'storefront' },
   { id: 'home', label: 'Home page', icon: 'home' },
@@ -43,6 +47,7 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState(DEFAULT_STORE_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [footerPage, setFooterPage] = useState(FOOTER_ROUTES[0]?.path ?? '/');
   const [baseline, setBaseline] = useState(() => JSON.stringify(DEFAULT_STORE_SETTINGS));
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedTab = searchParams.get('tab');
@@ -81,6 +86,12 @@ export default function AdminSettingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const pageKey = pageMetaKey(footerPage);
+  const pageFooterValue = settings.pageFooters?.[pageKey] ?? '';
+  const updatePageFooter = (event) =>
+    setSettings((prev) => ({ ...prev, pageFooters: { ...prev.pageFooters, [pageKey]: event.target.value } }));
+  const customisedPages = FOOTER_ROUTES.filter((r) => sanitizeFooterText(settings.pageFooters?.[pageMetaKey(r.path)])).length;
+
   const updateField = (key) => (event) => setSettings((prev) => ({ ...prev, [key]: event.target.value }));
 
   const updateTaxRate = (event) => {
@@ -108,8 +119,12 @@ export default function AdminSettingsPage() {
       const whatsappOrderTemplate = String(settings.whatsappOrderTemplate ?? '').trim().slice(0, MAX_ORDER_TEMPLATE_LENGTH) || DEFAULT_ORDER_TEMPLATE;
       const siteFooterText = sanitizeFooterText(settings.siteFooterText);
       const productFooterText = sanitizeFooterText(settings.productFooterText);
-      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText });
-      setBaseline(JSON.stringify({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText }));
+      const pageFooters = cleanPageFooters(settings.pageFooters);
+      const toSave = { ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText, pageFooters };
+      await saveStoreSettings(toSave);
+      // Show what was actually stored (trimmed, clamped), so the form and the saved copy match.
+      setSettings(toSave);
+      setBaseline(JSON.stringify(toSave));
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -376,8 +391,8 @@ export default function AdminSettingsPage() {
               </p>
             </div>
             {[
-              { key: 'siteFooterText', label: 'Every page', hint: 'Shown at the very bottom of every customer-facing page.', placeholder: 'e.g. Free shipping on orders above ₹999' },
-              { key: 'productFooterText', label: 'Every product page', hint: 'Shown on each product page, just above the site footer.', placeholder: 'e.g. Colours may vary slightly from the photos.' },
+              { key: 'siteFooterText', label: 'Default for every page', hint: 'Shown on every page that has no text of its own (below).', placeholder: 'e.g. Free shipping on orders above ₹999' },
+              { key: 'productFooterText', label: 'Default for every product page', hint: 'Shown on each product page that has no footer text of its own (set per product in Products).', placeholder: 'e.g. Colours may vary slightly from the photos.' },
             ].map((field) => (
               <div key={field.key}>
                 <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={field.key}>
@@ -397,6 +412,30 @@ export default function AdminSettingsPage() {
                 </p>
               </div>
             ))}
+
+            <div className="settings-pagefooter">
+              <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor="pageFooterPage">Footer text for one page</label>
+              <select id="pageFooterPage" value={footerPage} onChange={(e) => setFooterPage(e.target.value)} className="settings-pagefooter__select">
+                {FOOTER_ROUTES.map((r) => (
+                  <option key={r.path} value={r.path}>
+                    {r.title} — {r.path}{sanitizeFooterText(settings.pageFooters?.[pageMetaKey(r.path)]) ? '  ● has text' : ''}
+                  </option>
+                ))}
+              </select>
+              <textarea
+                id="pageFooterText"
+                aria-label={`Footer text for ${footerPage}`}
+                rows={3}
+                maxLength={MAX_FOOTER_TEXT_LENGTH}
+                value={pageFooterValue}
+                onChange={updatePageFooter}
+                placeholder="Leave empty to use the default above on this page."
+                className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors mt-2"
+              />
+              <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
+                {pageFooterValue.length}/{MAX_FOOTER_TEXT_LENGTH} · {customisedPages} of {FOOTER_ROUTES.length} pages have their own text.
+              </p>
+            </div>
           </div>
 
           </div>

@@ -725,7 +725,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      <ProductFooterNote />
+      <ProductFooterNote product={product} />
       <SiteFooter />
     </>
   );

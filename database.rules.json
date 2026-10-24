@@ -87,6 +87,11 @@
         },
         "productFooterText": {
           ".validate": "newData.isString() && newData.val().length <= 500"
+        },
+        "pageFooters": {
+          "$page": {
+            ".validate": "$page.matches(/^[A-Za-z0-9_-]{1,120}$/) && newData.isString() && newData.val().length <= 500"
+          }
         }
       },
       "homeLayout": {

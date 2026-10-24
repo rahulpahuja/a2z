@@ -78,6 +78,12 @@ export const listIndexableRoutes = () =>
     .filter(([, entry]) => entry.indexable !== false)
     .map(([path, entry]) => ({ path, title: entry.title, description: entry.description }));
 
+// Every fixed page of the storefront (including cart and checkout, which are not indexed), for admin pickers.
+export const listAllRoutes = () =>
+  Object.entries(ROUTE_SEO)
+    .filter(([path]) => path !== '/__trap__')
+    .map(([path, entry]) => ({ path, title: entry.title }));
+
 // Builds the head spec for a static route. The shape is shared by applyDocumentHead
 // (browser) and injectHeadIntoHtml (edge).
 export function headForRoute(pathname, entry) {

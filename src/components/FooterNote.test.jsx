@@ -48,6 +48,31 @@ describe('SiteFooterNote', () => {
   });
 });
 
+describe('page-specific text', () => {
+  it('shows a page\'s own text there and the default elsewhere', () => {
+    settings = { siteFooterText: 'Everywhere', pageFooters: { products: 'Shop note' } };
+    const a = renderAt('/products', <SiteFooterNote />);
+    expect(screen.getByRole('note').textContent).toBe('Shop note');
+    a.unmount();
+    renderAt('/about-us', <SiteFooterNote />);
+    expect(screen.getByRole('note').textContent).toBe('Everywhere');
+  });
+});
+
+describe('product-specific text', () => {
+  it('prefers the product\'s own footer text over the default', () => {
+    settings = { productFooterText: 'Every product' };
+    renderAt('/products/a', <ProductFooterNote product={{ footerText: 'Final sale' }} />);
+    expect(screen.getByRole('note').textContent).toBe('Final sale');
+  });
+
+  it('falls back to the default for a product without its own', () => {
+    settings = { productFooterText: 'Every product' };
+    renderAt('/products/a', <ProductFooterNote product={{ footerText: '' }} />);
+    expect(screen.getByRole('note').textContent).toBe('Every product');
+  });
+});
+
 describe('ProductFooterNote', () => {
   it('renders only its own field, independent of the site-wide text', () => {
     settings = { siteFooterText: 'site', productFooterText: 'product' };

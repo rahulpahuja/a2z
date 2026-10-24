@@ -43,3 +43,34 @@ describe('isFooterNotePath', () => {
     expect(isFooterNotePath('/superb')).toBe(true);
   });
 });
+
+import { cleanPageFooters, resolvePageFooterText, resolveProductFooterText } from './footerText.js';
+
+describe('page and product footer text', () => {
+  const settings = { siteFooterText: 'Everywhere', productFooterText: 'Every product', pageFooters: { products: 'Shop page note', _home: 'Home note', 'shipping-policy': '   ' } };
+
+  it('uses the page\'s own text, else the site-wide default', () => {
+    expect(resolvePageFooterText(settings, '/products')).toBe('Shop page note');
+    expect(resolvePageFooterText(settings, '/products/')).toBe('Shop page note');
+    expect(resolvePageFooterText(settings, '/')).toBe('Home note');
+    expect(resolvePageFooterText(settings, '/about-us')).toBe('Everywhere');
+    expect(resolvePageFooterText(settings, '/shipping-policy')).toBe('Everywhere');
+  });
+
+  it('shows nothing when neither is set, and tolerates missing settings', () => {
+    expect(resolvePageFooterText({}, '/cart')).toBe('');
+    expect(resolvePageFooterText(undefined, undefined)).toBe('');
+  });
+
+  it('uses the product\'s own text, else the default for every product', () => {
+    expect(resolveProductFooterText(settings, { footerText: 'Final sale' })).toBe('Final sale');
+    expect(resolveProductFooterText(settings, { footerText: '  ' })).toBe('Every product');
+    expect(resolveProductFooterText(settings, undefined)).toBe('Every product');
+    expect(resolveProductFooterText({}, { })).toBe('');
+  });
+
+  it('cleans the saved page map: bad keys and empty texts are dropped, markup stays literal', () => {
+    expect(cleanPageFooters({ products: ' Hi ', 'bad key': 'x', cart: '', a: '<b>x</b>' })).toEqual({ products: 'Hi', a: '<b>x</b>' });
+    expect(cleanPageFooters(null)).toEqual({});
+  });
+});

@@ -30,9 +30,9 @@ describe('Store Settings tabs', () => {
     renderAt();
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['storefrontStore', 'homeHome page', 'gavelPolicies', 'bottom_navigationFooter']);
     expect(screen.getByLabelText('Store Name')).toBeVisible();
-    expect(screen.getByLabelText('Every page')).not.toBeVisible();
+    expect(screen.getByLabelText('Default for every page')).not.toBeVisible();
     fireEvent.click(screen.getByRole('tab', { name: /Footer/ }));
-    expect(screen.getByLabelText('Every page')).toBeVisible();
+    expect(screen.getByLabelText('Default for every page')).toBeVisible();
     expect(screen.getByLabelText('Store Name')).not.toBeVisible();
     expect(screen.getByRole('tab', { name: /Footer/ })).toHaveAttribute('aria-selected', 'true');
   });
@@ -53,6 +53,29 @@ describe('Store Settings tabs', () => {
   });
 });
 
+describe('page-wise footer text', () => {
+  it('writes text for one page, flags it in the list, and saves it with everything else', async () => {
+    renderAt('/super/settings?tab=footer');
+    fireEvent.change(screen.getByLabelText('Footer text for one page'), { target: { value: '/shipping-policy' } });
+    fireEvent.change(screen.getByLabelText('Footer text for /shipping-policy'), { target: { value: '  Ships in 3-5 days  ' } });
+    expect(screen.getByRole('option', { name: /Shipping Policy.*has text/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save Settings' }));
+    await waitFor(() => expect(saveStoreSettings).toHaveBeenCalled());
+    expect(saveStoreSettings.mock.calls[0][0].pageFooters).toEqual({ 'shipping-policy': 'Ships in 3-5 days' });
+  });
+
+  it('drops a page\'s text when it is cleared', async () => {
+    renderAt('/super/settings?tab=footer');
+    const box = () => screen.getByLabelText(/Footer text for \//);
+    fireEvent.change(box(), { target: { value: 'temp' } });
+    fireEvent.change(box(), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('Store Name'), { target: { value: 'Z' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save Settings' }));
+    await waitFor(() => expect(saveStoreSettings).toHaveBeenCalled());
+    expect(saveStoreSettings.mock.calls[0][0].pageFooters).toEqual({});
+  });
+});
+
 describe('Save button in the header', () => {
   it('sits in the page header and is disabled until something changes', () => {
     const { container } = renderAt();
@@ -67,7 +90,7 @@ describe('Save button in the header', () => {
     renderAt();
     fireEvent.change(screen.getByLabelText('Store Name'), { target: { value: 'A2Z Renamed' } });
     fireEvent.click(screen.getByRole('tab', { name: /Footer/ }));
-    fireEvent.change(screen.getByLabelText('Every page'), { target: { value: 'Free shipping' } });
+    fireEvent.change(screen.getByLabelText('Default for every page'), { target: { value: 'Free shipping' } });
     fireEvent.click(screen.getByRole('tab', { name: /Policies/ }));
     expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
 
