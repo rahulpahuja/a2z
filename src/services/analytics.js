@@ -268,6 +268,82 @@ export function logShotDeepLink(shotId, found) {
   logAnalyticsEvent(found ? 'shot_deeplink_open' : 'shot_deeplink_missing', { shot_id: shotId });
 }
 
+// ---- Blog -------------------------------------------------------------------------------------
+// `post` is any object with { id, slug, type, categoryId, readingMinutes? }.
+
+const blogParams = (post, extra = {}) => ({
+  post_id: post.id,
+  post_slug: post.slug,
+  post_type: post.type,
+  category_id: post.categoryId || undefined,
+  ...extra,
+});
+
+export function logBlogListView(articleCount) {
+  logAnalyticsEvent('blog_list_view', { article_count: articleCount });
+}
+
+export function logBlogSearch(term, results) {
+  logAnalyticsEvent('blog_search', { search_term: term, results });
+}
+
+// kind: 'category' | 'tag' | 'clear'
+export function logBlogFilter(kind, value) {
+  logAnalyticsEvent('blog_filter', { filter_type: kind, filter_value: value || '' });
+}
+
+export function logBlogLoadMore(shown) {
+  logAnalyticsEvent('blog_load_more', { shown });
+}
+
+// A card on the blog landing page was opened. `source`: 'featured' | 'guides' | 'collections' | 'grid' | 'related' | 'prev_next'.
+export function logBlogCardClick(post, source) {
+  logAnalyticsEvent('select_content', { content_type: 'blog_post', item_id: post.id });
+  logAnalyticsEvent('blog_card_click', blogParams(post, { source }));
+}
+
+export function logBlogView(post) {
+  logAnalyticsEvent('blog_view', blogParams(post, { reading_minutes: post.readingMinutes }));
+}
+
+// Scroll depth milestones: 25, 50, 75, 100.
+export function logBlogReadDepth(post, percent) {
+  logAnalyticsEvent('blog_read_depth', blogParams(post, { percent }));
+}
+
+// placement: 'inline' | 'comparison' | 'related' | 'hero'
+export function logBlogProductClick(post, product, placement) {
+  logSelectItem(product, `Blog - ${post.title || post.slug}`);
+  logAnalyticsEvent('blog_product_click', blogParams(post, { product_id: product.id, placement }));
+}
+
+export function logBlogProductUnavailableView(post, productId) {
+  logAnalyticsEvent('blog_product_unavailable', blogParams(post, { product_id: productId }));
+}
+
+export function logBlogCollectionClick(post, collection) {
+  logAnalyticsEvent('blog_collection_click', blogParams(post, { collection_id: collection.id }));
+}
+
+export function logBlogToc(post, headingId) {
+  logAnalyticsEvent('blog_toc_click', blogParams(post, { heading_id: headingId }));
+}
+
+// cta: 'shop_all' | 'shop_collection' | 'shop_the_guide' | 'back_to_blog'
+export function logBlogCta(post, cta) {
+  logAnalyticsEvent('blog_cta_click', blogParams(post, { cta }));
+}
+
+// result: 'shared' | 'copied' | 'cancelled' | 'failed' | 'whatsapp' | 'facebook' | 'x'
+export function logBlogShare(post, result) {
+  if (['shared', 'copied', 'whatsapp', 'facebook', 'x'].includes(result)) {
+    const method = { shared: 'native', copied: 'copy_link' }[result] ?? result;
+    logAnalyticsEvent('share', blogParams(post, { method, content_type: 'blog_post', item_id: post.id }));
+  } else {
+    logAnalyticsEvent(result === 'cancelled' ? 'blog_share_cancelled' : 'blog_share_failed', blogParams(post));
+  }
+}
+
 // ---- Product listing pagination ---------------------------------------------------------------
 // source: 'next_button' (the large button under the grid) | 'pager' (the numbered pager) | 'back_to_top'
 export function logListingPageChange(page, source) {

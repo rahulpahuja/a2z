@@ -10,11 +10,28 @@ vi.mock('../services/storeSettings.js', () => ({
   },
 }));
 vi.mock('../components/BrandName.jsx', () => ({ default: () => <span>brand</span> }));
+let blogRows = [];
+vi.mock('../services/blog.js', () => ({ subscribeToBlogIndex: (cb) => { cb(blogRows); return () => {}; } }));
 
 const { default: SiteFooter } = await import('../components/SiteFooter.jsx');
 const { default: TermsConditionsPage } = await import('./TermsConditionsPage.jsx');
 
 const wrap = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
+describe('footer Blog link', () => {
+  it('is hidden until an article has been published', () => {
+    blogRows = [];
+    wrap(<SiteFooter />);
+    expect(screen.queryByRole('link', { name: 'Blog' })).toBeNull();
+  });
+
+  it('appears once there is a published article', () => {
+    blogRows = [{ id: 'b1' }];
+    wrap(<SiteFooter />);
+    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('href', '/blogs');
+    blogRows = [];
+  });
+});
 
 describe('footer credit', () => {
   it('says "Powered by mobile1x.com" and links to https://mobile1x.com safely', () => {
