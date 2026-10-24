@@ -267,3 +267,9 @@ export function logShotMuteToggle(shot, muted) {
 export function logShotDeepLink(shotId, found) {
   logAnalyticsEvent(found ? 'shot_deeplink_open' : 'shot_deeplink_missing', { shot_id: shotId });
 }
+
+// ---- Product listing pagination ---------------------------------------------------------------
+// source: 'next_button' (the large button under the grid) | 'pager' (the numbered pager) | 'back_to_top'
+export function logListingPageChange(page, source) {
+  logAnalyticsEvent('listing_page_change', { page, source });
+}

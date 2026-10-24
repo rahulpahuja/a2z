@@ -17,7 +17,8 @@ import { subscribeToTopNav, topNavLinkToPath, findNavLinkLabel, DEFAULT_TOP_NAV_
 import { getColorName, isProductAvailable } from '../utils/productColors.js';
 import { getPriceBreakdown, getDiscountedPrice } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
-import { logViewItemList, logSelectItem, logFilterProducts, logAddToWishlist } from '../services/analytics.js';
+import { logViewItemList, logSelectItem, logFilterProducts, logAddToWishlist, logListingPageChange } from '../services/analytics.js';
+import ListingPageNav from '../components/ListingPageNav.jsx';
 import './ProductListingPage.css';
 import { getProductAlt } from '../utils/productImages.js';
 import BrandName from '../components/BrandName.jsx';
@@ -258,8 +259,9 @@ export default function ProductListingPage() {
   // browser's scroll anchoring while the product grid's content swaps out
   // underneath it, since that's a large, page-wide layout change happening
   // at the same time.
-  const goToPage = (page) => {
+  const goToPage = (page, source = 'pager') => {
     setCurrentPage(page);
+    logListingPageChange(page, source);
     window.scrollTo(0, 0);
   };
 
@@ -1328,6 +1330,17 @@ export default function ProductListingPage() {
               </p>
             </div>
           )}
+
+          <ListingPageNav
+            currentPage={currentPage}
+            totalPages={totalPages}
+            allLoaded={visibleCount >= paginatedProducts.length}
+            onNext={(page) => goToPage(page, 'next_button')}
+            onTop={() => {
+              logListingPageChange(currentPage, 'back_to_top');
+              window.scrollTo(0, 0);
+            }}
+          />
 
           <div className="mt-12 flex justify-center items-center gap-2">
             <button
