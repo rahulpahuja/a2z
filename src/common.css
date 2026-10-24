@@ -401,8 +401,8 @@ body.user-signed-in .docked {
 }
 
 /* "New Arrivals" in the top bar: a red highlighter that gently pulses so the link stands out. Every page builds
-   its own header links, so this matches the link by its address (topNavLinkToPath in services/topNav.js). */
-header nav a[href$="filter=new-arrivals"] {
+   its own top-bar links (some inside a <header>, some not), so this matches the link by its address (topNavLinkToPath in services/topNav.js). */
+nav a[href$="filter=new-arrivals"] {
   position: relative;
   isolation: isolate;
   padding: 0.3rem 0.75rem;
@@ -410,7 +410,7 @@ header nav a[href$="filter=new-arrivals"] {
   color: var(--color-error, #ba1a1a);
   font-weight: 800;
 }
-header nav a[href$="filter=new-arrivals"]::before {
+nav a[href$="filter=new-arrivals"]::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -425,5 +425,5 @@ header nav a[href$="filter=new-arrivals"]::before {
   100% { box-shadow: 0 0 0 0 transparent; background-color: color-mix(in srgb, var(--color-error, #ba1a1a) 10%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) {
-  header nav a[href$="filter=new-arrivals"]::before { animation: none; }
+  nav a[href$="filter=new-arrivals"]::before { animation: none; }
 }
