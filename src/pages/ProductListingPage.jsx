@@ -187,6 +187,22 @@ export default function ProductListingPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const isFilterSheet = useMediaQuery(FILTER_SHEET_QUERY);
   const filtersButtonRef = useRef(null);
+  // The sticky filter bars sit directly under the header. Its height changes with screen size and
+  // orientation, so measure it instead of guessing (a wrong guess leaves a strip of products showing
+  // between the two, or tucks the bar under the header).
+  const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return undefined;
+    const measure = () => setHeaderHeight(Math.round(el.getBoundingClientRect().height));
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const stickyTop = headerHeight > 0 ? { top: headerHeight } : undefined;
   const filtersCloseRef = useRef(null);
   const filterSheetOpen = mobileFiltersOpen && isFilterSheet;
 
@@ -563,7 +579,7 @@ export default function ProductListingPage() {
 
   return (
     <>
-      <header className="bg-surface-solid dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
+      <header ref={headerRef} className="bg-surface-solid dark:bg-surface-container-highest flex justify-between items-center w-full px-6 md:px-12 py-4 max-w-[1680px] mx-auto z-50 docked full-width top-0 sticky">
         <div className="flex items-center gap-6">
           <button
             type="button"
@@ -611,7 +627,7 @@ export default function ProductListingPage() {
         </div>
       </div>
       {/* Desktop sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface-solid dark:bg-surface-container-highest border-b border-surface-variant">
+      <div className="hidden md:block [@media(orientation:landscape)_and_(max-height:500px)]:!hidden sticky top-[74px] z-40 bg-surface-solid dark:bg-surface-container-highest border-b border-surface-variant" style={stickyTop}>
         <div className="w-full max-w-[1680px] mx-auto px-6 md:px-12 py-2">
           <div className="flex flex-wrap items-center justify-end gap-2">
             {categoryFilterOnTop && renderCategoryQuickFilter('desktop')}
@@ -653,16 +669,16 @@ export default function ProductListingPage() {
       </div>
 
       {/* Mobile sticky filter/sort bar — stays pinned below the header while scrolling the product list */}
-      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface-solid dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-6 py-3 flex items-center gap-3 overflow-x-auto">
+      <div className="md:hidden [@media(orientation:landscape)_and_(max-height:500px)]:!flex sticky top-[64px] z-40 bg-surface-solid dark:bg-surface-container-highest backdrop-blur-lg border-b border-surface-variant px-4 py-2 flex items-center gap-2 overflow-x-auto" style={stickyTop}>
         {showFilterSidebar && (
         <button
           type="button"
           ref={filtersButtonRef}
           onClick={() => setMobileFiltersOpen((open) => !open)}
           aria-expanded={mobileFiltersOpen}
-          className="shrink-0 flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 flex items-center gap-1 border border-outline rounded-md py-1 px-2.5 font-body-sm !text-xs text-on-surface hover:border-primary hover:text-primary transition-colors"
         >
-          <span className="material-symbols-outlined text-sm">tune</span>
+          <span className="material-symbols-outlined !text-base">tune</span>
           Filters
         </button>
         )}
@@ -670,14 +686,14 @@ export default function ProductListingPage() {
           type="button"
           onClick={() => setMobileViewMode((mode) => (mode === 'grid' ? 'list' : 'grid'))}
           aria-pressed={mobileViewMode === 'grid'}
-          className="shrink-0 flex items-center gap-2 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 flex items-center gap-1 border border-outline rounded-md py-1 px-2.5 font-body-sm !text-xs text-on-surface hover:border-primary hover:text-primary transition-colors"
         >
-          <span className="material-symbols-outlined text-sm">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+          <span className="material-symbols-outlined !text-base">{mobileViewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
           {mobileViewMode === 'grid' ? 'List' : 'Grid'}
         </button>
         <div className="relative ml-auto shrink-0">
           <select
-            className="appearance-none bg-transparent border border-outline rounded-lg py-2 pl-4 pr-10 font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+            className="appearance-none bg-transparent border border-outline rounded-md py-1 pl-2.5 pr-7 font-body-sm !text-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
             id="sort-by-mobile"
             value={sortSelectValue}
             onChange={(e) => handleSortSelectChange(e.target.value)}
@@ -692,12 +708,12 @@ export default function ProductListingPage() {
               <option value={`${GENDER_SORT_PREFIX}Unisex`}>Unisex</option>
             </optgroup>
           </select>
-          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm">expand_more</span>
+          <span className="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant !text-base">expand_more</span>
         </div>
         <button
           type="button"
           onClick={clearAllFilters}
-          className="shrink-0 border border-outline rounded-lg py-2 px-4 font-body-sm text-body-sm text-on-surface hover:border-primary hover:text-primary transition-colors"
+          className="shrink-0 border border-outline rounded-md py-1 px-2.5 font-body-sm !text-xs text-on-surface hover:border-primary hover:text-primary transition-colors"
         >
           Clear Filters
         </button>

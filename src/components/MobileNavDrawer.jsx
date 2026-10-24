@@ -80,7 +80,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
       {/* Drawer Panel with hardware-accelerated slide */}
       <div
-        className={`absolute left-0 top-0 h-full w-[85vw] max-w-[340px] bg-surface dark:bg-surface-container-highest shadow-2xl flex flex-col z-10 transform transition-transform duration-300 ease-out will-change-transform ${
+        className={`absolute left-0 top-0 h-full w-[85vw] max-w-[340px] bg-surface-solid dark:bg-surface-container-highest shadow-2xl flex flex-col z-10 transform transition-transform duration-300 ease-out will-change-transform ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -110,7 +110,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
           {/* Main Primary Links */}
           <div>
-            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant font-bold mb-2 block">
               Discover
             </span>
             <nav className="flex flex-col gap-1">
@@ -146,7 +146,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
           {/* Categories Section */}
           <div>
-            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant font-bold mb-2 block">
               Categories
             </span>
             <nav className="flex flex-col gap-1">
@@ -166,7 +166,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
           {/* Highlights & Experience */}
           <div>
-            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant font-bold mb-2 block">
               Experience
             </span>
             <nav className="flex flex-col gap-1">
@@ -219,7 +219,7 @@ export default function MobileNavDrawer({ open, onClose, links = [] }) {
 
           {/* Quick Help & Store Details */}
           <div>
-            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant/70 font-semibold mb-2 block">
+            <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-on-surface-variant font-bold mb-2 block">
               About &amp; Support
             </span>
             <nav className="flex flex-col gap-1">
