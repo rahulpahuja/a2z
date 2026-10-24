@@ -38,6 +38,7 @@ const ROUTE_SEO = {
     `Shop All Products | ${BRAND_NAME}`,
     'Browse the full A2Z Collection catalogue of apparel and footwear, with delivery across India.'
   ),
+  '/blogs': indexable(`Blog | ${BRAND_NAME}`, `Style guides, buying advice and stories from ${BRAND_NAME}.`),
   '/shots': indexable(`Shots | ${BRAND_NAME}`, `Photos and videos from ${BRAND_NAME}.`),
   '/about-us': indexable(`About Us | ${BRAND_NAME}`, `Learn about ${BRAND_NAME}, a fashion brand rooted in Indore, Madhya Pradesh.`),
   '/contact-us': indexable(`Contact Us | ${BRAND_NAME}`, `Get in touch with the ${BRAND_NAME} team.`),

@@ -26,6 +26,8 @@ const StorefrontPage = lazy(() => import('./pages/StorefrontPage.jsx'))
 const ProductListingPage = lazy(() => import('./pages/ProductListingPage.jsx'))
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage.jsx'))
 const ProductDetailAltPage = lazy(() => import('./pages/ProductDetailAltPage.jsx'))
+const BlogListPage = lazy(() => import('./pages/BlogListPage.jsx'))
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage.jsx'))
 const CartPage = lazy(() => import('./pages/CartPage.jsx'))
 const CheckoutShippingPage = lazy(() => import('./pages/CheckoutShippingPage.jsx'))
 const PaymentPage = lazy(() => import('./pages/PaymentPage.jsx'))
@@ -88,6 +90,8 @@ const ROUTES = [
   { path: '/products', Component: ProductListingPage },
   { path: '/products/:id', Component: ProductDetailPage },
   { path: '/collections/:collectionId', Component: CollectionPage },
+  { path: '/blogs', Component: BlogListPage },
+  { path: '/blogs/:slug', Component: BlogPostPage },
   { path: '/product-alt', Component: ProductDetailAltPage },
   { path: '/cart', Component: CartPage },
   { path: '/checkout/shipping', Component: CheckoutShippingPage },

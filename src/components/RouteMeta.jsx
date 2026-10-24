@@ -5,8 +5,8 @@ import { normalizePath, resolveRouteSeo } from '../seo/routes.js';
 import { applyPageMeta, pageMetaKey } from '../seo/pageMeta.js';
 import { subscribeToPageMeta } from '../services/pageMeta.js';
 
-// Product and collection pages set their own head from live data (ProductDetailPage, CollectionPage).
-const hasOwnHead = (pathname) => pathname.startsWith('/products/') || pathname.startsWith('/collections/');
+// Product, collection and blog article pages set their own head from live data (ProductDetailPage, CollectionPage).
+const hasOwnHead = (pathname) => pathname.startsWith('/products/') || pathname.startsWith('/collections/') || pathname.startsWith('/blogs/');
 
 // Keeps the document head in step with each route during client-side navigation,
 // including the not-found head for unknown URLs.

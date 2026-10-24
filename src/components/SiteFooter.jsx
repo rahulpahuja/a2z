@@ -12,6 +12,7 @@ const ABOUT_LINKS = [
   { label: 'Contact Us', to: '/contact-us' },
   { label: 'Store Appointment', to: '/store-appointment' },
   { label: 'A2Z Stores', to: '/a2z-stores' },
+  { label: 'Blog', to: '/blogs' },
   { label: 'Careers', to: '/careers' },
   { label: 'Feedback', to: '/feedback' },
 ];
