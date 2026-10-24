@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { MAX_FOOTER_TEXT_LENGTH, sanitizeFooterText } from '../../utils/footerText.js';
@@ -12,6 +13,15 @@ const FIELDS = [
   { key: 'phone', label: 'Store Phone Number', placeholder: '+91 98765 43210' },
   { key: 'gstNumber', label: 'GST Number', placeholder: '27AAAAA0000A1Z5' },
   { key: 'facebookUrl', label: 'Facebook Page URL', placeholder: 'https://www.facebook.com/yourpage' },
+];
+
+// The settings are grouped into tabs; every panel stays mounted (hidden when inactive) so one Save covers all of
+// them and nothing typed in another tab is lost.
+const TABS = [
+  { id: 'store', label: 'Store', icon: 'storefront' },
+  { id: 'home', label: 'Home page', icon: 'home' },
+  { id: 'policies', label: 'Policies', icon: 'gavel' },
+  { id: 'footer', label: 'Footer', icon: 'bottom_navigation' },
 ];
 
 function SettingToggle({ checked, onChange, label }) {
@@ -33,10 +43,37 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState(DEFAULT_STORE_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [baseline, setBaseline] = useState(() => JSON.stringify(DEFAULT_STORE_SETTINGS));
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const tab = TABS.some((t) => t.id === requestedTab) ? requestedTab : TABS[0].id;
+  const selectTab = (id) => setSearchParams({ tab: id }, { replace: true });
+  const dirty = useMemo(() => JSON.stringify(settings) !== baseline, [settings, baseline]);
+
+  const onTabKeyDown = (event, index) => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) return;
+    event.preventDefault();
+    const next = TABS[(index + step + TABS.length) % TABS.length];
+    selectTab(next.id);
+    document.getElementById(`settings-tab-${next.id}`)?.focus();
+  };
+
+  // Browser-level guard against closing the tab with unsaved edits.
+  useEffect(() => {
+    if (!dirty) return undefined;
+    const handler = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [dirty]);
 
   useEffect(() => {
     const unsubscribe = subscribeToStoreSettings((data, error) => {
       setSettings(data);
+      setBaseline(JSON.stringify(data));
       setLoading(false);
       if (error) showToast(`Couldn't load saved store settings (${error.message || 'permission denied'}). Showing defaults.`);
     });
@@ -72,6 +109,7 @@ export default function AdminSettingsPage() {
       const siteFooterText = sanitizeFooterText(settings.siteFooterText);
       const productFooterText = sanitizeFooterText(settings.productFooterText);
       await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText });
+      setBaseline(JSON.stringify({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText }));
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -90,15 +128,50 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6">
-        <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Store Settings</h1>
-        <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-          These details appear on generated order receipts and are saved for the whole team.
-        </p>
+      <header className="settings-header bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-4">
+        <div className="settings-header__row">
+          <div>
+            <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Store Settings</h1>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              These details appear on generated order receipts and are saved for the whole team.
+            </p>
+          </div>
+          <div className="settings-header__save">
+            {dirty && <span className="settings-header__unsaved" role="status">Unsaved changes</span>}
+            <button
+              type="submit"
+              form="store-settings-form"
+              disabled={saving || !dirty}
+              className="bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : dirty ? 'Save Settings' : 'Saved'}
+            </button>
+          </div>
+        </div>
+        <div className="settings-tabs" role="tablist" aria-label="Settings sections">
+          {TABS.map((t, index) => (
+            <button
+              key={t.id}
+              id={`settings-tab-${t.id}`}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              aria-controls={`settings-panel-${t.id}`}
+              tabIndex={tab === t.id ? 0 : -1}
+              className={`settings-tab${tab === t.id ? ' settings-tab--active' : ''}`}
+              onClick={() => selectTab(t.id)}
+              onKeyDown={(e) => onTabKeyDown(e, index)}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-10">
-        <form onSubmit={handleSave} className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30 max-w-2xl flex flex-col gap-5">
+      <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8">
+        <form id="store-settings-form" onSubmit={handleSave} className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/30 max-w-3xl">
+          <div role="tabpanel" id="settings-panel-store" aria-labelledby="settings-tab-store" hidden={tab !== 'store'} className="flex flex-col gap-5">
           {FIELDS.map((field) => (
             <div key={field.key}>
               <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={field.key}>
@@ -149,8 +222,10 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
+          </div>
+          <div role="tabpanel" id="settings-panel-home" aria-labelledby="settings-tab-home" hidden={tab !== 'home'} className="flex flex-col gap-5">
           {/* Home Page Layout Provision for Super User */}
-          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+          <div className="">
             <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Home Page Layout</h2>
             <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">
               Super User setting — number of product cards shown per row in the Trending Now, Featured Elegance, and Heritage Masterpieces sections on the home page. Default 8.
@@ -262,8 +337,10 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
+          </div>
+          <div role="tabpanel" id="settings-panel-policies" aria-labelledby="settings-tab-policies" hidden={tab !== 'policies'} className="flex flex-col gap-5">
           {/* Refund Policy Provision for Super User */}
-          <div className="border-t border-outline-variant/30 pt-5 mt-1">
+          <div className="">
             <div className="flex justify-between items-center mb-1">
               <h2 className="font-title-sm text-title-sm text-on-surface">Refund &amp; Return Policy</h2>
               <button
@@ -289,7 +366,9 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="border-t border-outline-variant/30 pt-5 mt-1 flex flex-col gap-5">
+          </div>
+          <div role="tabpanel" id="settings-panel-footer" aria-labelledby="settings-tab-footer" hidden={tab !== 'footer'} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5">
             <div>
               <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Footer Text</h2>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
@@ -320,13 +399,7 @@ export default function AdminSettingsPage() {
             ))}
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="self-start bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {saving ? 'Saving…' : 'Save Settings'}
-          </button>
+          </div>
         </form>
       </main>
     </div>

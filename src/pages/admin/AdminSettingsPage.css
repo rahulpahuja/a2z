@@ -98,3 +98,72 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Header with the Save button at the top right, and the section tabs. */
+.settings-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.settings-header__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-header__save {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.settings-header__unsaved {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b26a00;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.settings-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.settings-tab:hover {
+  color: var(--color-primary);
+}
+
+.settings-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.settings-tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.settings-tab .material-symbols-outlined {
+  font-size: 1.125rem;
+}
