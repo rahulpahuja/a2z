@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import ProductImage from './ProductImage.jsx';
 import VideoPlayer from './VideoPlayer.jsx';
-import { getGridTiles, stepIndex } from '../utils/productGallery.js';
+import { aspectToRatio, getGridTiles, stepIndex } from '../utils/productGallery.js';
 import './ProductGalleryGrid.css';
 
 function MediaView({ item, alt, className }) {
@@ -36,7 +37,10 @@ function GalleryLightbox({ media, index, name, onClose, onChange }) {
   }, [index, media.length, onChange, onClose]);
 
   if (!item) return null;
-  return (
+  // Rendered into <body>: an ancestor with a filter, transform or backdrop-filter (the product page
+  // has one) would otherwise become the containing block of this fixed overlay and trap it inside
+  // the page content instead of covering the window.
+  return createPortal(
     <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label={`${name} photos`} onClick={onClose}>
       <button ref={closeRef} type="button" className="gallery-lightbox__close" onClick={onClose} aria-label="Close gallery">
         <span className="material-symbols-outlined" aria-hidden="true">close</span>
@@ -73,20 +77,21 @@ function GalleryLightbox({ media, index, name, onClose, onChange }) {
       <p className="gallery-lightbox__count" aria-live="polite">
         {index + 1} / {media.length}
       </p>
-    </div>
+    </div>,
+    document.body
   );
 }
 
 // Four equal tiles, two across and two down. With more than four items the last tile shows
 // "+N"; tapping any tile opens the viewer on that item.
-export default function ProductGalleryGrid({ media, leadIndex = 0, name, dimmed = false }) {
+export default function ProductGalleryGrid({ media, leadIndex = 0, name, dimmed = false, aspect }) {
   const [openIndex, setOpenIndex] = useState(null);
   const { tiles, extra } = getGridTiles(media, leadIndex);
   const close = useCallback(() => setOpenIndex(null), []);
 
   return (
     <>
-      <div className="gallery-grid" role="list" aria-label={`${name} photos`}>
+      <div className="gallery-grid" role="list" aria-label={`${name} photos`} style={{ '--gallery-ratio': aspectToRatio(aspect) }}>
         {tiles.map(({ item, index }, position) => {
           const showExtra = extra > 0 && position === tiles.length - 1;
           return (

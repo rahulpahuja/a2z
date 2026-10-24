@@ -285,7 +285,7 @@ export default function ProductDetailPage() {
 
       {/* Main Content Canvas */}
       <main
-        className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter"
+        className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-2 pb-8 md:pt-3 md:pb-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-y-4"
         style={{
           backgroundColor: 'var(--custom-store-bg, transparent)',
           backdropFilter: 'var(--custom-backdrop-filter, none)',
@@ -319,6 +319,7 @@ export default function ProductDetailPage() {
               leadIndex={selectedThumbnail}
               name={product.name || product.title}
               dimmed={isProductOutOfStock}
+              aspect={theme?.detailImgAspect}
             />
           ) : (
             <>

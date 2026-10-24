@@ -28,6 +28,14 @@ export function getGridTiles(media, leadIndex = 0, max = GRID_TILE_COUNT) {
   return { tiles, extra: Math.max(0, list.length - tiles.length) };
 }
 
+// '3/4' -> 0.75 (width / height). Anything that is not a plain "w/h" ratio falls back to 3/4.
+export function aspectToRatio(aspect) {
+  const match = /^\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*$/.exec(String(aspect ?? ''));
+  if (!match) return 0.75;
+  const ratio = Number(match[1]) / Number(match[2]);
+  return Number.isFinite(ratio) && ratio > 0.2 && ratio < 5 ? ratio : 0.75;
+}
+
 // Wraps around, so previous/next in the lightbox never runs off either end.
 export function stepIndex(current, delta, count) {
   if (!count) return 0;

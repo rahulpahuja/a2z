@@ -7,6 +7,15 @@
   width: 100%;
 }
 
+/* On wide screens, size the grid so both rows fit in the window instead of running far below the
+   fold: two tiles of the chosen ratio plus the gap must fit in the viewport height less the header. */
+@media (min-width: 768px) {
+  .gallery-grid {
+    width: min(100%, calc(var(--gallery-ratio, 0.75) * (100vh - 8.5rem) + 0.5rem));
+    margin-inline: auto;
+  }
+}
+
 .gallery-grid__tile {
   position: relative;
   display: block;
@@ -71,7 +80,7 @@
 .gallery-lightbox {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;

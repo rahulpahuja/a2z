@@ -47,6 +47,18 @@ describe('ProductGalleryGrid', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('renders the viewer in <body>, outside any ancestor that could trap a fixed overlay', () => {
+    const { container } = render(
+      <div style={{ backdropFilter: 'blur(4px)' }}>
+        <ProductGalleryGrid media={images(3)} name="Jacket" />
+      </div>
+    );
+    fireEvent.click(screen.getAllByRole('listitem')[0]);
+    const dialog = screen.getByRole('dialog');
+    expect(container.contains(dialog)).toBe(false);
+    expect(dialog.parentElement).toBe(document.body);
+  });
+
   it('renders a video tile with a play icon and plays it in the viewer', () => {
     const media = [...images(2), { type: 'video', src: 'clip.mp4' }];
     render(<ProductGalleryGrid media={media} name="Jacket" />);

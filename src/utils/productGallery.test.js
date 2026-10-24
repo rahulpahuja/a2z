@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getGalleryMode, getGridTiles, normalizeGalleryLayout, stepIndex } from './productGallery.js';
+import { aspectToRatio, getGalleryMode, getGridTiles, normalizeGalleryLayout, stepIndex } from './productGallery.js';
 
 const media = (n) => Array.from({ length: n }, (_, i) => ({ type: 'image', src: `img${i}` }));
 
@@ -65,5 +65,18 @@ describe('stepIndex', () => {
 
   it('is safe for an empty list', () => {
     expect(stepIndex(0, 1, 0)).toBe(0);
+  });
+});
+
+describe('aspectToRatio', () => {
+  it('turns "w/h" into a number', () => {
+    expect(aspectToRatio('3/4')).toBe(0.75);
+    expect(aspectToRatio('1/1')).toBe(1);
+    expect(aspectToRatio(' 4 / 3 ')).toBeCloseTo(1.3333, 3);
+    expect(aspectToRatio('1.5/1')).toBe(1.5);
+  });
+
+  it('falls back to 3/4 for anything else', () => {
+    for (const bad of ['', undefined, null, 'auto', '3:4', '0/4', '4/0', '1000/1', 'a/b', 7]) expect(aspectToRatio(bad)).toBe(0.75);
   });
 });
