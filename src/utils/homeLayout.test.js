@@ -218,7 +218,7 @@ describe('placement edits', () => {
 describe('section edits', () => {
   it('reorders sections and ignores out-of-range or identical moves', () => {
     const layout = createDefaultHomeLayout();
-    expect(ids(moveSection(layout, 0, 2)).slice(0, 3)).toEqual(['genderTiles', 'categoryBubbles', 'hero']);
+    expect(ids(moveSection(layout, 0, 2)).slice(0, 3)).toEqual(['blogs', 'genderTiles', 'hero']);
     expect(moveSection(layout, 0, 0)).toBe(layout);
     expect(moveSection(layout, 0, -1)).toBe(layout);
     expect(moveSection(layout, 0, 99)).toBe(layout);
@@ -297,7 +297,28 @@ describe('getVisibleSections', () => {
   it('returns only visible sections in order', () => {
     const layout = updateSection(moveSection(createDefaultHomeLayout(), 0, 1), 'trending', { visible: false });
     const visible = getVisibleSections(layout).map((s) => s.id);
-    expect(visible[0]).toBe('genderTiles');
+    expect(visible[0]).toBe('blogs');
     expect(visible).not.toContain('trending');
+  });
+});
+
+describe('blogs section', () => {
+  it('is on by default, right after the hero banner', () => {
+    expect(ids(createDefaultHomeLayout()).slice(0, 2)).toEqual(['hero', 'blogs']);
+    expect(createDefaultHomeLayout().sections[1].visible).toBe(true);
+  });
+
+  it('is added after the hero for a layout saved before it existed, keeping the saved order', () => {
+    const saved = SECTION_IDS.filter((id) => id !== 'blogs');
+    const layout = normalizeHomeLayout({ sections: saved.map((id) => ({ id })) });
+    expect(ids(layout)).toEqual(SECTION_IDS);
+    const reordered = ['featured1', ...saved.filter((id) => id !== 'featured1')];
+    expect(ids(normalizeHomeLayout({ sections: reordered.map((id) => ({ id })) }))[0]).toBe('featured1');
+  });
+
+  it('can be hidden and moved to the very top', () => {
+    const layout = createDefaultHomeLayout();
+    expect(updateSection(layout, 'blogs', { visible: false }).sections[1].visible).toBe(false);
+    expect(ids(moveSection(layout, 1, 0))[0]).toBe('blogs');
   });
 });

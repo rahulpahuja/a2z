@@ -4,6 +4,7 @@ import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
 import TrendingProducts from '../components/TrendingProducts.jsx';
 import HomeCollections from '../components/HomeCollections.jsx';
+import HomeBlogs from '../components/blog/HomeBlogs.jsx';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { useStorefrontTheme } from '../context/StorefrontThemeContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
@@ -353,6 +354,7 @@ export default function HomePage() {
         </div>
       </section>
     ) : null,
+    blogs: <HomeBlogs />,
     trending: <TrendingProducts productsPerRow={homeProductsPerRow} />,
     collections: <HomeCollections />,
     featured1: (

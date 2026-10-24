@@ -14,6 +14,7 @@ vi.mock('../components/MobileQuickNav.jsx', () => stub('quicknav'));
 vi.mock('../components/SearchBar.jsx', () => stub('search'));
 vi.mock('../components/TrendingProducts.jsx', () => stub('trending'));
 vi.mock('../components/HomeCollections.jsx', () => stub('collections'));
+vi.mock('../components/blog/HomeBlogs.jsx', () => stub('blogs'));
 vi.mock('../components/BrandName.jsx', () => ({ default: () => <span>brand</span> }));
 vi.mock('../components/ProductCardImage.jsx', () => ({ default: () => <i /> }));
 vi.mock('../services/analytics.js', () => ({
@@ -64,11 +65,11 @@ beforeEach(() => {
 describe('HomePage driven by the saved layout', () => {
   it('renders every section in the default order', () => {
     const { container } = renderHome();
-    expect(order(container)).toEqual(['hero', 'genderTiles', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2']);
+    expect(order(container)).toEqual(['hero', 'blogs', 'genderTiles', 'categoryBubbles', 'trending', 'collections', 'featured1', 'featured2']);
   });
 
   it('follows a reordered layout', () => {
-    layout = moveSection(layout, 5, 0); // featured1 to the very top
+    layout = moveSection(layout, 6, 0); // featured1 to the very top
     const { container } = renderHome();
     expect(order(container)[0]).toBe('featured1');
   });
