@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '../../context/ToastContext.jsx';
+import DatabaseUsageCard from '../../components/admin/DatabaseUsageCard.jsx';
 
 const SESSION_KEY = 'a2z_usage_billing_key';
 const apiUrl = import.meta.env.VITE_USAGE_BILLING_API_URL;
@@ -94,6 +95,8 @@ export default function AdminUsageBillingPage() {
       </header>
 
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-10 flex flex-col gap-8">
+        <DatabaseUsageCard />
+
         {!apiUrl && (
           <section className="bg-error/10 border border-error/30 rounded-xl p-6">
             <p className="font-body-md text-body-md text-error">
