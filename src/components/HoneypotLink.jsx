@@ -7,6 +7,7 @@ export default function HoneypotLink() {
       href="/__trap__"
       tabIndex={-1}
       aria-hidden="true"
+      data-analytics-ignore
       rel="nofollow"
       style={{
         position: 'absolute',

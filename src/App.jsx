@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import RouteMeta from './components/RouteMeta.jsx'
 import AnalyticsListener from './components/AnalyticsListener.jsx'
+import ClickTracker from './components/ClickTracker.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
 import { SiteFooterNote } from './components/FooterNote.jsx'
@@ -189,6 +190,7 @@ export default function App() {
           <ScrollToTop />
           <RouteMeta />
           <AnalyticsListener />
+          <ClickTracker />
           <HoneypotLink />
           <Suspense fallback={<RouteFallback />}>
             <Routes>
