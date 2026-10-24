@@ -596,7 +596,7 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[0.6875rem] sm:text-label-caps font-label-caps uppercase sticky top-0 z-[60] w-full max-w-full break-words [@media(orientation:landscape)_and_(max-height:500px)]:!py-1">
+      <div className="bg-primary text-on-primary py-2 px-3 text-center text-[0.6875rem] sm:text-label-caps font-label-caps uppercase relative md:sticky md:top-0 z-[60] w-full max-w-full break-words [@media(orientation:landscape)_and_(max-height:500px)]:!py-1">
         Enjoy Free Shipping on Orders Above ₹2,500
       </div>
       <header className="bg-surface dark:bg-surface-container-highest docked full-width sticky top-0 md:top-[32px] z-50 flat no shadows border-b border-surface-variant w-full max-w-full">

@@ -99,6 +99,16 @@ describe('HomePage driven by the saved layout', () => {
     expect(logSelectContent).toHaveBeenCalledWith('home_gender_tile', 'Female');
   });
 
+  it('does not pin the free-shipping banner on phones, where it would cover the sticky header', () => {
+    const { container } = renderHome();
+    const banner = [...container.querySelectorAll('div')].find((d) => d.textContent.startsWith('Enjoy Free Shipping'));
+    const classes = banner.className.split(/\s+/);
+    expect(classes).not.toContain('sticky');
+    expect(classes).toContain('md:sticky');
+    const header = container.querySelector('header');
+    expect(header.className.split(/\s+/)).toContain('top-0');
+  });
+
   it('pins and hides products in the featured rows', () => {
     layout = { ...layout, products: { top: ['e'], bottom: ['a'], hidden: ['b'] } };
     const { container } = renderHome();
