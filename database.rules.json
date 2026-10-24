@@ -75,12 +75,12 @@
       "homeLayout": {
         ".validate": "newData.hasChildren(['version', 'rev', 'sections']) && newData.child('version').val() === 1 && newData.child('rev').isNumber()",
         "sections": {
-          ".validate": "newData.numChildren() <= 20"
+          "$index": { ".validate": "$index.matches(/^([0-9]|1[0-9])$/)" }
         },
         "products": {
-          "top": { ".validate": "newData.numChildren() <= 200" },
-          "bottom": { ".validate": "newData.numChildren() <= 200" },
-          "hidden": { ".validate": "newData.numChildren() <= 200" }
+          "top": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } },
+          "bottom": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } },
+          "hidden": { "$index": { ".validate": "$index.matches(/^(1[0-9]{2}|[0-9]{1,2})$/)" } }
         }
       }
     },
