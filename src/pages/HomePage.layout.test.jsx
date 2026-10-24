@@ -88,6 +88,17 @@ describe('HomePage driven by the saved layout', () => {
     expect(container.querySelector('[data-section="featured2"]').getAttribute('style')).toBeNull();
   });
 
+  it('shows Men and Women as icon tiles that link to the gender listing and are tracked', async () => {
+    const { container } = renderHome();
+    const tiles = [...container.querySelectorAll('.gender-tile')];
+    expect(tiles.map((t) => t.getAttribute('href'))).toEqual(['/products?gender=Male', '/products?gender=Female']);
+    expect(tiles.map((t) => t.querySelector('.gender-tile__icon').textContent)).toEqual(['man', 'woman']);
+    expect(tiles[0].textContent).toContain('Shop Men');
+    const { logSelectContent } = await import('../services/analytics.js');
+    tiles[1].click();
+    expect(logSelectContent).toHaveBeenCalledWith('home_gender_tile', 'Female');
+  });
+
   it('pins and hides products in the featured rows', () => {
     layout = { ...layout, products: { top: ['e'], bottom: ['a'], hidden: ['b'] } };
     const { container } = renderHome();

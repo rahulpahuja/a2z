@@ -108,8 +108,8 @@ function readBannerHintSeen() {
 }
 
 const GENDER_CARDS = [
-  { label: 'Men', gender: 'Male' },
-  { label: 'Women', gender: 'Female' },
+  { label: 'Men', gender: 'Male', icon: 'man' },
+  { label: 'Women', gender: 'Female', icon: 'woman' },
 ];
 
 export default function HomePage() {
@@ -303,15 +303,19 @@ export default function HomePage() {
     ),
     genderTiles: (
       <section className="grid grid-cols-2 gap-3 sm:gap-6 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full pt-6 md:pt-10">
-        {GENDER_CARDS.map(({ label, gender }) => (
+        {GENDER_CARDS.map(({ label, gender, icon }) => (
           <Link
             key={gender}
             to={`/products?gender=${gender}`}
             onClick={() => logSelectContent('home_gender_tile', gender)}
-            className="group flex items-center justify-center h-24 sm:h-36 rounded-xl bg-surface-container-low border border-tertiary-container/30 hover:border-primary hover:shadow-[0_10px_30px_rgba(172,36,113,0.05)] transition-all duration-300"
+            className="gender-tile"
+            aria-label={`Shop ${label}`}
           >
-            <span className="playfair text-headline-md md:text-headline-lg text-on-surface group-hover:text-primary transition-colors">
-              {label}
+            <span className="material-symbols-outlined gender-tile__icon" aria-hidden="true">{icon}</span>
+            <span className="gender-tile__label playfair">{label}</span>
+            <span className="gender-tile__cta">
+              Shop {label}
+              <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
             </span>
           </Link>
         ))}
