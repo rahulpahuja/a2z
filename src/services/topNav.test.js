@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { findNavLinkLabel, isAllProductsView } from './topNav.js';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { findNavLinkLabel, isAllProductsView, subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from './topNav.js';
 
 const links = [
   { id: '1', label: 'New Arrivals', type: 'all' },
@@ -35,5 +35,37 @@ describe('isAllProductsView', () => {
     expect(isAllProductsView('/')).toBe(false);
     expect(isAllProductsView('/products/abc')).toBe(false);
     expect(isAllProductsView('/cart')).toBe(false);
+  });
+});
+
+describe('Style Blogs link', () => {
+  beforeEach(() => {
+    const store = new Map();
+    vi.stubGlobal('localStorage', { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k) });
+  });
+
+  const labels = (list) => list.map((l) => l.label);
+  const saved = (value) => globalThis.localStorage.setItem('settings/topNav', JSON.stringify(value));
+  const load = () => {
+    let out;
+    subscribeToTopNav((list) => { out = list; })();
+    return out;
+  };
+
+  it('leads to the blog and sits right after New Arrivals by default', () => {
+    expect(labels(DEFAULT_TOP_NAV_LINKS).slice(0, 2)).toEqual(['New Arrivals', 'Style Blogs']);
+    expect(topNavLinkToPath({ id: 'nav_style_blogs', label: 'Style Blogs', type: 'blog' })).toBe('/blogs');
+  });
+
+  it('is added after New Arrivals to a saved list that predates it, and not twice', () => {
+    saved([{ id: 'a', label: 'New Arrivals', type: 'all' }, { id: 'b', label: 'Kurtis', type: 'category', category: 'Kurti' }]);
+    expect(labels(load())).toEqual(['New Arrivals', 'Style Blogs', 'Kurtis']);
+    saved(load());
+    expect(labels(load())).toEqual(['New Arrivals', 'Style Blogs', 'Kurtis']);
+  });
+
+  it('keeps a position the admin chose for it', () => {
+    saved([{ id: 'a', label: 'New Arrivals', type: 'all' }, { id: 'b', label: 'Kurtis', type: 'category', category: 'Kurti' }, { id: 'c', label: 'Journal', type: 'blog' }]);
+    expect(labels(load())).toEqual(['New Arrivals', 'Kurtis', 'Journal']);
   });
 });

@@ -1251,7 +1251,7 @@ export default function AdminConfiguratorPage() {
                                 className="form-input text-[0.75rem] py-2 px-3 flex-1"
                               />
                               <span className="text-[0.625rem] text-on-surface-variant/70 font-mono shrink-0 whitespace-nowrap">
-                                {link.type === 'all' ? 'All Products' : (link.categories?.length ? link.categories.join(', ') : link.category)}
+                                {link.type === 'all' ? 'All Products' : link.type === 'blog' ? 'Blog' : (link.categories?.length ? link.categories.join(', ') : link.category)}
                               </span>
                               <button
                                 type="button"

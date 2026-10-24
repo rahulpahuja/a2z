@@ -5,6 +5,7 @@ const PATH = 'settings/topNav';
 
 export const DEFAULT_TOP_NAV_LINKS = [
   { id: 'nav_new_arrivals', label: 'New Arrivals', type: 'all' },
+  { id: 'nav_style_blogs', label: 'Style Blogs', type: 'blog' },
   { id: 'nav_kurti', label: 'Kurtis', type: 'category', category: 'Kurti' },
 ];
 
@@ -21,6 +22,11 @@ function normalizeNavLinks(val) {
   // Guarantee 'New Arrivals' is always present in top navigation
   if (!list.some((item) => item?.type === 'all' || item?.label?.toLowerCase() === 'new arrivals')) {
     list.unshift({ id: 'nav_new_arrivals', label: 'New Arrivals', type: 'all' });
+  }
+  // ...and so is the blog, right after it, so it can be found from every page's top bar.
+  if (!list.some((item) => item?.type === 'blog')) {
+    const at = list.findIndex((item) => item?.type === 'all' || item?.label?.toLowerCase() === 'new arrivals');
+    list.splice(at + 1, 0, { id: 'nav_style_blogs', label: 'Style Blogs', type: 'blog' });
   }
   return list;
 }
@@ -90,6 +96,7 @@ export function saveTopNav(links) {
 // view. `categories` (array) is preferred; `category` (single string) is
 // kept for links saved before multi-category support was added.
 export function topNavLinkToPath(link) {
+  if (link.type === 'blog') return '/blogs';
   if (link.type === 'category') {
     const categories = link.categories?.length ? link.categories : (link.category ? [link.category] : []);
     if (categories.length) {
