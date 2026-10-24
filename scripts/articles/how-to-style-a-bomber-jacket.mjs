@@ -1,10 +1,12 @@
-import { bold, doc, h2, h3, li, p, ul } from './_doc.mjs';
+import { bold, doc, h2, h3, li, p, productCard, ul } from './_doc.mjs';
 
 export default {
   id: 'blog_bomber_jacket_styling',
   categoryName: 'Styling guide',
   post: {
-    type: 'general',
+    type: 'style',
+    productIds: ['prod_1792778003777_6vgbb', 'prod_1788267657839_anwit', 'prod_1792086921755_kg7oq', 'prod_1792777877496_6n7wq'],
+    heroProductId: 'prod_1792778003777_6vgbb',
     title: 'How to Style a Bomber Jacket: 5 Easy Looks',
     slug: 'how-to-style-a-bomber-jacket',
     author: 'A2Z Collection',
@@ -34,6 +36,12 @@ export default {
         li(bold('Cuffs and hem: '), 'they should grip comfortably without squeezing, and the zip should close smoothly over the layer you plan to wear underneath.'),
         li(bold('Print and detailing: '), 'a loud jacket does best with plain pieces underneath.'),
       ),
+      h2('Bomber jackets to try'),
+      p('A few bombers from our collection to try these looks with.'),
+      productCard('prod_1792778003777_6vgbb'),
+      productCard('prod_1788267657839_anwit'),
+      productCard('prod_1792086921755_kg7oq'),
+      productCard('prod_1792777877496_6n7wq'),
       h2('Keeping it looking good'),
       p('Follow the care instructions on the product page and the garment label, zip it before washing or cleaning, and store it on a wide hanger so the shoulders hold their shape.'),
       p('Browse our jackets to find a bomber, and try two or three of these looks with pieces you already own.'),

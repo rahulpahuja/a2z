@@ -7,3 +7,4 @@ export const h3 = (value) => ({ type: 'heading', attrs: { level: 3 }, content: [
 export const li = (...parts) => ({ type: 'listItem', content: [p(...parts)] });
 export const ul = (...items) => ({ type: 'bulletList', content: items });
 export const doc = (...content) => ({ type: 'doc', content });
+export const productCard = (productId) => ({ type: 'productCard', attrs: { productId } });

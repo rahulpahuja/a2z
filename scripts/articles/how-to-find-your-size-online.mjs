@@ -1,10 +1,12 @@
-import { bold, doc, h2, li, p, ul } from './_doc.mjs';
+import { bold, doc, h2, li, p, productCard, ul } from './_doc.mjs';
 
 export default {
   id: 'blog_find_your_size_online',
   categoryName: 'Buying guide',
   post: {
-    type: 'general',
+    type: 'guide',
+    productIds: ['prod_1785934267682_tdqo1', 'prod_1784989491009_0jl4r'],
+    heroProductId: 'prod_1785934267682_tdqo1',
     title: 'How to Find Your Size When Shopping Online',
     slug: 'how-to-find-your-size-online',
     author: 'A2Z Collection',
@@ -27,6 +29,10 @@ export default {
       p('Find each of your measurements in the chart and see which size it falls in. If you are between two sizes, think about how the garment is meant to fit: choose the smaller size for a close fit, and the larger one if you prefer more room or plan to layer.'),
       h2('Read the product description too'),
       p('The description tells you the intended fit, such as regular, relaxed or oversized. A relaxed or oversized style will feel looser than the same size in a regular cut, so a size that matches your measurements is often right and sizing up may not be needed.'),
+      h2('Examples of oversized and relaxed styles'),
+      p('Both of these are cut to fit loosely, so check the fit notes on each product page before choosing a size.'),
+      productCard('prod_1785934267682_tdqo1'),
+      productCard('prod_1784989491009_0jl4r'),
       h2('A quick checklist before you order'),
       ul(
         li('Measure yourself and write the numbers down.'),

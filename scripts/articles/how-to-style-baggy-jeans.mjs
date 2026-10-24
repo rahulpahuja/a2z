@@ -1,10 +1,12 @@
-import { bold, doc, h2, h3, li, p, ul } from './_doc.mjs';
+import { bold, doc, h2, h3, li, p, productCard, ul } from './_doc.mjs';
 
 export default {
   id: 'blog_baggy_jeans_styling',
   categoryName: 'Styling guide',
   post: {
-    type: 'general',
+    type: 'style',
+    productIds: ['prod_1784989679098_0uvji', 'prod_1784989491009_0jl4r', 'prod_1792441296617_aap1c', 'prod_1792441413564_xxycw'],
+    heroProductId: 'prod_1784989679098_0uvji',
     title: 'How to Style Baggy Jeans: 6 Outfit Ideas That Work',
     slug: 'how-to-style-baggy-jeans',
     author: 'A2Z Collection',
@@ -36,6 +38,12 @@ export default {
           li(bold('Shoes: '), 'a wide leg needs a shoe with some weight, such as sneakers or boots. Very slim shoes can look too small under the fabric.'),
           li(bold('Layers: '), 'pick one oversized piece per outfit, not three.'),
         ),
+      h2('Baggy jeans to try these looks with'),
+      p('A few pairs from our collection that suit the outfits above.'),
+      productCard('prod_1784989679098_0uvji'),
+      productCard('prod_1784989491009_0jl4r'),
+      productCard('prod_1792441296617_aap1c'),
+      productCard('prod_1792441413564_xxycw'),
         h2('Check the size before you buy'),
         p('Because baggy jeans are cut loose, the label size can be misleading. Compare your measurements against the size chart on the product page, and read the product description for the intended fit before ordering.'),
         h2('Wearing it your way'),

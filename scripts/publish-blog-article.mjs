@@ -13,6 +13,7 @@ import path from 'node:path';
 import { normalizePost, validatePost } from '../src/utils/blog/post.js';
 import { buildPublishWrites, blogPath } from '../src/utils/blog/writes.js';
 import { slugFromTitle } from '../src/utils/blog/slug.js';
+import { isProductAvailable } from '../src/utils/productColors.js';
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
@@ -23,13 +24,42 @@ if (files.length === 0) {
 }
 
 const now = Date.now();
+const databaseUrl = process.env.VITE_FIREBASE_DATABASE_URL?.replace(/\/$/, '');
+
+// The catalogue is publicly readable, so products can be checked without credentials.
+async function fetchProduct(id) {
+  const response = await fetch(`${databaseUrl}/adminProducts/${encodeURIComponent(id)}.json`);
+  return response.ok ? response.json() : null;
+}
+
+// Checks that every product an article features exists, and takes the cover image from the lead product's first
+// photo (https only, as the blog requires). Needs VITE_FIREBASE_DATABASE_URL; without it the products are not checked.
+async function resolveProducts(post) {
+  const errors = [];
+  const warnings = [];
+  if (!post.productIds?.length) return { errors, warnings, cover: {} };
+  if (!databaseUrl) {
+    warnings.push({ field: 'products', message: 'Products were not checked: set VITE_FIREBASE_DATABASE_URL to check them and set the cover image.' });
+    return { errors, warnings, cover: {} };
+  }
+  const products = await Promise.all(post.productIds.map(async (id) => [id, await fetchProduct(id)]));
+  for (const [id, product] of products) {
+    if (!product) errors.push({ field: 'products', message: `Product ${id} was not found.` });
+    else if (!isProductAvailable(product)) warnings.push({ field: 'products', message: `${product.name || product.title} (${id}) is out of stock.` });
+  }
+  const hero = products.find(([id]) => id === post.heroProductId)?.[1];
+  const image = [...(hero?.images ?? []), hero?.image].find((src) => typeof src === 'string' && src.startsWith('https://'));
+  const cover = image ? { coverImage: image, ogImage: image, coverAlt: hero.imageAlts?.[0] || hero.name || hero.title } : {};
+  return { errors, warnings, cover };
+}
 
 async function loadArticle(file) {
   const { default: article } = await import(pathToFileURL(path.resolve(file)).href);
   const categoryId = slugFromTitle(article.categoryName, '');
-  const draft = normalizePost({ ...article.post, id: article.id, categoryId, body: JSON.stringify(article.post.body), status: 'published', createdAt: now, updatedAt: now });
-  const { errors, warnings } = validatePost(draft, { forPublish: true });
-  return { file, article, categoryId, draft, errors, warnings };
+  const resolved = await resolveProducts(article.post);
+  const draft = normalizePost({ ...article.post, ...resolved.cover, id: article.id, categoryId, body: JSON.stringify(article.post.body), status: 'published', createdAt: now, updatedAt: now });
+  const checked = validatePost(draft, { forPublish: true });
+  return { file, article, categoryId, draft, errors: [...resolved.errors, ...checked.errors], warnings: [...resolved.warnings, ...checked.warnings] };
 }
 
 // 1. Validate everything first, so a mistake in one article stops the whole run before anything is written.

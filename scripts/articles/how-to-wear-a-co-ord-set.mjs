@@ -1,10 +1,12 @@
-import { bold, doc, h2, h3, li, p, ul } from './_doc.mjs';
+import { bold, doc, h2, h3, li, p, productCard, ul } from './_doc.mjs';
 
 export default {
   id: 'blog_coord_set_styling',
   categoryName: 'Styling guide',
   post: {
-    type: 'general',
+    type: 'style',
+    productIds: ['prod_1785096638065_16d1m', 'prod_1786198247220_4p4w0', 'prod_1789733037198_8qznf', 'prod_1785934267682_tdqo1'],
+    heroProductId: 'prod_1785096638065_16d1m',
     title: 'How to Wear a Co-ord Set: 5 Ways, Dressed Up or Down',
     slug: 'how-to-wear-a-co-ord-set',
     author: 'A2Z Collection',
@@ -27,6 +29,12 @@ export default {
       p('Pair the top with your favourite jeans for a casual outfit. The set then gives you two looks from one purchase.'),
       h3('5. Wear the bottom with a plain tee'),
       p('A solid-colour tee or shirt with the matching trousers or skirt is quick and comfortable, and it keeps the print or texture as the focus.'),
+      h2('Co-ord sets to try'),
+      p('A few sets from our collection, for women and men.'),
+      productCard('prod_1785096638065_16d1m'),
+      productCard('prod_1786198247220_4p4w0'),
+      productCard('prod_1789733037198_8qznf'),
+      productCard('prod_1785934267682_tdqo1'),
       h2('Making the most of it'),
       ul(
         li(bold('Keep accessories simple: '), 'a printed or textured set needs little else.'),
