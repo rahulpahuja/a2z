@@ -7,6 +7,7 @@ import { recordView, subscribeToProductStats } from '../services/productStats.js
 import { logViewItem } from '../services/analytics.js';
 import { getHighResUrl } from '../utils/image.js';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { ProductFooterNote } from '../components/FooterNote.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
 import './ProductDetailAltPage.css';
@@ -447,6 +448,7 @@ export default function ProductDetailAltPage() {
         </section>
       </main>
 
+      <ProductFooterNote />
       <SiteFooter />
     </>
   );

@@ -6,6 +6,7 @@ import RouteMeta from './components/RouteMeta.jsx'
 import AnalyticsListener from './components/AnalyticsListener.jsx'
 import FloatingContactButtons from './components/FloatingContactButtons.jsx'
 import HoneypotLink from './components/HoneypotLink.jsx'
+import { SiteFooterNote } from './components/FooterNote.jsx'
 import BotTrapPage from './pages/BotTrapPage.jsx'
 // HomePage stays a static import — it's the landing page for most visits,
 // so lazy-loading it would only add a network round-trip with no benefit.
@@ -204,6 +205,7 @@ export default function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
+          <SiteFooterNote />
           <FloatingContactButtons />
           <SimulatedSmsToaster />
           <OtpCaptchaHost />

@@ -46,6 +46,10 @@ export const DEFAULT_STORE_SETTINGS = {
   // Shows a "Buy on WhatsApp" button on each product page that opens a chat
   // with the store number, prefilled with the product, variant and quantity.
   showBuyOnWhatsapp: true,
+  // Plain-text note shown at the bottom of every customer-facing page.
+  siteFooterText: '',
+  // Plain-text note shown on every product detail page.
+  productFooterText: '',
   // Message prefilled by the Buy on WhatsApp button; {placeholders} are filled per product.
   whatsappOrderTemplate: DEFAULT_ORDER_TEMPLATE,
   // Structured warehouse address used as the pickupAddress for shipping

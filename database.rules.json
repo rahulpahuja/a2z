@@ -63,7 +63,15 @@
     },
     "settings": {
       ".read": true,
-      ".write": "auth.token.admin === true"
+      ".write": "auth.token.admin === true",
+      "store": {
+        "siteFooterText": {
+          ".validate": "newData.isString() && newData.val().length <= 500"
+        },
+        "productFooterText": {
+          ".validate": "newData.isString() && newData.val().length <= 500"
+        }
+      }
     },
     "fileMetadata": {
       ".read": "auth.token.admin === true",

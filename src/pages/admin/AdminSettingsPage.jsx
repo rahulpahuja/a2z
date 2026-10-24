@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { subscribeToStoreSettings, saveStoreSettings, DEFAULT_STORE_SETTINGS, DEFAULT_REFUND_POLICY } from '../../services/storeSettings.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import { MAX_FOOTER_TEXT_LENGTH, sanitizeFooterText } from '../../utils/footerText.js';
 import { DEFAULT_ORDER_TEMPLATE, MAX_ORDER_TEMPLATE_LENGTH, ORDER_TEMPLATE_PLACEHOLDERS, buildProductOrderMessage, findUnknownPlaceholders } from '../../utils/whatsapp.js';
 import './AdminSettingsPage.css';
 
@@ -68,7 +69,9 @@ export default function AdminSettingsPage() {
       const homeProductsPerRow = Math.min(10, Math.max(4, Number(settings.homeProductsPerRow) || 8));
       const mobileHeroHeightVh = Math.min(60, Math.max(15, Math.round(Number(settings.mobileHeroHeightVh)) || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh));
       const whatsappOrderTemplate = String(settings.whatsappOrderTemplate ?? '').trim().slice(0, MAX_ORDER_TEMPLATE_LENGTH) || DEFAULT_ORDER_TEMPLATE;
-      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate });
+      const siteFooterText = sanitizeFooterText(settings.siteFooterText);
+      const productFooterText = sanitizeFooterText(settings.productFooterText);
+      await saveStoreSettings({ ...settings, taxRatePercent, homeProductsPerRow, mobileHeroHeightVh, whatsappOrderTemplate, siteFooterText, productFooterText });
       showToast('Store settings saved.');
     } catch (err) {
       showToast(err.message || 'Could not save store settings.');
@@ -284,6 +287,37 @@ export default function AdminSettingsPage() {
                 className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-mono text-sm text-on-surface transition-colors leading-relaxed"
               />
             </div>
+          </div>
+
+          <div className="border-t border-outline-variant/30 pt-5 mt-1 flex flex-col gap-5">
+            <div>
+              <h2 className="font-title-sm text-title-sm text-on-surface mb-1">Footer Text</h2>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Plain text only (up to {MAX_FOOTER_TEXT_LENGTH} characters; line breaks are kept). Leave a field empty to hide it.
+              </p>
+            </div>
+            {[
+              { key: 'siteFooterText', label: 'Every page', hint: 'Shown at the very bottom of every customer-facing page.', placeholder: 'e.g. Free shipping on orders above ₹999' },
+              { key: 'productFooterText', label: 'Every product page', hint: 'Shown on each product page, just above the site footer.', placeholder: 'e.g. Colours may vary slightly from the photos.' },
+            ].map((field) => (
+              <div key={field.key}>
+                <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2" htmlFor={field.key}>
+                  {field.label}
+                </label>
+                <textarea
+                  id={field.key}
+                  rows={3}
+                  maxLength={MAX_FOOTER_TEXT_LENGTH}
+                  value={settings[field.key] ?? ''}
+                  onChange={updateField(field.key)}
+                  placeholder={field.placeholder}
+                  className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-0 rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface transition-colors"
+                />
+                <p className="text-[0.625rem] text-on-surface-variant/60 mt-1">
+                  {field.hint} {String(settings[field.key] ?? '').length}/{MAX_FOOTER_TEXT_LENGTH}
+                </p>
+              </div>
+            ))}
           </div>
 
           <button

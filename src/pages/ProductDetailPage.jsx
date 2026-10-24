@@ -12,6 +12,7 @@ import { logViewItem, logSelectVariant, logShare, logSelectContent, logSelectIte
 import ProductImage from '../components/ProductImage.jsx';
 import ProductCardImage from '../components/ProductCardImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
+import { ProductFooterNote } from '../components/FooterNote.jsx';
 import { normalizeColors, isColorOutOfStock, getColorSizeStock, getAllSizeNames } from '../utils/productColors.js';
 import { getPriceBreakdown } from '../utils/discount.js';
 import DiscountCountdown from '../components/DiscountCountdown.jsx';
@@ -707,6 +708,7 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
+      <ProductFooterNote />
       <SiteFooter />
     </>
   );
