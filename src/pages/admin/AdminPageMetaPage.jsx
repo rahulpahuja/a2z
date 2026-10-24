@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { subscribeToPageMeta, savePageMeta } from '../../services/pageMeta.js';
-import { listIndexableRoutes } from '../../seo/routes.js';
+import { BRAND_NAME, SITE_URL, listIndexableRoutes } from '../../seo/routes.js';
+import { DESCRIPTION_RANGE, SEO_TIPS, TITLE_RANGE, analyzeSeo } from '../../seo/seoChecks.js';
 import { META_ATTRS, isValidMetaKey, pageMetaKey, sanitizeMetaTags } from '../../seo/pageMeta.js';
 import { useToast } from '../../context/ToastContext.jsx';
+import './AdminPageMetaPage.css';
 
 const ROUTES = listIndexableRoutes();
 const INPUT_CLASS =
@@ -16,7 +19,74 @@ const toDraft = (saved) => ({
   metaTags: Object.values(saved?.metaTags ?? {}),
 });
 
-function PageMetaCard({ route, saved, onSave }) {
+const CHECK_ICONS = { good: 'check_circle', warn: 'warning', bad: 'error', info: 'info' };
+
+function CharCount({ value, placeholder, range }) {
+  const length = (value || placeholder || '').length;
+  const state = length === 0 ? 'seo-count--bad' : length < range.min || length > range.max ? 'seo-count--warn' : 'seo-count--good';
+  return (
+    <span className={`seo-count ${state}`} aria-live="polite">
+      {length} / {range.min}–{range.max}
+      {!value && placeholder ? ' (default)' : ''}
+    </span>
+  );
+}
+
+// How the page is likely to look as a search result. Only an approximation: engines decide
+// what to display and may rewrite titles and snippets.
+function SearchPreview({ title, description, path }) {
+  const url = `${SITE_URL}${path === '/' ? '' : path}`.replace(/^https?:\/\//, '').replace(/\//g, ' › ');
+  return (
+    <div className="seo-preview" aria-label="Search result preview">
+      <p className="seo-preview__url">{url}</p>
+      <p className="seo-preview__title">{title}</p>
+      <p className="seo-preview__desc">{description}</p>
+    </div>
+  );
+}
+
+function SeoChecks({ checks }) {
+  return (
+    <ul className="seo-checks" aria-label="SEO checks for this page">
+      {checks.map((check) => (
+        <li key={check.id} className={`seo-check seo-check--${check.level}`}>
+          <span className="material-symbols-outlined seo-check__icon" aria-hidden="true">
+            {CHECK_ICONS[check.level]}
+          </span>
+          <span>{check.message}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SeoTips() {
+  return (
+    <section className="seo-tips" aria-labelledby="seo-tips-title">
+      <h2 id="seo-tips-title" className="font-title-sm text-title-sm text-on-surface">
+        Tips to improve your SEO
+      </h2>
+      <p className="font-body-sm text-[0.75rem] text-on-surface-variant">
+        General good practice, not a promise of rankings: search engines decide what to show and when.
+      </p>
+      <ul className="seo-tips__list">
+        {SEO_TIPS.map((tip) => (
+          <li key={tip.title} className="seo-tip">
+            <span className="material-symbols-outlined seo-tip__icon" aria-hidden="true">
+              {tip.icon}
+            </span>
+            <div>
+              <p className="seo-tip__title">{tip.title}</p>
+              <p className="seo-tip__body">{tip.body}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function PageMetaCard({ route, saved, onSave, otherPages, onDirtyChange }) {
   const { showToast } = useToast();
   const [draft, setDraft] = useState(() => toDraft(saved));
   const [saving, setSaving] = useState(false);
@@ -25,6 +95,27 @@ function PageMetaCard({ route, saved, onSave }) {
   // content, not the object, since every save re-delivers every page's entry.
   const savedJson = JSON.stringify(saved ?? null);
   useEffect(() => setDraft(toDraft(JSON.parse(savedJson))), [savedJson]);
+
+  const baseline = toDraft(JSON.parse(savedJson));
+  const dirty = JSON.stringify(draft) !== JSON.stringify(baseline);
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+    return () => onDirtyChange?.(false);
+  }, [dirty, onDirtyChange]);
+
+  const effectiveTitle = draft.title.trim() || route.title;
+  const effectiveDescription = draft.description.trim() || route.description;
+  const checks = useMemo(
+    () =>
+      analyzeSeo({
+        effectiveTitle,
+        effectiveDescription,
+        brand: BRAND_NAME,
+        metaTags: sanitizeMetaTags(draft.metaTags),
+        others: otherPages,
+      }),
+    [effectiveTitle, effectiveDescription, draft.metaTags, otherPages]
+  );
 
   const setField = (field) => (event) => setDraft((prev) => ({ ...prev, [field]: event.target.value }));
   const updateTag = (index, field, value) =>
@@ -64,12 +155,20 @@ function PageMetaCard({ route, saved, onSave }) {
         {route.title} <span className="font-mono text-[0.75rem] text-on-surface-variant">{route.path}</span>
       </h2>
 
+      <SearchPreview title={effectiveTitle} description={effectiveDescription} path={route.path} />
+
       <div>
-        <label className={LABEL_CLASS} htmlFor={`title-${route.path}`}>Page Title</label>
+        <div className="seo-label-row">
+          <label className={LABEL_CLASS} htmlFor={`title-${route.path}`}>Page Title</label>
+          <CharCount value={draft.title.trim()} placeholder={route.title} range={TITLE_RANGE} />
+        </div>
         <input id={`title-${route.path}`} value={draft.title} onChange={setField('title')} placeholder={route.title} className={INPUT_CLASS} />
       </div>
       <div>
-        <label className={LABEL_CLASS} htmlFor={`description-${route.path}`}>Meta Description</label>
+        <div className="seo-label-row">
+          <label className={LABEL_CLASS} htmlFor={`description-${route.path}`}>Meta Description</label>
+          <CharCount value={draft.description.trim()} placeholder={route.description} range={DESCRIPTION_RANGE} />
+        </div>
         <textarea
           id={`description-${route.path}`}
           rows={2}
@@ -118,6 +217,8 @@ function PageMetaCard({ route, saved, onSave }) {
         </p>
       </div>
 
+      <SeoChecks checks={checks} />
+
       <div className="flex items-center gap-4">
         <button
           type="button"
@@ -125,8 +226,9 @@ function PageMetaCard({ route, saved, onSave }) {
           onClick={handleSave}
           className="bg-primary text-on-primary font-label-caps text-label-caps px-6 py-2 rounded-lg uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Saving…' : dirty ? 'Save' : 'Saved'}
         </button>
+        {dirty && <span className="seo-unsaved">Unsaved changes</span>}
         {saved && (
           <button type="button" disabled={saving} onClick={handleReset} className="text-xs text-primary hover:underline font-label-caps uppercase tracking-wider">
             Reset to default
@@ -139,8 +241,37 @@ function PageMetaCard({ route, saved, onSave }) {
 
 export default function AdminPageMetaPage() {
   const [overrides, setOverrides] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => subscribeToPageMeta(setOverrides), []);
+
+  // The selected page lives in ?page=/path so it survives a refresh and can be linked to.
+  const requested = searchParams.get('page');
+  const selectedPath = ROUTES.some((r) => r.path === requested) ? requested : ROUTES[0]?.path;
+  const route = ROUTES.find((r) => r.path === selectedPath);
+
+  // Effective title/description of every other page, for the duplicate checks.
+  const otherPages = useMemo(
+    () =>
+      ROUTES.filter((r) => r.path !== selectedPath).map((r) => {
+        const saved = overrides?.[pageMetaKey(r.path)];
+        return { path: r.path, title: saved?.title?.trim() || r.title, description: saved?.description?.trim() || r.description };
+      }),
+    [overrides, selectedPath]
+  );
+
+  const isCustomised = (path) => {
+    const saved = overrides?.[pageMetaKey(path)];
+    return Boolean(saved && (saved.title || saved.description || Object.keys(saved.metaTags ?? {}).length));
+  };
+
+  const handleSelect = (event) => {
+    const next = event.target.value;
+    if (next === selectedPath) return;
+    if (dirty && !window.confirm('You have unsaved changes on this page. Switch anyway and discard them?')) return;
+    setSearchParams({ page: next }, { replace: true });
+  };
 
   if (!overrides) {
     return (
@@ -160,14 +291,33 @@ export default function AdminPageMetaPage() {
       </header>
 
       <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-10 flex flex-col gap-6">
-        {ROUTES.map((route) => (
+        <div className="seo-picker">
+          <label className={LABEL_CLASS} htmlFor="seo-page-select">Page</label>
+          <select id="seo-page-select" value={selectedPath} onChange={handleSelect} className={INPUT_CLASS}>
+            {ROUTES.map((r) => (
+              <option key={r.path} value={r.path}>
+                {r.title} — {r.path}
+                {isCustomised(r.path) ? '  ● customised' : ''}
+              </option>
+            ))}
+          </select>
+          <p className="font-body-sm text-[0.75rem] text-on-surface-variant mt-1">
+            {ROUTES.filter((r) => isCustomised(r.path)).length} of {ROUTES.length} pages customised.
+          </p>
+        </div>
+
+        {route && (
           <PageMetaCard
             key={route.path}
             route={route}
             saved={overrides[pageMetaKey(route.path)]}
             onSave={(entry) => savePageMeta(pageMetaKey(route.path), entry)}
+            otherPages={otherPages}
+            onDirtyChange={setDirty}
           />
-        ))}
+        )}
+
+        <SeoTips />
       </main>
     </div>
   );
