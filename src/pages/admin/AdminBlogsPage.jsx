@@ -67,23 +67,16 @@ export default function AdminBlogsPage() {
     <div className="admin-page-container">
       <header className="admin-header ab-head">
         <div>
-          <h1 className="admin-page-title">Blog <span className="ab-badge">Under construction</span></h1>
+          <h1 className="admin-page-title">Blog</h1>
           <p className="admin-page-subtitle">Write, schedule and publish articles that link to your products and collections.</p>
         </div>
-        <button type="button" className="btn btn-primary" disabled title="The editor is under construction">
+        <Link to="/super/blogs/new" className="btn btn-primary">
           <span className="material-symbols-outlined" aria-hidden="true">add</span>
           New article
-        </button>
+        </Link>
       </header>
 
       <main className="admin-main-container">
-        <div className="ab-construction" role="note">
-          <span className="material-symbols-outlined" aria-hidden="true">construction</span>
-          <div>
-            <strong>Under construction — work in progress. Please don't use this feature yet.</strong>
-            <p>The article editor is not finished, so articles cannot be created or edited here yet. Nothing on this page publishes to the website.</p>
-          </div>
-        </div>
         <section className="admin-card ab-list">
           <div className="ab-filters">
             <input type="search" aria-label="Search articles" placeholder="Search title, slug, author or tag" value={query} onChange={(e) => setQuery(e.target.value)} />
