@@ -22,9 +22,9 @@ export default function HomeBlogs() {
   return (
     <section
       aria-labelledby="home-blogs-title"
-      className="py-10 md:py-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden"
+      className="py-6 md:py-8 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto border-b border-outline-variant/10 w-full max-w-full overflow-hidden"
     >
-      <div className="flex justify-between items-center mb-6 md:mb-12 gap-2">
+      <div className="flex justify-between items-center mb-4 md:mb-6 gap-2">
         <h2 id="home-blogs-title" className="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md playfair text-on-surface">
           From the Journal
         </h2>
@@ -39,10 +39,10 @@ export default function HomeBlogs() {
       <div className="blog-frame">
         <div className="blog-grid">
           {entries.slice(0, HOME_BLOG_COUNT).map((entry) => (
-            <BlogCard key={entry.id} entry={entry} categoryName={categoryName(entry.categoryId)} onOpen={(e) => logBlogCardClick(e, 'home')} />
+            <BlogCard key={entry.id} entry={entry} variant="compact" categoryName={categoryName(entry.categoryId)} onOpen={(e) => logBlogCardClick(e, 'home')} />
           ))}
         </div>
-        <Link to="/blogs" className="blog-more blog-more--link" onClick={() => logSelectContent('home_blog_button', 'Read the Journal')}>
+        <Link to="/blogs" className="blog-more blog-more--link blog-more--compact" onClick={() => logSelectContent('home_blog_button', 'Read the Journal')}>
           Read the Journal
         </Link>
       </div>
