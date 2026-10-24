@@ -37,7 +37,7 @@ export const DEFAULT_STORE_SETTINGS = {
   homeProductsPerRow: 8,
   // Height of the home page hero banner on phones, as a % of the screen height.
   // Lower it to trim the blurred space above and below wide banner images.
-  mobileHeroHeightVh: 42,
+  mobileHeroHeightVh: 24,
   // Whether the circular "shop by category" bubbles row (Shots, Bags, Best
   // Sellers, Coords, New Arrivals, Tops, Trousers) shows on the home page.
   showCategoryBubbles: false,

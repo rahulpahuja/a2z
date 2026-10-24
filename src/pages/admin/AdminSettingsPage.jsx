@@ -67,7 +67,7 @@ export default function AdminSettingsPage() {
     try {
       const taxRatePercent = Math.min(100, Math.max(0, Number(settings.taxRatePercent) || 0));
       const homeProductsPerRow = Math.min(10, Math.max(4, Number(settings.homeProductsPerRow) || 8));
-      const mobileHeroHeightVh = Math.min(60, Math.max(15, Math.round(Number(settings.mobileHeroHeightVh)) || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh));
+      const mobileHeroHeightVh = Math.min(60, Math.max(12, Math.round(Number(settings.mobileHeroHeightVh)) || DEFAULT_STORE_SETTINGS.mobileHeroHeightVh));
       const whatsappOrderTemplate = String(settings.whatsappOrderTemplate ?? '').trim().slice(0, MAX_ORDER_TEMPLATE_LENGTH) || DEFAULT_ORDER_TEMPLATE;
       const siteFooterText = sanitizeFooterText(settings.siteFooterText);
       const productFooterText = sanitizeFooterText(settings.productFooterText);
@@ -180,7 +180,7 @@ export default function AdminSettingsPage() {
                 id="mobileHeroHeightVh"
                 className="admin-settings-field__input"
                 type="number"
-                min="15"
+                min="12"
                 max="60"
                 step="1"
                 value={settings.mobileHeroHeightVh ?? ''}
@@ -188,7 +188,7 @@ export default function AdminSettingsPage() {
                 placeholder={String(DEFAULT_STORE_SETTINGS.mobileHeroHeightVh)}
               />
               <p className="admin-settings-field__hint">
-                Lower it to trim the blurred space above and below the home page banner on phones. Between 15 and 60; default {DEFAULT_STORE_SETTINGS.mobileHeroHeightVh}. Tablets and desktop are unchanged.
+                Lower it to trim the blurred space above and below the home page banner on phones. Between 12 and 60; default {DEFAULT_STORE_SETTINGS.mobileHeroHeightVh}. Tablets and desktop are unchanged.
               </p>
             </div>
 

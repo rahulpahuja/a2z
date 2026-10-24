@@ -10,6 +10,7 @@ import { subscribeToTopNav, saveTopNav, DEFAULT_TOP_NAV_LINKS } from '../../serv
 import { compressImageFile } from '../../utils/imageCompression.js';
 import { isHeicFile, convertHeicFileToPng } from '../../utils/heic.js';
 import { isGifFile } from '../../utils/gif.js';
+import MobileHeroHeightCard from '../../components/admin/MobileHeroHeightCard.jsx';
 import './AdminConfiguratorPage.css';
 
 // R2 Image Uploader Function (Hero Carousel slide images)
@@ -735,6 +736,8 @@ export default function AdminConfiguratorPage() {
 
             {/* Settings for the active surface */}
             <div className="lg:col-span-2 flex flex-col gap-6">
+
+              {activeSurface === 'hero' && <MobileHeroHeightCard />}
 
               {activeSurface === 'hero' && (
                 <div className="admin-card flex flex-col gap-5">
