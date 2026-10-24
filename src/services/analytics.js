@@ -231,3 +231,39 @@ export function logViewCollection(collection, productCount) {
     product_count: productCount,
   });
 }
+
+// ---- Shots (short product videos) ---------------------------------------------------------------
+// Every interaction on the Shots feed. `shot` is { id, productId }.
+
+const shotParams = (shot, extra = {}) => ({ shot_id: shot.id, product_id: shot.productId, ...extra });
+
+// A short stayed on screen long enough to count. `counted` is false when this session had already counted it.
+export function logShotView(shot, counted) {
+  logAnalyticsEvent('shot_view', shotParams(shot, { counted: Boolean(counted) }));
+}
+
+export function logShotLike(shot, liked) {
+  logAnalyticsEvent(liked ? 'shot_like' : 'shot_unlike', shotParams(shot));
+}
+
+// result: 'shared' (native share sheet) | 'copied' (link copied) | 'cancelled' | 'failed'
+export function logShotShare(shot, result) {
+  if (result === 'shared' || result === 'copied') {
+    logAnalyticsEvent('share', shotParams(shot, { method: result === 'shared' ? 'native' : 'copy_link', content_type: 'shot', item_id: shot.id }));
+  } else {
+    logAnalyticsEvent(result === 'cancelled' ? 'shot_share_cancelled' : 'shot_share_failed', shotParams(shot));
+  }
+}
+
+export function logShotSwipe(shot, index) {
+  logAnalyticsEvent('shot_swipe', shotParams(shot, { index }));
+}
+
+export function logShotMuteToggle(shot, muted) {
+  logAnalyticsEvent('shot_mute_toggle', shotParams(shot, { muted: Boolean(muted) }));
+}
+
+// Someone opened /shots?v=<id> from a shared link. `found` is false when that short no longer exists.
+export function logShotDeepLink(shotId, found) {
+  logAnalyticsEvent(found ? 'shot_deeplink_open' : 'shot_deeplink_missing', { shot_id: shotId });
+}

@@ -7,6 +7,8 @@ import { applyPageMeta, pageMetaKey } from '../../src/seo/pageMeta.js';
 import { buildProductHead } from '../../src/seo/productHead.js';
 import { injectHeadIntoHtml } from '../../src/seo/head.js';
 import { buildCollectionHead } from '../../src/seo/collectionHead.js';
+import { buildShotHead } from '../../src/seo/shotHead.js';
+import { parseShotParam, shotProductId } from '../../src/utils/shotShare.js';
 
 export const config = { path: '/*', excludedPath: ['/assets/*', '/*.*'] };
 
@@ -48,8 +50,17 @@ async function resolveCollectionHead(databaseUrl, id) {
   return { status: 200, head: buildCollectionHead({ id, ...collection }, { image }) };
 }
 
+// A shared short (/shots?v=<id>) previews as its product. A missing product falls back to the plain
+// /shots head rather than a 404, since the page itself still opens.
+async function resolveShotHead(databaseUrl, shotId) {
+  const productId = shotProductId(shotId);
+  if (!productId) return null;
+  const product = await readRtdb(databaseUrl, `adminProducts/${encodeURIComponent(productId)}`);
+  return product ? buildShotHead({ id: productId, ...product }, shotId) : null;
+}
+
 export default async function seo(request, context) {
-  const { pathname } = new URL(request.url);
+  const { pathname, search } = new URL(request.url);
   const response = await context.next();
   const databaseUrl = Deno.env.get('VITE_FIREBASE_DATABASE_URL');
   const productMatch = pathname.match(PRODUCT_PATH);
@@ -75,6 +86,14 @@ export default async function seo(request, context) {
     }
   } else {
     ({ status, head } = resolveRouteSeo(pathname));
+    const shotId = status === 200 && pathname.replace(/\/$/, '') === '/shots' ? parseShotParam(search) : null;
+    if (shotId && databaseUrl) {
+      try {
+        head = (await resolveShotHead(databaseUrl, shotId)) ?? head;
+      } catch (err) {
+        console.error('seo: shot lookup failed, serving default head', err);
+      }
+    }
     if (status === 200 && databaseUrl) {
       try {
         const entry = await readRtdb(databaseUrl, `settings/pageMeta/${pageMetaKey(normalizePath(pathname))}`);

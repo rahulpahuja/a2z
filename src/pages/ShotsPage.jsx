@@ -1,9 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext.jsx';
 import { formatCurrency } from '../context/CartContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { readLikedShots, recordShotView, setShotLiked, subscribeToShotStats } from '../services/shotStats.js';
+import { formatCount } from '../utils/formatCount.js';
+import { buildShotUrl, parseShotParam, shareLink } from '../utils/shotShare.js';
+import { logSelectItem, logShotDeepLink, logShotLike, logShotMuteToggle, logShotShare, logShotSwipe, logShotView } from '../services/analytics.js';
+import './ShotsPage.css';
 
 const SHOTS_TUTORIAL_KEY = 'a2z_shots_tutorial_seen';
+// A view only counts once the shot has stayed on screen this long, so scrolling past does not.
+const VIEW_AFTER_MS = 2000;
 
 function hasSeenShotsTutorial() {
   try {
@@ -21,9 +29,15 @@ function markShotsTutorialSeen() {
   }
 }
 
-function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
+function ShotSlide({ shot, product, active, isNear, muted, onToggleMute, stats, liked, onLike, onShare, onView }) {
   const videoRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!active) return undefined;
+    const timer = setTimeout(() => onView(shot), VIEW_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [active, shot, onView]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -60,6 +74,27 @@ function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
         <span className="material-symbols-outlined">{muted ? 'volume_off' : 'volume_up'}</span>
       </button>
 
+      <div className="shot-actions">
+        <button
+          type="button"
+          className={`shot-actions__btn${liked ? ' shot-actions__btn--liked' : ''}`}
+          onClick={() => onLike(shot)}
+          aria-pressed={liked}
+          aria-label={liked ? 'Unlike this short' : 'Like this short'}
+        >
+          <span className={`material-symbols-outlined shot-actions__icon${liked ? ' shot-actions__icon--filled' : ''}`} aria-hidden="true">favorite</span>
+          <span className="shot-actions__count" data-testid="shot-likes">{formatCount(stats.likes)}</span>
+        </button>
+        <div className="shot-actions__btn shot-actions__btn--static" role="img" aria-label={`${stats.views} views`}>
+          <span className="material-symbols-outlined shot-actions__icon" aria-hidden="true">visibility</span>
+          <span className="shot-actions__count" data-testid="shot-views">{formatCount(stats.views)}</span>
+        </div>
+        <button type="button" className="shot-actions__btn" onClick={() => onShare(shot, product)} aria-label="Share this short">
+          <span className="material-symbols-outlined shot-actions__icon" aria-hidden="true">share</span>
+          <span className="shot-actions__count">Share</span>
+        </button>
+      </div>
+
       {product && (
         <div className="absolute inset-x-0 bottom-0 z-10 p-6 pb-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-between gap-4">
           <div className="min-w-0">
@@ -68,7 +103,10 @@ function ShotSlide({ shot, product, active, isNear, muted, onToggleMute }) {
           </div>
           <button
             type="button"
-            onClick={() => navigate(`/products/${product.id}`)}
+            onClick={() => {
+              logSelectItem(product, 'Shots');
+              navigate(`/products/${product.id}`);
+            }}
             className="shrink-0 bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 rounded-full uppercase tracking-widest hover:opacity-90 transition-opacity shadow-lg"
           >
             Buy Now
@@ -86,6 +124,16 @@ export default function ShotsPage() {
   const containerRef = useRef(null);
   const { products } = useProducts();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { showToast } = useToast();
+  const [stats, setStats] = useState({});
+  const [likedShots, setLikedShots] = useState(readLikedShots);
+  const requestedShotId = parseShotParam(location.search);
+  const deepLinkHandled = useRef(null);
+  const lastIndexRef = useRef(null);
+  const shotsRef = useRef([]);
+
+  useEffect(() => subscribeToShotStats(setStats), []);
 
   const dismissTutorial = () => {
     setShowTutorial(false);
@@ -126,11 +174,70 @@ export default function ShotsPage() {
     return rows;
   }, [products]);
 
+  shotsRef.current = shots;
+
   const productsById = useMemo(() => {
     const map = new Map();
     products.forEach((p) => map.set(p.id, p));
     return map;
   }, [products]);
+
+  // Opens the shot named in /shots?v=<id>. If it no longer exists (the video was removed or the
+  // product's videos were reordered) the feed starts at the first shot and says so, once.
+  useEffect(() => {
+    if (!requestedShotId || shots.length === 0 || deepLinkHandled.current === requestedShotId) return;
+    deepLinkHandled.current = requestedShotId;
+    const index = shots.findIndex((shot) => shot.id === requestedShotId);
+    logShotDeepLink(requestedShotId, index !== -1);
+    if (index === -1) {
+      showToast('That short is no longer available.');
+      return;
+    }
+    setActiveIndex(index);
+    containerRef.current?.children[index]?.scrollIntoView({ block: 'start' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedShotId, shots]);
+
+  const handleView = useCallback(async (shot) => {
+    const counted = await recordShotView(shot.id);
+    logShotView(shot, counted);
+  }, []);
+
+  const handleLike = useCallback(
+    async (shot) => {
+      const shotId = shot.id;
+      const next = !readLikedShots().has(shotId);
+      setLikedShots((prev) => {
+        const copy = new Set(prev);
+        if (next) copy.add(shotId);
+        else copy.delete(shotId);
+        return copy;
+      });
+      try {
+        await setShotLiked(shotId, next);
+        logShotLike(shot, next);
+      } catch {
+        setLikedShots(readLikedShots());
+        showToast('Could not save your like. Please try again.');
+      }
+    },
+    [showToast]
+  );
+
+  const handleShare = useCallback(
+    async (shot, product) => {
+      const name = product?.title || product?.name || 'this product';
+      const result = await shareLink({
+        title: `${name} | A2Z Collection`,
+        text: `Watch ${name} on A2Z Collection`,
+        url: buildShotUrl(shot.id, window.location.origin),
+      });
+      logShotShare(shot, result);
+      if (result === 'copied') showToast('Link copied.');
+      else if (result === 'failed') showToast('Could not share this short.');
+    },
+    [showToast]
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -140,7 +247,11 @@ export default function ShotsPage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveIndex(sections.indexOf(entry.target));
+            const next = sections.indexOf(entry.target);
+            setActiveIndex(next);
+            // Only a real change of short counts as a swipe, not the first one shown on load.
+            if (lastIndexRef.current !== null && lastIndexRef.current !== next) logShotSwipe(shotsRef.current[next] ?? { id: String(next) }, next);
+            lastIndexRef.current = next;
           }
         });
       },
@@ -187,7 +298,15 @@ export default function ShotsPage() {
               active={index === activeIndex}
               isNear={Math.abs(index - activeIndex) <= 1}
               muted={muted}
-              onToggleMute={() => setMuted((m) => !m)}
+              onToggleMute={() => {
+                logShotMuteToggle(shot, !muted);
+                setMuted((m) => !m);
+              }}
+              stats={stats[shot.id] ?? { views: 0, likes: 0 }}
+              liked={likedShots.has(shot.id)}
+              onLike={handleLike}
+              onShare={handleShare}
+              onView={handleView}
             />
           ))}
         </div>

@@ -28,6 +28,23 @@
         }
       }
     },
+    "shotStats": {
+      ".read": true,
+      "$shotId": {
+        ".validate": "$shotId.matches(/^[A-Za-z0-9_-]{1,160}$/)",
+        "views": {
+          ".write": true,
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+        },
+        "likes": {
+          ".write": true,
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && ((!data.exists() && newData.val() === 1) || (data.exists() && (newData.val() === data.val() + 1 || newData.val() === data.val() - 1)))"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "adminProducts": {
       ".read": true,
       ".write": "auth.token.admin === true",
