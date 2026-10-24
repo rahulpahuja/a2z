@@ -349,3 +349,35 @@ export function logBlogShare(post, result) {
 export function logListingPageChange(page, source) {
   logAnalyticsEvent('listing_page_change', { page, source });
 }
+
+// ---- Checkout: sign-in and delivery address -------------------------------------------------------
+// source: where the sign-in was asked for ('cart').
+export function logCheckoutSignInPrompt(source) {
+  logAnalyticsEvent('checkout_sign_in_prompt', { source });
+}
+
+export function logCheckoutSignInComplete(source) {
+  logAnalyticsEvent('checkout_sign_in_complete', { source });
+}
+
+export function logCheckoutSignInDismissed(source) {
+  logAnalyticsEvent('checkout_sign_in_dismissed', { source });
+}
+
+// choice: 'saved' (a saved address was chosen or preselected) | 'new' (deliver to a new address)
+export function logCheckoutAddressChoice(choice, savedCount) {
+  logAnalyticsEvent('checkout_address_choice', { choice, saved_count: savedCount });
+}
+
+export function logCheckoutAddressEdit() {
+  logAnalyticsEvent('checkout_address_edit');
+}
+
+export function logCheckoutAddressSaveToggle(checked, mode) {
+  logAnalyticsEvent('checkout_address_save_toggle', { checked: Boolean(checked), mode });
+}
+
+// outcome: 'saved_new' | 'updated' | 'duplicate_skipped' | 'not_saved'
+export function logCheckoutAddressSave(outcome) {
+  logAnalyticsEvent('checkout_address_save', { outcome });
+}

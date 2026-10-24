@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CartIconButton from '../components/CartIconButton.jsx';
 import ProfileButton from '../components/ProfileButton.jsx';
@@ -8,7 +8,8 @@ import ProductImage from '../components/ProductImage.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import MobileNavDrawer from '../components/MobileNavDrawer.jsx';
 import { subscribeToTopNav, topNavLinkToPath, DEFAULT_TOP_NAV_LINKS } from '../services/topNav.js';
-import { logViewCart } from '../services/analytics.js';
+import { logViewCart, logCheckoutSignInComplete, logCheckoutSignInDismissed, logCheckoutSignInPrompt } from '../services/analytics.js';
+import AuthModal from '../components/AuthModal.jsx';
 import { formatCouponBadge } from '../utils/coupons.js';
 import BrandName from '../components/BrandName.jsx';
 
@@ -78,13 +79,45 @@ export default function CartPage() {
     applyCoupon,
     removeCoupon,
   } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  // "Proceed to Checkout" asks a signed-out visitor to sign in right here, then carries on to shipping.
+  const [checkoutRequested, setCheckoutRequested] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const prompted = useRef(false);
+  const userRef = useRef(user);
+  userRef.current = user;
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [topNavLinks, setTopNavLinks] = useState(DEFAULT_TOP_NAV_LINKS);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!checkoutRequested || authLoading) return;
+    if (user) {
+      if (prompted.current) logCheckoutSignInComplete('cart');
+      prompted.current = false;
+      setCheckoutRequested(false);
+      setSignInOpen(false);
+      navigate('/checkout/shipping');
+    } else if (!prompted.current) {
+      prompted.current = true;
+      logCheckoutSignInPrompt('cart');
+      setSignInOpen(true);
+    }
+  }, [checkoutRequested, authLoading, user, navigate]);
+
+  // Closing the dialog right after a successful sign-in must not count as giving up, so look again a moment later.
+  const handleSignInClosed = () => {
+    setSignInOpen(false);
+    setTimeout(() => {
+      if (userRef.current) return;
+      prompted.current = false;
+      setCheckoutRequested(false);
+      logCheckoutSignInDismissed('cart');
+    }, 400);
+  };
 
   useEffect(() => {
     logViewCart(cartItems);
@@ -288,7 +321,7 @@ export default function CartPage() {
                 </span>
               </div>
               <button
-                onClick={() => navigate('/checkout/shipping')}
+                onClick={() => setCheckoutRequested(true)}
                 className="w-full bg-primary hover:bg-surface-tint text-on-primary font-label-caps text-label-caps py-4 rounded-[12px] uppercase tracking-widest transition-colors shadow-sm"
               >
                 Proceed to Checkout
@@ -298,6 +331,7 @@ export default function CartPage() {
         </div>
         )}
       </main>
+      {signInOpen && <AuthModal dismissible onClose={handleSignInClosed} />}
       <SiteFooter />
     </>
   );

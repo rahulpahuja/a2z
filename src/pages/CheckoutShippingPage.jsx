@@ -8,7 +8,8 @@ import { sanitizeShippingForm, isValidGstNumber } from '../utils/security.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProfile } from '../context/ProfileContext.jsx';
 import AuthModal from '../components/AuthModal.jsx';
-import { logAnalyticsEvent, logBeginCheckout, logAddShippingInfo } from '../services/analytics.js';
+import { logAnalyticsEvent, logBeginCheckout, logAddShippingInfo, logCheckoutAddressChoice, logCheckoutAddressEdit, logCheckoutAddressSave, logCheckoutAddressSaveToggle } from '../services/analytics.js';
+import { describeAddress, findSameAddress, nextAddressLabel } from '../utils/addresses.js';
 import BrandName from '../components/BrandName.jsx';
 
 const inputClassName =
@@ -56,6 +57,9 @@ export default function CheckoutShippingPage() {
   const [errors, setErrors] = useState({});
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [saveAddressChecked, setSaveAddressChecked] = useState(true);
+  // 'saved': deliver to one of the saved addresses; 'new': a different address (typed in below).
+  const [addressChoice, setAddressChoice] = useState('new');
+  const [editing, setEditing] = useState(false);
   const prefilledRef = useRef(false);
 
   useEffect(() => {
@@ -84,13 +88,43 @@ export default function CheckoutShippingPage() {
     const defaultAddress = addresses[0];
     setForm((prev) => ({ ...prev, ...defaultAddress }));
     setSelectedAddressId(defaultAddress.id);
+    // A returning customer starts on their first saved address: one tap on Continue, no typing.
+    setAddressChoice('saved');
+    setSaveAddressChecked(false);
     prefilledRef.current = true;
+    logCheckoutAddressChoice('saved', addresses.length);
   }, [profile.addresses]);
 
   const applySavedAddress = (addr) => {
     setForm((prev) => ({ ...prev, ...addr }));
     setSelectedAddressId(addr.id);
+    setAddressChoice('saved');
+    setEditing(false);
+    setErrors({});
+    setSaveAddressChecked(false);
+    logCheckoutAddressChoice('saved', (profile.addresses || []).length);
   };
+
+  // "Deliver to a new address": a blank address form (GST and referral details carry over), with saving on by default.
+  const chooseNewAddress = () => {
+    setForm((prev) => ({ ...prev, firstName: '', lastName: '', address: '', apartment: '', city: '', state: '', zip: '', phone: '', id: undefined, label: undefined }));
+    setSelectedAddressId('');
+    setAddressChoice('new');
+    setEditing(false);
+    setErrors({});
+    setSaveAddressChecked(true);
+    logCheckoutAddressChoice('new', (profile.addresses || []).length);
+  };
+
+  const startEditing = () => {
+    setEditing(true);
+    setSaveAddressChecked(false);
+    logCheckoutAddressEdit();
+  };
+
+  const savedAddresses = profile.addresses || [];
+  const showFields = savedAddresses.length === 0 || addressChoice === 'new' || editing;
+  const selectedSaved = savedAddresses.find((a) => a.id === selectedAddressId) ?? null;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -140,6 +174,8 @@ export default function CheckoutShippingPage() {
 
     if (Object.keys(errorsMap).length > 0) {
       setErrors(errorsMap);
+      // A saved address that is missing something opens its fields so the problem can be fixed.
+      if (!showFields) setEditing(true);
       Object.keys(errorsMap).forEach((field) => logAnalyticsEvent('shipping_form_error', { field }));
       document.getElementById(['zip', 'phone', 'gstNumber'].find((field) => errorsMap[field]))?.focus();
       return;
@@ -148,9 +184,18 @@ export default function CheckoutShippingPage() {
     const sanitized = sanitizeShippingForm(form);
     setShippingDetails(sanitized);
 
-    if (saveAddressChecked) {
-      const existingLabel = (profile.addresses || []).find((a) => a.id === selectedAddressId)?.label;
-      saveAddress({ ...sanitized, id: selectedAddressId || undefined, label: existingLabel || 'Home' });
+    if (showFields) {
+      if (!saveAddressChecked) {
+        logCheckoutAddressSave('not_saved');
+      } else if (addressChoice === 'saved' && selectedSaved) {
+        saveAddress({ ...sanitized, id: selectedSaved.id, label: selectedSaved.label || 'Home' });
+        logCheckoutAddressSave('updated');
+      } else if (findSameAddress(savedAddresses, sanitized)) {
+        logCheckoutAddressSave('duplicate_skipped');
+      } else {
+        saveAddress({ ...sanitized, label: nextAddressLabel(savedAddresses) });
+        logCheckoutAddressSave('saved_new');
+      }
     }
 
     logAddShippingInfo(cartItems);
@@ -227,25 +272,38 @@ export default function CheckoutShippingPage() {
                 Hi {profile.displayName}, where should we deliver your order?
               </p>
             )}
-            {(profile.addresses || []).length > 0 && (
-              <div className={`flex flex-wrap gap-2 ${profile.displayName ? '' : 'mt-8'} mb-8`}>
-                {profile.addresses.map((addr) => (
-                  <button
-                    key={addr.id}
-                    type="button"
-                    onClick={() => applySavedAddress(addr)}
-                    className={`px-4 py-2 rounded-full border font-label-caps text-[0.6875rem] uppercase tracking-wider transition-colors ${
-                      selectedAddressId === addr.id
-                        ? 'bg-primary text-on-primary border-primary'
-                        : 'border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
-                    }`}
-                  >
-                    {addr.label || 'Address'}
+            {savedAddresses.length > 0 && (
+              <fieldset className={`${profile.displayName ? '' : 'mt-8'} mb-8 space-y-3`}>
+                <legend className="font-title-sm text-title-sm text-on-surface mb-3">Deliver to</legend>
+                {savedAddresses.map((addr) => {
+                  const d = describeAddress(addr);
+                  const on = addressChoice === 'saved' && selectedAddressId === addr.id;
+                  return (
+                    <label key={addr.id} className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${on ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-primary'}`}>
+                      <input type="radio" name="deliveryAddress" className="mt-1" checked={on} onChange={() => applySavedAddress(addr)} />
+                      <span className="flex flex-col">
+                        <span className="font-label-caps text-[0.6875rem] uppercase tracking-wider text-primary">{addr.label || 'Address'}</span>
+                        <span className="font-body-lg text-body-lg text-on-surface">{d.name}</span>
+                        <span className="font-body-sm text-body-sm text-on-surface-variant">{d.line}</span>
+                        {d.phone && <span className="font-body-sm text-body-sm text-on-surface-variant">Phone {d.phone}</span>}
+                      </span>
+                    </label>
+                  );
+                })}
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${addressChoice === 'new' ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-primary'}`}>
+                  <input type="radio" name="deliveryAddress" checked={addressChoice === 'new'} onChange={chooseNewAddress} />
+                  <span className="font-body-lg text-body-lg text-on-surface">Deliver to a new address</span>
+                </label>
+                {!showFields && selectedSaved && (
+                  <button type="button" onClick={startEditing} className="font-label-caps text-label-caps text-primary underline underline-offset-2">
+                    Edit this address or add GST / referral details
                   </button>
-                ))}
-              </div>
+                )}
+              </fieldset>
             )}
             <form className="space-y-6" onSubmit={handleSubmit}>
+              {showFields && (
+              <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextField
                   id="firstName"
@@ -385,14 +443,21 @@ export default function CheckoutShippingPage() {
                   </select>
                 </div>
               </div>
-              <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
-                <input
-                  type="checkbox"
-                  checked={saveAddressChecked}
-                  onChange={(e) => setSaveAddressChecked(e.target.checked)}
-                />
-                Save this address to my profile
-              </label>
+              </>
+              )}
+              {showFields && (
+                <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                  <input
+                    type="checkbox"
+                    checked={saveAddressChecked}
+                    onChange={(e) => {
+                      setSaveAddressChecked(e.target.checked);
+                      logCheckoutAddressSaveToggle(e.target.checked, addressChoice === 'saved' ? 'update' : 'new');
+                    }}
+                  />
+                  {addressChoice === 'saved' && selectedSaved ? 'Update my saved address with these changes' : 'Save this address for next time'}
+                </label>
+              )}
               <div className="pt-6 flex flex-col-reverse md:flex-row items-center gap-4">
                 <Link
                   to="/cart"

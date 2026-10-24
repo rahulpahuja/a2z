@@ -65,3 +65,25 @@ describe('listing pagination analytics', () => {
     expect(last()).toEqual(['listing_page_change', { page: 3, source: 'next_button' }]);
   });
 });
+
+describe('checkout sign-in and address analytics', () => {
+  it('records each step with its details', async () => {
+    a.logCheckoutSignInPrompt('cart');
+    a.logCheckoutSignInComplete('cart');
+    a.logCheckoutSignInDismissed('cart');
+    a.logCheckoutAddressChoice('new', 2);
+    a.logCheckoutAddressEdit();
+    a.logCheckoutAddressSaveToggle(1, 'new');
+    a.logCheckoutAddressSave('saved_new');
+    await flush();
+    expect(logEvent.mock.calls.map((c) => [c[1], c[2]])).toEqual([
+      ['checkout_sign_in_prompt', { source: 'cart' }],
+      ['checkout_sign_in_complete', { source: 'cart' }],
+      ['checkout_sign_in_dismissed', { source: 'cart' }],
+      ['checkout_address_choice', { choice: 'new', saved_count: 2 }],
+      ['checkout_address_edit', undefined],
+      ['checkout_address_save_toggle', { checked: true, mode: 'new' }],
+      ['checkout_address_save', { outcome: 'saved_new' }],
+    ]);
+  });
+});
