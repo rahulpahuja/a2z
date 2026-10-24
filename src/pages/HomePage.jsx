@@ -225,7 +225,7 @@ export default function HomePage() {
   // super-user-managed layout (Home Layout page); see utils/homeLayout.js.
   const sectionNodes = {
     hero: (
-      <section ref={heroRef} onClick={dismissBannerHint} className={`${mobileHeroHeightVh !== DEFAULT_STORE_SETTINGS.mobileHeroHeightVh ? 'home-hero--mobile-custom ' : ''}relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden`}>
+      <section ref={heroRef} onClick={dismissBannerHint} className={`home-hero--mobile-custom relative w-full max-w-full h-[42vh] min-h-[290px] sm:h-[52vh] sm:min-h-[370px] md:h-[56vh] md:min-h-[400px] [@media(orientation:landscape)_and_(max-height:500px)]:!h-[70vh] [@media(orientation:landscape)_and_(max-height:500px)]:!min-h-0 bg-surface-container overflow-hidden`}>
         <div
           className="w-full h-full flex transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}

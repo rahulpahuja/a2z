@@ -57,3 +57,11 @@ describe('Shots analytics events', () => {
     ]);
   });
 });
+
+describe('listing pagination analytics', () => {
+  it('records which page was opened and how', async () => {
+    a.logListingPageChange(3, 'next_button');
+    await flush();
+    expect(last()).toEqual(['listing_page_change', { page: 3, source: 'next_button' }]);
+  });
+});

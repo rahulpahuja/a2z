@@ -343,3 +343,9 @@ export function logBlogShare(post, result) {
     logAnalyticsEvent(result === 'cancelled' ? 'blog_share_cancelled' : 'blog_share_failed', blogParams(post));
   }
 }
+
+// ---- Product listing pagination ---------------------------------------------------------------
+// source: 'next_button' (the large button under the grid) | 'pager' (the numbered pager) | 'back_to_top'
+export function logListingPageChange(page, source) {
+  logAnalyticsEvent('listing_page_change', { page, source });
+}
