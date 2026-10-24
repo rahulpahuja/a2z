@@ -1,14 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { recordPurchase } from '../services/productStats.js';
 import { logAddToCart, logRemoveFromCart, logPurchase, logApplyCoupon } from '../services/analytics.js';
-import { createFirebaseOrder, setOrderShipment, rememberOrderId, hasPriorOrders, currentCustomerUid } from '../services/orders.js';
+import { createFirebaseOrder, rememberOrderId, hasPriorOrders, currentCustomerUid } from '../services/orders.js';
 import { generateOrderId } from '../utils/orderId.js';
 import { reserveProductStock, releaseProductStock } from '../services/adminProducts.js';
-import { getStoreSettingsOnce, subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
-import { createForwardShipment, buildDeliveryAddress, extractShipmentCost } from '../services/shipprime.js';
+import { subscribeToStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeSettings.js';
 import { getCouponByCode, reserveCouponUsage, releaseCouponUsage, getServerNow } from '../services/coupons.js';
 import { computeCartTotals, computeEligibleAmount, evaluateCoupon } from '../utils/coupons.js';
-import { INDIAN_STATES_AND_UT } from '../data/indiaData.js';
 
 const CartContext = createContext(null);
 
@@ -30,7 +28,7 @@ export const formatCurrency = (value) => `₹${Math.round(value).toLocaleString(
 
 // Runs a side effect that happens after an order is already written, without
 // ever letting it escape. By that point the customer has paid and their order
-// exists, so a failure updating stats, analytics or shipping is cosmetic —
+// exists, so a failure updating stats or analytics is cosmetic —
 // surfacing it would tell them the order failed when it did not. Catches both
 // a synchronous throw (`ref()` rejects an id containing . # $ [ ]) and a
 // rejected promise, so neither can reach the caller or go unhandled.
@@ -40,37 +38,6 @@ function fireAndForget(label, fn) {
     Promise.resolve(fn()).catch(report);
   } catch (err) {
     report(err);
-  }
-}
-
-// Fire-and-forget: books a ShipPrime forward shipment for a freshly placed
-// order and persists the result onto it. Never throws — a shipping failure
-// (bad address, ShipPrime down, not configured) must not affect checkout,
-// which has already succeeded by the time this runs. Failures are visible to
-// admins via order.shipment.status/error and retryable from Sales Management.
-async function autoCreateShipment(order) {
-  try {
-    const storeSettings = await getStoreSettingsOnce();
-    const pickupAddress = storeSettings.pickupAddress;
-    if (!pickupAddress?.address1 || !pickupAddress?.pincode) {
-      throw new Error('Store pickup address is not set up (Store Settings > Pickup Address).');
-    }
-    const stateName = INDIAN_STATES_AND_UT.find((s) => s.code === order.shippingDetails?.state)?.name;
-    const deliveryAddress = buildDeliveryAddress(order.shippingDetails, stateName);
-    const result = await createForwardShipment({ order, pickupAddress, deliveryAddress });
-    await setOrderShipment(order.id, {
-      status: 'created',
-      awb: result.awb,
-      courier: result.courier,
-      labelUrl: result.labelUrl,
-      cost: extractShipmentCost(result),
-      createdAt: new Date().toISOString(),
-    });
-  } catch (err) {
-    await setOrderShipment(order.id, {
-      status: 'failed',
-      error: String(err.message || 'Shipment creation failed.').slice(0, 300),
-    }).catch(() => {});
   }
 }
 
@@ -242,8 +209,6 @@ export function CartProvider({ children }) {
       if (couponReserved) await releaseCouponUsage(appliedCoupon.code, customerId);
       throw err;
     }
-
-    fireAndForget('Shipment booking', () => autoCreateShipment(order));
 
     try {
       localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));

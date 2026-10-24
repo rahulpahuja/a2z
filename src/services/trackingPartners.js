@@ -3,7 +3,7 @@ import { db, isFirebaseEnabled } from '../firebase.js';
 
 const PATH = 'settings/tracking_partners';
 
-export const DEFAULT_TRACKING_PARTNERS = ['ShipPrime'];
+export const DEFAULT_TRACKING_PARTNERS = [];
 
 function getLocalTrackingPartners() {
   try {

@@ -88,7 +88,7 @@ export default function AdminUsageBillingPage() {
       <header className="bg-surface border-b border-surface-variant px-margin-mobile md:px-margin-desktop py-6">
         <h1 className="font-display-lg-mobile text-display-lg-mobile text-on-surface">Usage & Billing</h1>
         <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-          Live usage/estimated cost across R2, MSG91, Firebase, Netlify, and ShipPrime — served by the{' '}
+          Live usage/estimated cost across R2, MSG91, Firebase, and Netlify — served by the{' '}
           <code className="font-mono text-[0.75rem]">usage-billing-worker</code>.
         </p>
       </header>
@@ -149,7 +149,6 @@ export default function AdminUsageBillingPage() {
               <StatCard title="MSG91" icon="sms" data={report.msg91} />
               <StatCard title="Firebase" icon="local_fire_department" data={report.firebase} />
               <StatCard title="Netlify" icon="cloud" data={report.netlify} />
-              <StatCard title="ShipPrime" icon="local_shipping" data={report.shipprime} />
             </div>
           </section>
         )}

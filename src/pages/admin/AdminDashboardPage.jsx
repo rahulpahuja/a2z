@@ -148,16 +148,12 @@ export default function AdminDashboardPage() {
   const ordersToday = useMemo(() => getOrdersToday(allOrders), [allOrders]);
   const weekSummary = useMemo(() => getWeekSalesSummary(allOrders), [allOrders]);
   const shipmentStats = useMemo(() => {
-    let created = 0, needsAttention = 0, cancelled = 0, delivered = 0, inTransit = 0;
+    let delivered = 0, inTransit = 0;
     allOrders.forEach((o) => {
-      const shipStatus = o.shipment?.status;
-      if (shipStatus === 'created') created += 1;
-      else if (shipStatus === 'cancelled') cancelled += 1;
-      else needsAttention += 1; // no shipment yet, or creation failed
       if (o.status === 'Delivered') delivered += 1;
       if (o.status === 'Shipped' || o.status === 'In Transit') inTransit += 1;
     });
-    return { created, needsAttention, cancelled, delivered, inTransit };
+    return { delivered, inTransit };
   }, [allOrders]);
   const salesStats = useMemo(() => getProductSalesStats(allOrders, allProducts), [allOrders, allProducts]);
   const topProducts = useMemo(() => getTopProducts(salesStats, 10), [salesStats]);
@@ -210,22 +206,11 @@ export default function AdminDashboardPage() {
         {/* Shipment overview */}
         <section>
           <h2 className="font-title-sm text-title-sm text-on-surface mb-4">Shipment Overview</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <StatCard label="Orders Placed" value={allOrders.length} />
-            <StatCard label="Needs Tracking / Shipment" value={shipmentStats.needsAttention} />
-            <StatCard label="Shipment Created" value={shipmentStats.created} />
             <StatCard label="In Transit" value={shipmentStats.inTransit} />
             <StatCard label="Delivered" value={shipmentStats.delivered} />
           </div>
-          {shipmentStats.needsAttention > 0 && (
-            <Link
-              to="/super/sales"
-              className="inline-flex items-center gap-1 mt-3 text-primary font-label-caps text-label-caps hover:underline"
-            >
-              Review {shipmentStats.needsAttention} order{shipmentStats.needsAttention === 1 ? '' : 's'} in Sales Management
-              <span className="material-symbols-outlined text-[1rem]">arrow_forward</span>
-            </Link>
-          )}
         </section>
 
         <QuickActions />
