@@ -6,6 +6,7 @@ export const NAV_ITEMS = [
   { to: '/super', label: 'Dashboard', icon: 'dashboard', exact: true },
   { to: '/super/configurator', label: 'Layout Configurator', icon: 'settings_accessibility' },
   { to: '/super/home-layout', label: 'Home Layout', icon: 'dashboard_customize' },
+  { to: '/super/blogs', label: 'Blog (in progress)', icon: 'construction' },
   { to: '/super/sales', label: 'Sales Management', icon: 'bar_chart' },
   { to: '/super/analytics', label: 'Analytics', icon: 'insights' },
   { to: '/super/local-billing', label: 'Local Billing', icon: 'point_of_sale' },

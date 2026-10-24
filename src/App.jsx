@@ -72,6 +72,7 @@ const AdminTrackingPartnersPage = lazy(() => import('./pages/admin/AdminTracking
 const AdminPaymentGatewayPage = lazy(() => import('./pages/admin/AdminPaymentGatewayPage.jsx'))
 const AdminConfiguratorPage = lazy(() => import('./pages/admin/AdminConfiguratorPage.jsx'))
 const AdminHomeLayoutPage = lazy(() => import('./pages/admin/AdminHomeLayoutPage.jsx'))
+const AdminBlogsPage = lazy(() => import('./pages/admin/AdminBlogsPage.jsx'))
 const ImageStudioPage = lazy(() => import('./pages/admin/ImageStudioPage.jsx'))
 const AdminJobsPage = lazy(() => import('./pages/admin/AdminJobsPage.jsx'))
 const AdminFeedbackPage = lazy(() => import('./pages/admin/AdminFeedbackPage.jsx'))
@@ -136,6 +137,7 @@ const ADMIN_ROUTES = [
   { path: '/super/payment-gateway', Component: AdminPaymentGatewayPage },
   { path: '/super/configurator', Component: AdminConfiguratorPage },
   { path: '/super/home-layout', Component: AdminHomeLayoutPage },
+  { path: '/super/blogs', Component: AdminBlogsPage },
   { path: '/super/usage-billing', Component: AdminUsageBillingPage },
   { path: '/super/docs', Component: AdminDocsPage },
   { path: '/super/image-studio', Component: ImageStudioPage },
